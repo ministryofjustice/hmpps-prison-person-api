@@ -5,7 +5,11 @@ generic-service:
   replicaCount: 2
 
   ingress:
+<<<<<<< Updated upstream
     host: hmpps-prison-person-api-dev.hmpps.service.justice.gov.uk
+=======
+    host: prison-person-api-dev.prison.service.justice.gov.uk
+>>>>>>> Stashed changes
 
   env:
     APPLICATIONINSIGHTS_CONFIGURATION_FILE: applicationinsights.dev.json

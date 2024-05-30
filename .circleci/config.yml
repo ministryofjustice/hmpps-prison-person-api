@@ -10,18 +10,28 @@ parameters:
   releases-slack-channel:
     type: string
     default: dps-releases
+  java-version:
+    type: string
+    default: "21.0"
+  postgres-version:
+    type: string
+    default: "15"
 
 jobs:
   validate:
     executor:
-      name: hmpps/java
-      tag: "21.0"
+      name: hmpps/java_postgres
+      jdk_tag: << pipeline.parameters.java-version >>
+      postgres_tag: << pipeline.parameters.postgres-version >>
+      postgres_username: "prison-person-data"
+      postgres_password: "prison-person-data"
     steps:
       - checkout
       - restore_cache:
           keys:
             - gradle-{{ checksum "build.gradle.kts" }}
             - gradle-
+      - hmpps/wait_till_ready_postgres
       - run:
           command: ./gradlew check
       - save_cache:

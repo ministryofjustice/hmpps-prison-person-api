@@ -9,8 +9,17 @@ generic-service:
 
   env:
     APPLICATIONINSIGHTS_CONFIGURATION_FILE: applicationinsights.dev.json
+    API_BASE_URL_OAUTH: https://sign-in-dev.hmpps.service.justice.gov.uk/auth
+
+  scheduledDowntime:
+    enabled: true
+    startup: '49 6 * * 1-5' # Start at 6.49am UTC Monday-Friday
+    shutdown: '58 21 * * 1-5' # Stop at 9.58pm UTC Monday-Friday
 
 # CloudPlatform AlertManager receiver to route prometheus alerts to slack
 # See https://user-guide.cloud-platform.service.justice.gov.uk/documentation/monitoring-an-app/how-to-create-alarms.html#creating-your-own-custom-alerts
 generic-prometheus-alerts:
   alertSeverity: hmpps-prisoner-profile-non-prod
+  businessHoursOnly: true
+  rdsAlertsDatabases:
+    cloud-platform-a40b7024a320758f: prison-person-api

@@ -21,9 +21,15 @@ docker build -t quay.io/hmpps/hmpps-prison-person-api:latest .
 ./gradlew test 
 ```
 
-## Running
+## Running Locally
 
-The service can be run in the following ways:
+First, start the database and other required services via docker-compose with:
+
+```shell
+docker compose -f docker-compose-local.yml up
+```
+
+The service can then be run in the following ways:
 
 ### Running in the command line with gradle
 ```

@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.hmppsprisonpersonapi.integration
+package uk.gov.justice.digital.hmpps.hmppsprisonpersonapi.config
 
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.Jwts.SIG

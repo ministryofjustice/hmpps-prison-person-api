@@ -31,6 +31,8 @@ dependencies {
   // Test
   testImplementation("io.jsonwebtoken:jjwt-impl:0.12.5")
   testImplementation("io.jsonwebtoken:jjwt-jackson:0.12.5")
+  testImplementation("org.wiremock:wiremock-standalone:3.5.4")
+  testImplementation("org.testcontainers:postgresql:1.19.8")
 
   // Developer experience
   developmentOnly("org.springframework.boot:spring-boot-devtools")

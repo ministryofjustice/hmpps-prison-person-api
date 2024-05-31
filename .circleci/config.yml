@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  hmpps: ministryofjustice/hmpps@8
+  hmpps: ministryofjustice/hmpps@9
 
 parameters:
   alerts-slack-channel:
@@ -23,6 +23,7 @@ jobs:
       name: hmpps/java_postgres
       jdk_tag: << pipeline.parameters.java-version >>
       postgres_tag: << pipeline.parameters.postgres-version >>
+      postgres_db: "prison-person-data"
       postgres_username: "prison-person-data"
       postgres_password: "prison-person-data"
     steps:
@@ -132,6 +133,7 @@ workflows:
           context:
             - hmpps-common-vars
       - hmpps/veracode_pipeline_scan:
+          jdk_tag: "21.0"
           slack_channel: << pipeline.parameters.alerts-slack-channel >>
           context:
             - veracode-credentials

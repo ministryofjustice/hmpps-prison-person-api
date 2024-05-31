@@ -38,8 +38,8 @@ CREATE TABLE physical_attributes_history
     CONSTRAINT physical_attributes_history_prisoner_number_fk FOREIGN KEY (prisoner_number) REFERENCES physical_attributes(prisoner_number)
 );
 
--- To enable sort by created_at when trying to compare versions before and after a given change
-CREATE INDEX physical_attributes_history_created_at_idx on physical_attributes_history(created_at);
+-- Composite index to enable sort by created_at for a given prisoner when trying to compare versions before and after a given change
+CREATE INDEX physical_attributes_history_created_at_idx on physical_attributes_history(prisoner_number, created_at);
 
 COMMENT ON TABLE physical_attributes_history IS 'The history of the height and weight of a prisoner';
 

@@ -30,6 +30,8 @@ CREATE TABLE physical_attributes_history
     prisoner_number                 VARCHAR(7)                  NOT NULL,
     height_cm                       INT,
     weight_kg                       INT,
+    applies_from                    TIMESTAMP WITH TIME ZONE    NOT NULL,
+    applies_to                      TIMESTAMP WITH TIME ZONE,
     created_at                      TIMESTAMP WITH TIME ZONE    NOT NULL,
     created_by                      VARCHAR(40),
     migrated_at                     TIMESTAMP WITH TIME ZONE,
@@ -38,10 +40,9 @@ CREATE TABLE physical_attributes_history
     CONSTRAINT physical_attributes_history_prisoner_number_fk FOREIGN KEY (prisoner_number) REFERENCES physical_attributes(prisoner_number)
 );
 
--- Composite index to enable sort by created_at for a given prisoner when trying to compare versions before and after a given change
-CREATE INDEX physical_attributes_history_created_at_idx on physical_attributes_history(prisoner_number, created_at);
-
 COMMENT ON TABLE physical_attributes_history IS 'The history of the height and weight of a prisoner';
+COMMENT ON COLUMN physical_attributes_history.applies_from IS 'The timestamp from which these physical attributes were true of the prisoner. This is potentially different to the created_at timestamp to accommodate for the possibility that this was retroactively recorded data.';
+COMMENT ON COLUMN physical_attributes_history.applies_to IS 'The timestamp at which these physical attributes were no longer true of the prisoner. This should be populated for an old history record whenever a new history record is created.';
 
 --
 

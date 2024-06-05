@@ -1,6 +1,6 @@
 generic-service:
   nameOverride: hmpps-prison-person-api
-  productId: "DPS013" # productId for the product that this belongs too, i.e. DPS001, see README.md for details
+  productId: "DPS013"
 
   replicaCount: 4
 
@@ -28,12 +28,24 @@ generic-service:
   #     [name of environment variable as seen by app]: [key of kubernetes secret to load]
 
   namespace_secrets:
-    hmpps-prison-person-api:
-      APPINSIGHTS_INSTRUMENTATIONKEY: "APPINSIGHTS_INSTRUMENTATIONKEY"
+    dps-rds-instance-output:
+      DATABASE_ENDPOINT: "rds_instance_endpoint"
+      DATABASE_NAME: "database_name"
+      DATABASE_USERNAME: "database_username"
+      DATABASE_PASSWORD: "database_password"
+      SPRING_FLYWAY_USER: "database_username"
+      SPRING_FLYWAY_PASSWORD: "database_password"
 
   allowlist:
     groups:
       - internal
+
+  modsecurity_enabled: true
+  modsecurity_snippet: |
+    SecRuleEngine DetectionOnly
+    SecRuleUpdateActionById 949110 "t:none,deny,status:406,logdata:%{SERVER_NAME}"
+    SecRuleUpdateActionById 959100 "t:none,deny,status:406,logdata:%{SERVER_NAME}"
+    SecAction "id:900000,phase:1,nolog,pass,t:none,setvar:tx.paranoia_level=2"
 
 generic-prometheus-alerts:
   targetApplication: hmpps-prison-person-api

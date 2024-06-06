@@ -4,6 +4,7 @@ plugins {
   id("uk.gov.justice.hmpps.gradle-spring-boot") version "6.0.0"
   kotlin("plugin.spring") version "2.0.0"
   kotlin("plugin.jpa") version "2.0.0"
+  jacoco
   idea
 }
 
@@ -16,6 +17,7 @@ dependencies {
   implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:1.0.0")
   implementation("org.springframework.boot:spring-boot-starter-webflux")
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+  implementation("org.springframework.boot:spring-boot-starter-validation")
 
   // OpenAPI
   implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0")
@@ -33,6 +35,7 @@ dependencies {
   testImplementation("io.jsonwebtoken:jjwt-jackson:0.12.5")
   testImplementation("org.wiremock:wiremock-standalone:3.5.4")
   testImplementation("org.testcontainers:postgresql:1.19.8")
+  testImplementation("org.springframework.security:spring-security-test")
 
   // Developer experience
   developmentOnly("org.springframework.boot:spring-boot-devtools")
@@ -45,5 +48,17 @@ kotlin {
 tasks {
   withType<KotlinCompile> {
     compilerOptions.jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21
+  }
+}
+
+// Jacoco code coverage
+tasks.named("test") {
+  finalizedBy("jacocoTestReport")
+}
+
+tasks.named<JacocoReport>("jacocoTestReport") {
+  reports {
+    html.required.set(true)
+    xml.required.set(true)
   }
 }

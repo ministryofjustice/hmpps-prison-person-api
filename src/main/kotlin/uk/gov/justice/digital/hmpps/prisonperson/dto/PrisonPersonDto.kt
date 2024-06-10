@@ -1,10 +1,11 @@
 package uk.gov.justice.digital.hmpps.prisonperson.dto
 
 import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL
 import io.swagger.v3.oas.annotations.media.Schema
 
 @Schema(description = "Prison Person")
-@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonInclude(NON_NULL)
 data class PrisonPersonDto(
   @Schema(description = "Prisoner Number", example = "A1234AA")
   val prisonerNumber: String,

@@ -1,13 +1,16 @@
 package uk.gov.justice.digital.hmpps.prisonperson.config
 
+import jakarta.servlet.ServletException
 import jakarta.validation.ValidationException
 import org.apache.commons.lang3.StringUtils
+import org.hibernate.query.sqm.tree.SqmNode.log
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import org.springframework.http.HttpStatus.METHOD_NOT_ALLOWED
 import org.springframework.http.HttpStatus.NOT_FOUND
+import org.springframework.http.HttpStatus.NOT_IMPLEMENTED
 import org.springframework.http.ResponseEntity
 import org.springframework.http.converter.HttpMessageNotReadableException
 import org.springframework.security.access.AccessDeniedException
@@ -161,8 +164,26 @@ class HmppsPrisonPersonApiExceptionHandler {
       ),
     ).also { log.info("Method not allowed exception: {}", e.message) }
 
+  @ExceptionHandler(ServletException::class)
+  fun handleNotImplementedError(e: ServletException): ResponseEntity<ErrorResponse> =
+    if (e.rootCause is NotImplementedError) {
+      ResponseEntity
+        .status(NOT_IMPLEMENTED)
+        .body(
+          ErrorResponse(
+            status = NOT_IMPLEMENTED,
+            userMessage = "Not implemented: ${e.message}",
+            developerMessage = e.message,
+          ),
+        ).also { log.info("Not implemented: {}", e.message) }
+    } else {
+      handleUnexpectedException(e)
+    }
+
   @ExceptionHandler(Exception::class)
-  fun handleException(e: Exception): ResponseEntity<ErrorResponse> = ResponseEntity
+  fun handleException(e: Exception): ResponseEntity<ErrorResponse> = handleUnexpectedException(e)
+
+  fun handleUnexpectedException(e: Exception): ResponseEntity<ErrorResponse> = ResponseEntity
     .status(INTERNAL_SERVER_ERROR)
     .body(
       ErrorResponse(
@@ -175,23 +196,6 @@ class HmppsPrisonPersonApiExceptionHandler {
   private companion object {
     private val log = LoggerFactory.getLogger(this::class.java)
   }
-}
-
-data class ErrorResponse(
-  val status: Int,
-  val errorCode: Int? = null,
-  val userMessage: String? = null,
-  val developerMessage: String? = null,
-  val moreInfo: String? = null,
-) {
-  constructor(
-    status: HttpStatus,
-    errorCode: Int? = null,
-    userMessage: String? = null,
-    developerMessage: String? = null,
-    moreInfo: String? = null,
-  ) :
-    this(status.value(), errorCode, userMessage, developerMessage, moreInfo)
 }
 
 class PrisonPersonDataNotFoundException(prisonerNumber: String) : Exception("No data for '$prisonerNumber'")

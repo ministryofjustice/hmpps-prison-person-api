@@ -60,5 +60,5 @@ class PhysicalAttributesController(private val physicalAttributesService: Physic
     @RequestBody
     @Validated
     updatePhysicalAttributesRequest: UpdatePhysicalAttributesRequest,
-  ): PhysicalAttributesDto = physicalAttributesService.update(prisonerNumber, updatePhysicalAttributesRequest)
+  ): PhysicalAttributesDto = physicalAttributesService.createOrUpdate(prisonerNumber, updatePhysicalAttributesRequest)
 }

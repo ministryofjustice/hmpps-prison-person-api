@@ -4,22 +4,50 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.prisonperson.dto.PhysicalAttributesDto
 import uk.gov.justice.digital.hmpps.prisonperson.dto.UpdatePhysicalAttributesRequest
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.PhysicalAttributes
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.PhysicalAttributesRepository
+import uk.gov.justice.digital.hmpps.prisonperson.utils.AuthenticationFacade
+import java.time.Clock
+import java.time.ZonedDateTime
 import kotlin.jvm.optionals.getOrNull
 
 @Service
 @Transactional(readOnly = true)
 class PhysicalAttributesService(
   private val physicalAttributesRepository: PhysicalAttributesRepository,
+  private val authenticationFacade: AuthenticationFacade,
+  private val clock: Clock,
 ) {
   fun getPhysicalAttributes(prisonNumber: String): PhysicalAttributesDto? {
     return physicalAttributesRepository.findById(prisonNumber).getOrNull()?.toDto()
   }
 
-  fun update(
+  @Transactional
+  fun createOrUpdate(
     prisonerNumber: String,
-    physicalAttributes: UpdatePhysicalAttributesRequest,
+    request: UpdatePhysicalAttributesRequest,
   ): PhysicalAttributesDto {
-    TODO("CDPS-776: Update the physical attributes and history table")
+    val now = ZonedDateTime.now(clock)
+
+    val physicalAttributes = physicalAttributesRepository.findById(prisonerNumber)
+      .orElseGet { newPhysicalAttributesFor(prisonerNumber, now) }
+      .apply {
+        height = request.height
+        weight = request.weight
+        lastModifiedAt = now
+        lastModifiedBy = authenticationFacade.getUserOrSystemInContext()
+      }
+      .also { it.addToHistory() }
+
+    return physicalAttributesRepository.save(physicalAttributes).toDto()
+  }
+
+  private fun newPhysicalAttributesFor(prisonerNumber: String, now: ZonedDateTime): PhysicalAttributes {
+    // TODO CDPS-793: Use Prisoner Search API to check prisoner actually exists
+    return PhysicalAttributes(
+      prisonerNumber,
+      createdAt = now,
+      createdBy = authenticationFacade.getUserOrSystemInContext(),
+    )
   }
 }

@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.prisonperson.service
 
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -9,8 +10,12 @@ import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.Spy
 import org.mockito.junit.jupiter.MockitoExtension
+import org.mockito.junit.jupiter.MockitoSettings
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.whenever
+import org.mockito.quality.Strictness.LENIENT
+import uk.gov.justice.digital.hmpps.prisonperson.client.prisonersearch.PrisonerSearchClient
+import uk.gov.justice.digital.hmpps.prisonperson.client.prisonersearch.dto.PrisonerDto
 import uk.gov.justice.digital.hmpps.prisonperson.dto.PhysicalAttributesDto
 import uk.gov.justice.digital.hmpps.prisonperson.dto.UpdatePhysicalAttributesRequest
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.PhysicalAttributes
@@ -18,14 +23,19 @@ import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.PhysicalAttribut
 import uk.gov.justice.digital.hmpps.prisonperson.utils.AuthenticationFacade
 import java.time.Clock
 import java.time.Instant
+import java.time.LocalDate
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.Optional
 
 @ExtendWith(MockitoExtension::class)
+@MockitoSettings(strictness = LENIENT)
 class PhysicalAttributesServiceTest {
   @Mock
   lateinit var physicalAttributesRepository: PhysicalAttributesRepository
+
+  @Mock
+  lateinit var prisonerSearchClient: PrisonerSearchClient
 
   @Mock
   lateinit var authenticationFacade: AuthenticationFacade
@@ -75,6 +85,7 @@ class PhysicalAttributesServiceTest {
 
     @Test
     fun `creates new physical attributes`() {
+      whenever(prisonerSearchClient.getPrisoner(PRISONER_NUMBER)).thenReturn(PRISONER_SEARCH_RESPONSE)
       whenever(physicalAttributesRepository.findById(PRISONER_NUMBER)).thenReturn(Optional.empty())
 
       assertThat(underTest.createOrUpdate(PRISONER_NUMBER, UPDATE_PHYSICAL_ATTRIBUTES_REQUEST))
@@ -101,6 +112,15 @@ class PhysicalAttributesServiceTest {
           assertThat(migratedAt).isNull()
         }
       }
+    }
+
+    @Test
+    fun `does not create new physical attributes if prisoner doesn't exist in prisoner search`() {
+      whenever(prisonerSearchClient.getPrisoner(PRISONER_NUMBER)).thenReturn(null)
+      whenever(physicalAttributesRepository.findById(PRISONER_NUMBER)).thenReturn(Optional.empty())
+
+      assertThatThrownBy { underTest.createOrUpdate(PRISONER_NUMBER, UPDATE_PHYSICAL_ATTRIBUTES_REQUEST) }
+        .isInstanceOf(IllegalArgumentException::class.java)
     }
 
     @Test
@@ -169,5 +189,14 @@ class PhysicalAttributesServiceTest {
     val NOW: ZonedDateTime = ZonedDateTime.ofInstant(Instant.now(), ZoneId.of("Europe/London"))
 
     val UPDATE_PHYSICAL_ATTRIBUTES_REQUEST = UpdatePhysicalAttributesRequest(PRISONER_HEIGHT, PRISONER_WEIGHT)
+    val PRISONER_SEARCH_RESPONSE =
+      PrisonerDto(
+        PRISONER_NUMBER,
+        123,
+        "prisoner",
+        "middle",
+        "lastName",
+        LocalDate.of(1988, 3, 4),
+      )
   }
 }

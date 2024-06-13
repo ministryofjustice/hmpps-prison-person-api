@@ -15,6 +15,18 @@ spring:
         jwt:
           jwk-set-uri: ${api.base.url.oauth}/.well-known/jwks.json
 
+      client:
+        registration:
+          prisoner-search-api:
+            provider: hmpps-auth
+            client-id: ${prisoner-search.client.id}
+            client-secret: ${prisoner-search.client.secret}
+            authorization-grant-type: client_credentials
+            scope: read
+        provider:
+          hmpps-auth:
+            token-uri: ${api.base.url.oauth}/oauth/token
+
   jackson:
     date-format: "yyyy-MM-dd'T'HH:mm:ssZ"
     serialization:

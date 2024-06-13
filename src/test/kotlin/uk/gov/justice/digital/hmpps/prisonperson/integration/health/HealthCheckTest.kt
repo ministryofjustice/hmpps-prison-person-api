@@ -3,6 +3,8 @@ package uk.gov.justice.digital.hmpps.prisonperson.integration.health
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.prisonperson.integration.IntegrationTestBase
+import uk.gov.justice.digital.hmpps.prisonperson.integration.wiremock.HmppsAuthApiExtension.Companion.hmppsAuth
+import uk.gov.justice.digital.hmpps.prisonperson.integration.wiremock.PrisonerSearchExtension.Companion.prisonerSearch
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.function.Consumer
@@ -11,7 +13,7 @@ class HealthCheckTest : IntegrationTestBase() {
 
   @Test
   fun `Health page reports ok`() {
-    hmppsAuthMockServer.stubHealthPing(200)
+    stubPingWithResponse(200)
 
     webTestClient.get()
       .uri("/health")
@@ -22,11 +24,12 @@ class HealthCheckTest : IntegrationTestBase() {
       .jsonPath("status").isEqualTo("UP")
       .jsonPath("components.db.status").isEqualTo("UP")
       .jsonPath("components.hmppsAuth.status").isEqualTo("UP")
+      .jsonPath("components.prisonerSearch.status").isEqualTo("UP")
   }
 
   @Test
   fun `Health page reports down`() {
-    hmppsAuthMockServer.stubHealthPing(404)
+    stubPingWithResponse(404)
 
     webTestClient.get()
       .uri("/health")
@@ -36,11 +39,12 @@ class HealthCheckTest : IntegrationTestBase() {
       .jsonPath("status").isEqualTo("DOWN")
       .jsonPath("components.db.status").isEqualTo("UP")
       .jsonPath("components.hmppsAuth.status").isEqualTo("DOWN")
+      .jsonPath("components.prisonerSearch.status").isEqualTo("DOWN")
   }
 
   @Test
   fun `Health info reports version`() {
-    hmppsAuthMockServer.stubHealthPing(200)
+    stubPingWithResponse(200)
 
     webTestClient.get().uri("/health")
       .exchange()
@@ -83,5 +87,10 @@ class HealthCheckTest : IntegrationTestBase() {
       .isOk
       .expectBody()
       .jsonPath("status").isEqualTo("UP")
+  }
+
+  private fun stubPingWithResponse(status: Int) {
+    hmppsAuth.stubHealthPing(status)
+    prisonerSearch.stubHealthPing(status)
   }
 }

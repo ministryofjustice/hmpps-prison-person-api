@@ -43,7 +43,7 @@ class PhysicalAttributesController(private val physicalAttributesService: Physic
       ),
       ApiResponse(
         responseCode = "403",
-        description = "Missing required role. Requires ROLE_PRISON_PERSON_API____RW",
+        description = "Missing required role. Requires ROLE_PRISON_PERSON_API__PHYSICAL_ATTRIBUTES__RW",
         content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
       ),
       ApiResponse(

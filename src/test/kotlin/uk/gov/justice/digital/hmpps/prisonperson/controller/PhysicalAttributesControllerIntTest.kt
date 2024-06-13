@@ -115,6 +115,17 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
         )
       }
 
+      @Test
+      fun `bad request when prisoner not found`() {
+        webTestClient.put().uri("/prisoners/PRISONER_NOT_FOUND/physical-attributes")
+          .headers(setAuthorisation(USER1, roles = listOf("ROLE_PRISON_PERSON_API__PHYSICAL_ATTRIBUTES__RW")))
+          .header("Content-Type", "application/json")
+          .bodyValue("""{ "height": 180, "weight": 70 }""")
+          .exchange()
+          .expectStatus().isBadRequest
+          .expectBody().jsonPath("userMessage").isEqualTo("Validation failure: Prisoner number 'PRISONER_NOT_FOUND' not found")
+      }
+
       private fun expectBadRequestFrom(requestBody: String, message: String) {
         webTestClient.put().uri("/prisoners/${PRISONER_NUMBER}/physical-attributes")
           .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__PHYSICAL_ATTRIBUTES__RW")))

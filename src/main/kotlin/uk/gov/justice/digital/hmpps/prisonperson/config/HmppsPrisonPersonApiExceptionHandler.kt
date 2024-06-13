@@ -199,3 +199,4 @@ class HmppsPrisonPersonApiExceptionHandler {
 }
 
 class PrisonPersonDataNotFoundException(prisonerNumber: String) : Exception("No data for '$prisonerNumber'")
+class DownstreamServiceException(message: String, cause: Throwable) : Exception(message, cause)

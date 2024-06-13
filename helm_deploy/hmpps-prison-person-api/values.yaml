@@ -28,6 +28,10 @@ generic-service:
   #     [name of environment variable as seen by app]: [key of kubernetes secret to load]
 
   namespace_secrets:
+    hmpps-prison-person-api:
+      PRISONER_SEARCH_CLIENT_ID: "PRISONER_SEARCH_CLIENT_ID"
+      PRISONER_SEARCH_CLIENT_SECRET: "PRISONER_SEARCH_CLIENT_SECRET"
+
     rds-postgresql-instance-output:
       DATABASE_ENDPOINT: "rds_instance_endpoint"
       DATABASE_NAME: "database_name"

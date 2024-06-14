@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.prisonperson.service
 
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import uk.gov.justice.digital.hmpps.prisonperson.client.prisonersearch.PrisonerSearchClient
 import uk.gov.justice.digital.hmpps.prisonperson.dto.PhysicalAttributesDto
 import uk.gov.justice.digital.hmpps.prisonperson.dto.UpdatePhysicalAttributesRequest
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.PhysicalAttributes
@@ -15,6 +16,7 @@ import kotlin.jvm.optionals.getOrNull
 @Transactional(readOnly = true)
 class PhysicalAttributesService(
   private val physicalAttributesRepository: PhysicalAttributesRepository,
+  private val prisonerSearchClient: PrisonerSearchClient,
   private val authenticationFacade: AuthenticationFacade,
   private val clock: Clock,
 ) {
@@ -43,11 +45,15 @@ class PhysicalAttributesService(
   }
 
   private fun newPhysicalAttributesFor(prisonerNumber: String, now: ZonedDateTime): PhysicalAttributes {
-    // TODO CDPS-793: Use Prisoner Search API to check prisoner actually exists
+    validatePrisonerNumber(prisonerNumber)
+
     return PhysicalAttributes(
       prisonerNumber,
       createdAt = now,
       createdBy = authenticationFacade.getUserOrSystemInContext(),
     )
   }
+
+  private fun validatePrisonerNumber(prisonerNumber: String) =
+    require(prisonerSearchClient.getPrisoner(prisonerNumber) != null) { "Prisoner number '$prisonerNumber' not found" }
 }

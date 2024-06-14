@@ -38,6 +38,8 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
       @Test
       fun `access forbidden when no authority`() {
         webTestClient.put().uri("/prisoners/${PRISONER_NUMBER}/physical-attributes")
+          .header("Content-Type", "application/json")
+          .bodyValue(VALID_REQUEST_BODY)
           .exchange()
           .expectStatus().isUnauthorized
       }
@@ -47,15 +49,7 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
         webTestClient.put().uri("/prisoners/${PRISONER_NUMBER}/physical-attributes")
           .headers(setAuthorisation(roles = listOf()))
           .header("Content-Type", "application/json")
-          .bodyValue(
-            // language=json
-            """
-              { 
-                "height": 180,
-                "weight": 70
-              }
-            """.trimIndent(),
-          )
+          .bodyValue(VALID_REQUEST_BODY)
           .exchange()
           .expectStatus().isForbidden
       }
@@ -65,15 +59,7 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
         webTestClient.put().uri("/prisoners/${PRISONER_NUMBER}/physical-attributes")
           .headers(setAuthorisation(roles = listOf("ROLE_IS_WRONG")))
           .header("Content-Type", "application/json")
-          .bodyValue(
-            // language=json
-            """
-              { 
-                "height": 180,
-                "weight": 70
-              }
-            """.trimIndent(),
-          )
+          .bodyValue(VALID_REQUEST_BODY)
           .exchange()
           .expectStatus().isForbidden
       }
@@ -120,7 +106,7 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
         webTestClient.put().uri("/prisoners/PRISONER_NOT_FOUND/physical-attributes")
           .headers(setAuthorisation(USER1, roles = listOf("ROLE_PRISON_PERSON_API__PHYSICAL_ATTRIBUTES__RW")))
           .header("Content-Type", "application/json")
-          .bodyValue("""{ "height": 180, "weight": 70 }""")
+          .bodyValue(VALID_REQUEST_BODY)
           .exchange()
           .expectStatus().isBadRequest
           .expectBody().jsonPath("userMessage").isEqualTo("Validation failure: Prisoner number 'PRISONER_NOT_FOUND' not found")
@@ -246,6 +232,15 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
     const val PRISONER_NUMBER = "A1234AA"
     const val USER1 = "USER1"
     const val USER2 = "USER2"
+
+    val VALID_REQUEST_BODY =
+      // language=json
+      """
+        { 
+          "height": 180,
+          "weight": 70
+        }
+      """.trimIndent()
 
     val NOW = ZonedDateTime.now(clock)
     val THEN = ZonedDateTime.of(2024, 1, 2, 9, 10, 11, 123000000, ZoneId.of("Europe/London"))

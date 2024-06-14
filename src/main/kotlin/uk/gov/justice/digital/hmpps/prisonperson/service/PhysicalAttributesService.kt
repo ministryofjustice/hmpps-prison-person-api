@@ -4,7 +4,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.prisonperson.client.prisonersearch.PrisonerSearchClient
 import uk.gov.justice.digital.hmpps.prisonperson.dto.PhysicalAttributesDto
-import uk.gov.justice.digital.hmpps.prisonperson.dto.UpdatePhysicalAttributesRequest
+import uk.gov.justice.digital.hmpps.prisonperson.dto.PhysicalAttributesUpdateRequest
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.PhysicalAttributes
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.PhysicalAttributesRepository
 import uk.gov.justice.digital.hmpps.prisonperson.utils.AuthenticationFacade
@@ -27,7 +27,7 @@ class PhysicalAttributesService(
   @Transactional
   fun createOrUpdate(
     prisonerNumber: String,
-    request: UpdatePhysicalAttributesRequest,
+    request: PhysicalAttributesUpdateRequest,
   ): PhysicalAttributesDto {
     val now = ZonedDateTime.now(clock)
 

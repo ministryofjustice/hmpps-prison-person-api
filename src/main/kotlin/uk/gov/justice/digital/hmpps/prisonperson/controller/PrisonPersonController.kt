@@ -17,7 +17,7 @@ import uk.gov.justice.digital.hmpps.prisonperson.service.PrisonPersonService
 import uk.gov.justice.hmpps.kotlin.common.ErrorResponse
 
 @RestController
-@Tag(name = "Prison Person Data")
+@Tag(name = "Prison Person Data", description = "Data about a person that is specific to their time in prison")
 @RequestMapping("/prisoners/{prisonerNumber}", produces = [MediaType.APPLICATION_JSON_VALUE])
 class PrisonPersonController(private val prisonPersonService: PrisonPersonService) {
 
@@ -25,7 +25,6 @@ class PrisonPersonController(private val prisonPersonService: PrisonPersonServic
   @ResponseStatus(HttpStatus.OK)
   @PreAuthorize("hasRole('ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RO')")
   @Operation(
-    summary = "Returns Prison Person Data (data about a person that is specific to their time in prison)",
     description = "Requires role ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RO",
     responses = [
       ApiResponse(

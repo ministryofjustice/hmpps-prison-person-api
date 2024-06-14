@@ -17,7 +17,7 @@ import org.mockito.quality.Strictness.LENIENT
 import uk.gov.justice.digital.hmpps.prisonperson.client.prisonersearch.PrisonerSearchClient
 import uk.gov.justice.digital.hmpps.prisonperson.client.prisonersearch.dto.PrisonerDto
 import uk.gov.justice.digital.hmpps.prisonperson.dto.PhysicalAttributesDto
-import uk.gov.justice.digital.hmpps.prisonperson.dto.UpdatePhysicalAttributesRequest
+import uk.gov.justice.digital.hmpps.prisonperson.dto.PhysicalAttributesUpdateRequest
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.PhysicalAttributes
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.PhysicalAttributesRepository
 import uk.gov.justice.digital.hmpps.prisonperson.utils.AuthenticationFacade
@@ -188,7 +188,7 @@ class PhysicalAttributesServiceTest {
 
     val NOW: ZonedDateTime = ZonedDateTime.ofInstant(Instant.now(), ZoneId.of("Europe/London"))
 
-    val UPDATE_PHYSICAL_ATTRIBUTES_REQUEST = UpdatePhysicalAttributesRequest(PRISONER_HEIGHT, PRISONER_WEIGHT)
+    val UPDATE_PHYSICAL_ATTRIBUTES_REQUEST = PhysicalAttributesUpdateRequest(PRISONER_HEIGHT, PRISONER_WEIGHT)
     val PRISONER_SEARCH_RESPONSE =
       PrisonerDto(
         PRISONER_NUMBER,

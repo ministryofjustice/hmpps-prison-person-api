@@ -9,6 +9,7 @@ import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import org.hibernate.Hibernate
+import uk.gov.justice.digital.hmpps.prisonperson.dto.PhysicalAttributesHistoryDto
 import java.time.Instant
 import java.time.ZonedDateTime
 
@@ -31,9 +32,19 @@ class PhysicalAttributesHistory(
   val appliesFrom: ZonedDateTime = ZonedDateTime.now(),
   var appliesTo: ZonedDateTime? = null,
   val createdAt: ZonedDateTime = ZonedDateTime.now(),
-  val createdBy: String? = null,
+  val createdBy: String,
   val migratedAt: ZonedDateTime? = null,
 ) : Comparable<PhysicalAttributesHistory> {
+
+  fun toDto(): PhysicalAttributesHistoryDto = PhysicalAttributesHistoryDto(
+    physicalAttributesHistoryId,
+    height,
+    weight,
+    appliesFrom,
+    appliesTo,
+    createdAt,
+    createdBy,
+  )
 
   override fun compareTo(other: PhysicalAttributesHistory) =
     compareValuesBy(this, other, { it.appliesTo?.toInstant() ?: Instant.MAX }, { it.createdAt }, { it.hashCode() })

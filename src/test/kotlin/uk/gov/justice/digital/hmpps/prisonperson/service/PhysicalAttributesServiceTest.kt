@@ -11,7 +11,10 @@ import org.mockito.Mock
 import org.mockito.Spy
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.junit.jupiter.MockitoSettings
+import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.mockito.quality.Strictness.LENIENT
 import uk.gov.justice.digital.hmpps.prisonperson.client.prisonersearch.PrisonerSearchClient
@@ -22,9 +25,7 @@ import uk.gov.justice.digital.hmpps.prisonperson.jpa.PhysicalAttributes
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.PhysicalAttributesRepository
 import uk.gov.justice.digital.hmpps.prisonperson.utils.AuthenticationFacade
 import java.time.Clock
-import java.time.Instant
 import java.time.LocalDate
-import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.Optional
 
@@ -65,6 +66,8 @@ class PhysicalAttributesServiceTest {
             prisonerNumber = PRISONER_NUMBER,
             height = PRISONER_HEIGHT,
             weight = PRISONER_WEIGHT,
+            createdBy = USER1,
+            lastModifiedBy = USER1,
           ),
         ),
       )
@@ -88,7 +91,7 @@ class PhysicalAttributesServiceTest {
       whenever(prisonerSearchClient.getPrisoner(PRISONER_NUMBER)).thenReturn(PRISONER_SEARCH_RESPONSE)
       whenever(physicalAttributesRepository.findById(PRISONER_NUMBER)).thenReturn(Optional.empty())
 
-      assertThat(underTest.createOrUpdate(PRISONER_NUMBER, UPDATE_PHYSICAL_ATTRIBUTES_REQUEST))
+      assertThat(underTest.createOrUpdate(PRISONER_NUMBER, PHYSICAL_ATTRIBUTES_UPDATE_REQUEST))
         .isEqualTo(PhysicalAttributesDto(PRISONER_HEIGHT, PRISONER_WEIGHT))
 
       with(savedPhysicalAttributes.firstValue) {
@@ -119,8 +122,11 @@ class PhysicalAttributesServiceTest {
       whenever(prisonerSearchClient.getPrisoner(PRISONER_NUMBER)).thenReturn(null)
       whenever(physicalAttributesRepository.findById(PRISONER_NUMBER)).thenReturn(Optional.empty())
 
-      assertThatThrownBy { underTest.createOrUpdate(PRISONER_NUMBER, UPDATE_PHYSICAL_ATTRIBUTES_REQUEST) }
+      assertThatThrownBy { underTest.createOrUpdate(PRISONER_NUMBER, PHYSICAL_ATTRIBUTES_UPDATE_REQUEST) }
         .isInstanceOf(IllegalArgumentException::class.java)
+        .hasMessage("Prisoner number '${PRISONER_NUMBER}' not found")
+
+      verify(physicalAttributesRepository, never()).save(any())
     }
 
     @Test
@@ -139,7 +145,7 @@ class PhysicalAttributesServiceTest {
         ),
       )
 
-      assertThat(underTest.createOrUpdate(PRISONER_NUMBER, UPDATE_PHYSICAL_ATTRIBUTES_REQUEST))
+      assertThat(underTest.createOrUpdate(PRISONER_NUMBER, PHYSICAL_ATTRIBUTES_UPDATE_REQUEST))
         .isEqualTo(PhysicalAttributesDto(PRISONER_HEIGHT, PRISONER_WEIGHT))
 
       with(savedPhysicalAttributes.firstValue) {
@@ -186,9 +192,9 @@ class PhysicalAttributesServiceTest {
     const val USER1 = "USER1"
     const val USER2 = "USER2"
 
-    val NOW: ZonedDateTime = ZonedDateTime.ofInstant(Instant.now(), ZoneId.of("Europe/London"))
+    val NOW: ZonedDateTime = ZonedDateTime.now()
 
-    val UPDATE_PHYSICAL_ATTRIBUTES_REQUEST = PhysicalAttributesUpdateRequest(PRISONER_HEIGHT, PRISONER_WEIGHT)
+    val PHYSICAL_ATTRIBUTES_UPDATE_REQUEST = PhysicalAttributesUpdateRequest(PRISONER_HEIGHT, PRISONER_WEIGHT)
     val PRISONER_SEARCH_RESPONSE =
       PrisonerDto(
         PRISONER_NUMBER,

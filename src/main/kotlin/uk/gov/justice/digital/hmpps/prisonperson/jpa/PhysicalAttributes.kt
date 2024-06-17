@@ -25,9 +25,9 @@ class PhysicalAttributes(
   var weight: Int? = null,
 
   val createdAt: ZonedDateTime = ZonedDateTime.now(),
-  val createdBy: String? = null,
+  val createdBy: String,
   var lastModifiedAt: ZonedDateTime = ZonedDateTime.now(),
-  var lastModifiedBy: String? = null,
+  var lastModifiedBy: String,
   val migratedAt: ZonedDateTime? = null,
 
   @OneToMany(mappedBy = "physicalAttributes", fetch = LAZY, cascade = [ALL], orphanRemoval = true)

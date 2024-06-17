@@ -25,7 +25,7 @@ class PrisonPersonController(private val prisonPersonService: PrisonPersonServic
   @ResponseStatus(HttpStatus.OK)
   @PreAuthorize("hasRole('ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RO')")
   @Operation(
-    description = "Requires role ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RO",
+    description = "Requires role `ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RO`",
     responses = [
       ApiResponse(
         responseCode = "200",

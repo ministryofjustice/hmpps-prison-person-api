@@ -47,10 +47,12 @@ class PhysicalAttributesService(
   private fun newPhysicalAttributesFor(prisonerNumber: String, now: ZonedDateTime): PhysicalAttributes {
     validatePrisonerNumber(prisonerNumber)
 
+    val username = authenticationFacade.getUserOrSystemInContext()
     return PhysicalAttributes(
       prisonerNumber,
       createdAt = now,
-      createdBy = authenticationFacade.getUserOrSystemInContext(),
+      createdBy = username,
+      lastModifiedBy = username,
     )
   }
 

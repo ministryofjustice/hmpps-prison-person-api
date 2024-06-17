@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
-import uk.gov.justice.digital.hmpps.prisonperson.dto.PhysicalAttributesDto
+import uk.gov.justice.digital.hmpps.prisonperson.dto.PhysicalAttributesHistoryDto
 import uk.gov.justice.digital.hmpps.prisonperson.dto.PhysicalAttributesSyncRequest
 import uk.gov.justice.digital.hmpps.prisonperson.service.PhysicalAttributesSyncService
 import uk.gov.justice.hmpps.kotlin.common.ErrorResponse
@@ -31,9 +31,16 @@ class PhysicalAttributesSyncController(private val physicalAttributesSyncService
   @PreAuthorize("hasRole('ROLE_PRISON_PERSON_API__PHYSICAL_ATTRIBUTES_SYNC__RW')")
   @Operation(
     summary = "SYNC endpoint to sync changes to physical attributes made in NOMIS",
-    description = "This endpoint SHOULD ONLY BE USED IN ORDER TO SYNC CHANGES MADE IN NOMIS. " +
-      "There is a separate endpoint for normal editing of the Physical Attributes. " +
-      "<br/><br/>Requires role ROLE_PRISON_PERSON_API__PHYSICAL_ATTRIBUTES_SYNC__RW",
+    description = "This endpoint <b>SHOULD ONLY BE USED IN ORDER TO SYNC CHANGES MADE IN NOMIS.</b> " +
+      "There is a separate endpoint for normal editing of the Physical Attributes." +
+      "<br/><br/>Requires role `ROLE_PRISON_PERSON_API__PHYSICAL_ATTRIBUTES_SYNC__RW`" +
+      "<br/><br/>Edits can be made to physical attributes in NOMIS to both the current booking " +
+      "and to old bookings. This sync API can handle both by accepting the `appliesFrom` and " +
+      "`appliesTo` timestamps.  For edits to the current booking, `appliesFrom` should be equal to the " +
+      "point in time that the edit happened, and `appliesTo` should be null.  For edits to historical " +
+      "bookings `appliesFrom` should be equal to the booking start date and and `appliesTo` should be " +
+      "equal to the booking end date. The `createdAt` date should always be the point in time that the " +
+      "user made the edit.",
     responses = [
       ApiResponse(
         responseCode = "201",
@@ -63,5 +70,5 @@ class PhysicalAttributesSyncController(private val physicalAttributesSyncService
     @RequestBody
     @Validated
     physicalAttributesSyncRequest: PhysicalAttributesSyncRequest,
-  ): PhysicalAttributesDto = physicalAttributesSyncService.sync(prisonerNumber, physicalAttributesSyncRequest)
+  ): PhysicalAttributesHistoryDto = physicalAttributesSyncService.sync(prisonerNumber, physicalAttributesSyncRequest)
 }

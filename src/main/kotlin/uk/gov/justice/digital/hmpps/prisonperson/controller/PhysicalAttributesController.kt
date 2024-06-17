@@ -30,7 +30,7 @@ class PhysicalAttributesController(private val physicalAttributesService: Physic
   @PreAuthorize("hasRole('ROLE_PRISON_PERSON_API__PHYSICAL_ATTRIBUTES__RW')")
   @Operation(
     summary = "Updates the physical attributes (height and weight) for a prisoner",
-    description = "Requires role ROLE_PRISON_PERSON_API__PHYSICAL_ATTRIBUTES__RW",
+    description = "Requires role `ROLE_PRISON_PERSON_API__PHYSICAL_ATTRIBUTES__RW`",
     responses = [
       ApiResponse(
         responseCode = "201",

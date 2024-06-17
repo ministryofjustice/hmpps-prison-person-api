@@ -18,20 +18,18 @@ class PhysicalAttributesDtoHistoryRepositoryTest : RepositoryTest() {
 
   @Test
   fun `can persist physical attributes history`() {
-    val time = ZonedDateTime.now(clock)
-
-    val physicalAttributes = PhysicalAttributes(prisonerNumber = "A1234AA")
-    physicalAttributesRepository.save(PhysicalAttributes(prisonerNumber = "A1234AA"))
+    val physicalAttributes = PhysicalAttributes(PRISONER_NUMBER, createdBy = USER1, lastModifiedBy = USER1)
+      .also { physicalAttributesRepository.save(it) }
 
     val physicalAttributesHistory = PhysicalAttributesHistory(
       physicalAttributes = physicalAttributes,
       height = 180,
       weight = 70,
-      migratedAt = time,
-      createdAt = time,
-      createdBy = "USER1",
-      appliesFrom = time.minusDays(2),
-      appliesTo = time.minusDays(1),
+      migratedAt = NOW,
+      createdAt = NOW,
+      createdBy = USER1,
+      appliesFrom = NOW.minusDays(2),
+      appliesTo = NOW.minusDays(1),
     )
 
     val id = physicalAttributesHistoryRepository.save(physicalAttributesHistory).physicalAttributesHistoryId
@@ -41,13 +39,22 @@ class PhysicalAttributesDtoHistoryRepositoryTest : RepositoryTest() {
     TestTransaction.start()
 
     with(physicalAttributesHistoryRepository.getReferenceById(id)) {
-      assertThat(height).isEqualTo(180)
-      assertThat(weight).isEqualTo(70)
-      assertThat(migratedAt).isEqualTo(time)
-      assertThat(createdAt).isEqualTo(time)
-      assertThat(createdBy).isEqualTo("USER1")
-      assertThat(appliesFrom).isEqualTo(time.minusDays(2))
-      assertThat(appliesTo).isEqualTo(time.minusDays(1))
+      assertThat(height).isEqualTo(PRISONER_HEIGHT)
+      assertThat(weight).isEqualTo(PRISONER_WEIGHT)
+      assertThat(migratedAt).isEqualTo(NOW)
+      assertThat(createdAt).isEqualTo(NOW)
+      assertThat(createdBy).isEqualTo(USER1)
+      assertThat(appliesFrom).isEqualTo(NOW.minusDays(2))
+      assertThat(appliesTo).isEqualTo(NOW.minusDays(1))
     }
+  }
+
+  private companion object {
+    const val PRISONER_NUMBER = "A1234AA"
+    const val PRISONER_HEIGHT = 180
+    const val PRISONER_WEIGHT = 70
+    const val USER1 = "USER1"
+
+    val NOW: ZonedDateTime = ZonedDateTime.now(clock)
   }
 }

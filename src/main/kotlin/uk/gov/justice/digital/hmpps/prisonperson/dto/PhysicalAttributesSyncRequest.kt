@@ -13,7 +13,7 @@ data class PhysicalAttributesSyncRequest(
     example = "180",
     nullable = true,
   )
-  private val height: Int? = null,
+  val height: Int? = null,
 
   @Schema(
     description = "Weight (in kilograms). May be left null if no data available for weight.",
@@ -23,14 +23,17 @@ data class PhysicalAttributesSyncRequest(
   val weight: Int? = null,
 
   @Schema(
-    description = "The timestamp indicating from when these physical attributes were true for the prisoner",
+    description = "The timestamp indicating from when these physical attributes were true for the prisoner. " +
+      "For edits to the current booking, this should be equal to the 'createdAt' date. " +
+      "For edits to historical bookings, this should be equal to the booking start date.",
     required = true,
   )
   val appliesFrom: ZonedDateTime,
 
   @Schema(
-    description = "The timestamp of when these physical attributes were superseded by another record. " +
-      "If they are current, this should be left null.",
+    description = "The timestamp of when these physical attributes should no longer be considered applicable. " +
+      "For edits to the current booking, this should be left null. " +
+      "For edits to historical bookings, this should be equal to the booking end date.",
     nullable = true,
   )
   var appliesTo: ZonedDateTime? = null,
@@ -42,9 +45,9 @@ data class PhysicalAttributesSyncRequest(
   val createdAt: ZonedDateTime,
 
   @Schema(
-    description = "The username of who created the record in NOMIS, if available.",
+    description = "The username of who created the record in NOMIS",
     example = "USER1",
     nullable = true,
   )
-  val createdBy: String? = null,
+  val createdBy: String,
 )

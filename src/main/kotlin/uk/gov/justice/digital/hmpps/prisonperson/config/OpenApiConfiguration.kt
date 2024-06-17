@@ -88,7 +88,7 @@ class OpenApiConfiguration(
             properties.replace(
               propertyName,
               StringSchema()
-                .example("2024-06-14T10:35:17+0100")
+                .example("2024-06-14T10:35:17+01:00[Europe/London]")
                 .format("yyyy-MM-dd'T'HH:mm:ssX")
                 .description(propertySchema.description)
                 .required(propertySchema.required),

@@ -233,6 +233,47 @@ class PhysicalAttributesSyncServiceTest {
         }
       }
     }
+
+    @Test
+    fun `accepts physical attributes with null height and weight`() {
+      whenever(prisonerSearchClient.getPrisoner(PRISONER_NUMBER)).thenReturn(PRISONER_SEARCH_RESPONSE)
+      whenever(physicalAttributesRepository.findById(PRISONER_NUMBER)).thenReturn(Optional.empty())
+
+      assertThat(underTest.sync(PRISONER_NUMBER, PHYSICAL_ATTRIBUTES_SYNC_REQUEST.copy(height = null, weight = null)))
+        .isEqualTo(
+          PhysicalAttributesHistoryDto(
+            physicalAttributesHistoryId = HISTORY_ID,
+            height = null,
+            weight = null,
+            appliesFrom = NOW,
+            appliesTo = null,
+            createdAt = NOW,
+            createdBy = USER1,
+          ),
+        )
+
+      with(savedPhysicalAttributes.firstValue) {
+        assertThat(prisonerNumber).isEqualTo(PRISONER_NUMBER)
+        assertThat(height).isEqualTo(null)
+        assertThat(weight).isEqualTo(null)
+        assertThat(createdAt).isEqualTo(NOW)
+        assertThat(createdBy).isEqualTo(USER1)
+        assertThat(lastModifiedAt).isEqualTo(NOW)
+        assertThat(lastModifiedBy).isEqualTo(USER1)
+        assertThat(migratedAt).isNull()
+
+        assertThat(history).hasSize(1)
+        with(history.first()) {
+          assertThat(height).isEqualTo(null)
+          assertThat(weight).isEqualTo(null)
+          assertThat(createdAt).isEqualTo(NOW)
+          assertThat(createdBy).isEqualTo(USER1)
+          assertThat(appliesFrom).isEqualTo(NOW)
+          assertThat(appliesTo).isNull()
+          assertThat(migratedAt).isNull()
+        }
+      }
+    }
   }
 
   private companion object {

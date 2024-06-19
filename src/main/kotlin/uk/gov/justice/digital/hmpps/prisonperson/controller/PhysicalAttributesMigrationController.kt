@@ -19,6 +19,7 @@ import uk.gov.justice.digital.hmpps.prisonperson.dto.PhysicalAttributesDto
 import uk.gov.justice.digital.hmpps.prisonperson.dto.PhysicalAttributesMigrationRequest
 import uk.gov.justice.digital.hmpps.prisonperson.service.PhysicalAttributesMigrationService
 import uk.gov.justice.hmpps.kotlin.common.ErrorResponse
+import java.util.SortedSet
 
 @RestController
 @Tag(name = "Physical Attributes", description = "The height and weight of a prisoner")
@@ -61,6 +62,6 @@ class PhysicalAttributesMigrationController(private val physicalAttributesMigrat
     prisonerNumber: String,
     @RequestBody
     @Validated
-    physicalAttributesMigration: List<PhysicalAttributesMigrationRequest>,
+    physicalAttributesMigration: SortedSet<PhysicalAttributesMigrationRequest>,
   ): PhysicalAttributesDto = physicalAttributesMigrationService.migrate(prisonerNumber, physicalAttributesMigration)
 }

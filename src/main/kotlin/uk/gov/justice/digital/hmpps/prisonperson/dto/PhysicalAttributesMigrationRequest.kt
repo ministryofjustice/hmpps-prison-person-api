@@ -47,7 +47,7 @@ data class PhysicalAttributesMigrationRequest(
   @Schema(
     description = "The username of who last edited the record in NOMIS",
     example = "USER1",
-    nullable = true,
+    required = true,
   )
   val createdBy: String,
 )

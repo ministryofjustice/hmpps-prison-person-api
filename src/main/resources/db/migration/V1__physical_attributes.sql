@@ -4,9 +4,9 @@ CREATE TABLE physical_attributes
     height_cm                   INT,
     weight_kg                   INT,
     created_at                  TIMESTAMP WITH TIME ZONE    NOT NULL,
-    created_by                  VARCHAR(40),
+    created_by                  VARCHAR(40)                 NOT NULL,
     last_modified_at            TIMESTAMP WITH TIME ZONE    NOT NULL,
-    last_modified_by            VARCHAR(40),
+    last_modified_by            VARCHAR(40)                 NOT NULL,
     migrated_at                 TIMESTAMP WITH TIME ZONE,
 
     CONSTRAINT physical_attributes_pk PRIMARY KEY (prisoner_number)
@@ -17,9 +17,9 @@ COMMENT ON COLUMN physical_attributes.prisoner_number IS 'Primary key - the iden
 COMMENT ON COLUMN physical_attributes.height_cm IS 'Prisoner height, in centimetres';
 COMMENT ON COLUMN physical_attributes.weight_kg IS 'Prisoner weight, in kilograms';
 COMMENT ON COLUMN physical_attributes.created_at IS 'Timestamp of creation';
-COMMENT ON COLUMN physical_attributes.created_by IS 'If available, the username of the user creating the record';
+COMMENT ON COLUMN physical_attributes.created_by IS 'The username of the user creating the record';
 COMMENT ON COLUMN physical_attributes.last_modified_at IS 'Timestamp of last modification';
-COMMENT ON COLUMN physical_attributes.last_modified_by IS 'If available, the username of the user modifying the record';
+COMMENT ON COLUMN physical_attributes.last_modified_by IS 'The username of the user modifying the record';
 COMMENT ON COLUMN physical_attributes.migrated_at IS 'If the record has been migrated from NOMIS, the timestamp of migration';
 
 --
@@ -33,7 +33,7 @@ CREATE TABLE physical_attributes_history
     applies_from                    TIMESTAMP WITH TIME ZONE    NOT NULL,
     applies_to                      TIMESTAMP WITH TIME ZONE,
     created_at                      TIMESTAMP WITH TIME ZONE    NOT NULL,
-    created_by                      VARCHAR(40),
+    created_by                      VARCHAR(40)                 NOT NULL,
     migrated_at                     TIMESTAMP WITH TIME ZONE,
 
     CONSTRAINT physical_attributes_history_pk PRIMARY KEY (physical_attributes_history_id),

@@ -20,9 +20,7 @@ class PhysicalAttributesService(
   private val authenticationFacade: AuthenticationFacade,
   private val clock: Clock,
 ) {
-  fun getPhysicalAttributes(prisonNumber: String): PhysicalAttributesDto? {
-    return physicalAttributesRepository.findById(prisonNumber).getOrNull()?.toDto()
-  }
+  fun getPhysicalAttributes(prisonNumber: String): PhysicalAttributesDto? = physicalAttributesRepository.findById(prisonNumber).getOrNull()?.toDto()
 
   @Transactional
   fun createOrUpdate(

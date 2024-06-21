@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Primary
 import org.springframework.test.context.jdbc.Sql
 import uk.gov.justice.digital.hmpps.prisonperson.integration.IntegrationTestBase
+import uk.gov.justice.digital.hmpps.prisonperson.integration.wiremock.PRISONER_NUMBER
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.PhysicalAttributesHistoryRepository
 import java.time.Clock
 import java.time.ZoneId

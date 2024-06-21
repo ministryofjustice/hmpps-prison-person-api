@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.prisonperson.dto
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL
 import io.swagger.v3.oas.annotations.media.Schema
+import java.time.Instant
 import java.time.ZonedDateTime
 
 @Schema(description = "Request object for migration of a prisoner's physical attributes")
@@ -50,4 +51,7 @@ data class PhysicalAttributesMigrationRequest(
     required = true,
   )
   val createdBy: String,
-)
+) : Comparable<PhysicalAttributesMigrationRequest> {
+  override fun compareTo(other: PhysicalAttributesMigrationRequest): Int =
+    compareValuesBy(this, other, { it.appliesTo?.toInstant() ?: Instant.MAX }, { it.createdAt }, { it.hashCode() })
+}

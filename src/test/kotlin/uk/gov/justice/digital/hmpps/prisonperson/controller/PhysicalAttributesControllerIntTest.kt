@@ -70,26 +70,26 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
     inner class Validation {
 
       @Test
-      fun `bad request when height below 54cm`() {
+      fun `bad request when height below 30cm`() {
         expectBadRequestFrom(
-          requestBody = """{ "height": 53 }""",
-          message = "Validation failure(s): The height must be a plausible value in centimetres (between 54 and 272)",
+          requestBody = """{ "height": 29 }""",
+          message = "Validation failure(s): The height must be a plausible value in centimetres (between 30 and 274)",
         )
       }
 
       @Test
-      fun `bad request when height exceeds 272cm`() {
+      fun `bad request when height exceeds 274cm`() {
         expectBadRequestFrom(
-          requestBody = """{ "height": 273 }""",
-          message = "Validation failure(s): The height must be a plausible value in centimetres (between 54 and 272)",
+          requestBody = """{ "height": 275 }""",
+          message = "Validation failure(s): The height must be a plausible value in centimetres (between 30 and 274)",
         )
       }
 
       @Test
-      fun `bad request when weight below 2kg`() {
+      fun `bad request when weight below 12kg`() {
         expectBadRequestFrom(
-          requestBody = """{ "weight": 1 }""",
-          message = "Validation failure(s): The weight must be a plausible value in kilograms (between 2 and 635)",
+          requestBody = """{ "weight": 11 }""",
+          message = "Validation failure(s): The weight must be a plausible value in kilograms (between 12 and 635)",
         )
       }
 
@@ -97,7 +97,7 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
       fun `bad request when weight exceeds 635kg`() {
         expectBadRequestFrom(
           requestBody = """{ "weight": 636 }""",
-          message = "Validation failure(s): The weight must be a plausible value in kilograms (between 2 and 635)",
+          message = "Validation failure(s): The weight must be a plausible value in kilograms (between 12 and 635)",
         )
       }
 

@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.prisonperson.config
+package uk.gov.justice.digital.hmpps.prisonperson.integration.testcontainers
 
 import org.slf4j.LoggerFactory
 import org.testcontainers.containers.PostgreSQLContainer

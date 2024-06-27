@@ -8,7 +8,10 @@ import jakarta.persistence.Id
 import jakarta.persistence.OneToMany
 import org.hibernate.Hibernate
 import org.hibernate.annotations.SortNatural
+import org.springframework.data.domain.AbstractAggregateRoot
 import uk.gov.justice.digital.hmpps.prisonperson.dto.PhysicalAttributesDto
+import uk.gov.justice.digital.hmpps.prisonperson.service.event.PhysicalAttributesUpdatedEvent
+import uk.gov.justice.digital.hmpps.prisonperson.service.event.Source
 import java.time.ZonedDateTime
 import java.util.SortedSet
 
@@ -34,7 +37,7 @@ class PhysicalAttributes(
   @SortNatural
   val history: SortedSet<PhysicalAttributesHistory> = sortedSetOf(),
 
-) {
+) : AbstractAggregateRoot<PhysicalAttributes>() {
   fun toDto(): PhysicalAttributesDto = PhysicalAttributesDto(height, weight)
 
   fun addToHistory() {
@@ -59,6 +62,16 @@ class PhysicalAttributes(
 
   fun getHistoryAsList() = history.toList()
 
+  fun publishUpdateEvent(source: Source, now: ZonedDateTime) {
+    registerEvent(
+      PhysicalAttributesUpdatedEvent(
+        prisonerNumber = prisonerNumber,
+        occurredAt = now,
+        source = source,
+      ),
+    )
+  }
+
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
     if (other == null || Hibernate.getClass(this) != Hibernate.getClass(other)) return false
@@ -82,23 +95,21 @@ class PhysicalAttributes(
     result = 31 * result + height.hashCode()
     result = 31 * result + weight.hashCode()
     result = 31 * result + createdAt.hashCode()
-    result = 31 * result + (createdBy?.hashCode() ?: 0)
+    result = 31 * result + createdBy.hashCode()
     result = 31 * result + lastModifiedAt.hashCode()
-    result = 31 * result + (lastModifiedBy?.hashCode() ?: 0)
+    result = 31 * result + lastModifiedBy.hashCode()
     result = 31 * result + (migratedAt?.hashCode() ?: 0)
     return result
   }
 
-  override fun toString(): String {
-    return "PhysicalAttributes(" +
-      "prisonerNumber='$prisonerNumber', " +
-      "height=$height, " +
-      "weight=$weight, " +
-      "createdAt=$createdAt, " +
-      "createdBy=$createdBy, " +
-      "lastModifiedAt=$lastModifiedAt, " +
-      "lastModifiedBy=$lastModifiedBy, " +
-      "migratedAt=$migratedAt" +
-      ")"
-  }
+  override fun toString(): String = "PhysicalAttributes(" +
+    "prisonerNumber='$prisonerNumber', " +
+    "height=$height, " +
+    "weight=$weight, " +
+    "createdAt=$createdAt, " +
+    "createdBy=$createdBy, " +
+    "lastModifiedAt=$lastModifiedAt, " +
+    "lastModifiedBy=$lastModifiedBy, " +
+    "migratedAt=$migratedAt" +
+    ")"
 }

@@ -9,6 +9,9 @@ import uk.gov.justice.digital.hmpps.prisonperson.jpa.PhysicalAttributes
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.PhysicalAttributesHistory
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.PhysicalAttributesHistoryRepository
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.PhysicalAttributesRepository
+import uk.gov.justice.digital.hmpps.prisonperson.service.event.Source.NOMIS
+import java.time.Clock
+import java.time.ZonedDateTime
 
 @Service
 @Transactional
@@ -16,6 +19,7 @@ class PhysicalAttributesSyncService(
   private val physicalAttributesRepository: PhysicalAttributesRepository,
   private val physicalAttributesHistoryRepository: PhysicalAttributesHistoryRepository,
   private val prisonerSearchClient: PrisonerSearchClient,
+  private val clock: Clock,
 ) {
   fun sync(
     prisonerNumber: String,
@@ -27,6 +31,8 @@ class PhysicalAttributesSyncService(
   }
 
   private fun syncLatestPhysicalAttributes(prisonerNumber: String, request: PhysicalAttributesSyncRequest): PhysicalAttributesHistoryDto {
+    val now = ZonedDateTime.now(clock)
+
     val physicalAttributes = physicalAttributesRepository.findById(prisonerNumber)
       .orElseGet { newPhysicalAttributesFor(prisonerNumber, request) }
       .apply {
@@ -36,6 +42,7 @@ class PhysicalAttributesSyncService(
         lastModifiedBy = request.createdBy
       }
       .also { it.addToHistory() }
+      .also { it.publishUpdateEvent(NOMIS, now) }
 
     return physicalAttributesRepository.save(physicalAttributes).history.last.toDto()
   }

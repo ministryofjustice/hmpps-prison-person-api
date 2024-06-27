@@ -3,13 +3,11 @@ package uk.gov.justice.digital.hmpps.prisonperson.jpa.repository
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.data.jpa.domain.AbstractAuditable_.createdBy
 import org.springframework.test.context.transaction.TestTransaction
-import uk.gov.justice.digital.hmpps.prisonperson.integration.wiremock.PRISONER_NUMBER
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.PhysicalAttributes
 import java.time.ZonedDateTime
 
-class PhysicalAttributesDtoRepositoryTest : RepositoryTest() {
+class PhysicalAttributesRepositoryTest : RepositoryTest() {
 
   @Autowired
   lateinit var repository: PhysicalAttributesRepository
@@ -83,6 +81,30 @@ class PhysicalAttributesDtoRepositoryTest : RepositoryTest() {
       assertThat(weight).isEqualTo(PRISONER_WEIGHT)
       assertThat(lastModifiedAt).isEqualTo(NOW.plusDays(1))
     }
+  }
+
+  @Test
+  fun `can check for equality`() {
+    assertThat(
+      PhysicalAttributes(PRISONER_NUMBER, createdAt = NOW, createdBy = USER1, lastModifiedAt = NOW, lastModifiedBy = USER2),
+    ).isEqualTo(
+      PhysicalAttributes(PRISONER_NUMBER, createdAt = NOW, createdBy = USER1, lastModifiedAt = NOW, lastModifiedBy = USER2),
+    )
+
+    assertThat(
+      PhysicalAttributes(PRISONER_NUMBER, createdAt = NOW, createdBy = USER1, lastModifiedAt = NOW, lastModifiedBy = USER2),
+    ).isNotEqualTo(
+      PhysicalAttributes("Z1234ZZ", createdAt = NOW, createdBy = USER1, lastModifiedAt = NOW, lastModifiedBy = USER2),
+    )
+  }
+
+  @Test
+  fun `toString does not cause stack overflow`() {
+    assertThat(
+      PhysicalAttributes(PRISONER_NUMBER, createdAt = NOW, createdBy = USER1, lastModifiedAt = NOW, lastModifiedBy = USER2)
+        .also { it.addToHistory() }
+        .toString(),
+    ).isInstanceOf(String::class.java)
   }
 
   private companion object {

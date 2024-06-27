@@ -8,7 +8,7 @@ import uk.gov.justice.digital.hmpps.prisonperson.jpa.PhysicalAttributes
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.PhysicalAttributesHistory
 import java.time.ZonedDateTime
 
-class PhysicalAttributesDtoHistoryRepositoryTest : RepositoryTest() {
+class PhysicalAttributesHistoryRepositoryTest : RepositoryTest() {
 
   @Autowired
   lateinit var physicalAttributesRepository: PhysicalAttributesRepository
@@ -47,6 +47,39 @@ class PhysicalAttributesDtoHistoryRepositoryTest : RepositoryTest() {
       assertThat(appliesFrom).isEqualTo(NOW.minusDays(2))
       assertThat(appliesTo).isEqualTo(NOW.minusDays(1))
     }
+  }
+
+  @Test
+  fun `can check for equality`() {
+    assertThat(
+      PhysicalAttributes(PRISONER_NUMBER, createdBy = USER1, lastModifiedAt = NOW, lastModifiedBy = USER1)
+        .also { it.addToHistory() }
+        .history.first(),
+    ).isEqualTo(
+      PhysicalAttributes(PRISONER_NUMBER, createdBy = USER1, lastModifiedAt = NOW, lastModifiedBy = USER1)
+        .also { it.addToHistory() }
+        .history.first(),
+    )
+
+    assertThat(
+      PhysicalAttributes(PRISONER_NUMBER, createdBy = USER1, lastModifiedAt = NOW, lastModifiedBy = USER1)
+        .also { it.addToHistory() }
+        .history.first(),
+    ).isNotEqualTo(
+      PhysicalAttributes("Z1234ZZ", createdBy = USER1, lastModifiedAt = NOW, lastModifiedBy = USER1)
+        .also { it.addToHistory() }
+        .history.first(),
+    )
+  }
+
+  @Test
+  fun `toString does not cause stack overflow`() {
+    assertThat(
+      PhysicalAttributes(PRISONER_NUMBER, createdBy = USER1, lastModifiedBy = USER1)
+        .also { it.addToHistory() }
+        .history.first()
+        .toString(),
+    ).isInstanceOf(String::class.java)
   }
 
   private companion object {

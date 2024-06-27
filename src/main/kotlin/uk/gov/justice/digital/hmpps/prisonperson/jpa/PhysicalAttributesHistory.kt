@@ -72,23 +72,21 @@ class PhysicalAttributesHistory(
     result = 31 * result + (height?.hashCode() ?: 0)
     result = 31 * result + (weight?.hashCode() ?: 0)
     result = 31 * result + appliesFrom.hashCode()
-    result = 31 * result + (appliesTo?.hashCode() ?: 0)
+    result = 31 * result + appliesTo.hashCode()
     result = 31 * result + createdAt.hashCode()
-    result = 31 * result + (createdBy?.hashCode() ?: 0)
+    result = 31 * result + createdBy.hashCode()
     result = 31 * result + (migratedAt?.hashCode() ?: 0)
     return result
   }
 
-  override fun toString(): String {
-    return "PhysicalAttributesHistory(" +
-      "prisonerNumber=${physicalAttributes.prisonerNumber}, " +
-      "height=$height, " +
-      "weight=$weight, " +
-      "appliesFrom=$appliesFrom, " +
-      "appliesTo=$appliesTo, " +
-      "createdAt=$createdAt, " +
-      "createdBy=$createdBy, " +
-      "migratedAt=$migratedAt" +
-      ")"
-  }
+  override fun toString(): String = "PhysicalAttributesHistory(" +
+    "prisonerNumber=${physicalAttributes.prisonerNumber}, " +
+    "height=$height, " +
+    "weight=$weight, " +
+    "appliesFrom=$appliesFrom, " +
+    "appliesTo=$appliesTo, " +
+    "createdAt=$createdAt, " +
+    "createdBy=$createdBy, " +
+    "migratedAt=$migratedAt" +
+    ")"
 }

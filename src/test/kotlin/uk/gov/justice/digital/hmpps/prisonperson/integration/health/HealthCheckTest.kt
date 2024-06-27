@@ -89,6 +89,38 @@ class HealthCheckTest : IntegrationTestBase() {
       .jsonPath("status").isEqualTo("UP")
   }
 
+  @Test
+  fun `Database reports UP`() {
+    stubPingWithResponse(200)
+
+    webTestClient.get()
+      .uri("/health")
+      .exchange()
+      .expectStatus()
+      .isOk
+      .expectBody()
+      .jsonPath("status").isEqualTo("UP")
+      .jsonPath("components.db.status").isEqualTo("UP")
+      .jsonPath("components.db.details.database").isEqualTo("PostgreSQL")
+  }
+
+  @Test
+  fun `HMPPS Domain events topic health reports UP`() {
+    stubPingWithResponse(200)
+
+    webTestClient.get()
+      .uri("/health")
+      .exchange()
+      .expectStatus()
+      .isOk
+      .expectBody()
+      .jsonPath("status").isEqualTo("UP")
+      .jsonPath("components.hmppseventtopic-health.status").isEqualTo("UP")
+      .jsonPath("components.hmppseventtopic-health.details.topicArn").isEqualTo(hmppsEventTopic.arn)
+      .jsonPath("components.hmppseventtopic-health.details.subscriptionsConfirmed").isEqualTo(0)
+      .jsonPath("components.hmppseventtopic-health.details.subscriptionsPending").isEqualTo(0)
+  }
+
   private fun stubPingWithResponse(status: Int) {
     hmppsAuth.stubHealthPing(status)
     prisonerSearch.stubHealthPing(status)

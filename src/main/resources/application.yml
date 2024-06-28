@@ -44,11 +44,17 @@ spring:
 
   flyway:
     enabled: true
+    url: ${spring.datasource.url}
+    user: ${database.superuser.username}
+    password: ${database.superuser.password}
+    placeholders:
+      database_password: ${database.prisonperson.password}
+    schemas: prison_person
 
   datasource:
     url: 'jdbc:postgresql://${DATABASE_ENDPOINT}/${DATABASE_NAME}?sslmode=verify-full'
-    username: ${DATABASE_USERNAME}
-    password: ${DATABASE_PASSWORD}
+    username: prison_person
+    password: ${database.prisonperson.password}
     hikari:
       pool-name: PRISON_PERSON-DB-CP
       maximum-pool-size: 10

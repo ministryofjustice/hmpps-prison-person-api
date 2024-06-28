@@ -24,8 +24,6 @@ abstract class TestBase {
     fun properties(registry: DynamicPropertyRegistry) {
       pgContainer?.run {
         registry.add("spring.datasource.url", pgContainer::getJdbcUrl)
-        registry.add("spring.datasource.username", pgContainer::getUsername)
-        registry.add("spring.datasource.password", pgContainer::getPassword)
         registry.add("spring.flyway.url", pgContainer::getJdbcUrl)
         registry.add("spring.flyway.user", pgContainer::getUsername)
         registry.add("spring.flyway.password", pgContainer::getPassword)

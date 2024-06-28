@@ -9,10 +9,10 @@ import org.hibernate.validator.constraints.Range
 @JsonInclude(NON_NULL)
 data class PhysicalAttributesUpdateRequest(
   @Schema(description = "Height (in centimetres). May be left null if no data available for height.", example = "180")
-  @field:Range(min = 54, max = 272, message = "The height must be a plausible value in centimetres (between 54 and 272)")
+  @field:Range(min = 30, max = 274, message = "The height must be a plausible value in centimetres (between 30 and 274)")
   val height: Int? = null,
 
   @Schema(description = "Weight (in kilograms). May be left null if no data available for weight.", example = "70")
-  @field:Range(min = 2, max = 635, message = "The weight must be a plausible value in kilograms (between 2 and 635)")
+  @field:Range(min = 12, max = 635, message = "The weight must be a plausible value in kilograms (between 12 and 635)")
   val weight: Int? = null,
 )

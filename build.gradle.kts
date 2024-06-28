@@ -19,6 +19,9 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
   implementation("org.springframework.boot:spring-boot-starter-validation")
 
+  // AWS
+  implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:4.0.0")
+
   // OpenAPI
   implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0")
 
@@ -35,6 +38,8 @@ dependencies {
   testImplementation("io.jsonwebtoken:jjwt-jackson:0.12.5")
   testImplementation("org.wiremock:wiremock-standalone:3.5.4")
   testImplementation("org.testcontainers:postgresql:1.19.8")
+  testImplementation("org.testcontainers:localstack:1.19.8")
+  testImplementation("org.awaitility:awaitility-kotlin:4.2.1")
   testImplementation("org.springframework.security:spring-security-test")
 
   // Developer experience

@@ -86,3 +86,10 @@ management:
     info:
       cache:
         time-to-live: 2000ms
+
+events:
+  publish: true
+  base-url: http://localhost:8080
+
+hmpps.sqs:
+  queueAdminRole: ROLE_PRISON_PERSON_API__QUEUE_ADMIN__RW

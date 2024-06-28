@@ -1,6 +1,9 @@
 package uk.gov.justice.digital.hmpps.prisonperson.controller
 
 import org.assertj.core.api.Assertions.assertThat
+import org.awaitility.kotlin.await
+import org.awaitility.kotlin.matches
+import org.awaitility.kotlin.untilCallTo
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -11,10 +14,15 @@ import org.springframework.context.annotation.Primary
 import org.springframework.test.context.jdbc.Sql
 import uk.gov.justice.digital.hmpps.prisonperson.integration.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.PhysicalAttributesHistoryRepository
+import uk.gov.justice.digital.hmpps.prisonperson.service.event.AdditionalInformation
+import uk.gov.justice.digital.hmpps.prisonperson.service.event.DomainEvent
+import uk.gov.justice.digital.hmpps.prisonperson.service.event.EventType.PHYSICAL_ATTRIBUTES_UPDATED
+import uk.gov.justice.digital.hmpps.prisonperson.service.event.Source.DPS
 import java.time.Clock
 import java.time.Duration
 import java.time.ZoneId
 import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME
 
 class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
 
@@ -30,7 +38,7 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
 
   @DisplayName("PUT /prisoners/{prisonerNumber}/physical-attributes")
   @Nested
-  inner class ViewPrisonPersonDataTest {
+  inner class SetPhysicalAttributesTest {
 
     @Nested
     inner class Security {
@@ -200,6 +208,29 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
           HistoryComparison(height = null, weight = 72, appliesFrom = THEN.plusDays(2), appliesTo = THEN.plusDays(3), createdAt = THEN.plusDays(2), createdBy = USER1),
           HistoryComparison(height = 183, weight = null, appliesFrom = THEN.plusDays(3), appliesTo = NOW, createdAt = THEN.plusDays(3), createdBy = USER2),
           HistoryComparison(height = 183, weight = 74, appliesFrom = NOW, appliesTo = null, createdAt = NOW, createdBy = USER2),
+        )
+      }
+
+      @Test
+      @Sql("classpath:jpa/repository/reset.sql")
+      fun `should publish domain event`() {
+        expectSuccessfulUpdateFrom("""{ "height": 180, "weight": 70 }""")
+
+        await untilCallTo { hmppsEventsQueue.countAllMessagesOnQueue() } matches { it == 1 }
+        val event = hmppsEventsQueue.receiveDomainEventOnQueue()
+
+        assertThat(event).isEqualTo(
+          DomainEvent(
+            eventType = PHYSICAL_ATTRIBUTES_UPDATED.domainEventType,
+            additionalInformation = AdditionalInformation(
+              url = "http://localhost:8080/prisoners/${PRISONER_NUMBER}",
+              prisonerNumber = PRISONER_NUMBER,
+              source = DPS,
+            ),
+            description = PHYSICAL_ATTRIBUTES_UPDATED.description,
+            occurredAt = ISO_OFFSET_DATE_TIME.format(ZonedDateTime.now(clock)),
+            version = 1,
+          ),
         )
       }
 

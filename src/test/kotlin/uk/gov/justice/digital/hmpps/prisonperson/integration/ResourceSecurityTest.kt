@@ -18,6 +18,7 @@ class ResourceSecurityTest : IntegrationTestBase() {
     "GET /swagger-ui.html",
     "GET /v3/api-docs",
     "GET /v3/api-docs/swagger-config",
+    "PUT /queue-admin/retry-all-dlqs",
     " /error",
   )
 
@@ -50,7 +51,6 @@ class ResourceSecurityTest : IntegrationTestBase() {
 }
 
 private fun RequestMappingInfo.getMappings() =
-  methodsCondition.methods.map { it.name }.flatMap {
-      method ->
+  methodsCondition.methods.map { it.name }.flatMap { method ->
     pathPatternsCondition?.patternValues!!.map { "$method $it" }
   }

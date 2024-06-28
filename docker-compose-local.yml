@@ -27,5 +27,19 @@ services:
       - POSTGRES_USER=prison-person-data
       - POSTGRES_DB=prison-person-data
 
+  localstack:
+    image: localstack/localstack:latest
+    networks:
+      - hmpps
+    container_name: localstack
+    ports:
+      - "4567:4566"
+    environment:
+      - SERVICES=sqs,sns
+      - DEBUG=${DEBUG-}
+      - DOCKER_HOST=unix:///var/run/docker.sock
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+
 networks:
   hmpps:

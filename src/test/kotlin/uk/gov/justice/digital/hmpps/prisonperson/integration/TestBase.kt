@@ -4,7 +4,7 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import uk.gov.justice.digital.hmpps.prisonperson.config.FixedClock
-import uk.gov.justice.digital.hmpps.prisonperson.config.PostgresContainer
+import uk.gov.justice.digital.hmpps.prisonperson.integration.testcontainers.PostgresContainer
 import java.time.Instant
 import java.time.ZoneId
 
@@ -13,7 +13,7 @@ abstract class TestBase {
 
   companion object {
     val clock: FixedClock = FixedClock(
-      Instant.parse("2024-05-30T12:34:56+01:00"),
+      Instant.parse("2024-06-14T09:10:11.123+01:00"),
       ZoneId.of("Europe/London"),
     )
 

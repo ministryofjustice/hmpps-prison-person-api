@@ -1,6 +1,9 @@
 package uk.gov.justice.digital.hmpps.prisonperson.controller
 
 import org.assertj.core.api.Assertions.assertThat
+import org.awaitility.kotlin.await
+import org.awaitility.kotlin.matches
+import org.awaitility.kotlin.untilCallTo
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -12,9 +15,14 @@ import org.springframework.test.context.jdbc.Sql
 import uk.gov.justice.digital.hmpps.prisonperson.integration.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.prisonperson.integration.wiremock.PRISONER_NUMBER
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.PhysicalAttributesHistoryRepository
+import uk.gov.justice.digital.hmpps.prisonperson.service.event.AdditionalInformation
+import uk.gov.justice.digital.hmpps.prisonperson.service.event.DomainEvent
+import uk.gov.justice.digital.hmpps.prisonperson.service.event.EventType.PHYSICAL_ATTRIBUTES_UPDATED
+import uk.gov.justice.digital.hmpps.prisonperson.service.event.Source.NOMIS
 import java.time.Clock
 import java.time.ZoneId
 import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME
 
 class PhysicalAttributesSyncControllerIntTest : IntegrationTestBase() {
 
@@ -261,6 +269,29 @@ class PhysicalAttributesSyncControllerIntTest : IntegrationTestBase() {
         )
       }
 
+      @Test
+      @Sql("classpath:jpa/repository/reset.sql")
+      fun `should publish domain event`() {
+        expectSuccessfulSyncFrom(REQUEST_TO_SYNC_LATEST_PHYSICAL_ATTRIBUTES)
+
+        await untilCallTo { hmppsEventsQueue.countAllMessagesOnQueue() } matches { it == 1 }
+        val event = hmppsEventsQueue.receiveDomainEventOnQueue()
+
+        assertThat(event).isEqualTo(
+          DomainEvent(
+            eventType = PHYSICAL_ATTRIBUTES_UPDATED.domainEventType,
+            additionalInformation = AdditionalInformation(
+              url = "http://localhost:8080/prisoners/${PRISONER_NUMBER}",
+              prisonerNumber = PRISONER_NUMBER,
+              source = NOMIS,
+            ),
+            description = PHYSICAL_ATTRIBUTES_UPDATED.description,
+            occurredAt = ISO_OFFSET_DATE_TIME.format(NOW),
+            version = 1,
+          ),
+        )
+      }
+
       private fun expectSuccessfulSyncFrom(requestBody: String) =
         webTestClient.put().uri("/sync/prisoners/${PRISONER_NUMBER}/physical-attributes")
           .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__PHYSICAL_ATTRIBUTES_SYNC__RW")))
@@ -292,7 +323,7 @@ class PhysicalAttributesSyncControllerIntTest : IntegrationTestBase() {
     const val PRISONER_NUMBER = "A1234AA"
     const val USER1 = "USER1"
 
-    val NOW = ZonedDateTime.of(2024, 6, 14, 9, 10, 11, 123000000, ZoneId.of("Europe/London"))
+    val NOW = ZonedDateTime.now(clock)
     val THEN = ZonedDateTime.of(2024, 1, 2, 9, 10, 11, 123000000, ZoneId.of("Europe/London"))
 
     val REQUEST_TO_SYNC_HISTORICAL_PHYSICAL_ATTRIBUTES =

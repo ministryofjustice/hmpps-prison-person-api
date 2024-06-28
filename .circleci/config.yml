@@ -17,13 +17,18 @@ parameters:
   postgres-version:
     type: string
     default: "15"
+  localstack-version:
+      type: string
+      default: "3"
 
 jobs:
   validate:
     executor:
-      name: hmpps/java_postgres
+      name: hmpps/java_localstack_postgres_with_db_name
       jdk_tag: << pipeline.parameters.java-version >>
       postgres_tag: << pipeline.parameters.postgres-version >>
+      localstack_tag: << pipeline.parameters.localstack-version >>
+      services: "sqs,sns"
       postgres_db: "prison-person-data"
       postgres_username: "prison-person-data"
       postgres_password: "prison-person-data"

@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
 import org.mockito.Mock
+import org.mockito.Spy
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.junit.jupiter.MockitoSettings
 import org.mockito.kotlin.any
@@ -24,6 +25,7 @@ import uk.gov.justice.digital.hmpps.prisonperson.jpa.PhysicalAttributes
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.PhysicalAttributesHistory
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.PhysicalAttributesHistoryRepository
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.PhysicalAttributesRepository
+import java.time.Clock
 import java.time.LocalDate
 import java.time.ZonedDateTime
 import java.util.Optional
@@ -39,6 +41,9 @@ class PhysicalAttributesSyncServiceTest {
 
   @Mock
   lateinit var prisonerSearchClient: PrisonerSearchClient
+
+  @Spy
+  val clock: Clock? = Clock.fixed(NOW.toInstant(), NOW.zone)
 
   @InjectMocks
   lateinit var underTest: PhysicalAttributesSyncService

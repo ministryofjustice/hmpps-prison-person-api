@@ -7,6 +7,7 @@ import uk.gov.justice.digital.hmpps.prisonperson.dto.PhysicalAttributesDto
 import uk.gov.justice.digital.hmpps.prisonperson.dto.PhysicalAttributesUpdateRequest
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.PhysicalAttributes
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.PhysicalAttributesRepository
+import uk.gov.justice.digital.hmpps.prisonperson.service.event.Source.DPS
 import uk.gov.justice.digital.hmpps.prisonperson.utils.AuthenticationFacade
 import java.time.Clock
 import java.time.ZonedDateTime
@@ -38,6 +39,7 @@ class PhysicalAttributesService(
         lastModifiedBy = authenticationFacade.getUserOrSystemInContext()
       }
       .also { it.addToHistory() }
+      .also { it.publishUpdateEvent(DPS, now) }
 
     return physicalAttributesRepository.save(physicalAttributes).toDto()
   }

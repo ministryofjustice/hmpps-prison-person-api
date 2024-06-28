@@ -17,8 +17,6 @@ spring:
 
   datasource:
     url: jdbc:postgresql://localhost:5432/prison-person-data?sslmode=prefer
-    username: prison-person-data
-    password: prison-person-data
 
   jpa:
     show-sql: true
@@ -29,3 +27,10 @@ hmpps.sqs:
   topics:
     hmppseventtopic:
       arn: arn:aws:sns:eu-west-2:000000000000:hmpps-event-topic
+
+database:
+  superuser:
+    username: prison-person-data
+    password: prison-person-data
+  prisonperson:
+    password: prisonperson

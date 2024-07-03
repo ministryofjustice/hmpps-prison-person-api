@@ -14,6 +14,10 @@ import org.springframework.context.annotation.Primary
 import org.springframework.test.context.jdbc.Sql
 import uk.gov.justice.digital.hmpps.prisonperson.integration.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.prisonperson.integration.wiremock.PRISONER_NUMBER
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.FieldMetadata
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.FieldName.HEIGHT
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.FieldName.WEIGHT
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.FieldMetadataRepository
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.PhysicalAttributesHistoryRepository
 import uk.gov.justice.digital.hmpps.prisonperson.service.event.AdditionalInformation
 import uk.gov.justice.digital.hmpps.prisonperson.service.event.DomainEvent
@@ -35,6 +39,9 @@ class PhysicalAttributesSyncControllerIntTest : IntegrationTestBase() {
 
   @Autowired
   lateinit var physicalAttributesHistoryRepository: PhysicalAttributesHistoryRepository
+
+  @Autowired
+  lateinit var fieldMetadataRepository: FieldMetadataRepository
 
   @DisplayName("PUT /sync/prisoners/{prisonerNumber}/physical-attributes")
   @Nested
@@ -129,6 +136,11 @@ class PhysicalAttributesSyncControllerIntTest : IntegrationTestBase() {
             createdBy = USER1,
           ),
         )
+
+        expectFieldMetadata(
+          FieldMetadata(PRISONER_NUMBER, HEIGHT, lastModifiedAt = NOW, lastModifiedBy = USER1),
+          FieldMetadata(PRISONER_NUMBER, WEIGHT, lastModifiedAt = NOW, lastModifiedBy = USER1),
+        )
       }
 
       @Test
@@ -181,6 +193,11 @@ class PhysicalAttributesSyncControllerIntTest : IntegrationTestBase() {
             createdAt = NOW,
             createdBy = USER1,
           ),
+        )
+
+        expectFieldMetadata(
+          FieldMetadata(PRISONER_NUMBER, HEIGHT, lastModifiedAt = NOW, lastModifiedBy = USER1),
+          FieldMetadata(PRISONER_NUMBER, WEIGHT, lastModifiedAt = NOW, lastModifiedBy = USER1),
         )
       }
 
@@ -315,6 +332,10 @@ class PhysicalAttributesSyncControllerIntTest : IntegrationTestBase() {
           assertThat(actual.createdAt).isEqualTo(expected.createdAt)
           assertThat(actual.createdBy).isEqualTo(expected.createdBy)
         }
+      }
+
+      private fun expectFieldMetadata(vararg comparison: FieldMetadata) {
+        assertThat(fieldMetadataRepository.findAllByPrisonerNumber(PRISONER_NUMBER)).containsAll(comparison.toList())
       }
     }
   }

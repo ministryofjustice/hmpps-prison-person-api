@@ -13,6 +13,10 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Primary
 import org.springframework.test.context.jdbc.Sql
 import uk.gov.justice.digital.hmpps.prisonperson.integration.IntegrationTestBase
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.FieldMetadata
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.FieldName.HEIGHT
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.FieldName.WEIGHT
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.FieldMetadataRepository
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.PhysicalAttributesHistoryRepository
 import uk.gov.justice.digital.hmpps.prisonperson.service.event.AdditionalInformation
 import uk.gov.justice.digital.hmpps.prisonperson.service.event.DomainEvent
@@ -35,6 +39,9 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
 
   @Autowired
   lateinit var physicalAttributesHistoryRepository: PhysicalAttributesHistoryRepository
+
+  @Autowired
+  lateinit var fieldMetadataRepository: FieldMetadataRepository
 
   @DisplayName("PUT /prisoners/{prisonerNumber}/physical-attributes")
   @Nested
@@ -152,6 +159,11 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
         expectHistory(
           HistoryComparison(height = 180, weight = 70, appliesFrom = NOW, appliesTo = null, createdAt = NOW, createdBy = USER1),
         )
+
+        expectFieldMetadata(
+          FieldMetadata(PRISONER_NUMBER, HEIGHT, lastModifiedAt = NOW, lastModifiedBy = USER1),
+          FieldMetadata(PRISONER_NUMBER, WEIGHT, lastModifiedAt = NOW, lastModifiedBy = USER1),
+        )
       }
 
       @Test
@@ -178,6 +190,11 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
         expectHistory(
           HistoryComparison(height = 180, weight = 70, appliesFrom = THEN, appliesTo = NOW, createdAt = THEN, createdBy = USER1),
           HistoryComparison(height = 181, weight = 71, appliesFrom = NOW, appliesTo = null, createdAt = NOW, createdBy = USER2),
+        )
+
+        expectFieldMetadata(
+          FieldMetadata(PRISONER_NUMBER, HEIGHT, lastModifiedAt = NOW, lastModifiedBy = USER2),
+          FieldMetadata(PRISONER_NUMBER, WEIGHT, lastModifiedAt = NOW, lastModifiedBy = USER2),
         )
       }
 
@@ -208,6 +225,11 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
           HistoryComparison(height = null, weight = 72, appliesFrom = THEN.plusDays(2), appliesTo = THEN.plusDays(3), createdAt = THEN.plusDays(2), createdBy = USER1),
           HistoryComparison(height = 183, weight = null, appliesFrom = THEN.plusDays(3), appliesTo = NOW, createdAt = THEN.plusDays(3), createdBy = USER2),
           HistoryComparison(height = 183, weight = 74, appliesFrom = NOW, appliesTo = null, createdAt = NOW, createdBy = USER2),
+        )
+
+        expectFieldMetadata(
+          FieldMetadata(PRISONER_NUMBER, HEIGHT, lastModifiedAt = THEN.plusDays(3), lastModifiedBy = USER2),
+          FieldMetadata(PRISONER_NUMBER, WEIGHT, lastModifiedAt = NOW, lastModifiedBy = USER2),
         )
       }
 
@@ -255,6 +277,10 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
           assertThat(actual.createdAt).isEqualTo(expected.createdAt)
           assertThat(actual.createdBy).isEqualTo(expected.createdBy)
         }
+      }
+
+      private fun expectFieldMetadata(vararg comparison: FieldMetadata) {
+        assertThat(fieldMetadataRepository.findAllByPrisonerNumber(PRISONER_NUMBER)).containsAll(comparison.toList())
       }
     }
   }

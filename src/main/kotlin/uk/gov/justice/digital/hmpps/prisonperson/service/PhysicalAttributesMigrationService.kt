@@ -34,7 +34,7 @@ class PhysicalAttributesMigrationService(
       lastModifiedAt = latestRecord.createdAt,
       lastModifiedBy = latestRecord.createdBy,
       migratedAt = now,
-    )
+    ).also { it.createNewFieldMetadata() }
 
     migration.forEach { it.addToHistory(physicalAttributes, now) }
 

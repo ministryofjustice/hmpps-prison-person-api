@@ -10,6 +10,10 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Primary
 import org.springframework.test.context.jdbc.Sql
 import uk.gov.justice.digital.hmpps.prisonperson.integration.IntegrationTestBase
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.FieldMetadata
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.FieldName.HEIGHT
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.FieldName.WEIGHT
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.FieldMetadataRepository
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.PhysicalAttributesHistoryRepository
 import java.time.Clock
 import java.time.ZoneId
@@ -26,6 +30,9 @@ class PhysicalAttributesMigrationControllerIntTest : IntegrationTestBase() {
 
   @Autowired
   lateinit var physicalAttributesHistoryRepository: PhysicalAttributesHistoryRepository
+
+  @Autowired
+  lateinit var fieldMetadataRepository: FieldMetadataRepository
 
   @DisplayName("PUT /migration/prisoners/{prisonerNumber}/physical-attributes")
   @Nested
@@ -119,6 +126,11 @@ class PhysicalAttributesMigrationControllerIntTest : IntegrationTestBase() {
             createdBy = USER1,
           ),
         )
+
+        expectFieldMetadata(
+          FieldMetadata(PRISONER_NUMBER, HEIGHT, lastModifiedAt = NOW, lastModifiedBy = USER1),
+          FieldMetadata(PRISONER_NUMBER, WEIGHT, lastModifiedAt = NOW, lastModifiedBy = USER1),
+        )
       }
 
       @Test
@@ -159,6 +171,11 @@ class PhysicalAttributesMigrationControllerIntTest : IntegrationTestBase() {
             createdBy = USER1,
           ),
         )
+
+        expectFieldMetadata(
+          FieldMetadata(PRISONER_NUMBER, HEIGHT, lastModifiedAt = NOW, lastModifiedBy = USER1),
+          FieldMetadata(PRISONER_NUMBER, WEIGHT, lastModifiedAt = NOW, lastModifiedBy = USER1),
+        )
       }
 
       @Test
@@ -193,6 +210,11 @@ class PhysicalAttributesMigrationControllerIntTest : IntegrationTestBase() {
             createdBy = USER1,
           ),
         )
+
+        expectFieldMetadata(
+          FieldMetadata(PRISONER_NUMBER, HEIGHT, lastModifiedAt = NOW, lastModifiedBy = USER1),
+          FieldMetadata(PRISONER_NUMBER, WEIGHT, lastModifiedAt = NOW, lastModifiedBy = USER1),
+        )
       }
     }
   }
@@ -210,6 +232,10 @@ class PhysicalAttributesMigrationControllerIntTest : IntegrationTestBase() {
       assertThat(actual.createdAt).isEqualTo(expected.createdAt)
       assertThat(actual.createdBy).isEqualTo(expected.createdBy)
     }
+  }
+
+  private fun expectFieldMetadata(vararg comparison: FieldMetadata) {
+    assertThat(fieldMetadataRepository.findAllByPrisonerNumber(PRISONER_NUMBER)).containsAll(comparison.toList())
   }
 
   private companion object {

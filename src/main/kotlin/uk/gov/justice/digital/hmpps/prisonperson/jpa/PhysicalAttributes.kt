@@ -5,11 +5,14 @@ import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.FetchType.LAZY
 import jakarta.persistence.Id
+import jakarta.persistence.MapKey
 import jakarta.persistence.OneToMany
 import org.hibernate.Hibernate
 import org.hibernate.annotations.SortNatural
 import org.springframework.data.domain.AbstractAggregateRoot
 import uk.gov.justice.digital.hmpps.prisonperson.dto.PhysicalAttributesDto
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.FieldName.HEIGHT
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.FieldName.WEIGHT
 import uk.gov.justice.digital.hmpps.prisonperson.service.event.PhysicalAttributesUpdatedEvent
 import uk.gov.justice.digital.hmpps.prisonperson.service.event.Source
 import java.time.ZonedDateTime
@@ -33,15 +36,27 @@ class PhysicalAttributes(
   var lastModifiedBy: String,
   val migratedAt: ZonedDateTime? = null,
 
+  // Stores snapshots of each update to a prisoner's physical attributes
   @OneToMany(mappedBy = "physicalAttributes", fetch = LAZY, cascade = [ALL], orphanRemoval = true)
   @SortNatural
   val history: SortedSet<PhysicalAttributesHistory> = sortedSetOf(),
 
+  // Stores timestamps of when each individual field was changed
+  @OneToMany(mappedBy = "prisonerNumber", fetch = LAZY, cascade = [ALL], orphanRemoval = true)
+  @MapKey(name = "field")
+  val fieldMetadata: MutableMap<FieldName, FieldMetadata> = mutableMapOf(),
+
 ) : AbstractAggregateRoot<PhysicalAttributes>() {
+
+  private fun fieldComparators(): Map<FieldName, FieldComparator<Any>> = mapOf(
+    HEIGHT to FieldComparator(::height) { it.height },
+    WEIGHT to FieldComparator(::weight) { it.weight },
+  )
+
   fun toDto(): PhysicalAttributesDto = PhysicalAttributesDto(height, weight)
 
   fun addToHistory() {
-    val previousEntry = history.lastOrNull()
+    val previousEntry = history.lastOrNull().also { updateFieldMetadata(it) }
 
     // Set appliesTo on previous history item if not already set
     previousEntry
@@ -71,6 +86,20 @@ class PhysicalAttributes(
       ),
     )
   }
+
+  fun createNewFieldMetadata() = updateFieldMetadata(null)
+
+  private fun updateFieldMetadata(previousVersion: PhysicalAttributesHistory?) =
+    fieldComparators().forEach { (field, comparator) ->
+      if (previousVersion == null || comparator.hasChangedFrom(previousVersion)) {
+        fieldMetadata[field] = FieldMetadata(
+          field = field,
+          prisonerNumber = this.prisonerNumber,
+          lastModifiedAt = this.lastModifiedAt,
+          lastModifiedBy = this.lastModifiedBy,
+        )
+      }
+    }
 
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
@@ -112,4 +141,11 @@ class PhysicalAttributes(
     "lastModifiedBy=$lastModifiedBy, " +
     "migratedAt=$migratedAt" +
     ")"
+
+  private data class FieldComparator<T>(
+    val new: () -> T?,
+    val old: (history: PhysicalAttributesHistory) -> T?,
+  ) {
+    fun hasChangedFrom(history: PhysicalAttributesHistory) = new() != old(history)
+  }
 }

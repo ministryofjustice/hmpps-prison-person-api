@@ -15,6 +15,7 @@ import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.HEIGHT
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.WEIGHT
 import uk.gov.justice.digital.hmpps.prisonperson.enums.Source
+import uk.gov.justice.digital.hmpps.prisonperson.enums.Source.DPS
 import uk.gov.justice.digital.hmpps.prisonperson.service.event.PhysicalAttributesUpdatedEvent
 import java.time.ZonedDateTime
 import java.util.SortedSet
@@ -50,7 +51,7 @@ class PhysicalAttributes(
 
   fun toDto(): PhysicalAttributesDto = PhysicalAttributesDto(height, weight)
 
-  fun updateFieldHistory(lastModifiedAt: ZonedDateTime, lastModifiedBy: String) {
+  fun updateFieldHistory(lastModifiedAt: ZonedDateTime, lastModifiedBy: String, source: Source = DPS) {
     fields().forEach { (field, currentValue) ->
       val previousVersion = fieldHistory.lastOrNull { it.field == field }
       if (previousVersion == null || field.hasChangedFrom(previousVersion, currentValue())) {
@@ -73,13 +74,12 @@ class PhysicalAttributes(
             appliesFrom = lastModifiedAt,
             createdAt = lastModifiedAt,
             createdBy = lastModifiedBy,
+            source = source,
           ).also { field.set(it, currentValue()) },
         )
       }
     }
   }
-
-  fun getHistoryAsList() = fieldHistory.toList()
 
   fun publishUpdateEvent(source: Source, now: ZonedDateTime) {
     registerEvent(

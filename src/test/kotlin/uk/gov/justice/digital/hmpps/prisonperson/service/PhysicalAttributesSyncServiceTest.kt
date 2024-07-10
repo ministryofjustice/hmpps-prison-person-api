@@ -23,6 +23,7 @@ import uk.gov.justice.digital.hmpps.prisonperson.dto.PhysicalAttributesSyncReque
 import uk.gov.justice.digital.hmpps.prisonperson.dto.PhysicalAttributesSyncResponse
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.HEIGHT
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.WEIGHT
+import uk.gov.justice.digital.hmpps.prisonperson.enums.Source.NOMIS
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.FieldHistory
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.PhysicalAttributes
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.FieldHistoryRepository
@@ -79,12 +80,12 @@ class PhysicalAttributesSyncServiceTest {
 
         expectFieldHistory(
           HEIGHT,
-          HistoryComparison(value = PRISONER_HEIGHT, createdAt = NOW, createdBy = USER1, appliesFrom = NOW, appliesTo = null),
+          HistoryComparison(value = PRISONER_HEIGHT, createdAt = NOW, createdBy = USER1, appliesFrom = NOW, appliesTo = null, source = NOMIS),
         )
 
         expectFieldHistory(
           WEIGHT,
-          HistoryComparison(value = PRISONER_WEIGHT, createdAt = NOW, createdBy = USER1, appliesFrom = NOW, appliesTo = null),
+          HistoryComparison(value = PRISONER_WEIGHT, createdAt = NOW, createdBy = USER1, appliesFrom = NOW, appliesTo = null, source = NOMIS),
         )
       }
     }
@@ -126,7 +127,7 @@ class PhysicalAttributesSyncServiceTest {
           // Initial history entry:
           HistoryComparison(value = PREVIOUS_PRISONER_HEIGHT, createdAt = NOW.minusDays(1), createdBy = USER1, appliesFrom = NOW.minusDays(1), appliesTo = NOW),
           // New history entry:
-          HistoryComparison(value = PRISONER_HEIGHT, createdAt = NOW, createdBy = USER2, appliesFrom = NOW, appliesTo = null),
+          HistoryComparison(value = PRISONER_HEIGHT, createdAt = NOW, createdBy = USER2, appliesFrom = NOW, appliesTo = null, source = NOMIS),
         )
 
         expectFieldHistory(
@@ -134,7 +135,7 @@ class PhysicalAttributesSyncServiceTest {
           // Initial history entry:
           HistoryComparison(value = PREVIOUS_PRISONER_WEIGHT, createdAt = NOW.minusDays(1), createdBy = USER1, appliesFrom = NOW.minusDays(1), appliesTo = NOW),
           // New history entry:
-          HistoryComparison(value = PRISONER_WEIGHT, createdAt = NOW, createdBy = USER2, appliesFrom = NOW, appliesTo = null),
+          HistoryComparison(value = PRISONER_WEIGHT, createdAt = NOW, createdBy = USER2, appliesFrom = NOW, appliesTo = null, source = NOMIS),
         )
       }
     }
@@ -175,6 +176,7 @@ class PhysicalAttributesSyncServiceTest {
           createdBy = USER2,
           appliesFrom = NOW.minusDays(10),
           appliesTo = NOW.minusDays(5),
+          source = NOMIS,
         ),
       )
 
@@ -187,6 +189,7 @@ class PhysicalAttributesSyncServiceTest {
           createdBy = USER2,
           appliesFrom = NOW.minusDays(10),
           appliesTo = NOW.minusDays(5),
+          source = NOMIS,
         ),
       )
     }
@@ -206,12 +209,12 @@ class PhysicalAttributesSyncServiceTest {
 
         expectFieldHistory(
           HEIGHT,
-          HistoryComparison(value = null, createdAt = NOW, createdBy = USER1, appliesFrom = NOW, appliesTo = null),
+          HistoryComparison(value = null, createdAt = NOW, createdBy = USER1, appliesFrom = NOW, appliesTo = null, source = NOMIS),
         )
 
         expectFieldHistory(
           WEIGHT,
-          HistoryComparison(value = null, createdAt = NOW, createdBy = USER1, appliesFrom = NOW, appliesTo = null),
+          HistoryComparison(value = null, createdAt = NOW, createdBy = USER1, appliesFrom = NOW, appliesTo = null, source = NOMIS),
         )
       }
     }

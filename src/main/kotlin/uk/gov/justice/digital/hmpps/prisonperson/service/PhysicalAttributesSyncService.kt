@@ -41,7 +41,7 @@ class PhysicalAttributesSyncService(
         height = request.height
         weight = request.weight
       }
-      .also { it.updateFieldHistory(request.createdAt, request.createdBy) }
+      .also { it.updateFieldHistory(request.createdAt, request.createdBy, NOMIS) }
       .also { it.publishUpdateEvent(NOMIS, now) }
 
     return PhysicalAttributesSyncResponse(
@@ -78,6 +78,7 @@ class PhysicalAttributesSyncService(
           appliesTo = appliesTo,
           createdAt = createdAt,
           createdBy = createdBy,
+          source = NOMIS,
         ).also { field.set(it, getter()) },
       )
     }

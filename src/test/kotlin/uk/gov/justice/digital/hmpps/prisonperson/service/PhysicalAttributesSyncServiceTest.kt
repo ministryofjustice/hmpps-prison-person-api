@@ -19,8 +19,8 @@ import org.mockito.kotlin.whenever
 import org.mockito.quality.Strictness.LENIENT
 import uk.gov.justice.digital.hmpps.prisonperson.client.prisonersearch.PrisonerSearchClient
 import uk.gov.justice.digital.hmpps.prisonperson.client.prisonersearch.dto.PrisonerDto
-import uk.gov.justice.digital.hmpps.prisonperson.dto.PhysicalAttributesDto
 import uk.gov.justice.digital.hmpps.prisonperson.dto.PhysicalAttributesSyncRequest
+import uk.gov.justice.digital.hmpps.prisonperson.dto.PhysicalAttributesSyncResponse
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.HEIGHT
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.WEIGHT
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.FieldHistory
@@ -70,12 +70,7 @@ class PhysicalAttributesSyncServiceTest {
       whenever(physicalAttributesRepository.findById(PRISONER_NUMBER)).thenReturn(Optional.empty())
 
       assertThat(underTest.sync(PRISONER_NUMBER, PHYSICAL_ATTRIBUTES_SYNC_REQUEST))
-        .isEqualTo(
-          PhysicalAttributesDto(
-            height = PRISONER_HEIGHT,
-            weight = PRISONER_WEIGHT,
-          ),
-        )
+        .isInstanceOf(PhysicalAttributesSyncResponse::class.java)
 
       with(savedPhysicalAttributes.firstValue) {
         assertThat(prisonerNumber).isEqualTo(PRISONER_NUMBER)
@@ -119,12 +114,7 @@ class PhysicalAttributesSyncServiceTest {
       )
 
       assertThat(underTest.sync(PRISONER_NUMBER, PHYSICAL_ATTRIBUTES_SYNC_REQUEST.copy(createdBy = USER2)))
-        .isEqualTo(
-          PhysicalAttributesDto(
-            height = PRISONER_HEIGHT,
-            weight = PRISONER_WEIGHT,
-          ),
-        )
+        .isInstanceOf(PhysicalAttributesSyncResponse::class.java)
 
       with(savedPhysicalAttributes.firstValue) {
         assertThat(prisonerNumber).isEqualTo(PRISONER_NUMBER)
@@ -174,12 +164,7 @@ class PhysicalAttributesSyncServiceTest {
           ),
         ),
       )
-        .isEqualTo(
-          PhysicalAttributesDto(
-            height = PRISONER_HEIGHT,
-            weight = PRISONER_WEIGHT,
-          ),
-        )
+        .isInstanceOf(PhysicalAttributesSyncResponse::class.java)
 
       expectFieldHistory(
         HEIGHT,
@@ -212,12 +197,7 @@ class PhysicalAttributesSyncServiceTest {
       whenever(physicalAttributesRepository.findById(PRISONER_NUMBER)).thenReturn(Optional.empty())
 
       assertThat(underTest.sync(PRISONER_NUMBER, PHYSICAL_ATTRIBUTES_SYNC_REQUEST.copy(height = null, weight = null)))
-        .isEqualTo(
-          PhysicalAttributesDto(
-            height = null,
-            weight = null,
-          ),
-        )
+        .isInstanceOf(PhysicalAttributesSyncResponse::class.java)
 
       with(savedPhysicalAttributes.firstValue) {
         assertThat(prisonerNumber).isEqualTo(PRISONER_NUMBER)

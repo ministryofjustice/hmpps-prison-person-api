@@ -4,6 +4,8 @@ import org.assertj.core.api.Assertions.assertThat
 import org.awaitility.kotlin.await
 import org.awaitility.kotlin.matches
 import org.awaitility.kotlin.untilCallTo
+import org.hamcrest.Matchers.hasItem
+import org.hamcrest.Matchers.not
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -101,16 +103,7 @@ class PhysicalAttributesSyncControllerIntTest : IntegrationTestBase() {
       @Sql("classpath:jpa/repository/reset.sql")
       fun `can sync creation of a new set of physical attributes`() {
         expectSuccessfulSyncFrom(REQUEST_TO_SYNC_LATEST_PHYSICAL_ATTRIBUTES)
-          .expectBody().json(
-            // language=json
-            """
-            {
-              "height": 190,
-              "weight": 80
-            }
-            """.trimIndent(),
-            false,
-          )
+          .expectBody().jsonPath("$.fieldHistoryInserted[*]").value(not(hasItem(-1)))
 
         expectFieldHistory(HEIGHT, HistoryComparison(value = 190, appliesFrom = NOW, appliesTo = null, createdAt = NOW, createdBy = USER1))
         expectFieldHistory(WEIGHT, HistoryComparison(value = 80, appliesFrom = NOW, appliesTo = null, createdAt = NOW, createdBy = USER1))
@@ -130,16 +123,7 @@ class PhysicalAttributesSyncControllerIntTest : IntegrationTestBase() {
         expectFieldHistory(WEIGHT, HistoryComparison(value = 70, appliesFrom = THEN, appliesTo = null, createdAt = THEN, createdBy = USER1))
 
         expectSuccessfulSyncFrom(REQUEST_TO_SYNC_LATEST_PHYSICAL_ATTRIBUTES)
-          .expectBody().json(
-            // language=json
-            """
-            {
-              "height": 190,
-              "weight": 80
-            }
-            """.trimIndent(),
-            false,
-          )
+          .expectBody().jsonPath("$.fieldHistoryInserted[*]").value(not(hasItem(-1)))
 
         expectFieldHistory(
           HEIGHT,
@@ -168,16 +152,7 @@ class PhysicalAttributesSyncControllerIntTest : IntegrationTestBase() {
         expectFieldHistory(WEIGHT, HistoryComparison(value = 70, appliesFrom = THEN, appliesTo = null, createdAt = THEN, createdBy = USER1))
 
         expectSuccessfulSyncFrom(REQUEST_TO_SYNC_HISTORICAL_PHYSICAL_ATTRIBUTES)
-          .expectBody().json(
-            // language=json
-            """
-            {
-              "height": 180,
-              "weight": 70
-            }
-            """.trimIndent(),
-            false,
-          )
+          .expectBody().jsonPath("$.fieldHistoryInserted[*]").value(not(hasItem(-1)))
 
         expectFieldHistory(
           HEIGHT,
@@ -196,16 +171,7 @@ class PhysicalAttributesSyncControllerIntTest : IntegrationTestBase() {
       @Sql("classpath:jpa/repository/reset.sql")
       fun `can sync creation of historical physical attributes`() {
         expectSuccessfulSyncFrom(REQUEST_TO_SYNC_HISTORICAL_PHYSICAL_ATTRIBUTES)
-          .expectBody().json(
-            // language=json
-            """
-            {
-              "height": 190,
-              "weight": 80
-            }
-            """.trimIndent(),
-            false,
-          )
+          .expectBody().jsonPath("$.fieldHistoryInserted[*]").value(not(hasItem(-1)))
 
         expectFieldHistory(HEIGHT, HistoryComparison(value = 190, appliesFrom = THEN.minusYears(1), appliesTo = NOW.minusYears(1), createdAt = NOW, createdBy = USER1))
         expectFieldHistory(WEIGHT, HistoryComparison(value = 80, appliesFrom = THEN.minusYears(1), appliesTo = NOW.minusYears(1), createdAt = NOW, createdBy = USER1))

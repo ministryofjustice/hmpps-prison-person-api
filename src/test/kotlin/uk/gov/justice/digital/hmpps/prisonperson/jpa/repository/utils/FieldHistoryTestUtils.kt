@@ -2,6 +2,8 @@ package uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.utils
 
 import org.assertj.core.api.Assertions.assertThat
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField
+import uk.gov.justice.digital.hmpps.prisonperson.enums.Source
+import uk.gov.justice.digital.hmpps.prisonperson.enums.Source.DPS
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.FieldHistory
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.PhysicalAttributes
 import java.time.ZonedDateTime
@@ -12,6 +14,7 @@ data class HistoryComparison<T>(
   val appliesTo: ZonedDateTime?,
   val createdAt: ZonedDateTime,
   val createdBy: String,
+  val source: Source = DPS,
   val migratedAt: ZonedDateTime? = null,
 )
 
@@ -27,6 +30,7 @@ fun <T> expectFieldHistory(field: PrisonPersonField, history: Collection<FieldHi
     assertThat(actual.appliesTo).isEqualTo(expected.appliesTo)
     assertThat(actual.createdAt).isEqualTo(expected.createdAt)
     assertThat(actual.createdBy).isEqualTo(expected.createdBy)
+    assertThat(actual.source).isEqualTo(expected.source)
   }
 }
 

@@ -6,6 +6,7 @@ import uk.gov.justice.digital.hmpps.prisonperson.dto.PhysicalAttributesDto
 import uk.gov.justice.digital.hmpps.prisonperson.dto.PhysicalAttributesMigrationRequest
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.HEIGHT
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.WEIGHT
+import uk.gov.justice.digital.hmpps.prisonperson.enums.Source.NOMIS
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.FieldHistory
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.FieldMetadata
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.PhysicalAttributes
@@ -62,6 +63,7 @@ class PhysicalAttributesMigrationService(
           appliesTo = appliesTo,
           createdAt = createdAt,
           createdBy = createdBy,
+          source = NOMIS,
           migratedAt = now,
         ).also { field.set(it, getter()) },
       )

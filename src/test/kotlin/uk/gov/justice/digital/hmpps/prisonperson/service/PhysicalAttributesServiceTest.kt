@@ -17,8 +17,6 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.mockito.quality.Strictness.LENIENT
-import org.springframework.data.jpa.domain.AbstractAuditable_.createdBy
-import org.springframework.data.jpa.domain.AbstractAuditable_.lastModifiedBy
 import uk.gov.justice.digital.hmpps.prisonperson.client.prisonersearch.PrisonerSearchClient
 import uk.gov.justice.digital.hmpps.prisonperson.client.prisonersearch.dto.PrisonerDto
 import uk.gov.justice.digital.hmpps.prisonperson.dto.PhysicalAttributesDto

@@ -10,7 +10,6 @@ import jakarta.persistence.OneToMany
 import org.hibernate.Hibernate
 import org.hibernate.annotations.SortNatural
 import org.springframework.data.domain.AbstractAggregateRoot
-import org.springframework.data.jpa.domain.AbstractAuditable_.lastModifiedBy
 import uk.gov.justice.digital.hmpps.prisonperson.dto.PhysicalAttributesDto
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.HEIGHT

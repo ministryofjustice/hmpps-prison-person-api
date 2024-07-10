@@ -3,8 +3,8 @@ package uk.gov.justice.digital.hmpps.prisonperson.service
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.prisonperson.client.prisonersearch.PrisonerSearchClient
-import uk.gov.justice.digital.hmpps.prisonperson.dto.PhysicalAttributesDto
 import uk.gov.justice.digital.hmpps.prisonperson.dto.PhysicalAttributesSyncRequest
+import uk.gov.justice.digital.hmpps.prisonperson.dto.PhysicalAttributesSyncResponse
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.HEIGHT
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.WEIGHT
 import uk.gov.justice.digital.hmpps.prisonperson.enums.Source.NOMIS
@@ -26,13 +26,13 @@ class PhysicalAttributesSyncService(
   fun sync(
     prisonerNumber: String,
     request: PhysicalAttributesSyncRequest,
-  ): PhysicalAttributesDto = if (request.appliesTo === null) {
+  ): PhysicalAttributesSyncResponse = if (request.appliesTo === null) {
     syncLatestPhysicalAttributes(prisonerNumber, request)
   } else {
     syncHistoricalPhysicalAttributes(prisonerNumber, request)
   }
 
-  private fun syncLatestPhysicalAttributes(prisonerNumber: String, request: PhysicalAttributesSyncRequest): PhysicalAttributesDto {
+  private fun syncLatestPhysicalAttributes(prisonerNumber: String, request: PhysicalAttributesSyncRequest): PhysicalAttributesSyncResponse {
     val now = ZonedDateTime.now(clock)
 
     val physicalAttributes = physicalAttributesRepository.findById(prisonerNumber)
@@ -44,11 +44,13 @@ class PhysicalAttributesSyncService(
       .also { it.updateFieldHistory(request.createdAt, request.createdBy) }
       .also { it.publishUpdateEvent(NOMIS, now) }
 
-    return physicalAttributesRepository.save(physicalAttributes).toDto()
+    return PhysicalAttributesSyncResponse(
+      physicalAttributesRepository.save(physicalAttributes).getLatestFieldHistoryIds(),
+    )
   }
 
-  private fun syncHistoricalPhysicalAttributes(prisonerNumber: String, request: PhysicalAttributesSyncRequest): PhysicalAttributesDto {
-    val physicalAttributes = physicalAttributesRepository.findById(prisonerNumber)
+  private fun syncHistoricalPhysicalAttributes(prisonerNumber: String, request: PhysicalAttributesSyncRequest): PhysicalAttributesSyncResponse {
+    physicalAttributesRepository.findById(prisonerNumber)
       .orElseGet {
         physicalAttributesRepository.save(
           newPhysicalAttributesFor(prisonerNumber).apply {
@@ -58,18 +60,16 @@ class PhysicalAttributesSyncService(
         )
       }
 
-    request.addToHistory(prisonerNumber)
-
-    return physicalAttributes.toDto()
+    return PhysicalAttributesSyncResponse(request.addToHistory(prisonerNumber).map { it.fieldHistoryId })
   }
 
-  private fun PhysicalAttributesSyncRequest.addToHistory(prisonerNumber: String) {
+  private fun PhysicalAttributesSyncRequest.addToHistory(prisonerNumber: String): List<FieldHistory> {
     val fieldsToSync = mapOf(
       HEIGHT to ::height,
       WEIGHT to ::weight,
     )
 
-    fieldsToSync.onEach { (field, getter) ->
+    return fieldsToSync.map { (field, getter) ->
       fieldHistoryRepository.save(
         FieldHistory(
           prisonerNumber = prisonerNumber,
@@ -90,4 +90,9 @@ class PhysicalAttributesSyncService(
 
   private fun validatePrisonerNumber(prisonerNumber: String) =
     require(prisonerSearchClient.getPrisoner(prisonerNumber) != null) { "Prisoner number '$prisonerNumber' not found" }
+
+  private fun PhysicalAttributes.getLatestFieldHistoryIds() = listOf(
+    fieldHistory.last { it.field == HEIGHT },
+    fieldHistory.last { it.field == WEIGHT },
+  ).map { it.fieldHistoryId }
 }

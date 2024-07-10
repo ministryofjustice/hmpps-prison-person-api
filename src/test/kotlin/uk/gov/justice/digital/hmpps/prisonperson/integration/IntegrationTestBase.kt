@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.PropertyNamingStrategies
 import com.fasterxml.jackson.databind.annotation.JsonNaming
 import com.fasterxml.jackson.module.kotlin.readValue
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -18,10 +19,17 @@ import software.amazon.awssdk.services.sqs.model.PurgeQueueRequest
 import software.amazon.awssdk.services.sqs.model.ReceiveMessageRequest
 import uk.gov.justice.digital.hmpps.prisonperson.config.CLIENT_ID
 import uk.gov.justice.digital.hmpps.prisonperson.config.JwtAuthHelper
+import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField
 import uk.gov.justice.digital.hmpps.prisonperson.integration.testcontainers.LocalStackContainer
 import uk.gov.justice.digital.hmpps.prisonperson.integration.testcontainers.LocalStackContainer.setLocalStackProperties
 import uk.gov.justice.digital.hmpps.prisonperson.integration.wiremock.HmppsAuthApiExtension
+import uk.gov.justice.digital.hmpps.prisonperson.integration.wiremock.PRISONER_NUMBER
 import uk.gov.justice.digital.hmpps.prisonperson.integration.wiremock.PrisonerSearchExtension
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.FieldMetadata
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.FieldHistoryRepository
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.FieldMetadataRepository
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.utils.HistoryComparison
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.utils.expectFieldHistory
 import uk.gov.justice.digital.hmpps.prisonperson.service.event.DomainEvent
 import uk.gov.justice.hmpps.sqs.HmppsQueue
 import uk.gov.justice.hmpps.sqs.HmppsQueueService
@@ -41,6 +49,12 @@ abstract class IntegrationTestBase : TestBase() {
 
   @Autowired
   lateinit var objectMapper: ObjectMapper
+
+  @Autowired
+  lateinit var fieldHistoryRepository: FieldHistoryRepository
+
+  @Autowired
+  lateinit var fieldMetadataRepository: FieldMetadataRepository
 
   @SpyBean
   lateinit var hmppsQueueService: HmppsQueueService
@@ -72,6 +86,13 @@ abstract class IntegrationTestBase : TestBase() {
     receiveMessageOnQueue()
       .let { objectMapper.readValue<MsgBody>(it.body()) }
       .let { objectMapper.readValue<DomainEvent>(it.Message) }
+
+  internal fun <T> expectFieldHistory(field: PrisonPersonField, vararg comparison: HistoryComparison<T>) =
+    expectFieldHistory(field, fieldHistoryRepository.findAllByPrisonerNumber(PRISONER_NUMBER), *comparison)
+
+  internal fun expectFieldMetadata(vararg comparison: FieldMetadata) {
+    assertThat(fieldMetadataRepository.findAllByPrisonerNumber(PRISONER_NUMBER)).containsAll(comparison.toList())
+  }
 
   @JsonNaming(value = PropertyNamingStrategies.UpperCamelCaseStrategy::class)
   private data class MsgBody(val Message: String)

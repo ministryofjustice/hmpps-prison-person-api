@@ -1,5 +1,7 @@
 package uk.gov.justice.digital.hmpps.prisonperson.service.event
 
+import uk.gov.justice.digital.hmpps.prisonperson.enums.Source
+
 data class DomainEvent(
   val eventType: String,
   val additionalInformation: AdditionalInformation,

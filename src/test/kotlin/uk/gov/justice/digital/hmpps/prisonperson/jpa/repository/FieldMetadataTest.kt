@@ -3,10 +3,9 @@ package uk.gov.justice.digital.hmpps.prisonperson.jpa.repository
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.data.jpa.domain.AbstractAuditable_.lastModifiedBy
 import org.springframework.test.context.transaction.TestTransaction
+import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.WEIGHT
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.FieldMetadata
-import uk.gov.justice.digital.hmpps.prisonperson.jpa.FieldName.WEIGHT
 import java.time.ZonedDateTime
 
 class FieldMetadataTest : RepositoryTest() {

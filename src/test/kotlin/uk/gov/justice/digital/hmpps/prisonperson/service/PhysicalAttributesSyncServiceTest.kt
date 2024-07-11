@@ -19,12 +19,17 @@ import org.mockito.kotlin.whenever
 import org.mockito.quality.Strictness.LENIENT
 import uk.gov.justice.digital.hmpps.prisonperson.client.prisonersearch.PrisonerSearchClient
 import uk.gov.justice.digital.hmpps.prisonperson.client.prisonersearch.dto.PrisonerDto
-import uk.gov.justice.digital.hmpps.prisonperson.dto.PhysicalAttributesHistoryDto
 import uk.gov.justice.digital.hmpps.prisonperson.dto.PhysicalAttributesSyncRequest
+import uk.gov.justice.digital.hmpps.prisonperson.dto.PhysicalAttributesSyncResponse
+import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.HEIGHT
+import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.WEIGHT
+import uk.gov.justice.digital.hmpps.prisonperson.enums.Source.NOMIS
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.FieldHistory
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.PhysicalAttributes
-import uk.gov.justice.digital.hmpps.prisonperson.jpa.PhysicalAttributesHistory
-import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.PhysicalAttributesHistoryRepository
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.FieldHistoryRepository
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.PhysicalAttributesRepository
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.utils.HistoryComparison
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.utils.expectFieldHistory
 import java.time.Clock
 import java.time.LocalDate
 import java.time.ZonedDateTime
@@ -37,7 +42,7 @@ class PhysicalAttributesSyncServiceTest {
   lateinit var physicalAttributesRepository: PhysicalAttributesRepository
 
   @Mock
-  lateinit var physicalAttributesHistoryRepository: PhysicalAttributesHistoryRepository
+  lateinit var fieldHistoryRepository: FieldHistoryRepository
 
   @Mock
   lateinit var prisonerSearchClient: PrisonerSearchClient
@@ -49,7 +54,7 @@ class PhysicalAttributesSyncServiceTest {
   lateinit var underTest: PhysicalAttributesSyncService
 
   private val savedPhysicalAttributes = argumentCaptor<PhysicalAttributes>()
-  private val savedPhysicalAttributesHistory = argumentCaptor<PhysicalAttributesHistory>()
+  private val savedFieldHistory = argumentCaptor<FieldHistory>()
 
   @Nested
   inner class SyncPhysicalAttributes {
@@ -57,7 +62,7 @@ class PhysicalAttributesSyncServiceTest {
     @BeforeEach
     fun beforeEach() {
       whenever(physicalAttributesRepository.save(savedPhysicalAttributes.capture())).thenAnswer { savedPhysicalAttributes.firstValue }
-      whenever(physicalAttributesHistoryRepository.save(savedPhysicalAttributesHistory.capture())).thenAnswer { savedPhysicalAttributesHistory.firstValue }
+      whenever(fieldHistoryRepository.save(savedFieldHistory.capture())).thenAnswer { savedFieldHistory.firstValue }
     }
 
     @Test
@@ -66,38 +71,22 @@ class PhysicalAttributesSyncServiceTest {
       whenever(physicalAttributesRepository.findById(PRISONER_NUMBER)).thenReturn(Optional.empty())
 
       assertThat(underTest.sync(PRISONER_NUMBER, PHYSICAL_ATTRIBUTES_SYNC_REQUEST))
-        .isEqualTo(
-          PhysicalAttributesHistoryDto(
-            physicalAttributesHistoryId = HISTORY_ID,
-            height = PRISONER_HEIGHT,
-            weight = PRISONER_WEIGHT,
-            appliesFrom = NOW,
-            appliesTo = null,
-            createdAt = NOW,
-            createdBy = USER1,
-          ),
-        )
+        .isInstanceOf(PhysicalAttributesSyncResponse::class.java)
 
       with(savedPhysicalAttributes.firstValue) {
         assertThat(prisonerNumber).isEqualTo(PRISONER_NUMBER)
         assertThat(height).isEqualTo(PRISONER_HEIGHT)
         assertThat(weight).isEqualTo(PRISONER_WEIGHT)
-        assertThat(createdAt).isEqualTo(NOW)
-        assertThat(createdBy).isEqualTo(USER1)
-        assertThat(lastModifiedAt).isEqualTo(NOW)
-        assertThat(lastModifiedBy).isEqualTo(USER1)
-        assertThat(migratedAt).isNull()
 
-        assertThat(history).hasSize(1)
-        with(history.first()) {
-          assertThat(height).isEqualTo(PRISONER_HEIGHT)
-          assertThat(weight).isEqualTo(PRISONER_WEIGHT)
-          assertThat(createdAt).isEqualTo(NOW)
-          assertThat(createdBy).isEqualTo(USER1)
-          assertThat(appliesFrom).isEqualTo(NOW)
-          assertThat(appliesTo).isNull()
-          assertThat(migratedAt).isNull()
-        }
+        expectFieldHistory(
+          HEIGHT,
+          HistoryComparison(value = PRISONER_HEIGHT, createdAt = NOW, createdBy = USER1, appliesFrom = NOW, appliesTo = null, source = NOMIS),
+        )
+
+        expectFieldHistory(
+          WEIGHT,
+          HistoryComparison(value = PRISONER_WEIGHT, createdAt = NOW, createdBy = USER1, appliesFrom = NOW, appliesTo = null, source = NOMIS),
+        )
       }
     }
 
@@ -121,58 +110,33 @@ class PhysicalAttributesSyncServiceTest {
             prisonerNumber = PRISONER_NUMBER,
             height = PREVIOUS_PRISONER_HEIGHT,
             weight = PREVIOUS_PRISONER_WEIGHT,
-            createdAt = NOW.minusDays(1),
-            createdBy = USER1,
-            lastModifiedAt = NOW.minusDays(1),
-            lastModifiedBy = USER1,
-          ).also { it.addToHistory() },
+          ).also { it.updateFieldHistory(lastModifiedAt = NOW.minusDays(1), lastModifiedBy = USER1) },
         ),
       )
 
       assertThat(underTest.sync(PRISONER_NUMBER, PHYSICAL_ATTRIBUTES_SYNC_REQUEST.copy(createdBy = USER2)))
-        .isEqualTo(
-          PhysicalAttributesHistoryDto(
-            physicalAttributesHistoryId = HISTORY_ID,
-            height = PRISONER_HEIGHT,
-            weight = PRISONER_WEIGHT,
-            appliesFrom = NOW,
-            appliesTo = null,
-            createdAt = NOW,
-            createdBy = USER2,
-          ),
-        )
+        .isInstanceOf(PhysicalAttributesSyncResponse::class.java)
 
       with(savedPhysicalAttributes.firstValue) {
         assertThat(prisonerNumber).isEqualTo(PRISONER_NUMBER)
         assertThat(height).isEqualTo(PRISONER_HEIGHT)
         assertThat(weight).isEqualTo(PRISONER_WEIGHT)
-        assertThat(createdAt).isEqualTo(NOW.minusDays(1))
-        assertThat(createdBy).isEqualTo(USER1)
-        assertThat(lastModifiedAt).isEqualTo(NOW)
-        assertThat(lastModifiedBy).isEqualTo(USER2)
-        assertThat(migratedAt).isNull()
 
-        assertThat(history).hasSize(2)
-        // Initial history entry:
-        with(getHistoryAsList()[0]) {
-          assertThat(height).isEqualTo(PREVIOUS_PRISONER_HEIGHT)
-          assertThat(weight).isEqualTo(PREVIOUS_PRISONER_WEIGHT)
-          assertThat(appliesFrom).isEqualTo(NOW.minusDays(1))
-          assertThat(appliesTo).isEqualTo(NOW)
-          assertThat(migratedAt).isNull()
-          assertThat(createdAt).isEqualTo(NOW.minusDays(1))
-          assertThat(createdBy).isEqualTo(USER1)
-        }
-        // New history entry:
-        with(getHistoryAsList()[1]) {
-          assertThat(height).isEqualTo(PRISONER_HEIGHT)
-          assertThat(weight).isEqualTo(PRISONER_WEIGHT)
-          assertThat(appliesFrom).isEqualTo(NOW)
-          assertThat(appliesTo).isNull()
-          assertThat(migratedAt).isNull()
-          assertThat(createdAt).isEqualTo(NOW)
-          assertThat(createdBy).isEqualTo(USER2)
-        }
+        expectFieldHistory(
+          HEIGHT,
+          // Initial history entry:
+          HistoryComparison(value = PREVIOUS_PRISONER_HEIGHT, createdAt = NOW.minusDays(1), createdBy = USER1, appliesFrom = NOW.minusDays(1), appliesTo = NOW),
+          // New history entry:
+          HistoryComparison(value = PRISONER_HEIGHT, createdAt = NOW, createdBy = USER2, appliesFrom = NOW, appliesTo = null, source = NOMIS),
+        )
+
+        expectFieldHistory(
+          WEIGHT,
+          // Initial history entry:
+          HistoryComparison(value = PREVIOUS_PRISONER_WEIGHT, createdAt = NOW.minusDays(1), createdBy = USER1, appliesFrom = NOW.minusDays(1), appliesTo = NOW),
+          // New history entry:
+          HistoryComparison(value = PRISONER_WEIGHT, createdAt = NOW, createdBy = USER2, appliesFrom = NOW, appliesTo = null, source = NOMIS),
+        )
       }
     }
 
@@ -184,11 +148,7 @@ class PhysicalAttributesSyncServiceTest {
             prisonerNumber = PRISONER_NUMBER,
             height = PRISONER_HEIGHT,
             weight = PRISONER_WEIGHT,
-            createdAt = NOW.minusDays(1),
-            createdBy = USER1,
-            lastModifiedAt = NOW.minusDays(1),
-            lastModifiedBy = USER1,
-          ).also { it.addToHistory() },
+          ).also { it.updateFieldHistory(lastModifiedAt = NOW.minusDays(1), lastModifiedBy = USER1) },
         ),
       )
 
@@ -205,38 +165,33 @@ class PhysicalAttributesSyncServiceTest {
           ),
         ),
       )
-        .isEqualTo(
-          PhysicalAttributesHistoryDto(
-            physicalAttributesHistoryId = HISTORY_ID,
-            height = PREVIOUS_PRISONER_HEIGHT,
-            weight = PREVIOUS_PRISONER_WEIGHT,
-            appliesFrom = NOW.minusDays(10),
-            appliesTo = NOW.minusDays(5),
-            createdAt = NOW,
-            createdBy = USER2,
-          ),
-        )
+        .isInstanceOf(PhysicalAttributesSyncResponse::class.java)
 
-      with(savedPhysicalAttributesHistory.firstValue) {
-        assertThat(height).isEqualTo(PREVIOUS_PRISONER_HEIGHT)
-        assertThat(weight).isEqualTo(PREVIOUS_PRISONER_WEIGHT)
-        assertThat(appliesFrom).isEqualTo(NOW.minusDays(10))
-        assertThat(appliesTo).isEqualTo(NOW.minusDays(5))
-        assertThat(createdAt).isEqualTo(NOW)
-        assertThat(createdBy).isEqualTo(USER2)
-        assertThat(migratedAt).isNull()
+      expectFieldHistory(
+        HEIGHT,
+        savedFieldHistory.allValues,
+        HistoryComparison(
+          value = PREVIOUS_PRISONER_HEIGHT,
+          createdAt = NOW,
+          createdBy = USER2,
+          appliesFrom = NOW.minusDays(10),
+          appliesTo = NOW.minusDays(5),
+          source = NOMIS,
+        ),
+      )
 
-        with(physicalAttributes) {
-          assertThat(prisonerNumber).isEqualTo(PRISONER_NUMBER)
-          assertThat(height).isEqualTo(PRISONER_HEIGHT)
-          assertThat(weight).isEqualTo(PRISONER_WEIGHT)
-          assertThat(createdAt).isEqualTo(NOW.minusDays(1))
-          assertThat(createdBy).isEqualTo(USER1)
-          assertThat(lastModifiedAt).isEqualTo(NOW.minusDays(1))
-          assertThat(lastModifiedBy).isEqualTo(USER1)
-          assertThat(migratedAt).isNull()
-        }
-      }
+      expectFieldHistory(
+        WEIGHT,
+        savedFieldHistory.allValues,
+        HistoryComparison(
+          value = PREVIOUS_PRISONER_WEIGHT,
+          createdAt = NOW,
+          createdBy = USER2,
+          appliesFrom = NOW.minusDays(10),
+          appliesTo = NOW.minusDays(5),
+          source = NOMIS,
+        ),
+      )
     }
 
     @Test
@@ -245,38 +200,22 @@ class PhysicalAttributesSyncServiceTest {
       whenever(physicalAttributesRepository.findById(PRISONER_NUMBER)).thenReturn(Optional.empty())
 
       assertThat(underTest.sync(PRISONER_NUMBER, PHYSICAL_ATTRIBUTES_SYNC_REQUEST.copy(height = null, weight = null)))
-        .isEqualTo(
-          PhysicalAttributesHistoryDto(
-            physicalAttributesHistoryId = HISTORY_ID,
-            height = null,
-            weight = null,
-            appliesFrom = NOW,
-            appliesTo = null,
-            createdAt = NOW,
-            createdBy = USER1,
-          ),
-        )
+        .isInstanceOf(PhysicalAttributesSyncResponse::class.java)
 
       with(savedPhysicalAttributes.firstValue) {
         assertThat(prisonerNumber).isEqualTo(PRISONER_NUMBER)
         assertThat(height).isEqualTo(null)
         assertThat(weight).isEqualTo(null)
-        assertThat(createdAt).isEqualTo(NOW)
-        assertThat(createdBy).isEqualTo(USER1)
-        assertThat(lastModifiedAt).isEqualTo(NOW)
-        assertThat(lastModifiedBy).isEqualTo(USER1)
-        assertThat(migratedAt).isNull()
 
-        assertThat(history).hasSize(1)
-        with(history.first()) {
-          assertThat(height).isEqualTo(null)
-          assertThat(weight).isEqualTo(null)
-          assertThat(createdAt).isEqualTo(NOW)
-          assertThat(createdBy).isEqualTo(USER1)
-          assertThat(appliesFrom).isEqualTo(NOW)
-          assertThat(appliesTo).isNull()
-          assertThat(migratedAt).isNull()
-        }
+        expectFieldHistory(
+          HEIGHT,
+          HistoryComparison(value = null, createdAt = NOW, createdBy = USER1, appliesFrom = NOW, appliesTo = null, source = NOMIS),
+        )
+
+        expectFieldHistory(
+          WEIGHT,
+          HistoryComparison(value = null, createdAt = NOW, createdBy = USER1, appliesFrom = NOW, appliesTo = null, source = NOMIS),
+        )
       }
     }
   }
@@ -289,7 +228,6 @@ class PhysicalAttributesSyncServiceTest {
     const val PREVIOUS_PRISONER_WEIGHT = 69
     const val USER1 = "USER1"
     const val USER2 = "USER2"
-    const val HISTORY_ID = -1L
 
     val NOW: ZonedDateTime = ZonedDateTime.now()
 

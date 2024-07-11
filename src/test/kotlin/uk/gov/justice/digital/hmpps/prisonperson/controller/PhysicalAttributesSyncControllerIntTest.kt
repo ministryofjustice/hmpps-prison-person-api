@@ -4,25 +4,25 @@ import org.assertj.core.api.Assertions.assertThat
 import org.awaitility.kotlin.await
 import org.awaitility.kotlin.matches
 import org.awaitility.kotlin.untilCallTo
+import org.hamcrest.Matchers.hasItem
+import org.hamcrest.Matchers.not
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Primary
 import org.springframework.test.context.jdbc.Sql
+import uk.gov.justice.digital.hmpps.prisonperson.enums.EventType.PHYSICAL_ATTRIBUTES_UPDATED
+import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.HEIGHT
+import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.WEIGHT
+import uk.gov.justice.digital.hmpps.prisonperson.enums.Source.DPS
+import uk.gov.justice.digital.hmpps.prisonperson.enums.Source.NOMIS
 import uk.gov.justice.digital.hmpps.prisonperson.integration.IntegrationTestBase
-import uk.gov.justice.digital.hmpps.prisonperson.integration.wiremock.PRISONER_NUMBER
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.FieldMetadata
-import uk.gov.justice.digital.hmpps.prisonperson.jpa.FieldName.HEIGHT
-import uk.gov.justice.digital.hmpps.prisonperson.jpa.FieldName.WEIGHT
-import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.FieldMetadataRepository
-import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.PhysicalAttributesHistoryRepository
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.utils.HistoryComparison
 import uk.gov.justice.digital.hmpps.prisonperson.service.event.AdditionalInformation
 import uk.gov.justice.digital.hmpps.prisonperson.service.event.DomainEvent
-import uk.gov.justice.digital.hmpps.prisonperson.service.event.EventType.PHYSICAL_ATTRIBUTES_UPDATED
-import uk.gov.justice.digital.hmpps.prisonperson.service.event.Source.NOMIS
 import java.time.Clock
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -36,12 +36,6 @@ class PhysicalAttributesSyncControllerIntTest : IntegrationTestBase() {
     @Bean
     fun fixedClock(): Clock = clock
   }
-
-  @Autowired
-  lateinit var physicalAttributesHistoryRepository: PhysicalAttributesHistoryRepository
-
-  @Autowired
-  lateinit var fieldMetadataRepository: FieldMetadataRepository
 
   @DisplayName("PUT /sync/prisoners/{prisonerNumber}/physical-attributes")
   @Nested
@@ -110,32 +104,10 @@ class PhysicalAttributesSyncControllerIntTest : IntegrationTestBase() {
       @Sql("classpath:jpa/repository/reset.sql")
       fun `can sync creation of a new set of physical attributes`() {
         expectSuccessfulSyncFrom(REQUEST_TO_SYNC_LATEST_PHYSICAL_ATTRIBUTES)
-          .expectBody().json(
-            // language=json
-            """
-            {
-              "height": 190,
-              "weight": 80,
-              "appliesFrom": "2024-06-14T09:10:11.123+01:00[Europe/London]",
-              "appliesTo": null,
-              "createdAt": "2024-06-14T09:10:11.123+01:00[Europe/London]",
-              "createdBy": "USER1"
-            }
-            """.trimIndent(),
-            false,
-          )
-          .jsonPath("physicalAttributesHistoryId").isNumber
+          .expectBody().jsonPath("$.fieldHistoryInserted[*]").value(not(hasItem(-1)))
 
-        expectHistory(
-          HistoryComparison(
-            height = 190,
-            weight = 80,
-            appliesFrom = NOW,
-            appliesTo = null,
-            createdAt = NOW,
-            createdBy = USER1,
-          ),
-        )
+        expectFieldHistory(HEIGHT, HistoryComparison(value = 190, appliesFrom = NOW, appliesTo = null, createdAt = NOW, createdBy = USER1, source = NOMIS))
+        expectFieldHistory(WEIGHT, HistoryComparison(value = 80, appliesFrom = NOW, appliesTo = null, createdAt = NOW, createdBy = USER1, source = NOMIS))
 
         expectFieldMetadata(
           FieldMetadata(PRISONER_NUMBER, HEIGHT, lastModifiedAt = NOW, lastModifiedBy = USER1),
@@ -148,51 +120,22 @@ class PhysicalAttributesSyncControllerIntTest : IntegrationTestBase() {
       @Sql("classpath:controller/physical_attributes.sql")
       @Sql("classpath:controller/physical_attributes_history.sql")
       fun `can sync an update of existing physical attributes`() {
-        expectHistory(
-          HistoryComparison(
-            height = 180,
-            weight = 70,
-            appliesFrom = THEN,
-            appliesTo = null,
-            createdAt = THEN,
-            createdBy = USER1,
-          ),
-        )
+        expectFieldHistory(HEIGHT, HistoryComparison(value = 180, appliesFrom = THEN, appliesTo = null, createdAt = THEN, createdBy = USER1))
+        expectFieldHistory(WEIGHT, HistoryComparison(value = 70, appliesFrom = THEN, appliesTo = null, createdAt = THEN, createdBy = USER1))
 
         expectSuccessfulSyncFrom(REQUEST_TO_SYNC_LATEST_PHYSICAL_ATTRIBUTES)
-          .expectBody().json(
-            // language=json
-            """
-            {
-              "height": 190,
-              "weight": 80,
-              "appliesFrom": "2024-06-14T09:10:11.123+01:00[Europe/London]",
-              "appliesTo": null,
-              "createdAt": "2024-06-14T09:10:11.123+01:00[Europe/London]",
-              "createdBy": "USER1"
-            }
-            """.trimIndent(),
-            false,
-          )
-          .jsonPath("physicalAttributesHistoryId").isNumber
+          .expectBody().jsonPath("$.fieldHistoryInserted[*]").value(not(hasItem(-1)))
 
-        expectHistory(
-          HistoryComparison(
-            height = 180,
-            weight = 70,
-            appliesFrom = THEN,
-            appliesTo = NOW,
-            createdAt = THEN,
-            createdBy = USER1,
-          ),
-          HistoryComparison(
-            height = 190,
-            weight = 80,
-            appliesFrom = NOW,
-            appliesTo = null,
-            createdAt = NOW,
-            createdBy = USER1,
-          ),
+        expectFieldHistory(
+          HEIGHT,
+          HistoryComparison(value = 180, appliesFrom = THEN, appliesTo = NOW, createdAt = THEN, createdBy = USER1, source = DPS),
+          HistoryComparison(value = 190, appliesFrom = NOW, appliesTo = null, createdAt = NOW, createdBy = USER1, source = NOMIS),
+        )
+
+        expectFieldHistory(
+          WEIGHT,
+          HistoryComparison(value = 70, appliesFrom = THEN, appliesTo = NOW, createdAt = THEN, createdBy = USER1, source = DPS),
+          HistoryComparison(value = 80, appliesFrom = NOW, appliesTo = null, createdAt = NOW, createdBy = USER1, source = NOMIS),
         )
 
         expectFieldMetadata(
@@ -206,51 +149,22 @@ class PhysicalAttributesSyncControllerIntTest : IntegrationTestBase() {
       @Sql("classpath:controller/physical_attributes.sql")
       @Sql("classpath:controller/physical_attributes_history.sql")
       fun `can sync a historical update of physical attributes`() {
-        expectHistory(
-          HistoryComparison(
-            height = 180,
-            weight = 70,
-            appliesFrom = THEN,
-            appliesTo = null,
-            createdAt = THEN,
-            createdBy = USER1,
-          ),
-        )
+        expectFieldHistory(HEIGHT, HistoryComparison(value = 180, appliesFrom = THEN, appliesTo = null, createdAt = THEN, createdBy = USER1))
+        expectFieldHistory(WEIGHT, HistoryComparison(value = 70, appliesFrom = THEN, appliesTo = null, createdAt = THEN, createdBy = USER1))
 
         expectSuccessfulSyncFrom(REQUEST_TO_SYNC_HISTORICAL_PHYSICAL_ATTRIBUTES)
-          .expectBody().json(
-            // language=json
-            """
-            {
-              "height": 190,
-              "weight": 80,
-              "appliesFrom": "2023-01-02T09:10:11.123Z[Europe/London]",
-              "appliesTo": "2023-06-14T09:10:11.123+01:00[Europe/London]",
-              "createdAt": "2024-06-14T09:10:11.123+01:00[Europe/London]",
-              "createdBy": "USER1"
-            }
-            """.trimIndent(),
-            false,
-          )
-          .jsonPath("physicalAttributesHistoryId").isNumber
+          .expectBody().jsonPath("$.fieldHistoryInserted[*]").value(not(hasItem(-1)))
 
-        expectHistory(
-          HistoryComparison(
-            height = 190,
-            weight = 80,
-            appliesFrom = THEN.minusYears(1),
-            appliesTo = NOW.minusYears(1),
-            createdAt = NOW,
-            createdBy = USER1,
-          ),
-          HistoryComparison(
-            height = 180,
-            weight = 70,
-            appliesFrom = THEN,
-            appliesTo = null,
-            createdAt = THEN,
-            createdBy = USER1,
-          ),
+        expectFieldHistory(
+          HEIGHT,
+          HistoryComparison(value = 190, appliesFrom = THEN.minusYears(1), appliesTo = NOW.minusYears(1), createdAt = NOW, createdBy = USER1, source = NOMIS),
+          HistoryComparison(value = 180, appliesFrom = THEN, appliesTo = null, createdAt = THEN, createdBy = USER1, source = DPS),
+        )
+
+        expectFieldHistory(
+          WEIGHT,
+          HistoryComparison(value = 80, appliesFrom = THEN.minusYears(1), appliesTo = NOW.minusYears(1), createdAt = NOW, createdBy = USER1, source = NOMIS),
+          HistoryComparison(value = 70, appliesFrom = THEN, appliesTo = null, createdAt = THEN, createdBy = USER1, source = DPS),
         )
       }
 
@@ -258,32 +172,10 @@ class PhysicalAttributesSyncControllerIntTest : IntegrationTestBase() {
       @Sql("classpath:jpa/repository/reset.sql")
       fun `can sync creation of historical physical attributes`() {
         expectSuccessfulSyncFrom(REQUEST_TO_SYNC_HISTORICAL_PHYSICAL_ATTRIBUTES)
-          .expectBody().json(
-            // language=json
-            """
-            {
-              "height": 190,
-              "weight": 80,
-              "appliesFrom": "2023-01-02T09:10:11.123Z[Europe/London]",
-              "appliesTo": "2023-06-14T09:10:11.123+01:00[Europe/London]",
-              "createdAt": "2024-06-14T09:10:11.123+01:00[Europe/London]",
-              "createdBy": "USER1"
-            }
-            """.trimIndent(),
-            false,
-          )
-          .jsonPath("physicalAttributesHistoryId").isNumber
+          .expectBody().jsonPath("$.fieldHistoryInserted[*]").value(not(hasItem(-1)))
 
-        expectHistory(
-          HistoryComparison(
-            height = 190,
-            weight = 80,
-            appliesFrom = THEN.minusYears(1),
-            appliesTo = NOW.minusYears(1),
-            createdAt = NOW,
-            createdBy = USER1,
-          ),
-        )
+        expectFieldHistory(HEIGHT, HistoryComparison(value = 190, appliesFrom = THEN.minusYears(1), appliesTo = NOW.minusYears(1), createdAt = NOW, createdBy = USER1, source = NOMIS))
+        expectFieldHistory(WEIGHT, HistoryComparison(value = 80, appliesFrom = THEN.minusYears(1), appliesTo = NOW.minusYears(1), createdAt = NOW, createdBy = USER1, source = NOMIS))
       }
 
       @Test
@@ -316,27 +208,6 @@ class PhysicalAttributesSyncControllerIntTest : IntegrationTestBase() {
           .bodyValue(requestBody)
           .exchange()
           .expectStatus().isOk
-
-      private fun expectHistory(vararg comparison: HistoryComparison) {
-        val history = physicalAttributesHistoryRepository.findAllByPhysicalAttributesPrisonerNumber(
-          PRISONER_NUMBER,
-        ).toList()
-        assertThat(history).hasSize(comparison.size)
-
-        history.forEachIndexed { index, actual ->
-          val expected = comparison[index]
-          assertThat(actual.height).isEqualTo(expected.height)
-          assertThat(actual.weight).isEqualTo(expected.weight)
-          assertThat(actual.appliesFrom).isEqualTo(expected.appliesFrom)
-          assertThat(actual.appliesTo).isEqualTo(expected.appliesTo)
-          assertThat(actual.createdAt).isEqualTo(expected.createdAt)
-          assertThat(actual.createdBy).isEqualTo(expected.createdBy)
-        }
-      }
-
-      private fun expectFieldMetadata(vararg comparison: FieldMetadata) {
-        assertThat(fieldMetadataRepository.findAllByPrisonerNumber(PRISONER_NUMBER)).containsAll(comparison.toList())
-      }
     }
   }
 
@@ -374,13 +245,4 @@ class PhysicalAttributesSyncControllerIntTest : IntegrationTestBase() {
 
     val VALID_REQUEST_BODY = REQUEST_TO_SYNC_LATEST_PHYSICAL_ATTRIBUTES
   }
-
-  private data class HistoryComparison(
-    val height: Int?,
-    val weight: Int?,
-    val appliesFrom: ZonedDateTime,
-    val appliesTo: ZonedDateTime?,
-    val createdAt: ZonedDateTime,
-    val createdBy: String,
-  )
 }

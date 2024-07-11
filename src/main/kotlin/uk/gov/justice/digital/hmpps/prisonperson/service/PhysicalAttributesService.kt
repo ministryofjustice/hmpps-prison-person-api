@@ -5,9 +5,9 @@ import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.prisonperson.client.prisonersearch.PrisonerSearchClient
 import uk.gov.justice.digital.hmpps.prisonperson.dto.PhysicalAttributesDto
 import uk.gov.justice.digital.hmpps.prisonperson.dto.PhysicalAttributesUpdateRequest
+import uk.gov.justice.digital.hmpps.prisonperson.enums.Source.DPS
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.PhysicalAttributes
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.PhysicalAttributesRepository
-import uk.gov.justice.digital.hmpps.prisonperson.service.event.Source.DPS
 import uk.gov.justice.digital.hmpps.prisonperson.utils.AuthenticationFacade
 import java.time.Clock
 import java.time.ZonedDateTime
@@ -31,29 +31,20 @@ class PhysicalAttributesService(
     val now = ZonedDateTime.now(clock)
 
     val physicalAttributes = physicalAttributesRepository.findById(prisonerNumber)
-      .orElseGet { newPhysicalAttributesFor(prisonerNumber, now) }
+      .orElseGet { newPhysicalAttributesFor(prisonerNumber) }
       .apply {
         height = request.height
         weight = request.weight
-        lastModifiedAt = now
-        lastModifiedBy = authenticationFacade.getUserOrSystemInContext()
       }
-      .also { it.addToHistory() }
+      .also { it.updateFieldHistory(now, authenticationFacade.getUserOrSystemInContext()) }
       .also { it.publishUpdateEvent(DPS, now) }
 
     return physicalAttributesRepository.save(physicalAttributes).toDto()
   }
 
-  private fun newPhysicalAttributesFor(prisonerNumber: String, now: ZonedDateTime): PhysicalAttributes {
+  private fun newPhysicalAttributesFor(prisonerNumber: String): PhysicalAttributes {
     validatePrisonerNumber(prisonerNumber)
-
-    val username = authenticationFacade.getUserOrSystemInContext()
-    return PhysicalAttributes(
-      prisonerNumber,
-      createdAt = now,
-      createdBy = username,
-      lastModifiedBy = username,
-    )
+    return PhysicalAttributes(prisonerNumber)
   }
 
   private fun validatePrisonerNumber(prisonerNumber: String) =

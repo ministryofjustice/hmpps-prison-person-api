@@ -2,8 +2,8 @@ package uk.gov.justice.digital.hmpps.prisonperson.service
 
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import uk.gov.justice.digital.hmpps.prisonperson.dto.PhysicalAttributesDto
-import uk.gov.justice.digital.hmpps.prisonperson.dto.PhysicalAttributesMigrationRequest
+import uk.gov.justice.digital.hmpps.prisonperson.dto.request.PhysicalAttributesMigrationRequest
+import uk.gov.justice.digital.hmpps.prisonperson.dto.response.PhysicalAttributesMigrationResponse
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.HEIGHT
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.WEIGHT
 import uk.gov.justice.digital.hmpps.prisonperson.enums.Source.NOMIS
@@ -24,7 +24,7 @@ class PhysicalAttributesMigrationService(
   fun migrate(
     prisonerNumber: String,
     migration: SortedSet<PhysicalAttributesMigrationRequest>,
-  ): PhysicalAttributesDto {
+  ): PhysicalAttributesMigrationResponse {
     val now = ZonedDateTime.now(clock)
     val latestRecord = migration.last()
 
@@ -45,7 +45,9 @@ class PhysicalAttributesMigrationService(
 
     migration.forEach { it.addToHistory(physicalAttributes, now) }
 
-    return physicalAttributesRepository.save(physicalAttributes).toDto()
+    return PhysicalAttributesMigrationResponse(
+      physicalAttributesRepository.save(physicalAttributes).fieldHistory.map { it.fieldHistoryId },
+    )
   }
 
   private fun PhysicalAttributesMigrationRequest.addToHistory(physicalAttributes: PhysicalAttributes, now: ZonedDateTime) {

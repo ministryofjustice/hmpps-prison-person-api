@@ -3,8 +3,8 @@ package uk.gov.justice.digital.hmpps.prisonperson.service
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.prisonperson.client.prisonersearch.PrisonerSearchClient
-import uk.gov.justice.digital.hmpps.prisonperson.dto.PhysicalAttributesDto
-import uk.gov.justice.digital.hmpps.prisonperson.dto.PhysicalAttributesUpdateRequest
+import uk.gov.justice.digital.hmpps.prisonperson.dto.request.PhysicalAttributesUpdateRequest
+import uk.gov.justice.digital.hmpps.prisonperson.dto.response.PhysicalAttributesDto
 import uk.gov.justice.digital.hmpps.prisonperson.enums.Source.DPS
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.PhysicalAttributes
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.PhysicalAttributesRepository

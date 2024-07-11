@@ -11,8 +11,8 @@ import org.mockito.Spy
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.whenever
-import uk.gov.justice.digital.hmpps.prisonperson.dto.PhysicalAttributesDto
-import uk.gov.justice.digital.hmpps.prisonperson.dto.PhysicalAttributesMigrationRequest
+import uk.gov.justice.digital.hmpps.prisonperson.dto.request.PhysicalAttributesMigrationRequest
+import uk.gov.justice.digital.hmpps.prisonperson.dto.response.PhysicalAttributesMigrationResponse
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.HEIGHT
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.WEIGHT
 import uk.gov.justice.digital.hmpps.prisonperson.enums.Source.NOMIS
@@ -49,7 +49,7 @@ class PhysicalAttributesMigrationServiceTest {
     @Test
     fun `migrates a single version of physical attributes`() {
       assertThat(underTest.migrate(PRISONER_NUMBER, sortedSetOf(PHYSICAL_ATTRIBUTES_MIGRATION_REQUEST)))
-        .isEqualTo(PhysicalAttributesDto(PRISONER_HEIGHT, PRISONER_WEIGHT))
+        .isInstanceOf(PhysicalAttributesMigrationResponse::class.java)
 
       with(savedPhysicalAttributes.firstValue) {
         assertThat(prisonerNumber).isEqualTo(PRISONER_NUMBER)
@@ -75,7 +75,7 @@ class PhysicalAttributesMigrationServiceTest {
       val record3 = generatePrevious(record2, USER3)
 
       assertThat(underTest.migrate(PRISONER_NUMBER, sortedSetOf(record1, record2, record3)))
-        .isEqualTo(PhysicalAttributesDto(PRISONER_HEIGHT, PRISONER_WEIGHT))
+        .isInstanceOf(PhysicalAttributesMigrationResponse::class.java)
 
       with(savedPhysicalAttributes.firstValue) {
         assertThat(prisonerNumber).isEqualTo(PRISONER_NUMBER)
@@ -101,7 +101,7 @@ class PhysicalAttributesMigrationServiceTest {
     @Test
     fun `migrates physical attributes with null height and weight`() {
       assertThat(underTest.migrate(PRISONER_NUMBER, sortedSetOf(PHYSICAL_ATTRIBUTES_MIGRATION_REQUEST.copy(height = null, weight = null))))
-        .isEqualTo(PhysicalAttributesDto(null, null))
+        .isInstanceOf(PhysicalAttributesMigrationResponse::class.java)
 
       with(savedPhysicalAttributes.firstValue) {
         assertThat(prisonerNumber).isEqualTo(PRISONER_NUMBER)

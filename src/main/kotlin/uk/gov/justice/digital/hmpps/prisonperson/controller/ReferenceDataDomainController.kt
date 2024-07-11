@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
@@ -27,11 +28,13 @@ class ReferenceDataDomainController(
 
   @GetMapping
   @ResponseStatus(HttpStatus.OK)
+  @PreAuthorize("hasRole('ROLE_PRISON_PERSON_API__REFERENCE_DATA__RO')")
   @Operation(
     summary = "Get all reference data domains",
     description = "Returns the list of reference data domains. " +
       "By default this endpoint only returns active reference data domains. " +
-      "The `includeInactive` parameter can be used to return all reference data domains.",
+      "The `includeInactive` parameter can be used to return all reference data domains. " +
+      "Requires role `ROLE_PRISON_PERSON_API__REFERENCE_DATA__RO`",
     responses = [
       ApiResponse(
         responseCode = "200",
@@ -54,9 +57,11 @@ class ReferenceDataDomainController(
 
   @GetMapping("/{domain}")
   @ResponseStatus(HttpStatus.OK)
+  @PreAuthorize("hasRole('ROLE_PRISON_PERSON_API__REFERENCE_DATA__RO')")
   @Operation(
     summary = "Get a reference data domain",
-    description = "Returns the reference data domain, including all reference data codes linked to that domain.",
+    description = "Returns the reference data domain, including all reference data codes linked to that domain. " +
+      "Requires role `ROLE_PRISON_PERSON_API__REFERENCE_DATA__RO`",
     responses = [
       ApiResponse(
         responseCode = "200",

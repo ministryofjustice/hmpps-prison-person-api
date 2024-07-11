@@ -28,7 +28,7 @@ class ReferenceDataDomainControllerIntTest : IntegrationTestBase() {
       @Test
       fun `can retrieve reference data domains`() {
         webTestClient.get().uri("/reference-data/domains")
-          .headers(setAuthorisation())
+          .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__REFERENCE_DATA__RO")))
           .exchange()
           .expectStatus().is5xxServerError
       }
@@ -56,7 +56,7 @@ class ReferenceDataDomainControllerIntTest : IntegrationTestBase() {
       @Test
       fun `can retrieve reference data domain`() {
         webTestClient.get().uri("/reference-data/domains/HAIR")
-          .headers(setAuthorisation())
+          .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__REFERENCE_DATA__RO")))
           .exchange()
           .expectStatus().is5xxServerError
       }
@@ -68,7 +68,7 @@ class ReferenceDataDomainControllerIntTest : IntegrationTestBase() {
       @Test
       fun `receive a 404 when no reference data domain found`() {
         webTestClient.get().uri("/reference-data/domains/UNKNOWN")
-          .headers(setAuthorisation())
+          .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__REFERENCE_DATA__RO")))
           .exchange()
           .expectStatus().is5xxServerError
       }

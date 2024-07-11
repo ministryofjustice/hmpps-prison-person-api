@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
@@ -27,11 +28,13 @@ class ReferenceDataCodeController(
 
   @GetMapping
   @ResponseStatus(HttpStatus.OK)
+  @PreAuthorize("hasRole('ROLE_PRISON_PERSON_API__REFERENCE_DATA__RO')")
   @Operation(
     summary = "Get all reference data codes for {domain}",
     description = "Returns the list of reference data codes within {domain}. " +
       "By default this endpoint only returns active reference data codes. " +
-      "The `includeInactive` parameter can be used to return all reference data codes.",
+      "The `includeInactive` parameter can be used to return all reference data codes. " +
+      "Requires role `ROLE_PRISON_PERSON_API__REFERENCE_DATA__RO`",
     responses = [
       ApiResponse(
         responseCode = "200",
@@ -53,13 +56,15 @@ class ReferenceDataCodeController(
   fun getReferenceDataCodes(
     @PathVariable domain: String,
     @Parameter(
-      description = "Include inactive reference data codes. Defaults to false.",
+      description = "Include inactive reference data codes. Defaults to false. " +
+        "Requires role `ROLE_PRISON_PERSON_API__REFERENCE_DATA__RO`",
     )
     includeInactive: Boolean = false,
   ): Collection<ReferenceDataCodeDto> = referenceDataCodeService.getReferenceDataCodes(domain, includeInactive)
 
   @GetMapping("/{code}")
   @ResponseStatus(HttpStatus.OK)
+  @PreAuthorize("hasRole('ROLE_PRISON_PERSON_API__REFERENCE_DATA__RO')")
   @Operation(
     summary = "Get a reference data code",
     description = "Returns the reference data code.",

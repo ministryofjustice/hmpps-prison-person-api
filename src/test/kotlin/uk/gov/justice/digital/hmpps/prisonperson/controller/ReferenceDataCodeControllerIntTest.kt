@@ -28,7 +28,7 @@ class ReferenceDataCodeControllerIntTest : IntegrationTestBase() {
       @Test
       fun `can retrieve reference data codes`() {
         webTestClient.get().uri("/reference-data/domains/HAIR/codes")
-          .headers(setAuthorisation())
+          .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__REFERENCE_DATA__RO")))
           .exchange()
           .expectStatus().is5xxServerError
       }
@@ -40,7 +40,7 @@ class ReferenceDataCodeControllerIntTest : IntegrationTestBase() {
       @Test
       fun `receive a 404 when no reference data domain found`() {
         webTestClient.get().uri("/reference-data/domains/UNKNOWN/codes")
-          .headers(setAuthorisation())
+          .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__REFERENCE_DATA__RO")))
           .exchange()
           .expectStatus().is5xxServerError
       }
@@ -68,7 +68,7 @@ class ReferenceDataCodeControllerIntTest : IntegrationTestBase() {
       @Test
       fun `can retrieve reference data code`() {
         webTestClient.get().uri("/reference-data/domains/HAIR/codes/BLONDE")
-          .headers(setAuthorisation())
+          .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__REFERENCE_DATA__RO")))
           .exchange()
           .expectStatus().is5xxServerError
       }
@@ -80,7 +80,7 @@ class ReferenceDataCodeControllerIntTest : IntegrationTestBase() {
       @Test
       fun `receive a 404 when no reference data domain found`() {
         webTestClient.get().uri("/reference-data/domains/UNKNOWN/codes/BLONDE")
-          .headers(setAuthorisation())
+          .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__REFERENCE_DATA__RO")))
           .exchange()
           .expectStatus().is5xxServerError
       }
@@ -88,7 +88,7 @@ class ReferenceDataCodeControllerIntTest : IntegrationTestBase() {
       @Test
       fun `receive a 404 when no reference data code found`() {
         webTestClient.get().uri("/reference-data/domains/HAIR/codes/UNKNOWN")
-          .headers(setAuthorisation())
+          .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__REFERENCE_DATA__RO")))
           .exchange()
           .expectStatus().is5xxServerError
       }

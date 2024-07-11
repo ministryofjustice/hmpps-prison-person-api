@@ -11,8 +11,8 @@ class ReferenceDataCodeService(
   private val referenceDataCodeRepository: ReferenceDataCodeRepository,
 ) {
   fun getReferenceDataCodes(domain: String, includeInactive: Boolean): Collection<ReferenceDataCodeDto> =
-    TODO("Awaiting DB implementation") // referenceDataCodeRepository.findAllByDomainAndIncludeInactive(domain, includeInactive).toDtos()
+    TODO("Awaiting DB implementation") // referenceDataCodeRepository.findAllByDomainAndIncludeInactive(domain, includeInactive).map { it.toDto() }
 
   fun getReferenceDataCode(domain: String, code: String): ReferenceDataCodeDto =
-    TODO("Awaiting DB implementation") // referenceDataCodeRepository.findByIdAndDomain(code, domain).getOrNull()?.toDto()
+    TODO("Awaiting DB implementation") // referenceDataCodeRepository.findByIdAndDomain(code, domain).orElseThrow { EntityNotFoundException("Reference Data Code not found") }.toDto()
 }

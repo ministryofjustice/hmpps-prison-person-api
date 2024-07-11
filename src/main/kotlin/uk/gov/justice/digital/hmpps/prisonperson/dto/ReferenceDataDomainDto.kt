@@ -1,7 +1,6 @@
 package uk.gov.justice.digital.hmpps.prisonperson.dto
 
 import io.swagger.v3.oas.annotations.media.Schema
-import uk.gov.justice.digital.hmpps.prisonperson.jpa.ReferenceDataCode
 import java.time.ZonedDateTime
 
 @Schema(description = "Reference Data Domain")
@@ -27,7 +26,6 @@ data class ReferenceDataDomainDto(
 
   @Schema(
     description = "The date and time the reference data domain was created",
-    example = "2024-06-30T15:43:27+0000",
   )
   val createdAt: ZonedDateTime,
 
@@ -39,7 +37,6 @@ data class ReferenceDataDomainDto(
 
   @Schema(
     description = "The date and time the reference data domain was last modified",
-    example = "2024-07-01T09:41:00+0000",
   )
   val modifiedAt: ZonedDateTime?,
 
@@ -51,7 +48,6 @@ data class ReferenceDataDomainDto(
 
   @Schema(
     description = "The date and time the reference data domain was deactivated",
-    example = "2024-07-08T22:30:11+0000",
   )
   val deactivatedAt: ZonedDateTime?,
 
@@ -64,5 +60,5 @@ data class ReferenceDataDomainDto(
   @Schema(
     description = "The reference data codes associated with this reference data domain",
   )
-  val referenceDataCodes: Collection<ReferenceDataCode>,
+  val referenceDataCodes: Collection<ReferenceDataCodeDto>,
 )

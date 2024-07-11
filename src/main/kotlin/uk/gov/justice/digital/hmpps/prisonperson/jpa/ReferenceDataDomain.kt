@@ -4,7 +4,6 @@ import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
 import jakarta.persistence.OneToMany
-import org.springframework.data.domain.AbstractAggregateRoot
 import uk.gov.justice.digital.hmpps.prisonperson.dto.ReferenceDataDomainDto
 import java.time.ZonedDateTime
 
@@ -18,7 +17,7 @@ class ReferenceDataDomain(
   var listSequence: Int,
   val createdAt: ZonedDateTime = ZonedDateTime.now(),
   val createdBy: String,
-) : AbstractAggregateRoot<ReferenceDataDomain>() {
+) {
   var lastModifiedAt: ZonedDateTime? = null
   var lastModifiedBy: String? = null
   var deactivatedAt: ZonedDateTime? = null
@@ -39,10 +38,8 @@ class ReferenceDataDomain(
     lastModifiedBy,
     deactivatedAt,
     deactivatedBy,
-    referenceDataCodes,
+    referenceDataCodes.map { it.toDto() },
   )
-
-  fun Collection<ReferenceDataDomain>.toDtos() = map { it.toDto() }
 
   fun isActive() = deactivatedAt?.isBefore(ZonedDateTime.now()) != true
 }

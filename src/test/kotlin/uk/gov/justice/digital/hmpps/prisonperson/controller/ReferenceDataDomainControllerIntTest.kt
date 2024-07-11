@@ -20,6 +20,14 @@ class ReferenceDataDomainControllerIntTest : IntegrationTestBase() {
           .exchange()
           .expectStatus().isUnauthorized
       }
+
+      @Test
+      fun `access forbidden with wrong role`() {
+        webTestClient.get().uri("/reference-data/domains")
+          .headers(setAuthorisation(roles = listOf("ROLE_IS_WRONG")))
+          .exchange()
+          .expectStatus().isForbidden
+      }
     }
 
     @Nested
@@ -47,6 +55,14 @@ class ReferenceDataDomainControllerIntTest : IntegrationTestBase() {
         webTestClient.get().uri("/reference-data/domains/HAIR")
           .exchange()
           .expectStatus().isUnauthorized
+      }
+
+      @Test
+      fun `access forbidden with wrong role`() {
+        webTestClient.get().uri("/reference-data/domains/HAIR")
+          .headers(setAuthorisation(roles = listOf("ROLE_IS_WRONG")))
+          .exchange()
+          .expectStatus().isForbidden
       }
     }
 

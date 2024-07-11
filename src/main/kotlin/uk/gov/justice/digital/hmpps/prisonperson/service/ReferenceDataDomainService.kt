@@ -11,8 +11,8 @@ class ReferenceDataDomainService(
   private val referenceDataDomainRepository: ReferenceDataDomainRepository,
 ) {
   fun getReferenceDataDomains(includeInactive: Boolean): Collection<ReferenceDataDomainDto> =
-    TODO("Awaiting DB implementation") // referenceDataDomainRepository.findAllByIncludeInactive(includeInactive).toDtos()
+    TODO("Awaiting DB implementation") // referenceDataDomainRepository.findAllByIncludeInactive(includeInactive).map { it.toDto() }
 
   fun getReferenceDataDomain(domain: String): ReferenceDataDomainDto =
-    TODO("Awaiting DB implementation") // referenceDataDomainRepository.findById(domain).getOrNull()?.toDto()
+    TODO("Awaiting DB implementation") // referenceDataDomainRepository.findById(domain).orElseThrow { EntityNotFoundException("Reference Data Domain not found") }.toDto()
 }

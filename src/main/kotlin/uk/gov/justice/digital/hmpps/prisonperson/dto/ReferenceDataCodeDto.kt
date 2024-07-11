@@ -30,7 +30,6 @@ data class ReferenceDataCodeDto(
 
   @Schema(
     description = "The date and time the reference data code was created",
-    example = "2024-06-30T15:43:27+0000",
   )
   val createdAt: ZonedDateTime,
 
@@ -42,7 +41,6 @@ data class ReferenceDataCodeDto(
 
   @Schema(
     description = "The date and time the reference data code was last modified",
-    example = "2024-07-01T09:41:00+0000",
   )
   val modifiedAt: ZonedDateTime?,
 
@@ -54,7 +52,6 @@ data class ReferenceDataCodeDto(
 
   @Schema(
     description = "The date and time the reference data code was deactivated",
-    example = "2024-07-08T22:30:11+0000",
   )
   val deactivatedAt: ZonedDateTime?,
 

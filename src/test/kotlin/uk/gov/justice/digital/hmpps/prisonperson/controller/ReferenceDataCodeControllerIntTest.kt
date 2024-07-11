@@ -20,6 +20,14 @@ class ReferenceDataCodeControllerIntTest : IntegrationTestBase() {
           .exchange()
           .expectStatus().isUnauthorized
       }
+
+      @Test
+      fun `access forbidden with wrong role`() {
+        webTestClient.get().uri("/reference-data/domains/HAIR/codes")
+          .headers(setAuthorisation(roles = listOf("ROLE_IS_WRONG")))
+          .exchange()
+          .expectStatus().isForbidden
+      }
     }
 
     @Nested
@@ -59,6 +67,14 @@ class ReferenceDataCodeControllerIntTest : IntegrationTestBase() {
         webTestClient.get().uri("/reference-data/domains/HAIR/codes/BLONDE")
           .exchange()
           .expectStatus().isUnauthorized
+      }
+
+      @Test
+      fun `access forbidden with wrong role`() {
+        webTestClient.get().uri("/reference-data/domains/HAIR/codes/BLONDE")
+          .headers(setAuthorisation(roles = listOf("ROLE_IS_WRONG")))
+          .exchange()
+          .expectStatus().isForbidden
       }
     }
 

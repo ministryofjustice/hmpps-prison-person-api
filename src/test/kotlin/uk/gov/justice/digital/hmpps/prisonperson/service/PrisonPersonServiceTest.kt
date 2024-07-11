@@ -9,8 +9,8 @@ import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.whenever
 import uk.gov.justice.digital.hmpps.prisonperson.config.PrisonPersonDataNotFoundException
-import uk.gov.justice.digital.hmpps.prisonperson.dto.PhysicalAttributesDto
-import uk.gov.justice.digital.hmpps.prisonperson.dto.PrisonPersonDto
+import uk.gov.justice.digital.hmpps.prisonperson.dto.response.PhysicalAttributesDto
+import uk.gov.justice.digital.hmpps.prisonperson.dto.response.PrisonPersonDto
 
 @ExtendWith(MockitoExtension::class)
 class PrisonPersonServiceTest {

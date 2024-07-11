@@ -15,8 +15,8 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
-import uk.gov.justice.digital.hmpps.prisonperson.dto.PhysicalAttributesSyncRequest
-import uk.gov.justice.digital.hmpps.prisonperson.dto.PhysicalAttributesSyncResponse
+import uk.gov.justice.digital.hmpps.prisonperson.dto.request.PhysicalAttributesSyncRequest
+import uk.gov.justice.digital.hmpps.prisonperson.dto.response.PhysicalAttributesSyncResponse
 import uk.gov.justice.digital.hmpps.prisonperson.service.PhysicalAttributesSyncService
 import uk.gov.justice.hmpps.kotlin.common.ErrorResponse
 

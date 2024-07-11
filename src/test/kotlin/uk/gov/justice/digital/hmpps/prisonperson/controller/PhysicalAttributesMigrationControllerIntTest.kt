@@ -1,5 +1,7 @@
 package uk.gov.justice.digital.hmpps.prisonperson.controller
 
+import org.hamcrest.Matchers.hasItem
+import org.hamcrest.Matchers.not
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -98,16 +100,7 @@ class PhysicalAttributesMigrationControllerIntTest : IntegrationTestBase() {
           .bodyValue(SINGLE_CURRENT_RECORD_MIGRATION)
           .exchange()
           .expectStatus().is2xxSuccessful
-          .expectBody().json(
-            // language=json
-            """
-            {
-              "height": 190,
-              "weight": 80
-            }
-            """.trimIndent(),
-            false,
-          )
+          .expectBody().jsonPath("$.fieldHistoryInserted[*]").value(not(hasItem(-1)))
 
         expectFieldHistory(HEIGHT, HistoryComparison(value = 190, appliesFrom = NOW, appliesTo = null, createdAt = NOW, createdBy = USER1, source = NOMIS))
         expectFieldHistory(WEIGHT, HistoryComparison(value = 80, appliesFrom = NOW, appliesTo = null, createdAt = NOW, createdBy = USER1, source = NOMIS))
@@ -127,16 +120,7 @@ class PhysicalAttributesMigrationControllerIntTest : IntegrationTestBase() {
           .bodyValue(PHYSICAL_ATTRIBUTES_WITH_HISTORY_MIGRATION)
           .exchange()
           .expectStatus().is2xxSuccessful
-          .expectBody().json(
-            // language=json
-            """
-            {
-              "height": 190,
-              "weight": 80
-            }
-            """.trimIndent(),
-            false,
-          )
+          .expectBody().jsonPath("$.fieldHistoryInserted[*]").value(not(hasItem(-1)))
 
         expectFieldHistory(
           HEIGHT,
@@ -166,16 +150,7 @@ class PhysicalAttributesMigrationControllerIntTest : IntegrationTestBase() {
           .bodyValue(SINGLE_CURRENT_RECORD_MIGRATION)
           .exchange()
           .expectStatus().is2xxSuccessful
-          .expectBody().json(
-            // language=json
-            """
-            {
-              "height": 190,
-              "weight": 80
-            }
-            """.trimIndent(),
-            false,
-          )
+          .expectBody().jsonPath("$.fieldHistoryInserted[*]").value(not(hasItem(-1)))
 
         expectFieldHistory(HEIGHT, HistoryComparison(value = 190, appliesFrom = NOW, appliesTo = null, createdAt = NOW, createdBy = USER1, source = NOMIS))
         expectFieldHistory(WEIGHT, HistoryComparison(value = 80, appliesFrom = NOW, appliesTo = null, createdAt = NOW, createdBy = USER1, source = NOMIS))

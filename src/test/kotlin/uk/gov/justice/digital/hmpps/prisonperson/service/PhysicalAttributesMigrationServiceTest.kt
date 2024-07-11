@@ -13,8 +13,13 @@ import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.whenever
 import uk.gov.justice.digital.hmpps.prisonperson.dto.PhysicalAttributesDto
 import uk.gov.justice.digital.hmpps.prisonperson.dto.PhysicalAttributesMigrationRequest
+import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.HEIGHT
+import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.WEIGHT
+import uk.gov.justice.digital.hmpps.prisonperson.enums.Source.NOMIS
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.PhysicalAttributes
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.PhysicalAttributesRepository
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.utils.HistoryComparison
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.utils.expectFieldHistory
 import java.time.Clock
 import java.time.Instant
 import java.time.ZoneId
@@ -43,35 +48,29 @@ class PhysicalAttributesMigrationServiceTest {
 
     @Test
     fun `migrates a single version of physical attributes`() {
-      assertThat(underTest.migrate(PRISONER_NUMBER, sortedSetOf(PHYSICAL_ATTRIBUTES_SYNC_REQUEST)))
+      assertThat(underTest.migrate(PRISONER_NUMBER, sortedSetOf(PHYSICAL_ATTRIBUTES_MIGRATION_REQUEST)))
         .isEqualTo(PhysicalAttributesDto(PRISONER_HEIGHT, PRISONER_WEIGHT))
 
       with(savedPhysicalAttributes.firstValue) {
         assertThat(prisonerNumber).isEqualTo(PRISONER_NUMBER)
         assertThat(height).isEqualTo(PRISONER_HEIGHT)
         assertThat(weight).isEqualTo(PRISONER_WEIGHT)
-        assertThat(createdAt).isEqualTo(THEN)
-        assertThat(createdBy).isEqualTo(USER1)
-        assertThat(lastModifiedAt).isEqualTo(THEN)
-        assertThat(lastModifiedBy).isEqualTo(USER1)
-        assertThat(migratedAt).isEqualTo(NOW)
 
-        assertThat(history).hasSize(1)
-        with(history.first()) {
-          assertThat(height).isEqualTo(PRISONER_HEIGHT)
-          assertThat(weight).isEqualTo(PRISONER_WEIGHT)
-          assertThat(createdAt).isEqualTo(THEN)
-          assertThat(createdBy).isEqualTo(USER1)
-          assertThat(appliesFrom).isEqualTo(THEN)
-          assertThat(appliesTo).isNull()
-          assertThat(migratedAt).isEqualTo(NOW)
-        }
+        expectFieldHistory(
+          HEIGHT,
+          HistoryComparison(value = PRISONER_HEIGHT, createdAt = THEN, createdBy = USER1, appliesFrom = THEN, appliesTo = null, migratedAt = NOW, source = NOMIS),
+        )
+
+        expectFieldHistory(
+          WEIGHT,
+          HistoryComparison(value = PRISONER_WEIGHT, createdAt = THEN, createdBy = USER1, appliesFrom = THEN, appliesTo = null, migratedAt = NOW, source = NOMIS),
+        )
       }
     }
 
     @Test
     fun `migrates a history of physical attributes`() {
-      val record1 = PHYSICAL_ATTRIBUTES_SYNC_REQUEST
+      val record1 = PHYSICAL_ATTRIBUTES_MIGRATION_REQUEST
       val record2 = generatePrevious(record1, USER2)
       val record3 = generatePrevious(record2, USER3)
 
@@ -82,68 +81,42 @@ class PhysicalAttributesMigrationServiceTest {
         assertThat(prisonerNumber).isEqualTo(PRISONER_NUMBER)
         assertThat(height).isEqualTo(PRISONER_HEIGHT)
         assertThat(weight).isEqualTo(PRISONER_WEIGHT)
-        assertThat(createdAt).isEqualTo(THEN.minusDays(2))
-        assertThat(createdBy).isEqualTo(USER3)
-        assertThat(lastModifiedAt).isEqualTo(THEN)
-        assertThat(lastModifiedBy).isEqualTo(USER1)
-        assertThat(migratedAt).isEqualTo(NOW)
 
-        assertThat(history).hasSize(3)
-        with(getHistoryAsList()[2]) {
-          assertThat(height).isEqualTo(PRISONER_HEIGHT)
-          assertThat(weight).isEqualTo(PRISONER_WEIGHT)
-          assertThat(createdAt).isEqualTo(THEN)
-          assertThat(createdBy).isEqualTo(USER1)
-          assertThat(appliesFrom).isEqualTo(THEN)
-          assertThat(appliesTo).isNull()
-          assertThat(migratedAt).isEqualTo(NOW)
-        }
-        with(getHistoryAsList()[1]) {
-          assertThat(height).isEqualTo(PRISONER_HEIGHT - 1)
-          assertThat(weight).isEqualTo(PRISONER_WEIGHT - 1)
-          assertThat(createdAt).isEqualTo(THEN.minusDays(1))
-          assertThat(createdBy).isEqualTo(USER2)
-          assertThat(appliesFrom).isEqualTo(THEN.minusDays(1))
-          assertThat(appliesTo).isEqualTo(THEN)
-          assertThat(migratedAt).isEqualTo(NOW)
-        }
-        with(getHistoryAsList()[0]) {
-          assertThat(height).isEqualTo(PRISONER_HEIGHT - 2)
-          assertThat(weight).isEqualTo(PRISONER_WEIGHT - 2)
-          assertThat(createdAt).isEqualTo(THEN.minusDays(2))
-          assertThat(createdBy).isEqualTo(USER3)
-          assertThat(appliesFrom).isEqualTo(THEN.minusDays(2))
-          assertThat(appliesTo).isEqualTo(THEN.minusDays(1))
-          assertThat(migratedAt).isEqualTo(NOW)
-        }
+        expectFieldHistory(
+          HEIGHT,
+          HistoryComparison(value = PRISONER_HEIGHT - 2, createdAt = THEN.minusDays(2), createdBy = USER3, appliesFrom = THEN.minusDays(2), appliesTo = THEN.minusDays(1), migratedAt = NOW, source = NOMIS),
+          HistoryComparison(value = PRISONER_HEIGHT - 1, createdAt = THEN.minusDays(1), createdBy = USER2, appliesFrom = THEN.minusDays(1), appliesTo = THEN, migratedAt = NOW, source = NOMIS),
+          HistoryComparison(value = PRISONER_HEIGHT, createdAt = THEN, createdBy = USER1, appliesFrom = THEN, appliesTo = null, migratedAt = NOW, source = NOMIS),
+        )
+
+        expectFieldHistory(
+          WEIGHT,
+          HistoryComparison(value = PRISONER_WEIGHT - 2, createdAt = THEN.minusDays(2), createdBy = USER3, appliesFrom = THEN.minusDays(2), appliesTo = THEN.minusDays(1), migratedAt = NOW, source = NOMIS),
+          HistoryComparison(value = PRISONER_WEIGHT - 1, createdAt = THEN.minusDays(1), createdBy = USER2, appliesFrom = THEN.minusDays(1), appliesTo = THEN, migratedAt = NOW, source = NOMIS),
+          HistoryComparison(value = PRISONER_WEIGHT, createdAt = THEN, createdBy = USER1, appliesFrom = THEN, appliesTo = null, migratedAt = NOW, source = NOMIS),
+        )
       }
     }
 
     @Test
     fun `migrates physical attributes with null height and weight`() {
-      assertThat(underTest.migrate(PRISONER_NUMBER, sortedSetOf(PHYSICAL_ATTRIBUTES_SYNC_REQUEST.copy(height = null, weight = null))))
+      assertThat(underTest.migrate(PRISONER_NUMBER, sortedSetOf(PHYSICAL_ATTRIBUTES_MIGRATION_REQUEST.copy(height = null, weight = null))))
         .isEqualTo(PhysicalAttributesDto(null, null))
 
       with(savedPhysicalAttributes.firstValue) {
         assertThat(prisonerNumber).isEqualTo(PRISONER_NUMBER)
         assertThat(height).isEqualTo(null)
         assertThat(weight).isEqualTo(null)
-        assertThat(createdAt).isEqualTo(THEN)
-        assertThat(createdBy).isEqualTo(USER1)
-        assertThat(lastModifiedAt).isEqualTo(THEN)
-        assertThat(lastModifiedBy).isEqualTo(USER1)
-        assertThat(migratedAt).isEqualTo(NOW)
 
-        assertThat(history).hasSize(1)
-        with(history.first()) {
-          assertThat(height).isEqualTo(null)
-          assertThat(weight).isEqualTo(null)
-          assertThat(createdAt).isEqualTo(THEN)
-          assertThat(createdBy).isEqualTo(USER1)
-          assertThat(appliesFrom).isEqualTo(THEN)
-          assertThat(appliesTo).isNull()
-          assertThat(migratedAt).isEqualTo(NOW)
-        }
+        expectFieldHistory(
+          HEIGHT,
+          HistoryComparison(value = null, createdAt = THEN, createdBy = USER1, appliesFrom = THEN, appliesTo = null, migratedAt = NOW, source = NOMIS),
+        )
+
+        expectFieldHistory(
+          WEIGHT,
+          HistoryComparison(value = null, createdAt = THEN, createdBy = USER1, appliesFrom = THEN, appliesTo = null, migratedAt = NOW, source = NOMIS),
+        )
       }
     }
   }
@@ -168,6 +141,6 @@ class PhysicalAttributesMigrationServiceTest {
     val NOW: ZonedDateTime = ZonedDateTime.ofInstant(Instant.now(), ZoneId.of("Europe/London"))
     val THEN: ZonedDateTime = NOW.minusDays(1)
 
-    val PHYSICAL_ATTRIBUTES_SYNC_REQUEST = PhysicalAttributesMigrationRequest(PRISONER_HEIGHT, PRISONER_WEIGHT, appliesFrom = THEN, createdAt = THEN, createdBy = USER1)
+    val PHYSICAL_ATTRIBUTES_MIGRATION_REQUEST = PhysicalAttributesMigrationRequest(PRISONER_HEIGHT, PRISONER_WEIGHT, appliesFrom = THEN, createdAt = THEN, createdBy = USER1)
   }
 }

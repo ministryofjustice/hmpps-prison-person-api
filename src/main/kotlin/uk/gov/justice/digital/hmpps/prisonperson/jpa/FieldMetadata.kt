@@ -7,16 +7,12 @@ import jakarta.persistence.Enumerated
 import jakarta.persistence.Id
 import jakarta.persistence.IdClass
 import org.hibernate.Hibernate
+import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField
 import java.io.Serializable
 import java.time.ZonedDateTime
 
-enum class FieldName {
-  HEIGHT,
-  WEIGHT,
-}
-
 @Entity
-@IdClass(FieldId::class)
+@IdClass(FieldMetadataId::class)
 class FieldMetadata(
   @Id
   @Column(updatable = false, nullable = false)
@@ -25,7 +21,7 @@ class FieldMetadata(
   @Id
   @Enumerated(STRING)
   @Column(updatable = false, nullable = false)
-  var field: FieldName,
+  var field: PrisonPersonField,
 
   var lastModifiedAt: ZonedDateTime = ZonedDateTime.now(),
 
@@ -57,4 +53,4 @@ class FieldMetadata(
   override fun toString(): String = "FieldMetadata(prisonerNumber='$prisonerNumber', field=$field, lastModifiedAt=$lastModifiedAt, lastModifiedBy='$lastModifiedBy')"
 }
 
-data class FieldId(val prisonerNumber: String? = null, val field: FieldName? = null) : Serializable
+private data class FieldMetadataId(val prisonerNumber: String? = null, val field: PrisonPersonField? = null) : Serializable

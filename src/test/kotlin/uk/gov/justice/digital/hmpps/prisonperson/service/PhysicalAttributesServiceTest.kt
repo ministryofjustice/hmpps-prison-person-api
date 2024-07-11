@@ -21,8 +21,12 @@ import uk.gov.justice.digital.hmpps.prisonperson.client.prisonersearch.PrisonerS
 import uk.gov.justice.digital.hmpps.prisonperson.client.prisonersearch.dto.PrisonerDto
 import uk.gov.justice.digital.hmpps.prisonperson.dto.PhysicalAttributesDto
 import uk.gov.justice.digital.hmpps.prisonperson.dto.PhysicalAttributesUpdateRequest
+import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.HEIGHT
+import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.WEIGHT
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.PhysicalAttributes
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.PhysicalAttributesRepository
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.utils.HistoryComparison
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.utils.expectFieldHistory
 import uk.gov.justice.digital.hmpps.prisonperson.utils.AuthenticationFacade
 import java.time.Clock
 import java.time.LocalDate
@@ -66,8 +70,6 @@ class PhysicalAttributesServiceTest {
             prisonerNumber = PRISONER_NUMBER,
             height = PRISONER_HEIGHT,
             weight = PRISONER_WEIGHT,
-            createdBy = USER1,
-            lastModifiedBy = USER1,
           ),
         ),
       )
@@ -98,22 +100,16 @@ class PhysicalAttributesServiceTest {
         assertThat(prisonerNumber).isEqualTo(PRISONER_NUMBER)
         assertThat(height).isEqualTo(PRISONER_HEIGHT)
         assertThat(weight).isEqualTo(PRISONER_WEIGHT)
-        assertThat(createdAt).isEqualTo(NOW)
-        assertThat(createdBy).isEqualTo(USER1)
-        assertThat(lastModifiedAt).isEqualTo(NOW)
-        assertThat(lastModifiedBy).isEqualTo(USER1)
-        assertThat(migratedAt).isNull()
 
-        assertThat(history).hasSize(1)
-        with(history.first()) {
-          assertThat(height).isEqualTo(PRISONER_HEIGHT)
-          assertThat(weight).isEqualTo(PRISONER_WEIGHT)
-          assertThat(createdAt).isEqualTo(NOW)
-          assertThat(createdBy).isEqualTo(USER1)
-          assertThat(appliesFrom).isEqualTo(NOW)
-          assertThat(appliesTo).isNull()
-          assertThat(migratedAt).isNull()
-        }
+        expectFieldHistory(
+          HEIGHT,
+          HistoryComparison(value = PRISONER_HEIGHT, createdAt = NOW, createdBy = USER1, appliesFrom = NOW, appliesTo = null),
+        )
+
+        expectFieldHistory(
+          WEIGHT,
+          HistoryComparison(value = PRISONER_WEIGHT, createdAt = NOW, createdBy = USER1, appliesFrom = NOW, appliesTo = null),
+        )
       }
     }
 
@@ -137,11 +133,7 @@ class PhysicalAttributesServiceTest {
             prisonerNumber = PRISONER_NUMBER,
             height = PREVIOUS_PRISONER_HEIGHT,
             weight = PREVIOUS_PRISONER_WEIGHT,
-            createdAt = NOW.minusDays(1),
-            createdBy = USER2,
-            lastModifiedAt = NOW.minusDays(1),
-            lastModifiedBy = USER2,
-          ).also { it.addToHistory() },
+          ).also { it.updateFieldHistory(lastModifiedAt = NOW.minusDays(1), lastModifiedBy = USER2) },
         ),
       )
 
@@ -152,33 +144,22 @@ class PhysicalAttributesServiceTest {
         assertThat(prisonerNumber).isEqualTo(PRISONER_NUMBER)
         assertThat(height).isEqualTo(PRISONER_HEIGHT)
         assertThat(weight).isEqualTo(PRISONER_WEIGHT)
-        assertThat(createdAt).isEqualTo(NOW.minusDays(1))
-        assertThat(createdBy).isEqualTo(USER2)
-        assertThat(lastModifiedAt).isEqualTo(NOW)
-        assertThat(lastModifiedBy).isEqualTo(USER1)
-        assertThat(migratedAt).isNull()
 
-        assertThat(history).hasSize(2)
-        // Initial history entry:
-        with(getHistoryAsList()[0]) {
-          assertThat(height).isEqualTo(PREVIOUS_PRISONER_HEIGHT)
-          assertThat(weight).isEqualTo(PREVIOUS_PRISONER_WEIGHT)
-          assertThat(createdAt).isEqualTo(NOW.minusDays(1))
-          assertThat(createdBy).isEqualTo(USER2)
-          assertThat(appliesFrom).isEqualTo(NOW.minusDays(1))
-          assertThat(appliesTo).isEqualTo(NOW)
-          assertThat(migratedAt).isNull()
-        }
-        // New history entry:
-        with(getHistoryAsList()[1]) {
-          assertThat(height).isEqualTo(PRISONER_HEIGHT)
-          assertThat(weight).isEqualTo(PRISONER_WEIGHT)
-          assertThat(createdAt).isEqualTo(NOW)
-          assertThat(createdBy).isEqualTo(USER1)
-          assertThat(appliesFrom).isEqualTo(NOW)
-          assertThat(appliesTo).isNull()
-          assertThat(migratedAt).isNull()
-        }
+        expectFieldHistory(
+          HEIGHT,
+          // Initial history entry:
+          HistoryComparison(value = PREVIOUS_PRISONER_HEIGHT, createdAt = NOW.minusDays(1), createdBy = USER2, appliesFrom = NOW.minusDays(1), appliesTo = NOW),
+          // New history entry:
+          HistoryComparison(value = PRISONER_HEIGHT, createdAt = NOW, createdBy = USER1, appliesFrom = NOW, appliesTo = null),
+        )
+
+        expectFieldHistory(
+          WEIGHT,
+          // Initial history entry:
+          HistoryComparison(value = PREVIOUS_PRISONER_WEIGHT, createdAt = NOW.minusDays(1), createdBy = USER2, appliesFrom = NOW.minusDays(1), appliesTo = NOW),
+          // New history entry:
+          HistoryComparison(value = PRISONER_WEIGHT, createdAt = NOW, createdBy = USER1, appliesFrom = NOW, appliesTo = null),
+        )
       }
     }
   }

@@ -9,8 +9,8 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import uk.gov.justice.digital.hmpps.prisonperson.config.EventProperties
-import uk.gov.justice.digital.hmpps.prisonperson.service.event.EventType.PHYSICAL_ATTRIBUTES_UPDATED
-import uk.gov.justice.digital.hmpps.prisonperson.service.event.Source.DPS
+import uk.gov.justice.digital.hmpps.prisonperson.enums.EventType.PHYSICAL_ATTRIBUTES_UPDATED
+import uk.gov.justice.digital.hmpps.prisonperson.enums.Source.DPS
 import java.time.Instant
 import java.time.ZoneId
 import java.time.ZonedDateTime

@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.prisonperson.service.event
+package uk.gov.justice.digital.hmpps.prisonperson.enums
 
 enum class EventType(
   val domainEventType: String,

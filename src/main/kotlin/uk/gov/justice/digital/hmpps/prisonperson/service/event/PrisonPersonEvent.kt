@@ -1,6 +1,8 @@
 package uk.gov.justice.digital.hmpps.prisonperson.service.event
 
-import uk.gov.justice.digital.hmpps.prisonperson.service.event.EventType.PHYSICAL_ATTRIBUTES_UPDATED
+import uk.gov.justice.digital.hmpps.prisonperson.enums.EventType
+import uk.gov.justice.digital.hmpps.prisonperson.enums.EventType.PHYSICAL_ATTRIBUTES_UPDATED
+import uk.gov.justice.digital.hmpps.prisonperson.enums.Source
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME
 

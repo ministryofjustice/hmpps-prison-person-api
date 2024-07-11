@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.prisonperson.jpa.repository
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.jpa.domain.AbstractAuditable_.lastModifiedBy
 import org.springframework.test.context.transaction.TestTransaction
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.PhysicalAttributes
 import java.time.ZonedDateTime
@@ -18,11 +19,6 @@ class PhysicalAttributesRepositoryTest : RepositoryTest() {
       PRISONER_NUMBER,
       PRISONER_HEIGHT,
       PRISONER_WEIGHT,
-      migratedAt = NOW,
-      createdAt = NOW,
-      createdBy = USER1,
-      lastModifiedAt = NOW.plusDays(1),
-      lastModifiedBy = USER2,
     )
 
     repository.save(physicalAttributes)
@@ -35,17 +31,12 @@ class PhysicalAttributesRepositoryTest : RepositoryTest() {
       assertThat(prisonerNumber).isEqualTo(PRISONER_NUMBER)
       assertThat(height).isEqualTo(PRISONER_HEIGHT)
       assertThat(weight).isEqualTo(PRISONER_WEIGHT)
-      assertThat(migratedAt).isEqualTo(NOW)
-      assertThat(createdAt).isEqualTo(NOW)
-      assertThat(createdBy).isEqualTo(USER1)
-      assertThat(lastModifiedAt).isEqualTo(NOW.plusDays(1))
-      assertThat(lastModifiedBy).isEqualTo(USER2)
     }
   }
 
   @Test
   fun `can persist physical attributes with null fields`() {
-    repository.save(PhysicalAttributes(PRISONER_NUMBER, createdBy = USER1, lastModifiedBy = USER2))
+    repository.save(PhysicalAttributes(PRISONER_NUMBER))
 
     TestTransaction.flagForCommit()
     TestTransaction.end()
@@ -60,7 +51,7 @@ class PhysicalAttributesRepositoryTest : RepositoryTest() {
 
   @Test
   fun `can update physical attributes`() {
-    repository.save(PhysicalAttributes(PRISONER_NUMBER, createdBy = USER1, lastModifiedAt = NOW, lastModifiedBy = USER2))
+    repository.save(PhysicalAttributes(PRISONER_NUMBER))
     TestTransaction.flagForCommit()
     TestTransaction.end()
     TestTransaction.start()
@@ -68,7 +59,6 @@ class PhysicalAttributesRepositoryTest : RepositoryTest() {
     val physicalAttributes = repository.getReferenceById("A1234AA")
     physicalAttributes.height = 180
     physicalAttributes.weight = 70
-    physicalAttributes.lastModifiedAt = NOW.plusDays(1)
 
     repository.save(physicalAttributes)
     TestTransaction.flagForCommit()
@@ -79,30 +69,29 @@ class PhysicalAttributesRepositoryTest : RepositoryTest() {
       assertThat(prisonerNumber).isEqualTo(PRISONER_NUMBER)
       assertThat(height).isEqualTo(PRISONER_HEIGHT)
       assertThat(weight).isEqualTo(PRISONER_WEIGHT)
-      assertThat(lastModifiedAt).isEqualTo(NOW.plusDays(1))
     }
   }
 
   @Test
   fun `can check for equality`() {
     assertThat(
-      PhysicalAttributes(PRISONER_NUMBER, createdAt = NOW, createdBy = USER1, lastModifiedAt = NOW, lastModifiedBy = USER2),
+      PhysicalAttributes(PRISONER_NUMBER),
     ).isEqualTo(
-      PhysicalAttributes(PRISONER_NUMBER, createdAt = NOW, createdBy = USER1, lastModifiedAt = NOW, lastModifiedBy = USER2),
+      PhysicalAttributes(PRISONER_NUMBER),
     )
 
     assertThat(
-      PhysicalAttributes(PRISONER_NUMBER, createdAt = NOW, createdBy = USER1, lastModifiedAt = NOW, lastModifiedBy = USER2),
+      PhysicalAttributes(PRISONER_NUMBER),
     ).isNotEqualTo(
-      PhysicalAttributes("Z1234ZZ", createdAt = NOW, createdBy = USER1, lastModifiedAt = NOW, lastModifiedBy = USER2),
+      PhysicalAttributes("Z1234ZZ"),
     )
   }
 
   @Test
   fun `toString does not cause stack overflow`() {
     assertThat(
-      PhysicalAttributes(PRISONER_NUMBER, createdAt = NOW, createdBy = USER1, lastModifiedAt = NOW, lastModifiedBy = USER2)
-        .also { it.addToHistory() }
+      PhysicalAttributes(PRISONER_NUMBER)
+        .also { it.updateFieldHistory(lastModifiedAt = NOW, lastModifiedBy = USER1) }
         .toString(),
     ).isInstanceOf(String::class.java)
   }
@@ -112,7 +101,6 @@ class PhysicalAttributesRepositoryTest : RepositoryTest() {
     const val PRISONER_HEIGHT = 180
     const val PRISONER_WEIGHT = 70
     const val USER1 = "USER1"
-    const val USER2 = "USER2"
 
     val NOW: ZonedDateTime = ZonedDateTime.now(clock)
   }

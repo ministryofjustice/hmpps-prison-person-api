@@ -15,8 +15,8 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
-import uk.gov.justice.digital.hmpps.prisonperson.dto.PhysicalAttributesDto
-import uk.gov.justice.digital.hmpps.prisonperson.dto.PhysicalAttributesMigrationRequest
+import uk.gov.justice.digital.hmpps.prisonperson.dto.request.PhysicalAttributesMigrationRequest
+import uk.gov.justice.digital.hmpps.prisonperson.dto.response.PhysicalAttributesMigrationResponse
 import uk.gov.justice.digital.hmpps.prisonperson.service.PhysicalAttributesMigrationService
 import uk.gov.justice.hmpps.kotlin.common.ErrorResponse
 import java.util.SortedSet
@@ -63,5 +63,5 @@ class PhysicalAttributesMigrationController(private val physicalAttributesMigrat
     @RequestBody
     @Validated
     physicalAttributesMigration: SortedSet<PhysicalAttributesMigrationRequest>,
-  ): PhysicalAttributesDto = physicalAttributesMigrationService.migrate(prisonerNumber, physicalAttributesMigration)
+  ): PhysicalAttributesMigrationResponse = physicalAttributesMigrationService.migrate(prisonerNumber, physicalAttributesMigration)
 }

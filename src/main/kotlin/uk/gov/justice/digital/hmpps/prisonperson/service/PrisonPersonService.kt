@@ -3,7 +3,7 @@ package uk.gov.justice.digital.hmpps.prisonperson.service
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.prisonperson.config.PrisonPersonDataNotFoundException
-import uk.gov.justice.digital.hmpps.prisonperson.dto.PrisonPersonDto
+import uk.gov.justice.digital.hmpps.prisonperson.dto.response.PrisonPersonDto
 
 @Service
 @Transactional(readOnly = true)

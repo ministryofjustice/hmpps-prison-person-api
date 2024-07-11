@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.prisonperson.dto
+package uk.gov.justice.digital.hmpps.prisonperson.dto.response
 
 import io.swagger.v3.oas.annotations.media.Schema
 

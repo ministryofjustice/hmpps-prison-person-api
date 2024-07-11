@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.prisonperson.dto
+package uk.gov.justice.digital.hmpps.prisonperson.dto.response
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL

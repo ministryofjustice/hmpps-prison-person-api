@@ -1,0 +1,77 @@
+package uk.gov.justice.digital.hmpps.prisonperson.controller
+
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.Parameter
+import io.swagger.v3.oas.annotations.media.ArraySchema
+import io.swagger.v3.oas.annotations.media.Content
+import io.swagger.v3.oas.annotations.media.Schema
+import io.swagger.v3.oas.annotations.responses.ApiResponse
+import io.swagger.v3.oas.annotations.tags.Tag
+import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
+import org.springframework.web.bind.annotation.*
+import uk.gov.justice.digital.hmpps.prisonperson.dto.ReferenceDataDomainDto
+import uk.gov.justice.digital.hmpps.prisonperson.service.ReferenceDataDomainService
+import uk.gov.justice.hmpps.kotlin.common.ErrorResponse
+
+@RestController
+@Tag(name = "Reference Data Domains", description = "Reference Data Domains for Prison Person data")
+@RequestMapping("/reference-data/domains", produces = [MediaType.APPLICATION_JSON_VALUE])
+class ReferenceDataDomainController(
+  private val referenceDataDomainService: ReferenceDataDomainService,
+) {
+
+  @GetMapping
+  @ResponseStatus(HttpStatus.OK)
+  @Operation(
+    summary = "Get all reference data domains",
+    description = "Returns the list of reference data domains. " +
+      "By default this endpoint only returns active reference data domains. " +
+      "The `includeInactive` parameter can be used to return all reference data domains.",
+    responses = [
+      ApiResponse(
+        responseCode = "200",
+        description = "Reference data domains found",
+        content = [Content(array = ArraySchema(schema = Schema(implementation = ReferenceDataDomainDto::class)))],
+      ),
+      ApiResponse(
+        responseCode = "401",
+        description = "Unauthorised, requires a valid Oauth2 token",
+        content = [Content(schema = Schema(implementation = ErrorResponse::class))],
+      ),
+    ],
+  )
+  fun getReferenceDataDomains(
+    @Parameter(
+      description = "Include inactive reference data domains. Defaults to false.",
+    )
+    includeInactive: Boolean = false,
+  ): Collection<ReferenceDataDomainDto> = referenceDataDomainService.getReferenceDataDomains(includeInactive)
+
+  @GetMapping("/{domain}")
+  @ResponseStatus(HttpStatus.OK)
+  @Operation(
+    summary = "Get a reference data domain",
+    description = "Returns the reference data domain, including all reference data codes linked to that domain.",
+    responses = [
+      ApiResponse(
+        responseCode = "200",
+        description = "Reference data domain retrieved",
+        content = [Content(schema = Schema(implementation = ReferenceDataDomainDto::class))],
+      ),
+      ApiResponse(
+        responseCode = "401",
+        description = "Unauthorised, requires a valid Oauth2 token",
+        content = [Content(schema = Schema(implementation = ErrorResponse::class))],
+      ),
+      ApiResponse(
+        responseCode = "404",
+        description = "Not found, the reference data domain was not found",
+        content = [Content(schema = Schema(implementation = ErrorResponse::class))],
+      ),
+    ],
+  )
+  fun getReferenceDataDomain(
+    @PathVariable domain: String,
+  ): ReferenceDataDomainDto = referenceDataDomainService.getReferenceDataDomain(domain)
+}

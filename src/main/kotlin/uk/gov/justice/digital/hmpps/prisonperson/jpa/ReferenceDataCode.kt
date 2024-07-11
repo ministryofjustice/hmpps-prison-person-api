@@ -28,7 +28,6 @@ class ReferenceDataCode(
   var deactivatedBy: String? = null
   var migratedAt: ZonedDateTime? = null
 
-
   fun ReferenceDataCode.toDto() = ReferenceDataCodeDto(
     domain.code,
     code,
@@ -46,5 +45,4 @@ class ReferenceDataCode(
   fun Collection<ReferenceDataCode>.toDtos() = map { it.toDto() }
 
   fun isActive() = deactivatedAt?.isBefore(ZonedDateTime.now()) != true
-
 }

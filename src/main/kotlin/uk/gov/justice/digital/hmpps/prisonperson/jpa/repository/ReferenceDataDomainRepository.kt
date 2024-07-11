@@ -19,5 +19,4 @@ interface ReferenceDataDomainRepository : JpaRepository<ReferenceDataDomain, Str
     """,
   )
   fun findAllByIncludeInactive(@Param("includeInactive") includeInactive: Boolean): Collection<ReferenceDataDomain>
-
 }

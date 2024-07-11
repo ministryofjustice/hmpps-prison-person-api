@@ -45,5 +45,4 @@ class ReferenceDataDomain(
   fun Collection<ReferenceDataDomain>.toDtos() = map { it.toDto() }
 
   fun isActive() = deactivatedAt?.isBefore(ZonedDateTime.now()) != true
-
 }

@@ -74,5 +74,4 @@ class ReferenceDataDomainControllerIntTest : IntegrationTestBase() {
       }
     }
   }
-
 }

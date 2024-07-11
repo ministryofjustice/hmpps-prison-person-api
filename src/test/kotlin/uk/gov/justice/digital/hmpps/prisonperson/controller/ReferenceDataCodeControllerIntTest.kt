@@ -94,5 +94,4 @@ class ReferenceDataCodeControllerIntTest : IntegrationTestBase() {
       }
     }
   }
-
 }

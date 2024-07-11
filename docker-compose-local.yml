@@ -26,7 +26,7 @@ services:
       - POSTGRES_PASSWORD=prison-person-data
       - POSTGRES_USER=prison-person-data
       - POSTGRES_DB=prison-person-data
-      - TZ: "Europe/London"
+      - TZ="Europe/London"
 
   localstack:
     image: localstack/localstack:latest

@@ -35,7 +35,7 @@ fun ReferenceDataCode.toDto(): ReferenceDataCodeDto {
     createdAt,
     createdBy,
     lastModifiedAt,
-    deactivatedBy,
+    lastModifiedBy,
     deactivatedAt,
     deactivatedBy,
   )

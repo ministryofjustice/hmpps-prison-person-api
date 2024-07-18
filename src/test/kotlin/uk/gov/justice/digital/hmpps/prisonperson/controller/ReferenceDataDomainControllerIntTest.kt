@@ -49,8 +49,8 @@ class ReferenceDataDomainControllerIntTest : IntegrationTestBase() {
                   "isActive": true,
                   "createdAt": "2024-07-11T16:00:00Z",
                   "createdBy": "OMS_OWNER",
-                  "modifiedAt": null,
-                  "modifiedBy": null,
+                  "lastModifiedAt": null,
+                  "lastModifiedBy": null,
                   "deactivatedAt": null,
                   "deactivatedBy": null,
                   "referenceDataCodes": [
@@ -62,8 +62,8 @@ class ReferenceDataDomainControllerIntTest : IntegrationTestBase() {
                       "isActive": true,
                       "createdAt": "2024-07-11T16:00:00Z",
                       "createdBy": "OMS_OWNER",
-                      "modifiedAt": null,
-                      "modifiedBy": null,
+                      "lastModifiedAt": null,
+                      "lastModifiedBy": null,
                       "deactivatedAt": null,
                       "deactivatedBy": null
                     },
@@ -75,8 +75,8 @@ class ReferenceDataDomainControllerIntTest : IntegrationTestBase() {
                       "isActive": true,
                       "createdAt": "2024-07-11T16:00:00Z",
                       "createdBy": "OMS_OWNER",
-                      "modifiedAt": null,
-                      "modifiedBy": null,
+                      "lastModifiedAt": null,
+                      "lastModifiedBy": null,
                       "deactivatedAt": null,
                       "deactivatedBy": null
                     },
@@ -88,8 +88,8 @@ class ReferenceDataDomainControllerIntTest : IntegrationTestBase() {
                       "isActive": true,
                       "createdAt": "2024-07-11T16:00:00Z",
                       "createdBy": "OMS_OWNER",
-                      "modifiedAt": null,
-                      "modifiedBy": null,
+                      "lastModifiedAt": null,
+                      "lastModifiedBy": null,
                       "deactivatedAt": null,
                       "deactivatedBy": null
                     },
@@ -101,8 +101,8 @@ class ReferenceDataDomainControllerIntTest : IntegrationTestBase() {
                       "isActive": true,
                       "createdAt": "2024-07-11T16:00:00Z",
                       "createdBy": "OMS_OWNER",
-                      "modifiedAt": null,
-                      "modifiedBy": null,
+                      "lastModifiedAt": null,
+                      "lastModifiedBy": null,
                       "deactivatedAt": null,
                       "deactivatedBy": null
                     },
@@ -114,8 +114,8 @@ class ReferenceDataDomainControllerIntTest : IntegrationTestBase() {
                       "isActive": false,
                       "createdAt": "2024-07-11T16:00:00Z",
                       "createdBy": "OMS_OWNER",
-                      "modifiedAt": null,
-                      "modifiedBy": "OMS_OWNER",
+                      "lastModifiedAt": "2024-07-11T16:00:00Z",
+                      "lastModifiedBy": "OMS_OWNER",
                       "deactivatedAt": "2024-07-11T16:00:00Z",
                       "deactivatedBy": "OMS_OWNER"
                     }
@@ -170,8 +170,8 @@ class ReferenceDataDomainControllerIntTest : IntegrationTestBase() {
                 "isActive": true,
                 "createdAt": "2024-07-11T16:00:00Z",
                 "createdBy": "OMS_OWNER",
-                "modifiedAt": null,
-                "modifiedBy": null,
+                "lastModifiedAt": null,
+                "lastModifiedBy": null,
                 "deactivatedAt": null,
                 "deactivatedBy": null,
                 "referenceDataCodes": [
@@ -183,8 +183,8 @@ class ReferenceDataDomainControllerIntTest : IntegrationTestBase() {
                     "isActive": true,
                     "createdAt": "2024-07-11T16:00:00Z",
                     "createdBy": "OMS_OWNER",
-                    "modifiedAt": null,
-                    "modifiedBy": null,
+                    "lastModifiedAt": null,
+                    "lastModifiedBy": null,
                     "deactivatedAt": null,
                     "deactivatedBy": null
                   },
@@ -196,8 +196,8 @@ class ReferenceDataDomainControllerIntTest : IntegrationTestBase() {
                     "isActive": true,
                     "createdAt": "2024-07-11T16:00:00Z",
                     "createdBy": "OMS_OWNER",
-                    "modifiedAt": null,
-                    "modifiedBy": null,
+                    "lastModifiedAt": null,
+                    "lastModifiedBy": null,
                     "deactivatedAt": null,
                     "deactivatedBy": null
                   },
@@ -209,8 +209,8 @@ class ReferenceDataDomainControllerIntTest : IntegrationTestBase() {
                     "isActive": true,
                     "createdAt": "2024-07-11T16:00:00Z",
                     "createdBy": "OMS_OWNER",
-                    "modifiedAt": null,
-                    "modifiedBy": null,
+                    "lastModifiedAt": null,
+                    "lastModifiedBy": null,
                     "deactivatedAt": null,
                     "deactivatedBy": null
                   },
@@ -222,8 +222,8 @@ class ReferenceDataDomainControllerIntTest : IntegrationTestBase() {
                     "isActive": true,
                     "createdAt": "2024-07-11T16:00:00Z",
                     "createdBy": "OMS_OWNER",
-                    "modifiedAt": null,
-                    "modifiedBy": null,
+                    "lastModifiedAt": null,
+                    "lastModifiedBy": null,
                     "deactivatedAt": null,
                     "deactivatedBy": null
                   },
@@ -235,8 +235,8 @@ class ReferenceDataDomainControllerIntTest : IntegrationTestBase() {
                     "isActive": false,
                     "createdAt": "2024-07-11T16:00:00Z",
                     "createdBy": "OMS_OWNER",
-                    "modifiedAt": null,
-                    "modifiedBy": "OMS_OWNER",
+                    "lastModifiedAt": "2024-07-11T16:00:00Z",
+                    "lastModifiedBy": "OMS_OWNER",
                     "deactivatedAt": "2024-07-11T16:00:00Z",
                     "deactivatedBy": "OMS_OWNER"
                   }

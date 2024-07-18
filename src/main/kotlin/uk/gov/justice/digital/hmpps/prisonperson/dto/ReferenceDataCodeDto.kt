@@ -42,13 +42,13 @@ data class ReferenceDataCodeDto(
   @Schema(
     description = "The date and time the reference data code was last modified",
   )
-  val modifiedAt: ZonedDateTime?,
+  val lastModifiedAt: ZonedDateTime?,
 
   @Schema(
     description = "The username of the user who last modified the reference data code",
     example = "USER1234",
   )
-  val modifiedBy: String?,
+  val lastModifiedBy: String?,
 
   @Schema(
     description = "The date and time the reference data code was deactivated",

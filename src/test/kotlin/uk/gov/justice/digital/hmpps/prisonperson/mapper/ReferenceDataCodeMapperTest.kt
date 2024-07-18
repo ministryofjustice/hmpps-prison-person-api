@@ -3,8 +3,8 @@ package uk.gov.justice.digital.hmpps.prisonperson.mapper
 import io.mockk.every
 import io.mockk.mockkObject
 import io.mockk.unmockkAll
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.ReferenceDataCode
@@ -46,9 +46,9 @@ class ReferenceDataCodeMapperTest {
 
     val dto = referenceDataCode.toDto()
 
-    assertEquals("TEST", dto.domain)
-    assertEquals("ORANGE", dto.code)
-    assertEquals("Purple", dto.description) // Should map to "Purple"
+    assertThat(dto.domain).isEqualTo("TEST")
+    assertThat(dto.code).isEqualTo("ORANGE")
+    assertThat(dto.description).isEqualTo("Purple") // Should map to "Purple"
   }
 
   @Test
@@ -64,16 +64,16 @@ class ReferenceDataCodeMapperTest {
 
     val dto = referenceDataCode.toDto()
 
-    assertEquals("TEST", dto.domain)
-    assertEquals("ORANGE", dto.code)
-    assertEquals("Orange", dto.description) // Should use default description
+    assertThat(dto.domain).isEqualTo("TEST")
+    assertThat(dto.code).isEqualTo("ORANGE")
+    assertThat(dto.description).isEqualTo("Orange") // Should use default description
   }
 
   @Test
   fun `test isActive when deactivatedAt is null`() {
     val referenceDataCode = testCode
 
-    assertEquals(true, referenceDataCode.isActive())
+    assertThat(referenceDataCode.isActive()).isEqualTo(true)
   }
 
   @Test
@@ -84,7 +84,7 @@ class ReferenceDataCodeMapperTest {
     referenceDataCode.deactivatedAt = ZonedDateTime.now().plusDays(1)
     referenceDataCode.deactivatedBy = "testUser"
 
-    assertEquals(true, referenceDataCode.isActive())
+    assertThat(referenceDataCode.isActive()).isEqualTo(true)
   }
 
   @Test
@@ -95,6 +95,6 @@ class ReferenceDataCodeMapperTest {
     referenceDataCode.deactivatedAt = ZonedDateTime.now().minusDays(1)
     referenceDataCode.deactivatedBy = "testUser"
 
-    assertEquals(false, referenceDataCode.isActive())
+    assertThat(referenceDataCode.isActive()).isEqualTo(false)
   }
 }

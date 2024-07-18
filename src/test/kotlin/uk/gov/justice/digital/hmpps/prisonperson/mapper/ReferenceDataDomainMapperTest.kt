@@ -1,6 +1,6 @@
 package uk.gov.justice.digital.hmpps.prisonperson.mapper
 
-import org.junit.jupiter.api.Assertions.assertEquals
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.ReferenceDataCode
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.ReferenceDataDomain
@@ -25,18 +25,18 @@ class ReferenceDataDomainMapperTest {
 
     val dto = referenceDataDomain.toDto()
 
-    assertEquals("HAIR", dto.code)
-    assertEquals("Description", dto.description)
-    assertEquals(1, dto.referenceDataCodes.size)
-    assertEquals("MOUSE", dto.referenceDataCodes.first().code)
-    assertEquals("Mousy", dto.referenceDataCodes.first().description)
+    assertThat(dto.code).isEqualTo("HAIR")
+    assertThat(dto.description).isEqualTo("Description")
+    assertThat(dto.referenceDataCodes.size).isEqualTo(1)
+    assertThat(dto.referenceDataCodes.first().code).isEqualTo("MOUSE")
+    assertThat(dto.referenceDataCodes.first().description).isEqualTo("Mousy")
   }
 
   @Test
   fun `test isActive when deactivatedAt is null`() {
     val referenceDataDomain = testCode
 
-    assertEquals(true, referenceDataDomain.isActive())
+    assertThat(referenceDataDomain.isActive()).isEqualTo(true)
   }
 
   @Test
@@ -47,7 +47,7 @@ class ReferenceDataDomainMapperTest {
     referenceDataDomain.deactivatedAt = ZonedDateTime.now().plusDays(1)
     referenceDataDomain.deactivatedBy = "testUser"
 
-    assertEquals(true, referenceDataDomain.isActive())
+    assertThat(referenceDataDomain.isActive()).isEqualTo(true)
   }
 
   @Test
@@ -58,6 +58,6 @@ class ReferenceDataDomainMapperTest {
     referenceDataDomain.deactivatedAt = ZonedDateTime.now().minusDays(1)
     referenceDataDomain.deactivatedBy = "testUser"
 
-    assertEquals(false, referenceDataDomain.isActive())
+    assertThat(referenceDataDomain.isActive()).isEqualTo(false)
   }
 }

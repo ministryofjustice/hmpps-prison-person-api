@@ -50,8 +50,8 @@ class ReferenceDataCodeControllerIntTest : IntegrationTestBase() {
                   "isActive": true,
                   "createdAt": "2024-07-11T16:00:00Z",
                   "createdBy": "OMS_OWNER",
-                  "modifiedAt": null,
-                  "modifiedBy": null,
+                  "lastModifiedAt": null,
+                  "lastModifiedBy": null,
                   "deactivatedAt": null,
                   "deactivatedBy": null
                 },
@@ -63,8 +63,8 @@ class ReferenceDataCodeControllerIntTest : IntegrationTestBase() {
                   "isActive": true,
                   "createdAt": "2024-07-11T16:00:00Z",
                   "createdBy": "OMS_OWNER",
-                  "modifiedAt": null,
-                  "modifiedBy": null,
+                  "lastModifiedAt": null,
+                  "lastModifiedBy": null,
                   "deactivatedAt": null,
                   "deactivatedBy": null
                 },
@@ -76,8 +76,8 @@ class ReferenceDataCodeControllerIntTest : IntegrationTestBase() {
                   "isActive": true,
                   "createdAt": "2024-07-11T16:00:00Z",
                   "createdBy": "OMS_OWNER",
-                  "modifiedAt": null,
-                  "modifiedBy": null,
+                  "lastModifiedAt": null,
+                  "lastModifiedBy": null,
                   "deactivatedAt": null,
                   "deactivatedBy": null
                 },
@@ -89,8 +89,8 @@ class ReferenceDataCodeControllerIntTest : IntegrationTestBase() {
                   "isActive": true,
                   "createdAt": "2024-07-11T16:00:00Z",
                   "createdBy": "OMS_OWNER",
-                  "modifiedAt": null,
-                  "modifiedBy": null,
+                  "lastModifiedAt": null,
+                  "lastModifiedBy": null,
                   "deactivatedAt": null,
                   "deactivatedBy": null
                 }
@@ -143,8 +143,8 @@ class ReferenceDataCodeControllerIntTest : IntegrationTestBase() {
                   "isActive": true,
                   "createdAt": "2024-07-11T16:00:00Z",
                   "createdBy": "OMS_OWNER",
-                  "modifiedAt": null,
-                  "modifiedBy": null,
+                  "lastModifiedAt": null,
+                  "lastModifiedBy": null,
                   "deactivatedAt": null,
                   "deactivatedBy": null
                 }

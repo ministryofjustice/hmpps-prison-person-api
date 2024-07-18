@@ -1,6 +1,6 @@
 package uk.gov.justice.digital.hmpps.prisonperson.service
 
-import org.junit.jupiter.api.Assertions.assertEquals
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
@@ -38,7 +38,7 @@ class ReferenceDataCodeServiceTest {
 
     val result = referenceDataCodeService.getReferenceDataCodes(DOMAIN.code, true)
 
-    assertEquals(2, result.size)
+    assertThat(result.size).isEqualTo(2)
     verify(referenceDataCodeRepository).findAllByDomainAndIncludeInactive(DOMAIN.code, true)
   }
 
@@ -53,7 +53,7 @@ class ReferenceDataCodeServiceTest {
 
     val result = referenceDataCodeService.getReferenceDataCodes(DOMAIN.code, false)
 
-    assertEquals(1, result.size)
+    assertThat(result.size).isEqualTo(1)
     verify(referenceDataCodeRepository).findAllByDomainAndIncludeInactive(DOMAIN.code, false)
   }
 
@@ -69,7 +69,7 @@ class ReferenceDataCodeServiceTest {
     val result = referenceDataCodeService.getReferenceDataCode(code, DOMAIN.code)
 
     assertNotNull(result)
-    assertEquals(code, result.code)
+    assertThat(result.code).isEqualTo(code)
     verify(referenceDataCodeRepository).findByCodeAndDomainCode(code, DOMAIN.code)
   }
 
@@ -82,7 +82,7 @@ class ReferenceDataCodeServiceTest {
       referenceDataCodeService.getReferenceDataCode(code, DOMAIN.code)
     }
 
-    assertEquals("No data for code 'NONEXISTENT' in domain 'DOMAIN'", exception.message)
+    assertThat(exception.message).isEqualTo("No data for code 'NONEXISTENT' in domain 'DOMAIN'")
     verify(referenceDataCodeRepository).findByCodeAndDomainCode(code, DOMAIN.code)
   }
 

@@ -1,6 +1,6 @@
 package uk.gov.justice.digital.hmpps.prisonperson.service
 
-import org.junit.jupiter.api.Assertions.assertEquals
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
@@ -37,7 +37,7 @@ class ReferenceDataDomainServiceTest {
 
     val result = referenceDataDomainService.getReferenceDataDomains(true)
 
-    assertEquals(2, result.size)
+    assertThat(result.size).isEqualTo(2)
     verify(referenceDataDomainRepository).findAllByIncludeInactive(true)
   }
 
@@ -48,7 +48,7 @@ class ReferenceDataDomainServiceTest {
 
     val result = referenceDataDomainService.getReferenceDataDomains(false)
 
-    assertEquals(1, result.size)
+    assertThat(result.size).isEqualTo(1)
     verify(referenceDataDomainRepository).findAllByIncludeInactive(false)
   }
 
@@ -62,7 +62,7 @@ class ReferenceDataDomainServiceTest {
     val result = referenceDataDomainService.getReferenceDataDomain(code)
 
     assertNotNull(result)
-    assertEquals(code, result.code)
+    assertThat(result.code).isEqualTo(code)
     verify(referenceDataDomainRepository).findByCode(code)
   }
 
@@ -75,7 +75,7 @@ class ReferenceDataDomainServiceTest {
       referenceDataDomainService.getReferenceDataDomain(code)
     }
 
-    assertEquals("No data for domain 'NONEXISTENT'", exception.message)
+    assertThat(exception.message).isEqualTo("No data for domain 'NONEXISTENT'")
     verify(referenceDataDomainRepository).findByCode(code)
   }
 

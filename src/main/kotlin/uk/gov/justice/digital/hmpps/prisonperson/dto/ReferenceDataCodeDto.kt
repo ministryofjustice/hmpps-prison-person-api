@@ -8,7 +8,7 @@ data class ReferenceDataCodeDto(
   @Schema(description = "Short code for the reference data code", example = "FACIAL_HAIR")
   val domain: String,
 
-  @Schema(description = "Short code for reference data code", example = "FULL_BEARD")
+  @Schema(description = "Short code for reference data code", example = "BEARDED")
   val code: String,
 
   @Schema(description = "Description of the reference data code", example = "Full Beard")

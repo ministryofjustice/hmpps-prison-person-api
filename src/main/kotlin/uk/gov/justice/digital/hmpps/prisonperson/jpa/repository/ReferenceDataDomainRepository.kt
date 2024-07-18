@@ -11,12 +11,18 @@ interface ReferenceDataDomainRepository : JpaRepository<ReferenceDataDomain, Str
 
   @Query(
     """
-        SELECT rdd 
+        SELECT rdd
         FROM ReferenceDataDomain rdd 
         WHERE :includeInactive = true OR 
               (:includeInactive = false AND rdd.deactivatedAt IS NULL)
-        ORDER BY rdd.listSequence, rdd.description 
+        ORDER BY CASE 
+                    WHEN rdd.listSequence = 0 THEN 999
+                    ELSE rdd.listSequence
+                 END,
+                 rdd.description
     """,
   )
   fun findAllByIncludeInactive(@Param("includeInactive") includeInactive: Boolean): Collection<ReferenceDataDomain>
+
+  fun findByCode(code: String): ReferenceDataDomain?
 }

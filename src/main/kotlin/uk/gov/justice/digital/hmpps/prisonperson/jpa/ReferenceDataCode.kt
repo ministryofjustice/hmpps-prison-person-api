@@ -3,8 +3,8 @@ package uk.gov.justice.digital.hmpps.prisonperson.jpa
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
+import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
-import uk.gov.justice.digital.hmpps.prisonperson.dto.ReferenceDataCodeDto
 import java.time.ZonedDateTime
 
 @Entity
@@ -14,6 +14,7 @@ class ReferenceDataCode(
   val code: String,
 
   @ManyToOne
+  @JoinColumn(name = "domain", nullable = false)
   val domain: ReferenceDataDomain,
 
   var description: String,
@@ -26,20 +27,4 @@ class ReferenceDataCode(
   var deactivatedAt: ZonedDateTime? = null
   var deactivatedBy: String? = null
   var migratedAt: ZonedDateTime? = null
-
-  fun toDto(): ReferenceDataCodeDto = ReferenceDataCodeDto(
-    domain.code,
-    code,
-    description,
-    listSequence,
-    isActive(),
-    createdAt,
-    createdBy,
-    lastModifiedAt,
-    deactivatedBy,
-    deactivatedAt,
-    deactivatedBy,
-  )
-
-  fun isActive() = deactivatedAt?.isBefore(ZonedDateTime.now()) != true
 }

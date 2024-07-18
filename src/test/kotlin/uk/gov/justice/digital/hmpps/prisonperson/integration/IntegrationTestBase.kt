@@ -59,10 +59,15 @@ abstract class IntegrationTestBase : TestBase() {
   @SpyBean
   lateinit var hmppsQueueService: HmppsQueueService
 
-  internal val hmppsEventTopic by lazy { hmppsQueueService.findByTopicId("hmppseventtopic") ?: throw MissingTopicException("hmppseventtopic not found") }
+  internal val hmppsEventTopic by lazy {
+    hmppsQueueService.findByTopicId("hmppseventtopic") ?: throw MissingTopicException("hmppseventtopic not found")
+  }
 
   // sqs queue subscribed to the topic purely for testing events
-  internal val hmppsEventsQueue by lazy { hmppsQueueService.findByQueueId("hmppseventtestqueue") ?: throw MissingQueueException("hmppseventtestqueue queue not found") }
+  internal val hmppsEventsQueue by lazy {
+    hmppsQueueService.findByQueueId("hmppseventtestqueue")
+      ?: throw MissingQueueException("hmppseventtestqueue queue not found")
+  }
 
   @BeforeEach
   fun `clear queues`() {

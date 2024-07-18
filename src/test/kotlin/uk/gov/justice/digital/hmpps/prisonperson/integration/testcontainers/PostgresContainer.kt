@@ -17,7 +17,8 @@ object PostgresContainer {
     log.info("Creating a Postgres database")
     return PostgreSQLContainer<Nothing>("postgres").apply {
       withEnv("HOSTNAME_EXTERNAL", "localhost")
-      withDatabaseName("prison-person-data")
+      withEnv("PORT_EXTERNAL", "9032")
+      withDatabaseName("prison-person-data-test")
       withUsername("prison-person-data")
       withPassword("prison-person-data")
       setWaitStrategy(Wait.forListeningPort())
@@ -29,7 +30,7 @@ object PostgresContainer {
 
   private fun isPostgresRunning(): Boolean =
     try {
-      val serverSocket = ServerSocket(5432)
+      val serverSocket = ServerSocket(9032)
       serverSocket.localPort == 0
     } catch (e: IOException) {
       true

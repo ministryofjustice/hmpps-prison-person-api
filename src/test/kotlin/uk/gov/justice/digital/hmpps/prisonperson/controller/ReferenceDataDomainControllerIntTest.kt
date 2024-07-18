@@ -38,7 +38,93 @@ class ReferenceDataDomainControllerIntTest : IntegrationTestBase() {
         webTestClient.get().uri("/reference-data/domains")
           .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__REFERENCE_DATA__RO")))
           .exchange()
-          .expectStatus().is5xxServerError
+          .expectStatus().isOk
+          .expectBody().json(
+            """
+              [
+                {
+                  "code": "TEST",
+                  "description": "Test domain",
+                  "listSequence": 1,
+                  "isActive": true,
+                  "createdAt": "2024-07-11T16:00:00Z",
+                  "createdBy": "OMS_OWNER",
+                  "modifiedAt": null,
+                  "modifiedBy": null,
+                  "deactivatedAt": null,
+                  "deactivatedBy": null,
+                  "referenceDataCodes": [
+                    {
+                      "domain": "TEST",
+                      "code": "ORANGE",
+                      "description": "Orange",
+                      "listSequence": 1,
+                      "isActive": true,
+                      "createdAt": "2024-07-11T16:00:00Z",
+                      "createdBy": "OMS_OWNER",
+                      "modifiedAt": null,
+                      "modifiedBy": null,
+                      "deactivatedAt": null,
+                      "deactivatedBy": null
+                    },
+                    {
+                      "domain": "TEST",
+                      "code": "BROWN",
+                      "description": "Brown",
+                      "listSequence": 0,
+                      "isActive": true,
+                      "createdAt": "2024-07-11T16:00:00Z",
+                      "createdBy": "OMS_OWNER",
+                      "modifiedAt": null,
+                      "modifiedBy": null,
+                      "deactivatedAt": null,
+                      "deactivatedBy": null
+                    },
+                    {
+                      "domain": "TEST",
+                      "code": "RED",
+                      "description": "Red",
+                      "listSequence": 0,
+                      "isActive": true,
+                      "createdAt": "2024-07-11T16:00:00Z",
+                      "createdBy": "OMS_OWNER",
+                      "modifiedAt": null,
+                      "modifiedBy": null,
+                      "deactivatedAt": null,
+                      "deactivatedBy": null
+                    },
+                    {
+                      "domain": "TEST",
+                      "code": "WHITE",
+                      "description": "White",
+                      "listSequence": 0,
+                      "isActive": true,
+                      "createdAt": "2024-07-11T16:00:00Z",
+                      "createdBy": "OMS_OWNER",
+                      "modifiedAt": null,
+                      "modifiedBy": null,
+                      "deactivatedAt": null,
+                      "deactivatedBy": null
+                    },
+                    {
+                      "domain": "TEST",
+                      "code": "INACTIVE",
+                      "description": "Inactive code for tests",
+                      "listSequence": 0,
+                      "isActive": false,
+                      "createdAt": "2024-07-11T16:00:00Z",
+                      "createdBy": "OMS_OWNER",
+                      "modifiedAt": null,
+                      "modifiedBy": "OMS_OWNER",
+                      "deactivatedAt": "2024-07-11T16:00:00Z",
+                      "deactivatedBy": "OMS_OWNER"
+                    }
+                  ]
+                }
+              ]
+
+            """.trimIndent(),
+          )
       }
     }
   }
@@ -52,14 +138,14 @@ class ReferenceDataDomainControllerIntTest : IntegrationTestBase() {
 
       @Test
       fun `access forbidden when no authority`() {
-        webTestClient.get().uri("/reference-data/domains/HAIR")
+        webTestClient.get().uri("/reference-data/domains/TEST")
           .exchange()
           .expectStatus().isUnauthorized
       }
 
       @Test
       fun `access forbidden with wrong role`() {
-        webTestClient.get().uri("/reference-data/domains/HAIR")
+        webTestClient.get().uri("/reference-data/domains/TEST")
           .headers(setAuthorisation(roles = listOf("ROLE_IS_WRONG")))
           .exchange()
           .expectStatus().isForbidden
@@ -71,10 +157,93 @@ class ReferenceDataDomainControllerIntTest : IntegrationTestBase() {
 
       @Test
       fun `can retrieve reference data domain`() {
-        webTestClient.get().uri("/reference-data/domains/HAIR")
+        webTestClient.get().uri("/reference-data/domains/TEST")
           .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__REFERENCE_DATA__RO")))
           .exchange()
-          .expectStatus().is5xxServerError
+          .expectStatus().isOk
+          .expectBody().json(
+            """
+              {
+                "code": "TEST",
+                "description": "Test domain",
+                "listSequence": 1,
+                "isActive": true,
+                "createdAt": "2024-07-11T16:00:00Z",
+                "createdBy": "OMS_OWNER",
+                "modifiedAt": null,
+                "modifiedBy": null,
+                "deactivatedAt": null,
+                "deactivatedBy": null,
+                "referenceDataCodes": [
+                  {
+                    "domain": "TEST",
+                    "code": "ORANGE",
+                    "description": "Orange",
+                    "listSequence": 1,
+                    "isActive": true,
+                    "createdAt": "2024-07-11T16:00:00Z",
+                    "createdBy": "OMS_OWNER",
+                    "modifiedAt": null,
+                    "modifiedBy": null,
+                    "deactivatedAt": null,
+                    "deactivatedBy": null
+                  },
+                  {
+                    "domain": "TEST",
+                    "code": "BROWN",
+                    "description": "Brown",
+                    "listSequence": 0,
+                    "isActive": true,
+                    "createdAt": "2024-07-11T16:00:00Z",
+                    "createdBy": "OMS_OWNER",
+                    "modifiedAt": null,
+                    "modifiedBy": null,
+                    "deactivatedAt": null,
+                    "deactivatedBy": null
+                  },
+                  {
+                    "domain": "TEST",
+                    "code": "RED",
+                    "description": "Red",
+                    "listSequence": 0,
+                    "isActive": true,
+                    "createdAt": "2024-07-11T16:00:00Z",
+                    "createdBy": "OMS_OWNER",
+                    "modifiedAt": null,
+                    "modifiedBy": null,
+                    "deactivatedAt": null,
+                    "deactivatedBy": null
+                  },
+                  {
+                    "domain": "TEST",
+                    "code": "WHITE",
+                    "description": "White",
+                    "listSequence": 0,
+                    "isActive": true,
+                    "createdAt": "2024-07-11T16:00:00Z",
+                    "createdBy": "OMS_OWNER",
+                    "modifiedAt": null,
+                    "modifiedBy": null,
+                    "deactivatedAt": null,
+                    "deactivatedBy": null
+                  },
+                  {
+                    "domain": "TEST",
+                    "code": "INACTIVE",
+                    "description": "Inactive code for tests",
+                    "listSequence": 0,
+                    "isActive": false,
+                    "createdAt": "2024-07-11T16:00:00Z",
+                    "createdBy": "OMS_OWNER",
+                    "modifiedAt": null,
+                    "modifiedBy": "OMS_OWNER",
+                    "deactivatedAt": "2024-07-11T16:00:00Z",
+                    "deactivatedBy": "OMS_OWNER"
+                  }
+                ]
+              }
+            """.trimIndent(),
+          )
       }
     }
 
@@ -86,7 +255,7 @@ class ReferenceDataDomainControllerIntTest : IntegrationTestBase() {
         webTestClient.get().uri("/reference-data/domains/UNKNOWN")
           .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__REFERENCE_DATA__RO")))
           .exchange()
-          .expectStatus().is5xxServerError
+          .expectStatus().isNotFound
       }
     }
   }

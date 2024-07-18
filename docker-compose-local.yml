@@ -7,7 +7,7 @@ services:
     ports:
       - "9090:8080"
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/auth/health/ping"]
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/auth/health/ping" ]
     environment:
       - SPRING_PROFILES_ACTIVE=dev
       - APPLICATION_AUTHENTICATION_UI_ALLOWLIST=0.0.0.0/0
@@ -21,7 +21,7 @@ services:
     container_name: prison-person-data-db
     restart: unless-stopped
     ports:
-      - "5432:5432"
+      - "9432:5432"
     environment:
       - POSTGRES_PASSWORD=prison-person-data
       - POSTGRES_USER=prison-person-data

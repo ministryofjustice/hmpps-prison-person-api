@@ -13,7 +13,7 @@ api:
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:9432/prison-person-data
+    url: jdbc:postgresql://localhost:5432/prison-person-data
 
   main:
     allow-bean-definition-overriding: true

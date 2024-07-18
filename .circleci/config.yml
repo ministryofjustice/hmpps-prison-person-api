@@ -32,8 +32,6 @@ jobs:
       postgres_db: "prison-person-data"
       postgres_username: "prison-person-data"
       postgres_password: "prison-person-data"
-      environment:
-        PGPORT: "9432"
     steps:
       - checkout
       - restore_cache:

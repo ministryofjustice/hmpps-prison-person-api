@@ -2,7 +2,6 @@ package uk.gov.justice.digital.hmpps.prisonperson.jpa.repository
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.transaction.TestTransaction
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.WEIGHT
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.FieldMetadata
@@ -10,12 +9,9 @@ import java.time.ZonedDateTime
 
 class FieldMetadataTest : RepositoryTest() {
 
-  @Autowired
-  lateinit var repository: FieldMetadataRepository
-
   @Test
   fun `can persist field metadata`() {
-    repository.save(
+    fieldMetadataRepository.save(
       FieldMetadata(
         PRISONER_NUMBER,
         WEIGHT,
@@ -28,7 +24,7 @@ class FieldMetadataTest : RepositoryTest() {
     TestTransaction.end()
     TestTransaction.start()
 
-    with(repository.findAllByPrisonerNumber(PRISONER_NUMBER)[0]) {
+    with(fieldMetadataRepository.findAllByPrisonerNumber(PRISONER_NUMBER)[0]) {
       assertThat(prisonerNumber).isEqualTo(PRISONER_NUMBER)
       assertThat(field).isEqualTo(WEIGHT)
       assertThat(lastModifiedAt).isEqualTo(NOW)
@@ -38,7 +34,7 @@ class FieldMetadataTest : RepositoryTest() {
 
   @Test
   fun `can update field metadata`() {
-    repository.save(
+    fieldMetadataRepository.save(
       FieldMetadata(
         PRISONER_NUMBER,
         WEIGHT,
@@ -51,16 +47,16 @@ class FieldMetadataTest : RepositoryTest() {
     TestTransaction.end()
     TestTransaction.start()
 
-    val fieldMetadata = repository.findAllByPrisonerNumber(PRISONER_NUMBER)[0]
+    val fieldMetadata = fieldMetadataRepository.findAllByPrisonerNumber(PRISONER_NUMBER)[0]
     fieldMetadata.lastModifiedAt = NOW.plusDays(1)
     fieldMetadata.lastModifiedBy = USER2
 
-    repository.save(fieldMetadata)
+    fieldMetadataRepository.save(fieldMetadata)
     TestTransaction.flagForCommit()
     TestTransaction.end()
     TestTransaction.start()
 
-    with(repository.findAllByPrisonerNumber(PRISONER_NUMBER)[0]) {
+    with(fieldMetadataRepository.findAllByPrisonerNumber(PRISONER_NUMBER)[0]) {
       assertThat(prisonerNumber).isEqualTo(PRISONER_NUMBER)
       assertThat(field).isEqualTo(WEIGHT)
       assertThat(lastModifiedAt).isEqualTo(NOW.plusDays(1))

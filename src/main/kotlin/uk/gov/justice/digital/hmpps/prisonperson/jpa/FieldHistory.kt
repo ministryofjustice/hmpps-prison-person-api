@@ -20,12 +20,12 @@ class FieldHistory(
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   val fieldHistoryId: Long = -1,
 
-  @Column(updatable = false, nullable = false)
-  val prisonerNumber: String,
+  // Allow this to mutate in order to handle merges
+  var prisonerNumber: String,
 
   @Enumerated(STRING)
   @Column(updatable = false, nullable = false)
-  var field: PrisonPersonField,
+  val field: PrisonPersonField,
 
   override var valueInt: Int? = null,
 
@@ -34,12 +34,21 @@ class FieldHistory(
   val createdAt: ZonedDateTime = ZonedDateTime.now(),
   val createdBy: String,
   val migratedAt: ZonedDateTime? = null,
+  var mergedAt: ZonedDateTime? = null,
+  var mergedFrom: String? = null,
 
   @Enumerated(STRING)
   val source: Source? = null,
 
 ) : FieldValues,
   Comparable<FieldHistory> {
+
+  fun toMetadata() = FieldMetadata(
+    prisonerNumber = prisonerNumber,
+    field = field,
+    lastModifiedAt = createdAt,
+    lastModifiedBy = createdBy,
+  )
 
   override fun compareTo(other: FieldHistory) =
     compareValuesBy(this, other, { it.appliesTo?.toInstant() ?: Instant.MAX }, { it.createdAt }, { it.hashCode() })
@@ -58,19 +67,24 @@ class FieldHistory(
     if (createdAt != other.createdAt) return false
     if (createdBy != other.createdBy) return false
     if (migratedAt != other.migratedAt) return false
+    if (mergedAt != other.mergedAt) return false
+    if (mergedFrom != other.mergedFrom) return false
     if (source != other.source) return false
 
     return true
   }
 
   override fun hashCode(): Int {
-    var result = field.hashCode()
+    var result = prisonerNumber.hashCode()
+    result = 31 * result + field.hashCode()
     result = 31 * result + (valueInt ?: 0)
     result = 31 * result + appliesFrom.hashCode()
     result = 31 * result + (appliesTo?.hashCode() ?: 0)
     result = 31 * result + createdAt.hashCode()
     result = 31 * result + createdBy.hashCode()
     result = 31 * result + (migratedAt?.hashCode() ?: 0)
+    result = 31 * result + (mergedAt?.hashCode() ?: 0)
+    result = 31 * result + (mergedFrom?.hashCode() ?: 0)
     result = 31 * result + (source?.hashCode() ?: 0)
     return result
   }
@@ -85,6 +99,8 @@ class FieldHistory(
     "createdAt=$createdAt, " +
     "createdBy='$createdBy', " +
     "migratedAt=$migratedAt, " +
+    "mergedAt=$mergedAt, " +
+    "mergedFrom=$mergedFrom, " +
     "source=$source" +
     ")"
 }

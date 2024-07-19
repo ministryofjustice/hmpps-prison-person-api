@@ -11,10 +11,12 @@ import org.mockito.kotlin.verify
 import uk.gov.justice.digital.hmpps.prisonperson.config.EventProperties
 import uk.gov.justice.digital.hmpps.prisonperson.enums.EventType.PHYSICAL_ATTRIBUTES_UPDATED
 import uk.gov.justice.digital.hmpps.prisonperson.enums.Source.DPS
+import uk.gov.justice.digital.hmpps.prisonperson.service.event.publish.DomainEventPublisher
+import uk.gov.justice.digital.hmpps.prisonperson.service.event.publish.EventService
+import uk.gov.justice.digital.hmpps.prisonperson.service.event.publish.PhysicalAttributesUpdatedEvent
 import java.time.Instant
 import java.time.ZoneId
 import java.time.ZonedDateTime
-import java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME
 
 class EventServiceTest {
 
@@ -25,38 +27,37 @@ class EventServiceTest {
 
   @Test
   fun `handle event - publish enabled`() {
-    val eventProperties = EventProperties(true, baseUrl)
+    val eventProperties = EventProperties(publish = true, baseUrl = baseUrl)
     val eventService = EventService(eventProperties, telemetryClient, domainEventPublisher)
     val event = PhysicalAttributesUpdatedEvent(PRISONER_NUMBER, NOW, DPS)
 
     eventService.handleEvent(event)
 
-    val domainEventCaptor = argumentCaptor<DomainEvent>()
+    val domainEventCaptor = argumentCaptor<DomainEvent<*>>()
     verify(domainEventPublisher).publish(domainEventCaptor.capture())
     assertThat(domainEventCaptor.firstValue).isEqualTo(
       DomainEvent(
         eventType = PHYSICAL_ATTRIBUTES_UPDATED.domainEventType,
-        additionalInformation = AdditionalInformation(
+        additionalInformation = PrisonPersonAdditionalInformation(
           url = "$baseUrl/prisoners/$PRISONER_NUMBER",
           source = event.source,
           prisonerNumber = PRISONER_NUMBER,
         ),
         description = PHYSICAL_ATTRIBUTES_UPDATED.description,
-        occurredAt = ISO_OFFSET_DATE_TIME.format(NOW),
-        version = 1,
+        occurredAt = NOW,
       ),
     )
   }
 
   @Test
   fun `handle event - publish disabled`() {
-    val eventProperties = EventProperties(false, baseUrl)
+    val eventProperties = EventProperties(publish = false, baseUrl = baseUrl)
     val eventService = EventService(eventProperties, telemetryClient, domainEventPublisher)
     val event = PhysicalAttributesUpdatedEvent(PRISONER_NUMBER, NOW, DPS)
 
     eventService.handleEvent(event)
 
-    verify(domainEventPublisher, never()).publish(any<DomainEvent>())
+    verify(domainEventPublisher, never()).publish(any<DomainEvent<*>>())
   }
 
   private companion object {

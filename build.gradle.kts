@@ -33,6 +33,9 @@ dependencies {
   runtimeOnly("org.flywaydb:flyway-database-postgresql")
   runtimeOnly("org.postgresql:postgresql")
 
+  // Logging and Telemetry
+  implementation("io.opentelemetry.instrumentation:opentelemetry-instrumentation-annotations:2.5.0")
+
   // Test
   testImplementation("io.jsonwebtoken:jjwt-impl:0.12.6")
   testImplementation("io.jsonwebtoken:jjwt-jackson:0.12.5")
@@ -43,6 +46,7 @@ dependencies {
   testImplementation("org.testcontainers:localstack:1.19.8")
   testImplementation("org.awaitility:awaitility-kotlin:4.2.1")
   testImplementation("org.springframework.security:spring-security-test")
+  testImplementation("io.opentelemetry:opentelemetry-sdk-testing:1.24.0")
 
   // Developer experience
   developmentOnly("org.springframework.boot:spring-boot-devtools")

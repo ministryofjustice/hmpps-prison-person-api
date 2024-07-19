@@ -3,6 +3,8 @@ package uk.gov.justice.digital.hmpps.prisonperson.dto.request
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL
 import io.swagger.v3.oas.annotations.media.Schema
+import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.HEIGHT
+import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.WEIGHT
 import java.time.Instant
 import java.time.ZonedDateTime
 
@@ -52,6 +54,12 @@ data class PhysicalAttributesMigrationRequest(
   )
   val createdBy: String,
 ) : Comparable<PhysicalAttributesMigrationRequest> {
+
+  fun fieldsToMigrate() = mapOf(
+    HEIGHT to ::height,
+    WEIGHT to ::weight,
+  )
+
   override fun compareTo(other: PhysicalAttributesMigrationRequest): Int =
     compareValuesBy(this, other, { it.appliesTo?.toInstant() ?: Instant.MAX }, { it.createdAt }, { it.hashCode() })
 }

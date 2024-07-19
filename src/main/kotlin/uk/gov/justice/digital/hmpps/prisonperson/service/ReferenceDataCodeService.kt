@@ -22,7 +22,7 @@ class ReferenceDataCodeService(
   )
 
   fun getReferenceDataCodes(domain: String, includeInactive: Boolean): Collection<ReferenceDataCodeDto> =
-    referenceDataCodeRepository.findAllByDomainCodeAndIncludeInactive(domain, includeInactive)
+    referenceDataCodeRepository.findAllByDomainAndIncludeInactive(domain, includeInactive)
       .filterNot { excludedCodes.contains(Pair(it.domain.code, it.code)) }
       .map { it.toDto() }
 

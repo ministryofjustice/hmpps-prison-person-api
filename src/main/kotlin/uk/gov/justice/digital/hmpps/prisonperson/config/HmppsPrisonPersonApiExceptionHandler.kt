@@ -3,7 +3,6 @@ package uk.gov.justice.digital.hmpps.prisonperson.config
 import jakarta.servlet.ServletException
 import jakarta.validation.ValidationException
 import org.apache.commons.lang3.StringUtils
-import org.hibernate.query.sqm.tree.SqmNode.log
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.BAD_REQUEST
@@ -39,15 +38,16 @@ class HmppsPrisonPersonApiExceptionHandler {
     ).also { log.info("Access denied exception: {}", e.message) }
 
   @ExceptionHandler(MissingServletRequestParameterException::class)
-  fun handleMissingServletRequestParameterException(e: MissingServletRequestParameterException): ResponseEntity<ErrorResponse> = ResponseEntity
-    .status(BAD_REQUEST)
-    .body(
-      ErrorResponse(
-        status = BAD_REQUEST,
-        userMessage = "Validation failure: ${e.message}",
-        developerMessage = e.message,
-      ),
-    ).also { log.info("Missing servlet request parameter exception: {}", e.message) }
+  fun handleMissingServletRequestParameterException(e: MissingServletRequestParameterException): ResponseEntity<ErrorResponse> =
+    ResponseEntity
+      .status(BAD_REQUEST)
+      .body(
+        ErrorResponse(
+          status = BAD_REQUEST,
+          userMessage = "Validation failure: ${e.message}",
+          developerMessage = e.message,
+        ),
+      ).also { log.info("Missing servlet request parameter exception: {}", e.message) }
 
   @ExceptionHandler(MethodArgumentTypeMismatchException::class)
   fun handleMethodArgumentTypeMismatchException(e: MethodArgumentTypeMismatchException): ResponseEntity<ErrorResponse> {
@@ -70,15 +70,16 @@ class HmppsPrisonPersonApiExceptionHandler {
   }
 
   @ExceptionHandler(HttpMessageNotReadableException::class)
-  fun handleHttpMessageNotReadableException(e: HttpMessageNotReadableException): ResponseEntity<ErrorResponse> = ResponseEntity
-    .status(BAD_REQUEST)
-    .body(
-      ErrorResponse(
-        status = BAD_REQUEST,
-        userMessage = "Validation failure: Couldn't read request body",
-        developerMessage = e.message,
-      ),
-    ).also { log.info("HTTP message not readable exception: {}", e.message) }
+  fun handleHttpMessageNotReadableException(e: HttpMessageNotReadableException): ResponseEntity<ErrorResponse> =
+    ResponseEntity
+      .status(BAD_REQUEST)
+      .body(
+        ErrorResponse(
+          status = BAD_REQUEST,
+          userMessage = "Validation failure: Couldn't read request body",
+          developerMessage = e.message,
+        ),
+      ).also { log.info("HTTP message not readable exception: {}", e.message) }
 
   @ExceptionHandler(MethodArgumentNotValidException::class)
   fun handleValidationException(e: MethodArgumentNotValidException): ResponseEntity<ErrorResponse> = ResponseEntity
@@ -132,15 +133,40 @@ class HmppsPrisonPersonApiExceptionHandler {
     }
 
   @ExceptionHandler(PrisonPersonDataNotFoundException::class)
-  fun handlePrisonPersonDataNotFoundException(e: PrisonPersonDataNotFoundException): ResponseEntity<ErrorResponse> = ResponseEntity
-    .status(NOT_FOUND)
-    .body(
-      ErrorResponse(
-        status = NOT_FOUND,
-        userMessage = "Prison person data not found: ${e.message}",
-        developerMessage = e.message,
-      ),
-    ).also { log.info("Prison person data not found exception: {}", e.message) }
+  fun handlePrisonPersonDataNotFoundException(e: PrisonPersonDataNotFoundException): ResponseEntity<ErrorResponse> =
+    ResponseEntity
+      .status(NOT_FOUND)
+      .body(
+        ErrorResponse(
+          status = NOT_FOUND,
+          userMessage = "Prison person data not found: ${e.message}",
+          developerMessage = e.message,
+        ),
+      ).also { log.info("Prison person data not found exception: {}", e.message) }
+
+  @ExceptionHandler(ReferenceDataDomainNotFoundException::class)
+  fun handleReferenceDataDomainNotFoundException(e: ReferenceDataDomainNotFoundException): ResponseEntity<ErrorResponse> =
+    ResponseEntity
+      .status(NOT_FOUND)
+      .body(
+        ErrorResponse(
+          status = NOT_FOUND,
+          userMessage = "Reference data domain not found: ${e.message}",
+          developerMessage = e.message,
+        ),
+      ).also { log.info("Reference data domain not found exception: {}", e.message) }
+
+  @ExceptionHandler(ReferenceDataCodeNotFoundException::class)
+  fun handleReferenceDataCodeNotFoundException(e: ReferenceDataCodeNotFoundException): ResponseEntity<ErrorResponse> =
+    ResponseEntity
+      .status(NOT_FOUND)
+      .body(
+        ErrorResponse(
+          status = NOT_FOUND,
+          userMessage = "Reference data code not found: ${e.message}",
+          developerMessage = e.message,
+        ),
+      ).also { log.info("Reference data code not found exception: {}", e.message) }
 
   @ExceptionHandler(NoResourceFoundException::class)
   fun handleNoResourceFoundException(e: NoResourceFoundException): ResponseEntity<ErrorResponse> = ResponseEntity
@@ -154,15 +180,16 @@ class HmppsPrisonPersonApiExceptionHandler {
     ).also { log.info("No resource found exception: {}", e.message) }
 
   @ExceptionHandler(HttpRequestMethodNotSupportedException::class)
-  fun handleHttpRequestMethodNotSupportedException(e: HttpRequestMethodNotSupportedException): ResponseEntity<ErrorResponse> = ResponseEntity
-    .status(METHOD_NOT_ALLOWED)
-    .body(
-      ErrorResponse(
-        status = METHOD_NOT_ALLOWED,
-        userMessage = "Method not allowed failure: ${e.message}",
-        developerMessage = e.message,
-      ),
-    ).also { log.info("Method not allowed exception: {}", e.message) }
+  fun handleHttpRequestMethodNotSupportedException(e: HttpRequestMethodNotSupportedException): ResponseEntity<ErrorResponse> =
+    ResponseEntity
+      .status(METHOD_NOT_ALLOWED)
+      .body(
+        ErrorResponse(
+          status = METHOD_NOT_ALLOWED,
+          userMessage = "Method not allowed failure: ${e.message}",
+          developerMessage = e.message,
+        ),
+      ).also { log.info("Method not allowed exception: {}", e.message) }
 
   @ExceptionHandler(ServletException::class)
   fun handleNotImplementedError(e: ServletException): ResponseEntity<ErrorResponse> =
@@ -199,4 +226,8 @@ class HmppsPrisonPersonApiExceptionHandler {
 }
 
 class PrisonPersonDataNotFoundException(prisonerNumber: String) : Exception("No data for '$prisonerNumber'")
+class ReferenceDataDomainNotFoundException(code: String) : Exception("No data for domain '$code'")
+class ReferenceDataCodeNotFoundException(code: String, domain: String) :
+  Exception("No data for code '$code' in domain '$domain'")
+
 class DownstreamServiceException(message: String, cause: Throwable) : Exception(message, cause)

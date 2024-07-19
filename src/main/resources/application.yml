@@ -50,6 +50,7 @@ spring:
     placeholders:
       database_password: ${database.prisonperson.password}
     schemas: prison_person
+    locations: classpath:/db/migration/common
 
   datasource:
     url: 'jdbc:postgresql://${DATABASE_ENDPOINT}/${DATABASE_NAME}?sslmode=verify-full'

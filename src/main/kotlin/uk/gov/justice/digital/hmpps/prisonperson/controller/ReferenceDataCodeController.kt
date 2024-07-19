@@ -89,5 +89,5 @@ class ReferenceDataCodeController(
   fun getReferenceDataCode(
     @PathVariable domain: String,
     @PathVariable code: String,
-  ): ReferenceDataCodeDto = referenceDataCodeService.getReferenceDataCode(domain, code)
+  ): ReferenceDataCodeDto = referenceDataCodeService.getReferenceDataCode(code, domain)
 }

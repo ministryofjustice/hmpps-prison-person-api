@@ -16,7 +16,10 @@ spring:
     add-properties: true
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/prison-person-data?sslmode=prefer
+    url: jdbc:postgresql://localhost:9432/prison-person-data?sslmode=prefer
+
+  flyway:
+    locations: classpath:/db/migration/common,classpath:/db/migration/dev
 
   jpa:
     show-sql: true

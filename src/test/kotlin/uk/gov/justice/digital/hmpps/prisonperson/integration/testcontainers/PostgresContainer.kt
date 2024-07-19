@@ -17,6 +17,7 @@ object PostgresContainer {
     log.info("Creating a Postgres database")
     return PostgreSQLContainer<Nothing>("postgres").apply {
       withEnv("HOSTNAME_EXTERNAL", "localhost")
+      withEnv("PORT_EXTERNAL", "5432")
       withDatabaseName("prison-person-data")
       withUsername("prison-person-data")
       withPassword("prison-person-data")

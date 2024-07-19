@@ -14,7 +14,7 @@ configurations {
 
 dependencies {
   // Spring Boot
-  implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:1.0.0")
+  implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:1.0.2")
   implementation("org.springframework.boot:spring-boot-starter-webflux")
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
   implementation("org.springframework.boot:spring-boot-starter-validation")
@@ -26,7 +26,7 @@ dependencies {
   implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0")
 
   // Jackson
-  implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.17.0")
+  implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.17.1")
 
   // Database
   implementation("com.zaxxer:HikariCP:5.1.0")
@@ -34,9 +34,11 @@ dependencies {
   runtimeOnly("org.postgresql:postgresql")
 
   // Test
-  testImplementation("io.jsonwebtoken:jjwt-impl:0.12.5")
+  testImplementation("io.jsonwebtoken:jjwt-impl:0.12.6")
   testImplementation("io.jsonwebtoken:jjwt-jackson:0.12.5")
-  testImplementation("org.wiremock:wiremock-standalone:3.5.4")
+  testImplementation("io.mockk:mockk:1.13.12")
+  testImplementation("org.wiremock:wiremock-standalone:3.8.0")
+  testImplementation("org.testcontainers:junit-jupiter:1.19.8")
   testImplementation("org.testcontainers:postgresql:1.19.8")
   testImplementation("org.testcontainers:localstack:1.19.8")
   testImplementation("org.awaitility:awaitility-kotlin:4.2.1")

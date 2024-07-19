@@ -29,7 +29,6 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON reference_data_domain TO prison_person;
 
 CREATE TABLE reference_data_code
 (
-    id               BIGSERIAL                NOT NULL,
     domain           VARCHAR(40)              NOT NULL REFERENCES reference_data_domain (code),
     code             VARCHAR(40)              NOT NULL,
     description      VARCHAR(100)             NOT NULL,
@@ -42,8 +41,7 @@ CREATE TABLE reference_data_code
     deactivated_by   VARCHAR(40),
     migrated_at      TIMESTAMP WITH TIME ZONE,
 
-    CONSTRAINT reference_data_code_pk PRIMARY KEY (id),
-    UNIQUE (code, domain)
+    CONSTRAINT reference_data_code_pk PRIMARY KEY (code, domain)
 );
 
 CREATE INDEX reference_data_code_description_idx ON reference_data_code (description);

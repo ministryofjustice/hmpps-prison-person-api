@@ -5,10 +5,9 @@ import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.ReferenceDataCode
-import uk.gov.justice.digital.hmpps.prisonperson.jpa.ReferenceDataCodeId
 
 @Repository
-interface ReferenceDataCodeRepository : JpaRepository<ReferenceDataCode, ReferenceDataCodeId> {
+interface ReferenceDataCodeRepository : JpaRepository<ReferenceDataCode, String> {
 
   @Query(
     """
@@ -24,10 +23,10 @@ interface ReferenceDataCodeRepository : JpaRepository<ReferenceDataCode, Referen
                  rdc.description
     """,
   )
-  fun findAllByDomainCodeAndIncludeInactive(
+  fun findAllByDomainAndIncludeInactive(
     @Param("domain") domain: String,
     @Param("includeInactive") includeInactive: Boolean,
   ): Collection<ReferenceDataCode>
 
-  fun findByCodeAndDomainCode(code: String, domain: String): ReferenceDataCode?
+  fun findByCodeAndDomainCode(@Param("code") code: String, @Param("domain") domain: String): ReferenceDataCode?
 }

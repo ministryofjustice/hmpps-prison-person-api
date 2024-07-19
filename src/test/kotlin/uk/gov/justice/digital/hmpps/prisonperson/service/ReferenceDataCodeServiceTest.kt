@@ -29,7 +29,7 @@ class ReferenceDataCodeServiceTest {
   fun `test getReferenceDataCodes with includeInactive`() {
     val activeCode = ACTIVE_CODE
     val inactiveCode = INACTIVE_CODE
-    whenever(referenceDataCodeRepository.findAllByDomainCodeAndIncludeInactive(DOMAIN.code, true)).thenReturn(
+    whenever(referenceDataCodeRepository.findAllByDomainAndIncludeInactive(DOMAIN.code, true)).thenReturn(
       listOf(
         activeCode,
         inactiveCode,
@@ -39,13 +39,13 @@ class ReferenceDataCodeServiceTest {
     val result = referenceDataCodeService.getReferenceDataCodes(DOMAIN.code, true)
 
     assertThat(result.size).isEqualTo(2)
-    verify(referenceDataCodeRepository).findAllByDomainCodeAndIncludeInactive(DOMAIN.code, true)
+    verify(referenceDataCodeRepository).findAllByDomainAndIncludeInactive(DOMAIN.code, true)
   }
 
   @Test
   fun `test getReferenceDataCodes without includeInactive`() {
     val activeCode = ACTIVE_CODE
-    whenever(referenceDataCodeRepository.findAllByDomainCodeAndIncludeInactive(DOMAIN.code, false)).thenReturn(
+    whenever(referenceDataCodeRepository.findAllByDomainAndIncludeInactive(DOMAIN.code, false)).thenReturn(
       listOf(
         activeCode,
       ),
@@ -54,7 +54,7 @@ class ReferenceDataCodeServiceTest {
     val result = referenceDataCodeService.getReferenceDataCodes(DOMAIN.code, false)
 
     assertThat(result.size).isEqualTo(1)
-    verify(referenceDataCodeRepository).findAllByDomainCodeAndIncludeInactive(DOMAIN.code, false)
+    verify(referenceDataCodeRepository).findAllByDomainAndIncludeInactive(DOMAIN.code, false)
   }
 
   @Test

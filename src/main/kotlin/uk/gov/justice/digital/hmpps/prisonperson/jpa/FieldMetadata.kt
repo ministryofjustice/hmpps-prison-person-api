@@ -21,7 +21,7 @@ class FieldMetadata(
   @Id
   @Enumerated(STRING)
   @Column(updatable = false, nullable = false)
-  var field: PrisonPersonField,
+  val field: PrisonPersonField,
 
   var lastModifiedAt: ZonedDateTime = ZonedDateTime.now(),
 

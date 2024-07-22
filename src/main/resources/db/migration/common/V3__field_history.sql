@@ -24,8 +24,12 @@ COMMENT ON COLUMN field_history.field IS 'The field that this history record is 
 COMMENT ON COLUMN field_history.value_int IS 'The integer value for the field if the field represents an integer';
 COMMENT ON COLUMN field_history.applies_from IS 'The timestamp from which the field value was true of the prisoner. This is potentially different to the created_at timestamp to accommodate for the possibility that this was retroactively recorded data.';
 COMMENT ON COLUMN field_history.applies_to IS 'The timestamp at which the field was no longer true of the prisoner. This should be populated for an old history record whenever a new history record is created.';
-COMMENT ON COLUMN field_history.created_at IS 'The timestamp from which the field value was true of the prisoner. This is potentially different to the created_at timestamp to accommodate for the possibility that this was retroactively recorded data.';
-COMMENT ON COLUMN field_history.applies_to IS 'The timestamp at which the field was no longer true of the prisoner. This should be populated for an old history record whenever a new history record is created.';
+COMMENT ON COLUMN field_history.created_at IS 'Timestamp of when the history record was created';
+COMMENT ON COLUMN field_history.created_by IS 'The username of the user creating the history record';
+COMMENT ON COLUMN field_history.migrated_at IS 'Timestamp of when the history record was migrated from NOMIS';
+COMMENT ON COLUMN field_history.merged_at IS 'Timestamp of when the history record was merged from another prisoner number';
+COMMENT ON COLUMN field_history.merged_from IS 'The old prisoner number that this history item was merged from';
+COMMENT ON COLUMN field_history.source IS 'Either DPS or NOMIS. Will be NOMIS if the record was either migrated or synced from NOMIS';
 
 
 GRANT SELECT, INSERT, UPDATE, DELETE ON field_history TO prison_person;

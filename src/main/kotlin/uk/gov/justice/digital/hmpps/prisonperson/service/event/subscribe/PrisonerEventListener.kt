@@ -10,9 +10,9 @@ import org.slf4j.LoggerFactory
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import uk.gov.justice.digital.hmpps.prisonperson.service.PrisonPersonMergeService
 import uk.gov.justice.digital.hmpps.prisonperson.service.event.DomainEvent
 import uk.gov.justice.digital.hmpps.prisonperson.service.event.PrisonerMergedAdditionalInformation
+import uk.gov.justice.digital.hmpps.prisonperson.service.merge.PrisonPersonMergeService
 
 @Service
 @ConditionalOnProperty(prefix = "events", name = ["subscribe"], havingValue = "true")

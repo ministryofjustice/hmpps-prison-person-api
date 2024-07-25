@@ -5,6 +5,8 @@ import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.FetchType.LAZY
 import jakarta.persistence.Id
+import jakarta.persistence.JoinColumn
+import jakarta.persistence.ManyToOne
 import jakarta.persistence.MapKey
 import jakarta.persistence.OneToMany
 import org.hibernate.Hibernate
@@ -16,9 +18,10 @@ import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.HEIGHT
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.WEIGHT
 import uk.gov.justice.digital.hmpps.prisonperson.enums.Source
 import uk.gov.justice.digital.hmpps.prisonperson.enums.Source.DPS
+import uk.gov.justice.digital.hmpps.prisonperson.mapper.toDto
 import uk.gov.justice.digital.hmpps.prisonperson.service.event.PhysicalAttributesUpdatedEvent
 import java.time.ZonedDateTime
-import java.util.SortedSet
+import java.util.*
 
 @Entity
 class PhysicalAttributes(
@@ -32,6 +35,22 @@ class PhysicalAttributes(
   @Column(name = "weight_kg")
   var weight: Int? = null,
 
+  @ManyToOne
+  @JoinColumn(name = "hair", referencedColumnName = "id")
+  var hair: ReferenceDataCode? = null,
+
+  @ManyToOne
+  @JoinColumn(name = "facial_hair", referencedColumnName = "id")
+  var facialHair: ReferenceDataCode? = null,
+
+  @ManyToOne
+  @JoinColumn(name = "face", referencedColumnName = "id")
+  var face: ReferenceDataCode? = null,
+
+  @ManyToOne
+  @JoinColumn(name = "build", referencedColumnName = "id")
+  var build: ReferenceDataCode? = null,
+
   // Stores snapshots of each update to a prisoner's physical attributes
   @OneToMany(mappedBy = "prisonerNumber", fetch = LAZY, cascade = [ALL], orphanRemoval = true)
   @SortNatural
@@ -42,14 +61,20 @@ class PhysicalAttributes(
   @MapKey(name = "field")
   val fieldMetadata: MutableMap<PrisonPersonField, FieldMetadata> = mutableMapOf(),
 
-) : AbstractAggregateRoot<PhysicalAttributes>() {
+  ) : AbstractAggregateRoot<PhysicalAttributes>() {
 
   private fun fields(): Map<PrisonPersonField, () -> Any?> = mapOf(
     HEIGHT to ::height,
     WEIGHT to ::weight,
+    // TODO get nested reference ???
+//    HAIR to ::hair::id,
+//    FACIAL_HAIR to ::facialHair,
+//    FACE to ::face,
+//    BUILD to ::build,
   )
 
-  fun toDto(): PhysicalAttributesDto = PhysicalAttributesDto(height, weight)
+  fun toDto(): PhysicalAttributesDto =
+    PhysicalAttributesDto(height, weight, hair?.toDto(), facialHair?.toDto(), face?.toDto(), build?.toDto())
 
   fun updateFieldHistory(lastModifiedAt: ZonedDateTime, lastModifiedBy: String, source: Source = DPS) {
     fields().forEach { (field, currentValue) ->
@@ -100,6 +125,10 @@ class PhysicalAttributes(
     if (prisonerNumber != other.prisonerNumber) return false
     if (height != other.height) return false
     if (weight != other.weight) return false
+    if (hair != other.hair) return false
+    if (facialHair != other.facialHair) return false
+    if (face != other.face) return false
+    if (build != other.build) return false
 
     return true
   }
@@ -108,6 +137,10 @@ class PhysicalAttributes(
     var result = prisonerNumber.hashCode()
     result = 31 * result + (height ?: 0)
     result = 31 * result + (weight ?: 0)
+    result = 31 * result + (hair?.id.hashCode())
+    result = 31 * result + (facialHair?.id.hashCode())
+    result = 31 * result + (face?.id.hashCode())
+    result = 31 * result + (build?.id.hashCode())
     return result
   }
 }

@@ -10,6 +10,9 @@ import java.time.ZonedDateTime
 @Entity
 class ReferenceDataCode(
   @Id
+  @Column(name = "id", updatable = false, nullable = false)
+  val id: String,
+
   @Column(name = "code", updatable = false, nullable = false)
   val code: String,
 

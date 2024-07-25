@@ -28,6 +28,7 @@ class FieldHistory(
   var field: PrisonPersonField,
 
   override var valueInt: Int? = null,
+  override var valueString: String? = null,
 
   val appliesFrom: ZonedDateTime = ZonedDateTime.now(),
   var appliesTo: ZonedDateTime? = null,
@@ -38,7 +39,7 @@ class FieldHistory(
   @Enumerated(STRING)
   val source: Source? = null,
 
-) : FieldValues,
+  ) : FieldValues,
   Comparable<FieldHistory> {
 
   override fun compareTo(other: FieldHistory) =
@@ -53,6 +54,7 @@ class FieldHistory(
     if (prisonerNumber != other.prisonerNumber) return false
     if (field != other.field) return false
     if (valueInt != other.valueInt) return false
+    if (valueString != other.valueString) return false
     if (appliesFrom != other.appliesFrom) return false
     if (appliesTo != other.appliesTo) return false
     if (createdAt != other.createdAt) return false
@@ -66,6 +68,7 @@ class FieldHistory(
   override fun hashCode(): Int {
     var result = field.hashCode()
     result = 31 * result + (valueInt ?: 0)
+    result = 31 * result + (valueString?.hashCode() ?: 0)
     result = 31 * result + appliesFrom.hashCode()
     result = 31 * result + (appliesTo?.hashCode() ?: 0)
     result = 31 * result + createdAt.hashCode()

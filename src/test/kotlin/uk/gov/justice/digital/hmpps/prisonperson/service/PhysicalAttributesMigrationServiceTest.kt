@@ -10,6 +10,7 @@ import org.mockito.Mock
 import org.mockito.Spy
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import uk.gov.justice.digital.hmpps.prisonperson.dto.request.PhysicalAttributesMigrationRequest
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.PhysicalAttributesMigrationResponse
@@ -119,6 +120,13 @@ class PhysicalAttributesMigrationServiceTest {
         )
       }
     }
+  }
+
+  @Test
+  fun `handles empty migration`() {
+    assertThat(underTest.migrate(PRISONER_NUMBER, sortedSetOf())).isEqualTo(PhysicalAttributesMigrationResponse())
+
+    verifyNoInteractions(physicalAttributesRepository)
   }
 
   private fun generatePrevious(migration: PhysicalAttributesMigrationRequest, username: String): PhysicalAttributesMigrationRequest = migration.copy(

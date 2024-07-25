@@ -25,6 +25,10 @@ class PhysicalAttributesMigrationService(
     prisonerNumber: String,
     migration: SortedSet<PhysicalAttributesMigrationRequest>,
   ): PhysicalAttributesMigrationResponse {
+    if (migration.isEmpty()) {
+      return PhysicalAttributesMigrationResponse()
+    }
+
     val now = ZonedDateTime.now(clock)
     val latestRecord = migration.last()
 
@@ -51,12 +55,7 @@ class PhysicalAttributesMigrationService(
   }
 
   private fun PhysicalAttributesMigrationRequest.addToHistory(physicalAttributes: PhysicalAttributes, now: ZonedDateTime) {
-    val fieldsToMigrate = mapOf(
-      HEIGHT to ::height,
-      WEIGHT to ::weight,
-    )
-
-    fieldsToMigrate.onEach { (field, getter) ->
+    fieldsToMigrate().onEach { (field, value) ->
       physicalAttributes.fieldHistory.add(
         FieldHistory(
           prisonerNumber = physicalAttributes.prisonerNumber,
@@ -67,7 +66,7 @@ class PhysicalAttributesMigrationService(
           createdBy = createdBy,
           source = NOMIS,
           migratedAt = now,
-        ).also { field.set(it, getter()) },
+        ).also { field.set(it, value()) },
       )
     }
   }

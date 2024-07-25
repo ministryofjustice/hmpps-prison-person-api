@@ -21,12 +21,11 @@ import uk.gov.justice.digital.hmpps.prisonperson.enums.Source.NOMIS
 import uk.gov.justice.digital.hmpps.prisonperson.integration.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.FieldMetadata
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.utils.HistoryComparison
-import uk.gov.justice.digital.hmpps.prisonperson.service.event.AdditionalInformation
 import uk.gov.justice.digital.hmpps.prisonperson.service.event.DomainEvent
+import uk.gov.justice.digital.hmpps.prisonperson.service.event.PrisonPersonAdditionalInformation
 import java.time.Clock
 import java.time.ZoneId
 import java.time.ZonedDateTime
-import java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME
 
 class PhysicalAttributesSyncControllerIntTest : IntegrationTestBase() {
 
@@ -183,20 +182,19 @@ class PhysicalAttributesSyncControllerIntTest : IntegrationTestBase() {
       fun `should publish domain event`() {
         expectSuccessfulSyncFrom(REQUEST_TO_SYNC_LATEST_PHYSICAL_ATTRIBUTES)
 
-        await untilCallTo { hmppsEventsQueue.countAllMessagesOnQueue() } matches { it == 1 }
-        val event = hmppsEventsQueue.receiveDomainEventOnQueue()
+        await untilCallTo { publishTestQueue.countAllMessagesOnQueue() } matches { it == 1 }
+        val event = publishTestQueue.receiveDomainEventOnQueue<PrisonPersonAdditionalInformation>()
 
         assertThat(event).isEqualTo(
           DomainEvent(
             eventType = PHYSICAL_ATTRIBUTES_UPDATED.domainEventType,
-            additionalInformation = AdditionalInformation(
+            additionalInformation = PrisonPersonAdditionalInformation(
               url = "http://localhost:8080/prisoners/${PRISONER_NUMBER}",
               prisonerNumber = PRISONER_NUMBER,
               source = NOMIS,
             ),
             description = PHYSICAL_ATTRIBUTES_UPDATED.description,
-            occurredAt = ISO_OFFSET_DATE_TIME.format(NOW),
-            version = 1,
+            occurredAt = NOW,
           ),
         )
       }

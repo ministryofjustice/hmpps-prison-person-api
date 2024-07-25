@@ -1,11 +1,14 @@
-package uk.gov.justice.digital.hmpps.prisonperson.service.event
+package uk.gov.justice.digital.hmpps.prisonperson.service.event.publish
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import io.opentelemetry.api.trace.SpanKind
+import io.opentelemetry.instrumentation.annotations.WithSpan
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import software.amazon.awssdk.services.sns.model.MessageAttributeValue
 import software.amazon.awssdk.services.sns.model.PublishRequest
+import uk.gov.justice.digital.hmpps.prisonperson.service.event.DomainEvent
 import uk.gov.justice.hmpps.sqs.HmppsQueueService
 
 @Service
@@ -14,10 +17,11 @@ class DomainEventPublisher(
   private val objectMapper: ObjectMapper,
 ) {
   private val domainEventsTopic by lazy {
-    hmppsQueueService.findByTopicId("hmppseventtopic") ?: throw IllegalStateException("hmppseventtopic not found")
+    hmppsQueueService.findByTopicId("domainevents") ?: throw IllegalStateException("domainevents not found")
   }
 
-  fun publish(domainEvent: DomainEvent) {
+  @WithSpan(value = "hmpps-domain-events-topic", kind = SpanKind.PRODUCER)
+  fun <T> publish(domainEvent: DomainEvent<T>) {
     val request = PublishRequest.builder()
       .topicArn(domainEventsTopic.arn)
       .message(objectMapper.writeValueAsString(domainEvent))
@@ -33,7 +37,7 @@ class DomainEventPublisher(
     }
   }
 
-  private fun DomainEvent.attributes() =
+  private fun <T> DomainEvent<T>.attributes() =
     mapOf("eventType" to MessageAttributeValue.builder().dataType("String").stringValue(eventType).build())
 
   private companion object {

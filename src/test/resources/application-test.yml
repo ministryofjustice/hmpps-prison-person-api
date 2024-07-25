@@ -27,13 +27,28 @@ spring:
 
 hmpps.sqs:
   provider: localstack
+
   queues:
-    hmppseventtestqueue:
+    prisonperson:
       queueName: ${random.uuid}
       dlqName: ${random.uuid}
-      subscribeTopicId: hmppseventtopic
+      subscribeTopicId: domainevents
+      subscribeFilter: >-
+        {"eventType": [
+          "prison-offender-events.prisoner.merged"
+        ]}
+
+    publishtest:
+      queueName: ${random.uuid}
+      dlqName: ${random.uuid}
+      subscribeTopicId: domainevents
+      subscribeFilter: >-
+        {"eventType": [
+          {"prefix": "prison-person."}
+        ]}
+
   topics:
-    hmppseventtopic:
+    domainevents:
       arn: arn:aws:sns:eu-west-2:000000000000:${random.uuid}
 
 database:

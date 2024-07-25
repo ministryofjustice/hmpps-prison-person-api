@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.prisonperson.service.event
+package uk.gov.justice.digital.hmpps.prisonperson.service.event.publish
 
 import com.microsoft.applicationinsights.TelemetryClient
 import org.slf4j.Logger

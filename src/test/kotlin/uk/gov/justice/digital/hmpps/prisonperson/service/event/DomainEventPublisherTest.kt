@@ -13,10 +13,10 @@ import software.amazon.awssdk.services.sns.model.MessageAttributeValue
 import software.amazon.awssdk.services.sns.model.PublishRequest
 import uk.gov.justice.digital.hmpps.prisonperson.enums.EventType.PHYSICAL_ATTRIBUTES_UPDATED
 import uk.gov.justice.digital.hmpps.prisonperson.enums.Source.NOMIS
+import uk.gov.justice.digital.hmpps.prisonperson.service.event.publish.DomainEventPublisher
 import uk.gov.justice.hmpps.sqs.HmppsQueueService
 import uk.gov.justice.hmpps.sqs.HmppsTopic
 import java.time.ZonedDateTime
-import java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME
 import java.util.UUID
 
 class DomainEventPublisherTest {
@@ -30,15 +30,15 @@ class DomainEventPublisherTest {
 
   @Test
   fun `throws IllegalStateException when topic not found`() {
-    whenever(hmppsQueueService.findByTopicId("hmppseventtopic")).thenReturn(null)
+    whenever(hmppsQueueService.findByTopicId("domainevents")).thenReturn(null)
     val domainEventPublisher = DomainEventPublisher(hmppsQueueService, objectMapper)
-    val exception = assertThrows<IllegalStateException> { domainEventPublisher.publish(mock<DomainEvent>()) }
-    assertThat(exception.message).isEqualTo("hmppseventtopic not found")
+    val exception = assertThrows<IllegalStateException> { domainEventPublisher.publish(mock<DomainEvent<Any>>()) }
+    assertThat(exception.message).isEqualTo("domainevents not found")
   }
 
   @Test
   fun `publish physical attributes event`() {
-    whenever(hmppsQueueService.findByTopicId("hmppseventtopic")).thenReturn(domainEventsTopic)
+    whenever(hmppsQueueService.findByTopicId("domainevents")).thenReturn(domainEventsTopic)
     whenever(domainEventsTopic.snsClient).thenReturn(domainEventsSnsClient)
     whenever(domainEventsTopic.arn).thenReturn(domainEventsTopicArn)
     val domainEventPublisher = DomainEventPublisher(hmppsQueueService, objectMapper)
@@ -47,14 +47,13 @@ class DomainEventPublisherTest {
 
     val domainEvent = DomainEvent(
       eventType = PHYSICAL_ATTRIBUTES_UPDATED.domainEventType,
-      additionalInformation = AdditionalInformation(
+      additionalInformation = PrisonPersonAdditionalInformation(
         url = "$baseUrl/prisoners/$prisonerNumber",
         prisonerNumber = prisonerNumber,
         source = NOMIS,
       ),
       description = PHYSICAL_ATTRIBUTES_UPDATED.description,
-      occurredAt = ISO_OFFSET_DATE_TIME.format(occurredAt),
-      version = 1,
+      occurredAt = occurredAt,
     )
 
     domainEventPublisher.publish(domainEvent)
@@ -70,11 +69,11 @@ class DomainEventPublisherTest {
 
   @Test
   fun `publish event - failure`() {
-    whenever(hmppsQueueService.findByTopicId("hmppseventtopic")).thenReturn(domainEventsTopic)
+    whenever(hmppsQueueService.findByTopicId("domainevents")).thenReturn(domainEventsTopic)
     whenever(domainEventsTopic.snsClient).thenReturn(domainEventsSnsClient)
     whenever(domainEventsTopic.arn).thenReturn(domainEventsTopicArn)
     val domainEventPublisher = DomainEventPublisher(hmppsQueueService, objectMapper)
-    val domainEvent = mock<DomainEvent>()
+    val domainEvent = mock<DomainEvent<Any>>()
     whenever(domainEventsSnsClient.publish(any<PublishRequest>())).thenThrow(RuntimeException("Failed to publish"))
 
     domainEventPublisher.publish(domainEvent)

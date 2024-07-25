@@ -19,8 +19,10 @@ import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.WEIGHT
 import uk.gov.justice.digital.hmpps.prisonperson.enums.Source
 import uk.gov.justice.digital.hmpps.prisonperson.enums.Source.DPS
 import uk.gov.justice.digital.hmpps.prisonperson.mapper.toDto
-import uk.gov.justice.digital.hmpps.prisonperson.service.event.PhysicalAttributesUpdatedEvent
+import uk.gov.justice.digital.hmpps.prisonperson.service.event.publish.PhysicalAttributesUpdatedEvent
 import java.time.ZonedDateTime
+import java.util.SortedSet
+import kotlin.reflect.KMutableProperty0
 import java.util.*
 
 @Entity
@@ -61,9 +63,9 @@ class PhysicalAttributes(
   @MapKey(name = "field")
   val fieldMetadata: MutableMap<PrisonPersonField, FieldMetadata> = mutableMapOf(),
 
-  ) : AbstractAggregateRoot<PhysicalAttributes>() {
+) : AbstractAggregateRoot<PhysicalAttributes>() {
 
-  private fun fields(): Map<PrisonPersonField, () -> Any?> = mapOf(
+  private fun fieldAccessors(): Map<PrisonPersonField, KMutableProperty0<*>> = mapOf(
     HEIGHT to ::height,
     WEIGHT to ::weight,
     // TODO get nested reference ???
@@ -73,11 +75,16 @@ class PhysicalAttributes(
 //    BUILD to ::build,
   )
 
+  @Suppress("UNCHECKED_CAST")
+  fun <T> set(field: PrisonPersonField, value: T) {
+    (fieldAccessors()[field] as KMutableProperty0<T>).set(value)
+  }
+
   fun toDto(): PhysicalAttributesDto =
     PhysicalAttributesDto(height, weight, hair?.toDto(), facialHair?.toDto(), face?.toDto(), build?.toDto())
 
   fun updateFieldHistory(lastModifiedAt: ZonedDateTime, lastModifiedBy: String, source: Source = DPS) {
-    fields().forEach { (field, currentValue) ->
+    fieldAccessors().forEach { (field, currentValue) ->
       val previousVersion = fieldHistory.lastOrNull { it.field == field }
       if (previousVersion == null || field.hasChangedFrom(previousVersion, currentValue())) {
         fieldMetadata[field] = FieldMetadata(
@@ -142,5 +149,9 @@ class PhysicalAttributes(
     result = 31 * result + (face?.id.hashCode())
     result = 31 * result + (build?.id.hashCode())
     return result
+  }
+
+  companion object {
+    fun fields() = listOf(HEIGHT, WEIGHT)
   }
 }

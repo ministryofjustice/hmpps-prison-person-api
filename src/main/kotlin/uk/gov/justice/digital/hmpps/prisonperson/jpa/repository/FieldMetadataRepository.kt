@@ -7,4 +7,5 @@ import uk.gov.justice.digital.hmpps.prisonperson.jpa.FieldMetadata
 @Repository
 interface FieldMetadataRepository : JpaRepository<FieldMetadata, String> {
   fun findAllByPrisonerNumber(prisonerNumber: String): List<FieldMetadata>
+  fun deleteAllByPrisonerNumber(prisonerNumber: String)
 }

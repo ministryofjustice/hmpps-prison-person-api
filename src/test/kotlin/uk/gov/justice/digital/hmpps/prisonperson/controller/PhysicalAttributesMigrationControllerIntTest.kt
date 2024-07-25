@@ -15,7 +15,6 @@ import uk.gov.justice.digital.hmpps.prisonperson.enums.Source.NOMIS
 import uk.gov.justice.digital.hmpps.prisonperson.integration.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.FieldMetadata
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.utils.HistoryComparison
-import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.utils.expectFieldHistory
 import java.time.Clock
 import java.time.ZoneId
 import java.time.ZonedDateTime

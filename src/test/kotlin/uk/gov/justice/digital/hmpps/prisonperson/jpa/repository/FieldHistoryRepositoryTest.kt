@@ -2,7 +2,6 @@ package uk.gov.justice.digital.hmpps.prisonperson.jpa.repository
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.transaction.TestTransaction
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.WEIGHT
 import uk.gov.justice.digital.hmpps.prisonperson.enums.Source.DPS
@@ -10,9 +9,6 @@ import uk.gov.justice.digital.hmpps.prisonperson.jpa.FieldHistory
 import java.time.ZonedDateTime
 
 class FieldHistoryRepositoryTest : RepositoryTest() {
-
-  @Autowired
-  lateinit var fieldHistoryRepository: FieldHistoryRepository
 
   @Test
   fun `can persist field history`() {

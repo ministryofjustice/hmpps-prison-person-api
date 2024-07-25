@@ -5,6 +5,9 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies
 import com.fasterxml.jackson.databind.annotation.JsonNaming
 import com.fasterxml.jackson.module.kotlin.readValue
 import org.assertj.core.api.Assertions.assertThat
+import org.awaitility.kotlin.await
+import org.awaitility.kotlin.matches
+import org.awaitility.kotlin.untilCallTo
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -15,6 +18,7 @@ import org.springframework.http.HttpHeaders
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.web.reactive.server.WebTestClient
+import software.amazon.awssdk.services.sqs.model.Message
 import software.amazon.awssdk.services.sqs.model.PurgeQueueRequest
 import software.amazon.awssdk.services.sqs.model.ReceiveMessageRequest
 import uk.gov.justice.digital.hmpps.prisonperson.config.CLIENT_ID
@@ -23,11 +27,8 @@ import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField
 import uk.gov.justice.digital.hmpps.prisonperson.integration.testcontainers.LocalStackContainer
 import uk.gov.justice.digital.hmpps.prisonperson.integration.testcontainers.LocalStackContainer.setLocalStackProperties
 import uk.gov.justice.digital.hmpps.prisonperson.integration.wiremock.HmppsAuthApiExtension
-import uk.gov.justice.digital.hmpps.prisonperson.integration.wiremock.PRISONER_NUMBER
 import uk.gov.justice.digital.hmpps.prisonperson.integration.wiremock.PrisonerSearchExtension
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.FieldMetadata
-import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.FieldHistoryRepository
-import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.FieldMetadataRepository
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.utils.HistoryComparison
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.utils.expectFieldHistory
 import uk.gov.justice.digital.hmpps.prisonperson.service.event.DomainEvent
@@ -50,64 +51,72 @@ abstract class IntegrationTestBase : TestBase() {
   @Autowired
   lateinit var objectMapper: ObjectMapper
 
-  @Autowired
-  lateinit var fieldHistoryRepository: FieldHistoryRepository
-
-  @Autowired
-  lateinit var fieldMetadataRepository: FieldMetadataRepository
-
   @SpyBean
   lateinit var hmppsQueueService: HmppsQueueService
 
-  internal val hmppsEventTopic by lazy {
-    hmppsQueueService.findByTopicId("hmppseventtopic") ?: throw MissingTopicException("hmppseventtopic not found")
+  protected val domainEventsTopic by lazy {
+    hmppsQueueService.findByTopicId("domainevents") ?: throw MissingTopicException("domainevents not found")
   }
 
-  // sqs queue subscribed to the topic purely for testing events
-  internal val hmppsEventsQueue by lazy {
-    hmppsQueueService.findByQueueId("hmppseventtestqueue")
-      ?: throw MissingQueueException("hmppseventtestqueue queue not found")
+  // sqs queue subscribed to the topic for testing publishing events
+  protected val publishTestQueue by lazy {
+    hmppsQueueService.findByQueueId("publishtest") ?: throw MissingQueueException("publishtest not found")
+  }
+
+  // sqs queue subscribed to the topic for testing publishing events
+  protected val prisonPersonQueue by lazy {
+    hmppsQueueService.findByQueueId("prisonperson") ?: throw MissingQueueException("prisonperson not found")
   }
 
   @BeforeEach
   fun `clear queues`() {
-    hmppsEventsQueue.sqsClient.purgeQueue(PurgeQueueRequest.builder().queueUrl(hmppsEventsQueue.queueUrl).build()).get()
+    publishTestQueue.sqsClient.purgeQueue(PurgeQueueRequest.builder().queueUrl(publishTestQueue.queueUrl).build()).get()
+    prisonPersonQueue.sqsClient.purgeQueue(PurgeQueueRequest.builder().queueUrl(prisonPersonQueue.queueUrl).build()).get()
+
+    await untilCallTo { publishTestQueue.countAllMessagesOnQueue() } matches { it == 0 }
+    await untilCallTo { prisonPersonQueue.countAllMessagesOnQueue() } matches { it == 0 }
   }
 
-  internal fun setAuthorisation(
+  protected fun setAuthorisation(
     user: String? = null,
     client: String = CLIENT_ID,
     roles: List<String> = listOf(),
     isUserToken: Boolean = true,
   ): (HttpHeaders) -> Unit = jwtAuthHelper.setAuthorisation(user, client, roles, isUserToken = isUserToken)
 
-  internal fun HmppsQueue.countAllMessagesOnQueue() =
+  protected fun HmppsQueue.countAllMessagesOnQueue(): Int =
     sqsClient.countAllMessagesOnQueue(queueUrl).get()
 
-  internal fun HmppsQueue.receiveMessageOnQueue() =
+  final fun HmppsQueue.receiveMessageOnQueue(): Message =
     sqsClient.receiveMessage(ReceiveMessageRequest.builder().queueUrl(queueUrl).build()).get().messages().single()
 
-  internal fun HmppsQueue.receiveDomainEventOnQueue() =
+  final inline fun <reified T> HmppsQueue.receiveDomainEventOnQueue() =
     receiveMessageOnQueue()
       .let { objectMapper.readValue<MsgBody>(it.body()) }
-      .let { objectMapper.readValue<DomainEvent>(it.Message) }
+      .let { objectMapper.readValue<DomainEvent<T>>(it.Message) }
 
-  internal fun <T> expectFieldHistory(field: PrisonPersonField, vararg comparison: HistoryComparison<T>) =
+  protected fun jsonString(any: Any) = objectMapper.writeValueAsString(any) as String
+
+  protected fun <T> expectFieldHistory(field: PrisonPersonField, vararg comparison: HistoryComparison<T>) =
     expectFieldHistory(field, fieldHistoryRepository.findAllByPrisonerNumber(PRISONER_NUMBER), *comparison)
 
-  internal fun expectFieldMetadata(vararg comparison: FieldMetadata) {
-    assertThat(fieldMetadataRepository.findAllByPrisonerNumber(PRISONER_NUMBER)).containsAll(comparison.toList())
+  protected fun expectFieldMetadata(prisonerNumber: String, vararg comparison: FieldMetadata) {
+    assertThat(fieldMetadataRepository.findAllByPrisonerNumber(prisonerNumber)).containsExactlyInAnyOrder(*comparison)
   }
 
+  protected fun expectFieldMetadata(vararg comparison: FieldMetadata) = expectFieldMetadata(PRISONER_NUMBER, *comparison)
+
   @JsonNaming(value = PropertyNamingStrategies.UpperCamelCaseStrategy::class)
-  private data class MsgBody(val Message: String)
+  data class MsgBody(val Message: String)
 
   init {
     // Resolves an issue where Wiremock keeps previous sockets open from other tests causing connection resets
     System.setProperty("http.keepAlive", "false")
   }
 
-  companion object {
+  private companion object {
+    private val PRISONER_NUMBER = "A1234AA"
+
     private val localStackContainer = LocalStackContainer.instance
 
     @JvmStatic

@@ -18,13 +18,12 @@ import uk.gov.justice.digital.hmpps.prisonperson.enums.Source.DPS
 import uk.gov.justice.digital.hmpps.prisonperson.integration.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.FieldMetadata
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.utils.HistoryComparison
-import uk.gov.justice.digital.hmpps.prisonperson.service.event.AdditionalInformation
 import uk.gov.justice.digital.hmpps.prisonperson.service.event.DomainEvent
+import uk.gov.justice.digital.hmpps.prisonperson.service.event.PrisonPersonAdditionalInformation
 import java.time.Clock
 import java.time.Duration
 import java.time.ZoneId
 import java.time.ZonedDateTime
-import java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME
 
 class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
 
@@ -243,20 +242,19 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
       fun `should publish domain event`() {
         expectSuccessfulUpdateFrom("""{ "height": 180, "weight": 70 }""")
 
-        await untilCallTo { hmppsEventsQueue.countAllMessagesOnQueue() } matches { it == 1 }
-        val event = hmppsEventsQueue.receiveDomainEventOnQueue()
+        await untilCallTo { publishTestQueue.countAllMessagesOnQueue() } matches { it == 1 }
+        val event = publishTestQueue.receiveDomainEventOnQueue<PrisonPersonAdditionalInformation>()
 
         assertThat(event).isEqualTo(
           DomainEvent(
             eventType = PHYSICAL_ATTRIBUTES_UPDATED.domainEventType,
-            additionalInformation = AdditionalInformation(
+            additionalInformation = PrisonPersonAdditionalInformation(
               url = "http://localhost:8080/prisoners/${PRISONER_NUMBER}",
               prisonerNumber = PRISONER_NUMBER,
               source = DPS,
             ),
             description = PHYSICAL_ATTRIBUTES_UPDATED.description,
-            occurredAt = ISO_OFFSET_DATE_TIME.format(ZonedDateTime.now(clock)),
-            version = 1,
+            occurredAt = ZonedDateTime.now(clock),
           ),
         )
       }

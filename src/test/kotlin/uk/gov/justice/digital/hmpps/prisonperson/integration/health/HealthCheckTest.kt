@@ -115,10 +115,10 @@ class HealthCheckTest : IntegrationTestBase() {
       .isOk
       .expectBody()
       .jsonPath("status").isEqualTo("UP")
-      .jsonPath("components.hmppseventtopic-health.status").isEqualTo("UP")
-      .jsonPath("components.hmppseventtopic-health.details.topicArn").isEqualTo(hmppsEventTopic.arn)
-      .jsonPath("components.hmppseventtopic-health.details.subscriptionsConfirmed").isEqualTo(0)
-      .jsonPath("components.hmppseventtopic-health.details.subscriptionsPending").isEqualTo(0)
+      .jsonPath("components.domainevents-health.status").isEqualTo("UP")
+      .jsonPath("components.domainevents-health.details.topicArn").isEqualTo(domainEventsTopic.arn)
+      .jsonPath("components.domainevents-health.details.subscriptionsConfirmed").isEqualTo(0)
+      .jsonPath("components.domainevents-health.details.subscriptionsPending").isEqualTo(0)
   }
 
   private fun stubPingWithResponse(status: Int) {

@@ -1,27 +1,27 @@
-package uk.gov.justice.digital.hmpps.prisonperson.service.event
+package uk.gov.justice.digital.hmpps.prisonperson.service.event.publish
 
 import uk.gov.justice.digital.hmpps.prisonperson.enums.EventType
 import uk.gov.justice.digital.hmpps.prisonperson.enums.EventType.PHYSICAL_ATTRIBUTES_UPDATED
 import uk.gov.justice.digital.hmpps.prisonperson.enums.Source
+import uk.gov.justice.digital.hmpps.prisonperson.service.event.DomainEvent
+import uk.gov.justice.digital.hmpps.prisonperson.service.event.PrisonPersonAdditionalInformation
 import java.time.ZonedDateTime
-import java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME
 
 abstract class PrisonPersonEvent(val type: EventType) {
   abstract val prisonerNumber: String
   abstract val occurredAt: ZonedDateTime
   abstract val source: Source
 
-  fun toDomainEvent(baseUrl: String): DomainEvent =
+  fun toDomainEvent(baseUrl: String): DomainEvent<PrisonPersonAdditionalInformation> =
     DomainEvent(
       eventType = type.domainEventType,
-      additionalInformation = AdditionalInformation(
+      additionalInformation = PrisonPersonAdditionalInformation(
         url = "$baseUrl/prisoners/$prisonerNumber",
         prisonerNumber = prisonerNumber,
         source = source,
       ),
       description = type.description,
-      occurredAt = ISO_OFFSET_DATE_TIME.format(occurredAt),
-      version = 1,
+      occurredAt = occurredAt,
     )
 }
 

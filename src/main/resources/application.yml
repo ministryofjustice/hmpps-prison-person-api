@@ -96,6 +96,7 @@ management:
 
 events:
   publish: true
+  subscribe: true
   base-url: http://localhost:8080
 
 hmpps.sqs:

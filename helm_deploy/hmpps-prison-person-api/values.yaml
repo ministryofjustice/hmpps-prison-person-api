@@ -53,10 +53,10 @@ generic-service:
     hmpps-domain-events-topic:
       HMPPS_SQS_TOPICS_DOMAINEVENTS_ARN: "topic_arn"
 
-    sqs-domain-events-queue-dlq-secret:
+    sqs-domain-events-queue-secret:
       HMPPS_SQS_QUEUES_PRISONPERSON_QUEUE_NAME: "sqs_queue_name"
 
-    sqs-domain-events-queue-secret:
+    sqs-domain-events-queue-dlq-secret:
       HMPPS_SQS_QUEUES_PRISONPERSON_DLQ_NAME: "sqs_queue_name"
 
   allowlist:

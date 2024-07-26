@@ -27,6 +27,16 @@ spring:
 hmpps.sqs:
   provider: localstack
   localstackUrl: http://localhost:4567
+  queues:
+    prisonperson:
+      queueName: ${random.uuid}
+      dlqName: ${random.uuid}
+      subscribeTopicId: domainevents
+      subscribeFilter: >-
+        {"eventType": [
+          "prison-offender-events.prisoner.merged"
+        ]}
+
   topics:
     domainevents:
       arn: arn:aws:sns:eu-west-2:000000000000:hmpps-domain-events-topic

@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "6.0.0"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "6.0.1"
   kotlin("plugin.spring") version "2.0.0"
   kotlin("plugin.jpa") version "2.0.0"
   jacoco
@@ -23,7 +23,7 @@ dependencies {
   implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:4.0.0")
 
   // OpenAPI
-  implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0")
+  implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0")
 
   // Jackson
   implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.17.1")
@@ -34,19 +34,19 @@ dependencies {
   runtimeOnly("org.postgresql:postgresql")
 
   // Logging and Telemetry
-  implementation("io.opentelemetry.instrumentation:opentelemetry-instrumentation-annotations:2.5.0")
+  implementation("io.opentelemetry.instrumentation:opentelemetry-instrumentation-annotations:2.6.0")
 
   // Test
   testImplementation("io.jsonwebtoken:jjwt-impl:0.12.6")
-  testImplementation("io.jsonwebtoken:jjwt-jackson:0.12.5")
+  testImplementation("io.jsonwebtoken:jjwt-jackson:0.12.6")
   testImplementation("io.mockk:mockk:1.13.12")
-  testImplementation("org.wiremock:wiremock-standalone:3.8.0")
-  testImplementation("org.testcontainers:junit-jupiter:1.19.8")
-  testImplementation("org.testcontainers:postgresql:1.19.8")
-  testImplementation("org.testcontainers:localstack:1.19.8")
+  testImplementation("org.wiremock:wiremock-standalone:3.9.1")
+  testImplementation("org.testcontainers:junit-jupiter:1.20.0")
+  testImplementation("org.testcontainers:postgresql:1.20.0")
+  testImplementation("org.testcontainers:localstack:1.20.0")
   testImplementation("org.awaitility:awaitility-kotlin:4.2.1")
   testImplementation("org.springframework.security:spring-security-test")
-  testImplementation("io.opentelemetry:opentelemetry-sdk-testing:1.24.0")
+  testImplementation("io.opentelemetry:opentelemetry-sdk-testing:1.40.0")
 
   // Developer experience
   developmentOnly("org.springframework.boot:spring-boot-devtools")

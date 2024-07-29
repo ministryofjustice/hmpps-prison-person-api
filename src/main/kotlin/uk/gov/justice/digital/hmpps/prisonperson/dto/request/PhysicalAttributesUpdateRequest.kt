@@ -24,7 +24,7 @@ data class PhysicalAttributesUpdateRequest(
     max = 274,
     message = "The height must be a plausible value in centimetres (between 30 and 274)",
   )
-  val height: Nullish = getAttribute("height")
+  val height: Nullish<Int> = getAttribute("height")
 
   @Schema(description = "Weight (in kilograms).", example = "70")
   @field:NullishRange(
@@ -32,10 +32,10 @@ data class PhysicalAttributesUpdateRequest(
     max = 635,
     message = "The weight must be a plausible value in kilograms (between 12 and 635)",
   )
-  val weight: Nullish = getAttribute("weight")
+  val weight: Nullish<Int> = getAttribute("weight")
 
   @Schema(description = "Hair type or colour. ReferenceDataCode `id`.", example = "HAIR_BROWN")
-  val hair: Nullish = getAttribute("hair")
+  val hair: Nullish<String> = getAttribute("hair")
 
   @Schema(
     type = "Nullish",
@@ -43,32 +43,40 @@ data class PhysicalAttributesUpdateRequest(
     description = "Facial hair type. ReferenceDataCode `id`.",
     example = "FACIAL_HAIR_BEARDED",
   )
-  val facialHair: Nullish = getAttribute("facialHair")
+  val facialHair: Nullish<String> = getAttribute("facialHair")
 
   @Schema(description = "Face shape. `ReferenceDataCode`.`id`.", example = "FACE_OVAL")
-  val face: Nullish = getAttribute("face")
+  val face: Nullish<String> = getAttribute("face")
 
   @Schema(description = "Build. `ReferenceDataCode.id`.", example = "BUILD_MEDIUM")
-  val build: Nullish = getAttribute("build")
+  val build: Nullish<String> = getAttribute("build")
 
   /**
    * Get an attribute from the map of `attributes` and push it into a `Nullish` object
    *
    * @param name the name of the attribute to get
    */
-  private fun getAttribute(name: String): Nullish = if (containsKey(name)) {
-    Nullish.Defined(this[name])
-  } else {
-    Nullish.Undefined
+  private inline fun <reified T> getAttribute(name: String): Nullish<T> {
+    if (!containsKey(name)) {
+      @Suppress("UNCHECKED_CAST")
+      return Nullish.Undefined as Nullish<T>
+    }
+
+    val value = this[name]
+    if (value is T || value == null) {
+      return Nullish.Defined(value as? T)
+    } else {
+      throw IllegalArgumentException("$name is not an instance of ${T::class.java.simpleName}")
+    }
   }
 }
 
 /**
  * Nullish sealed interface to define a type that can have a **Defined** `value` including `null`, or be **Undefined**
  */
-sealed interface Nullish {
-  data object Undefined : Nullish
-  data class Defined(val value: Any?) : Nullish
+sealed interface Nullish<T> {
+  data object Undefined : Nullish<Nothing>
+  data class Defined<T>(val value: T?) : Nullish<T>
 
   /**
    * `apply` the value of the Nullish object to the nullable property `prop`
@@ -79,11 +87,10 @@ sealed interface Nullish {
    *
    * @param prop the nullable property to set to the **Defined** `value`
    */
-  fun <T> apply(prop: KMutableProperty0<T?>) {
-    @Suppress("UNCHECKED_CAST")
+  fun apply(prop: KMutableProperty0<T?>) {
     when (this) {
       Undefined -> return
-      is Defined -> prop.set(value as T?)
+      is Defined -> prop.set(value)
     }
   }
 
@@ -98,12 +105,11 @@ sealed interface Nullish {
    * @param prop the nullable property to set to a mapped version of the **Defined** `value`
    * @param fn a function to map the `value` before setting on the `prop`
    */
-  fun <T, U> apply(prop: KMutableProperty0<U?>, fn: (T) -> U?) {
+  fun <U> apply(prop: KMutableProperty0<U?>, fn: (T) -> U?) {
     when (this) {
       is Undefined -> return
       is Defined -> {
-        @Suppress("UNCHECKED_CAST")
-        val currentValue = value as? T
+        val currentValue = value
         val modifiedValue = currentValue?.let { fn(it) }
         prop.set(modifiedValue)
       }

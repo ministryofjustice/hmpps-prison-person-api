@@ -22,6 +22,7 @@ CREATE INDEX reference_data_domain_created_at_idx ON reference_data_domain (crea
 CREATE INDEX reference_data_domain_deactivated_at_idx ON reference_data_domain (deactivated_at);
 
 COMMENT ON TABLE reference_data_domain IS 'Reference data domains for prison person data';
+COMMENT ON COLUMN reference_data_domain.list_sequence IS 'Used for ordering reference data correctly in lists. 0 is default order by description';
 
 GRANT SELECT, INSERT, UPDATE, DELETE ON reference_data_domain TO prison_person;
 
@@ -29,7 +30,7 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON reference_data_domain TO prison_person;
 
 CREATE TABLE reference_data_code
 (
-    id               BIGSERIAL                NOT NULL,
+    id               VARCHAR(81)              NOT NULL,
     domain           VARCHAR(40)              NOT NULL REFERENCES reference_data_domain (code),
     code             VARCHAR(40)              NOT NULL,
     description      VARCHAR(100)             NOT NULL,
@@ -52,5 +53,7 @@ CREATE INDEX reference_data_code_created_at_idx ON reference_data_code (created_
 CREATE INDEX reference_data_code_deactivated_at_idx ON reference_data_code (deactivated_at);
 
 COMMENT ON TABLE reference_data_code IS 'Reference data codes for prison person data';
+COMMENT ON COLUMN reference_data_code.id IS 'Primary key, uses `domain`_`code`';
+COMMENT ON COLUMN reference_data_code.list_sequence IS 'Used for ordering reference data correctly in lists and dropdowns. 0 is default order by description';
 
 GRANT SELECT, INSERT, UPDATE, DELETE ON reference_data_code TO prison_person;

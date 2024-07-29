@@ -25,19 +25,23 @@ import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.HEIGHT
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.WEIGHT
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.PhysicalAttributes
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.PhysicalAttributesRepository
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.ReferenceDataCodeRepository
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.utils.HistoryComparison
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.utils.expectFieldHistory
 import uk.gov.justice.digital.hmpps.prisonperson.utils.AuthenticationFacade
 import java.time.Clock
 import java.time.LocalDate
 import java.time.ZonedDateTime
-import java.util.Optional
+import java.util.*
 
 @ExtendWith(MockitoExtension::class)
 @MockitoSettings(strictness = LENIENT)
 class PhysicalAttributesServiceTest {
   @Mock
   lateinit var physicalAttributesRepository: PhysicalAttributesRepository
+
+  @Mock
+  lateinit var referenceDataCodeRepository: ReferenceDataCodeRepository
 
   @Mock
   lateinit var prisonerSearchClient: PrisonerSearchClient
@@ -103,12 +107,24 @@ class PhysicalAttributesServiceTest {
 
         expectFieldHistory(
           HEIGHT,
-          HistoryComparison(value = PRISONER_HEIGHT, createdAt = NOW, createdBy = USER1, appliesFrom = NOW, appliesTo = null),
+          HistoryComparison(
+            value = PRISONER_HEIGHT,
+            createdAt = NOW,
+            createdBy = USER1,
+            appliesFrom = NOW,
+            appliesTo = null,
+          ),
         )
 
         expectFieldHistory(
           WEIGHT,
-          HistoryComparison(value = PRISONER_WEIGHT, createdAt = NOW, createdBy = USER1, appliesFrom = NOW, appliesTo = null),
+          HistoryComparison(
+            value = PRISONER_WEIGHT,
+            createdAt = NOW,
+            createdBy = USER1,
+            appliesFrom = NOW,
+            appliesTo = null,
+          ),
         )
       }
     }
@@ -148,17 +164,41 @@ class PhysicalAttributesServiceTest {
         expectFieldHistory(
           HEIGHT,
           // Initial history entry:
-          HistoryComparison(value = PREVIOUS_PRISONER_HEIGHT, createdAt = NOW.minusDays(1), createdBy = USER2, appliesFrom = NOW.minusDays(1), appliesTo = NOW),
+          HistoryComparison(
+            value = PREVIOUS_PRISONER_HEIGHT,
+            createdAt = NOW.minusDays(1),
+            createdBy = USER2,
+            appliesFrom = NOW.minusDays(1),
+            appliesTo = NOW,
+          ),
           // New history entry:
-          HistoryComparison(value = PRISONER_HEIGHT, createdAt = NOW, createdBy = USER1, appliesFrom = NOW, appliesTo = null),
+          HistoryComparison(
+            value = PRISONER_HEIGHT,
+            createdAt = NOW,
+            createdBy = USER1,
+            appliesFrom = NOW,
+            appliesTo = null,
+          ),
         )
 
         expectFieldHistory(
           WEIGHT,
           // Initial history entry:
-          HistoryComparison(value = PREVIOUS_PRISONER_WEIGHT, createdAt = NOW.minusDays(1), createdBy = USER2, appliesFrom = NOW.minusDays(1), appliesTo = NOW),
+          HistoryComparison(
+            value = PREVIOUS_PRISONER_WEIGHT,
+            createdAt = NOW.minusDays(1),
+            createdBy = USER2,
+            appliesFrom = NOW.minusDays(1),
+            appliesTo = NOW,
+          ),
           // New history entry:
-          HistoryComparison(value = PRISONER_WEIGHT, createdAt = NOW, createdBy = USER1, appliesFrom = NOW, appliesTo = null),
+          HistoryComparison(
+            value = PRISONER_WEIGHT,
+            createdAt = NOW,
+            createdBy = USER1,
+            appliesFrom = NOW,
+            appliesTo = null,
+          ),
         )
       }
     }
@@ -175,7 +215,12 @@ class PhysicalAttributesServiceTest {
 
     val NOW: ZonedDateTime = ZonedDateTime.now()
 
-    val PHYSICAL_ATTRIBUTES_UPDATE_REQUEST = PhysicalAttributesUpdateRequest(PRISONER_HEIGHT, PRISONER_WEIGHT)
+    val attributes = mutableMapOf<String, Any?>(
+      Pair("height", PRISONER_HEIGHT),
+      Pair("weight", PRISONER_WEIGHT),
+    )
+
+    val PHYSICAL_ATTRIBUTES_UPDATE_REQUEST = PhysicalAttributesUpdateRequest(attributes)
     val PRISONER_SEARCH_RESPONSE =
       PrisonerDto(
         PRISONER_NUMBER,

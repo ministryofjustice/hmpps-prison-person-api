@@ -88,9 +88,18 @@ class ReferenceDataCodeServiceTest {
 
   private companion object {
     val DOMAIN = ReferenceDataDomain("DOMAIN", "Domain", 0, ZonedDateTime.now(), "testUser")
-    val ACTIVE_CODE = ReferenceDataCode("ACTIVE", DOMAIN, "Active domain", 0, ZonedDateTime.now(), "testUser")
+    val ACTIVE_CODE =
+      ReferenceDataCode("${DOMAIN.code}_ACTIVE", "ACTIVE", DOMAIN, "Active domain", 0, ZonedDateTime.now(), "testUser")
     val INACTIVE_CODE =
-      ReferenceDataCode("INACTIVE", DOMAIN, "Inactive domain", 0, ZonedDateTime.now(), "testUser").apply {
+      ReferenceDataCode(
+        "${DOMAIN.code}_INACTIVE",
+        "INACTIVE",
+        DOMAIN,
+        "Inactive domain",
+        0,
+        ZonedDateTime.now(),
+        "testUser",
+      ).apply {
         this.deactivatedAt = ZonedDateTime.now()
         this.deactivatedBy = "testUser"
       }

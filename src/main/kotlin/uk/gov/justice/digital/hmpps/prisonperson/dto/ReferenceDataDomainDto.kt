@@ -12,7 +12,9 @@ data class ReferenceDataDomainDto(
   val description: String,
 
   @Schema(
-    description = "The sequence number of the reference data domain. Used for ordering domains correctly in lists.",
+    description = "The sequence number of the reference data domain. " +
+      "Used for ordering domains correctly in lists. " +
+      "0 is default order by description.",
     example = "3",
   )
   val listSequence: Int,

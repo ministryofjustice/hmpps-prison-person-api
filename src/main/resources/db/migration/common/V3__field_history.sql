@@ -1,17 +1,18 @@
 CREATE TABLE field_history
 (
-    field_history_id            BIGSERIAL                   NOT NULL,
-    prisoner_number             VARCHAR(7)                  NOT NULL,
-    field                       VARCHAR(40),
-    value_int                   INT,
-    applies_from                TIMESTAMP WITH TIME ZONE    NOT NULL,
-    applies_to                  TIMESTAMP WITH TIME ZONE,
-    created_at                  TIMESTAMP WITH TIME ZONE    NOT NULL,
-    created_by                  VARCHAR(40)                 NOT NULL,
-    migrated_at                 TIMESTAMP WITH TIME ZONE,
+    field_history_id BIGSERIAL                NOT NULL,
+    prisoner_number  VARCHAR(7)               NOT NULL,
+    field            VARCHAR(40),
+    value_int        INT,
+    value_string     VARCHAR(40),
+    applies_from     TIMESTAMP WITH TIME ZONE NOT NULL,
+    applies_to       TIMESTAMP WITH TIME ZONE,
+    created_at       TIMESTAMP WITH TIME ZONE NOT NULL,
+    created_by       VARCHAR(40)              NOT NULL,
+    migrated_at      TIMESTAMP WITH TIME ZONE,
     merged_at                   TIMESTAMP WITH TIME ZONE,
     merged_from                 VARCHAR(7),
-    source                      VARCHAR(10),
+    source           VARCHAR(10),
 
     CONSTRAINT field_history_pk PRIMARY KEY (field_history_id)
 );

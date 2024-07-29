@@ -27,6 +27,7 @@ object ReferenceDataCodeMapper {
 fun ReferenceDataCode.toDto(): ReferenceDataCodeDto {
   val mappedDescription = mapDescription(domain.code, code, description)
   return ReferenceDataCodeDto(
+    id,
     domain = domain.code,
     code,
     description = mappedDescription,

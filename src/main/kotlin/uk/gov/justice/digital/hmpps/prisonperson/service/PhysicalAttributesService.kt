@@ -40,6 +40,7 @@ class PhysicalAttributesService(
         request.height.apply(this::height)
         request.weight.apply(this::weight)
         request.hair.apply(this::hair, ::toReferenceDataCode)
+        request.hair.apply(this::hairId)
         request.facialHair.apply(this::facialHair, ::toReferenceDataCode)
         request.face.apply(this::face, ::toReferenceDataCode)
         request.build.apply(this::build, ::toReferenceDataCode)

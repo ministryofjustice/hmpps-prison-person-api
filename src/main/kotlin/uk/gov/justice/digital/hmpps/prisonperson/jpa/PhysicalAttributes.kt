@@ -14,6 +14,7 @@ import org.hibernate.annotations.SortNatural
 import org.springframework.data.domain.AbstractAggregateRoot
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.PhysicalAttributesDto
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField
+import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.HAIR
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.HEIGHT
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.WEIGHT
 import uk.gov.justice.digital.hmpps.prisonperson.enums.Source
@@ -36,9 +37,12 @@ class PhysicalAttributes(
   @Column(name = "weight_kg")
   var weight: Int? = null,
 
-  @ManyToOne
-  @JoinColumn(name = "hair", referencedColumnName = "id")
+  @ManyToOne(fetch = LAZY)
+  @JoinColumn(name = "hair", referencedColumnName = "id", insertable = false, updatable = false)
   var hair: ReferenceDataCode? = null,
+
+  @Column(name = "hair")
+  var hairId: String? = null,
 
   @ManyToOne
   @JoinColumn(name = "facial_hair", referencedColumnName = "id")
@@ -67,8 +71,7 @@ class PhysicalAttributes(
   private fun fieldAccessors(): Map<PrisonPersonField, KMutableProperty0<*>> = mapOf(
     HEIGHT to ::height,
     WEIGHT to ::weight,
-    // TODO get nested reference ???
-//    HAIR to ::hair::id,
+    HAIR to ::hairId,
 //    FACIAL_HAIR to ::facialHair,
 //    FACE to ::face,
 //    BUILD to ::build,
@@ -151,6 +154,6 @@ class PhysicalAttributes(
   }
 
   companion object {
-    fun fields() = listOf(HEIGHT, WEIGHT)
+    fun fields() = listOf(HEIGHT, WEIGHT, HAIR)
   }
 }

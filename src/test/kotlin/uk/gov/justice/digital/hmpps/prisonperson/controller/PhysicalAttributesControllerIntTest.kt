@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Primary
 import org.springframework.test.context.jdbc.Sql
 import uk.gov.justice.digital.hmpps.prisonperson.enums.EventType.PHYSICAL_ATTRIBUTES_UPDATED
+import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.HAIR
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.HEIGHT
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.WEIGHT
 import uk.gov.justice.digital.hmpps.prisonperson.enums.Source.DPS
@@ -140,6 +141,36 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
 
     @Nested
     inner class HappyPath {
+      @Test
+      @Sql("classpath:jpa/repository/reset.sql")
+      fun `can create a new set of physical attributes2`() {
+        expectSuccessfulUpdateFrom("""{ "hair": "TEST_RED" }""")
+          .expectBody().json(
+            // language=json
+            """
+            {
+              "height": null,
+              "weight": null,
+              "hair":{"id":"TEST_RED","domain":"TEST","code":"RED","description":"Red","listSequence":0,"isActive":true,"createdAt":"2024-07-11T16:00:00Z","createdBy":"OMS_OWNER","lastModifiedAt":null,"lastModifiedBy":null,"deactivatedAt":null,"deactivatedBy":null},
+              "facialHair": null,
+              "face": null,
+              "build": null
+            }
+            """.trimIndent(),
+            true,
+          )
+
+        expectFieldHistory(
+          HAIR,
+          HistoryComparison(value = "TEST_RED", appliesFrom = NOW, appliesTo = null, createdAt = NOW, createdBy = USER1),
+        )
+
+        expectFieldMetadata(
+          FieldMetadata(PRISONER_NUMBER, HEIGHT, lastModifiedAt = NOW, lastModifiedBy = USER1),
+          FieldMetadata(PRISONER_NUMBER, WEIGHT, lastModifiedAt = NOW, lastModifiedBy = USER1),
+          FieldMetadata(PRISONER_NUMBER, HAIR, lastModifiedAt = NOW, lastModifiedBy = USER1),
+        )
+      }
 
       @Test
       @Sql("classpath:jpa/repository/reset.sql")

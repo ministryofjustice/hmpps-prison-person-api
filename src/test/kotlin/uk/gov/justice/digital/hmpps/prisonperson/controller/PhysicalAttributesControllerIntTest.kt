@@ -34,7 +34,7 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
     fun fixedClock(): Clock = clock
   }
 
-  @DisplayName("PUT /prisoners/{prisonerNumber}/physical-attributes")
+  @DisplayName("PATCH /prisoners/{prisonerNumber}/physical-attributes")
   @Nested
   inner class SetPhysicalAttributesTest {
 
@@ -74,6 +74,14 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
     @Nested
     @Sql("classpath:jpa/repository/reset.sql")
     inner class Validation {
+
+      @Test
+      fun `bad request when field type is not as expected`() {
+        expectBadRequestFrom(
+          requestBody = """{ "hair": 123 }""",
+          message = "Validation failure: Couldn't read request body",
+        )
+      }
 
       @Test
       fun `bad request when height below 30cm`() {

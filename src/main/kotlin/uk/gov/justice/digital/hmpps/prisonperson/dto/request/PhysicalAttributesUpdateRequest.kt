@@ -16,7 +16,7 @@ data class PhysicalAttributesUpdateRequest(
   @Schema(description = "Map of attributes")
   private val attributes: MutableMap<String, Any?> = mutableMapOf(),
 
-  ) : MutableMap<String, Any?> by attributes {
+) : MutableMap<String, Any?> by attributes {
 
   @Schema(description = "Height (in centimetres).", example = "180")
   @field:NullishRange(
@@ -56,12 +56,10 @@ data class PhysicalAttributesUpdateRequest(
    *
    * @param name the name of the attribute to get
    */
-  private fun getAttribute(name: String): Nullish {
-    return if (containsKey(name)) {
-      Nullish.Defined(this[name])
-    } else {
-      Nullish.Undefined
-    }
+  private fun getAttribute(name: String): Nullish = if (containsKey(name)) {
+    Nullish.Defined(this[name])
+  } else {
+    Nullish.Undefined
   }
 }
 

@@ -136,13 +136,17 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
       @Test
       @Sql("classpath:jpa/repository/reset.sql")
       fun `can create a new set of physical attributes`() {
-        expectSuccessfulUpdateFrom("""{ "height": 180, "weight": 70 }""")
+        expectSuccessfulUpdateFrom("""{ "height": 180 }""")
           .expectBody().json(
             // language=json
             """
             {
               "height": 180,
-              "weight": 70
+              "weight": null,
+              "hair": null,
+              "facialHair": null,
+              "face": null,
+              "build": null
             }
             """.trimIndent(),
             true,
@@ -151,10 +155,6 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
         expectFieldHistory(
           HEIGHT,
           HistoryComparison(value = 180, appliesFrom = NOW, appliesTo = null, createdAt = NOW, createdBy = USER1),
-        )
-        expectFieldHistory(
-          WEIGHT,
-          HistoryComparison(value = 70, appliesFrom = NOW, appliesTo = null, createdAt = NOW, createdBy = USER1),
         )
 
         expectFieldMetadata(
@@ -183,7 +183,11 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
             """
             {
               "height": 181,
-              "weight": 71
+              "weight": 71,
+              "hair": null,
+              "facialHair": null,
+              "face": null,
+              "build": null
             }
             """.trimIndent(),
             true,

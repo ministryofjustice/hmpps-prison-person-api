@@ -41,7 +41,7 @@ class FieldHistory(
   @Enumerated(STRING)
   val source: Source? = null,
 
-  ) : FieldValues,
+) : FieldValues,
   Comparable<FieldHistory> {
 
   fun toMetadata() = FieldMetadata(

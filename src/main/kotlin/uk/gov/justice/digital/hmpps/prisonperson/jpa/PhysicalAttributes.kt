@@ -21,7 +21,7 @@ import uk.gov.justice.digital.hmpps.prisonperson.enums.Source.DPS
 import uk.gov.justice.digital.hmpps.prisonperson.mapper.toDto
 import uk.gov.justice.digital.hmpps.prisonperson.service.event.publish.PhysicalAttributesUpdatedEvent
 import java.time.ZonedDateTime
-import java.util.*
+import java.util.SortedSet
 import kotlin.reflect.KMutableProperty0
 
 @Entity
@@ -62,7 +62,7 @@ class PhysicalAttributes(
   @MapKey(name = "field")
   val fieldMetadata: MutableMap<PrisonPersonField, FieldMetadata> = mutableMapOf(),
 
-  ) : AbstractAggregateRoot<PhysicalAttributes>() {
+) : AbstractAggregateRoot<PhysicalAttributes>() {
 
   private fun fieldAccessors(): Map<PrisonPersonField, KMutableProperty0<*>> = mapOf(
     HEIGHT to ::height,

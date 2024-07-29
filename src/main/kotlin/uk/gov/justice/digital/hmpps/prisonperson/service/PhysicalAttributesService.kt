@@ -50,11 +50,9 @@ class PhysicalAttributesService(
     return physicalAttributesRepository.save(physicalAttributes).toDto()
   }
 
-  private fun toReferenceDataCode(id: String?): ReferenceDataCode? {
-    return id?.let {
-      referenceDataCodeRepository.findById(it)
-        .orElseThrow { IllegalArgumentException("Invalid reference data code: $it") }
-    }
+  private fun toReferenceDataCode(id: String?): ReferenceDataCode? = id?.let {
+    referenceDataCodeRepository.findById(it)
+      .orElseThrow { IllegalArgumentException("Invalid reference data code: $it") }
   }
 
   private fun newPhysicalAttributesFor(prisonerNumber: String): PhysicalAttributes {

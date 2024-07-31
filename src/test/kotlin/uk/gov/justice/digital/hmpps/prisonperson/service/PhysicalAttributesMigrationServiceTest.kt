@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.prisonperson.service
 
+import com.microsoft.applicationinsights.TelemetryClient
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
@@ -9,7 +10,11 @@ import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.Spy
 import org.mockito.junit.jupiter.MockitoExtension
+import org.mockito.kotlin.argThat
 import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.eq
+import org.mockito.kotlin.isNull
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import uk.gov.justice.digital.hmpps.prisonperson.dto.request.PhysicalAttributesMigrationRequest
@@ -30,6 +35,9 @@ import java.time.ZonedDateTime
 class PhysicalAttributesMigrationServiceTest {
   @Mock
   lateinit var physicalAttributesRepository: PhysicalAttributesRepository
+
+  @Mock
+  lateinit var telemetryClient: TelemetryClient
 
   @Spy
   val clock: Clock? = Clock.fixed(NOW.toInstant(), NOW.zone)
@@ -67,6 +75,12 @@ class PhysicalAttributesMigrationServiceTest {
           HistoryComparison(value = PRISONER_WEIGHT, createdAt = THEN, createdBy = USER1, appliesFrom = THEN, appliesTo = null, migratedAt = NOW, source = NOMIS),
         )
       }
+
+      verify(telemetryClient).trackEvent(
+        eq("prison-person-api-physical-attributes-migrated"),
+        argThat { it -> it.containsValue(PRISONER_NUMBER) },
+        isNull(),
+      )
     }
 
     @Test
@@ -97,6 +111,12 @@ class PhysicalAttributesMigrationServiceTest {
           HistoryComparison(value = PRISONER_WEIGHT, createdAt = THEN, createdBy = USER1, appliesFrom = THEN, appliesTo = null, migratedAt = NOW, source = NOMIS),
         )
       }
+
+      verify(telemetryClient).trackEvent(
+        eq("prison-person-api-physical-attributes-migrated"),
+        argThat { it -> it.containsValue(PRISONER_NUMBER) },
+        isNull(),
+      )
     }
 
     @Test
@@ -119,6 +139,12 @@ class PhysicalAttributesMigrationServiceTest {
           HistoryComparison(value = null, createdAt = THEN, createdBy = USER1, appliesFrom = THEN, appliesTo = null, migratedAt = NOW, source = NOMIS),
         )
       }
+
+      verify(telemetryClient).trackEvent(
+        eq("prison-person-api-physical-attributes-migrated"),
+        argThat { it -> it.containsValue(PRISONER_NUMBER) },
+        isNull(),
+      )
     }
   }
 
@@ -127,6 +153,11 @@ class PhysicalAttributesMigrationServiceTest {
     assertThat(underTest.migrate(PRISONER_NUMBER, sortedSetOf())).isEqualTo(PhysicalAttributesMigrationResponse())
 
     verifyNoInteractions(physicalAttributesRepository)
+    verify(telemetryClient).trackEvent(
+      eq("prison-person-api-physical-attributes-migrated"),
+      argThat { it -> it.containsValue(PRISONER_NUMBER) && it.containsValue("[]") },
+      isNull(),
+    )
   }
 
   private fun generatePrevious(migration: PhysicalAttributesMigrationRequest, username: String): PhysicalAttributesMigrationRequest = migration.copy(

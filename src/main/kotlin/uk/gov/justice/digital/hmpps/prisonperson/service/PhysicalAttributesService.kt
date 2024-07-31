@@ -43,6 +43,8 @@ class PhysicalAttributesService(
         request.facialHair.apply(this::facialHair, ::toReferenceDataCode)
         request.face.apply(this::face, ::toReferenceDataCode)
         request.build.apply(this::build, ::toReferenceDataCode)
+        request.leftEyeColour.apply(this::leftEyeColour, ::toReferenceDataCode)
+        request.rightEyeColour.apply(this::rightEyeColour, ::toReferenceDataCode)
       }
       .also { it.updateFieldHistory(now, authenticationFacade.getUserOrSystemInContext()) }
       .also { it.publishUpdateEvent(DPS, now) }

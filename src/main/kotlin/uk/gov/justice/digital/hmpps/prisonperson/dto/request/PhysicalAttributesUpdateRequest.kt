@@ -51,6 +51,12 @@ data class PhysicalAttributesUpdateRequest(
   @Schema(description = "Build. `ReferenceDataCode.id`.", example = "BUILD_MEDIUM")
   val build: Nullish<String> = getAttribute("build")
 
+  @Schema(description = "Left eye colour. `ReferenceDataCode.id`.", example = "EYE_GREEN")
+  val leftEyeColour: Nullish<String> = getAttribute("leftEyeColour")
+
+  @Schema(description = "Right eye colour. `ReferenceDataCode.id`.", example = "EYE_BLUE")
+  val rightEyeColour: Nullish<String> = getAttribute("rightEyeColour")
+
   /**
    * Get an attribute from the map of `attributes` and push it into a `Nullish` object
    *

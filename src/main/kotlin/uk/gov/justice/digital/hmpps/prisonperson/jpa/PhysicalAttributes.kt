@@ -52,6 +52,14 @@ class PhysicalAttributes(
   @JoinColumn(name = "build", referencedColumnName = "id")
   var build: ReferenceDataCode? = null,
 
+  @ManyToOne
+  @JoinColumn(name = "left_eye_colour", referencedColumnName = "id")
+  var leftEyeColour: ReferenceDataCode? = null,
+
+  @ManyToOne
+  @JoinColumn(name = "right_eye_colour", referencedColumnName = "id")
+  var rightEyeColour: ReferenceDataCode? = null,
+
   // Stores snapshots of each update to a prisoner's physical attributes
   @OneToMany(mappedBy = "prisonerNumber", fetch = LAZY, cascade = [ALL], orphanRemoval = true)
   @SortNatural
@@ -72,6 +80,8 @@ class PhysicalAttributes(
 //    FACIAL_HAIR to ::facialHair,
 //    FACE to ::face,
 //    BUILD to ::build,
+//    LEFT_EYE_COLOUR to ::leftEyeColour,
+//    RIGHT_EYE_COLOUR to ::rightEyeColour,
   )
 
   @Suppress("UNCHECKED_CAST")
@@ -80,7 +90,16 @@ class PhysicalAttributes(
   }
 
   fun toDto(): PhysicalAttributesDto =
-    PhysicalAttributesDto(height, weight, hair?.toDto(), facialHair?.toDto(), face?.toDto(), build?.toDto())
+    PhysicalAttributesDto(
+      height,
+      weight,
+      hair?.toDto(),
+      facialHair?.toDto(),
+      face?.toDto(),
+      build?.toDto(),
+      leftEyeColour?.toDto(),
+      rightEyeColour?.toDto(),
+    )
 
   fun updateFieldHistory(lastModifiedAt: ZonedDateTime, lastModifiedBy: String, source: Source = DPS) {
     fieldAccessors().forEach { (field, currentValue) ->
@@ -135,6 +154,8 @@ class PhysicalAttributes(
     if (facialHair != other.facialHair) return false
     if (face != other.face) return false
     if (build != other.build) return false
+    if (leftEyeColour != other.leftEyeColour) return false
+    if (rightEyeColour != other.rightEyeColour) return false
 
     return true
   }
@@ -147,6 +168,8 @@ class PhysicalAttributes(
     result = 31 * result + (facialHair?.id.hashCode())
     result = 31 * result + (face?.id.hashCode())
     result = 31 * result + (build?.id.hashCode())
+    result = 31 * result + (leftEyeColour?.id.hashCode())
+    result = 31 * result + (rightEyeColour?.id.hashCode())
     return result
   }
 

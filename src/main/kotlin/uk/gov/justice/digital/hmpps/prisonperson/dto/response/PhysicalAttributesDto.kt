@@ -22,4 +22,10 @@ data class PhysicalAttributesDto(
 
   @Schema(description = "Build")
   val build: ReferenceDataCodeDto? = null,
+
+  @Schema(description = "Left eye colour")
+  val leftEyeColour: ReferenceDataCodeDto? = null,
+
+  @Schema(description = "Right eye colour")
+  val rightEyeColour: ReferenceDataCodeDto? = null,
 )

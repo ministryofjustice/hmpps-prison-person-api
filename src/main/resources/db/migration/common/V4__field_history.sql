@@ -5,19 +5,20 @@ CREATE TABLE field_history
     field            VARCHAR(40),
     value_int        INT,
     value_string     VARCHAR(40),
+    value_ref        VARCHAR(81) REFERENCES reference_data_code (id),
     applies_from     TIMESTAMP WITH TIME ZONE NOT NULL,
     applies_to       TIMESTAMP WITH TIME ZONE,
     created_at       TIMESTAMP WITH TIME ZONE NOT NULL,
     created_by       VARCHAR(40)              NOT NULL,
     migrated_at      TIMESTAMP WITH TIME ZONE,
-    merged_at                   TIMESTAMP WITH TIME ZONE,
-    merged_from                 VARCHAR(7),
+    merged_at        TIMESTAMP WITH TIME ZONE,
+    merged_from      VARCHAR(7),
     source           VARCHAR(10),
 
     CONSTRAINT field_history_pk PRIMARY KEY (field_history_id)
 );
 
-CREATE INDEX field_history_prisoner_number_field_idx ON field_history(prisoner_number, field);
+CREATE INDEX field_history_prisoner_number_field_idx ON field_history (prisoner_number, field);
 
 COMMENT ON TABLE field_history IS 'The field level history of prisoner physical attributes';
 COMMENT ON COLUMN field_history.prisoner_number IS 'The identifier of a prisoner (also often called prison number, NOMS number, offender number...)';

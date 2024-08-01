@@ -11,7 +11,12 @@ CREATE TABLE physical_attributes
     right_eye_colour VARCHAR(81),
 
     CONSTRAINT physical_attributes_pk PRIMARY KEY (prisoner_number),
-    CONSTRAINT hair_reference_data_code_fk FOREIGN KEY (hair) REFERENCES reference_data_code (id)
+    CONSTRAINT hair_reference_data_code_fk FOREIGN KEY (hair) REFERENCES reference_data_code (id),
+    CONSTRAINT facial_hair_reference_data_code_fk FOREIGN KEY (facial_hair) REFERENCES reference_data_code (id),
+    CONSTRAINT face_reference_data_code_fk FOREIGN KEY (face) REFERENCES reference_data_code (id),
+    CONSTRAINT build_reference_data_code_fk FOREIGN KEY (build) REFERENCES reference_data_code (id),
+    CONSTRAINT left_eye_colour_reference_data_code_fk FOREIGN KEY (left_eye_colour) REFERENCES reference_data_code (id),
+    CONSTRAINT right_eye_colour_reference_data_code_fk FOREIGN KEY (right_eye_colour) REFERENCES reference_data_code (id)
 );
 
 COMMENT ON TABLE physical_attributes IS 'The physical attributes of a prisoner';

@@ -4,6 +4,7 @@ import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
 import jakarta.persistence.OneToMany
+import org.hibernate.Hibernate
 import java.time.ZonedDateTime
 
 @Entity
@@ -12,8 +13,8 @@ class ReferenceDataDomain(
   @Column(name = "code", updatable = false, nullable = false)
   val code: String,
 
-  var description: String,
-  var listSequence: Int,
+  val description: String,
+  val listSequence: Int,
   val createdAt: ZonedDateTime = ZonedDateTime.now(),
   val createdBy: String,
 ) {
@@ -25,4 +26,24 @@ class ReferenceDataDomain(
 
   @OneToMany(mappedBy = "domain")
   var referenceDataCodes: MutableList<ReferenceDataCode> = mutableListOf()
+
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (other == null || Hibernate.getClass(this) != Hibernate.getClass(other)) return false
+
+    other as ReferenceDataDomain
+
+    if (code != other.code) return false
+    if (description != other.description) return false
+    if (listSequence != other.listSequence) return false
+
+    return true
+  }
+
+  override fun hashCode(): Int {
+    var result = code.hashCode()
+    result = 31 * result + (description.hashCode())
+    result = 31 * result + (listSequence)
+    return result
+  }
 }

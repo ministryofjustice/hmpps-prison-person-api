@@ -9,8 +9,8 @@ import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.security.access.prepost.PreAuthorize
+import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
@@ -25,7 +25,7 @@ import uk.gov.justice.hmpps.kotlin.common.ErrorResponse
 @RequestMapping("/prisoners/{prisonerNumber}/physical-attributes", produces = [MediaType.APPLICATION_JSON_VALUE])
 class PhysicalAttributesController(private val physicalAttributesService: PhysicalAttributesService) {
 
-  @PutMapping
+  @PatchMapping
   @ResponseStatus(HttpStatus.OK)
   @PreAuthorize("hasRole('ROLE_PRISON_PERSON_API__PHYSICAL_ATTRIBUTES__RW')")
   @Operation(

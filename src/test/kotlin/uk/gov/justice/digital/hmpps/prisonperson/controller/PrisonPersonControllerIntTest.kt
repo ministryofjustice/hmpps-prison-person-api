@@ -59,7 +59,13 @@ class PrisonPersonControllerIntTest : IntegrationTestBase() {
                 "prisonerNumber": "A1234AA",
                 "physicalAttributes": {
                   "height": 180,
-                  "weight": 70
+                  "weight": 70,
+                  "hair": null,
+                  "facialHair": null,
+                  "face": null,
+                  "build": null,
+                  "leftEyeColour": null,
+                  "rightEyeColour": null
                 }
               }
             """.trimIndent(),

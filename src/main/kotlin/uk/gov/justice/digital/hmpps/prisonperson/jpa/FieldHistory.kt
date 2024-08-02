@@ -28,6 +28,8 @@ class FieldHistory(
   val field: PrisonPersonField,
 
   override var valueInt: Int? = null,
+  override var valueString: String? = null,
+  override var valueRef: String? = null,
 
   val appliesFrom: ZonedDateTime = ZonedDateTime.now(),
   var appliesTo: ZonedDateTime? = null,
@@ -62,6 +64,8 @@ class FieldHistory(
     if (prisonerNumber != other.prisonerNumber) return false
     if (field != other.field) return false
     if (valueInt != other.valueInt) return false
+    if (valueString != other.valueString) return false
+    if (valueRef != other.valueRef) return false
     if (appliesFrom != other.appliesFrom) return false
     if (appliesTo != other.appliesTo) return false
     if (createdAt != other.createdAt) return false
@@ -78,6 +82,8 @@ class FieldHistory(
     var result = prisonerNumber.hashCode()
     result = 31 * result + field.hashCode()
     result = 31 * result + (valueInt ?: 0)
+    result = 31 * result + (valueString?.hashCode() ?: 0)
+    result = 31 * result + (valueRef?.hashCode() ?: 0)
     result = 31 * result + appliesFrom.hashCode()
     result = 31 * result + (appliesTo?.hashCode() ?: 0)
     result = 31 * result + createdAt.hashCode()
@@ -94,6 +100,8 @@ class FieldHistory(
     "prisonerNumber='$prisonerNumber', " +
     "field=$field, " +
     "valueInt=$valueInt, " +
+    "valueString=$valueString, " +
+    "valueRef=$valueRef, " +
     "appliesFrom=$appliesFrom, " +
     "appliesTo=$appliesTo, " +
     "createdAt=$createdAt, " +

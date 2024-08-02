@@ -5,6 +5,9 @@ import java.time.ZonedDateTime
 
 @Schema(description = "Reference Data Code")
 data class ReferenceDataCodeDto(
+  @Schema(description = "Id", example = "FACIAL_HAIR_BEARDED")
+  val id: String,
+
   @Schema(description = "Short code for the reference data code", example = "FACIAL_HAIR")
   val domain: String,
 
@@ -16,7 +19,8 @@ data class ReferenceDataCodeDto(
 
   @Schema(
     description = "The sequence number of the reference data code. " +
-      "Used for ordering reference data correctly in lists and dropdowns.",
+      "Used for ordering reference data correctly in lists and dropdowns. " +
+      "0 is default order by description.",
     example = "3",
   )
   val listSequence: Int,

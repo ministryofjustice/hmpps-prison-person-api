@@ -7,7 +7,9 @@ import uk.gov.justice.digital.hmpps.prisonperson.dto.request.PhysicalAttributesU
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.PhysicalAttributesDto
 import uk.gov.justice.digital.hmpps.prisonperson.enums.Source.DPS
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.PhysicalAttributes
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.ReferenceDataCode
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.PhysicalAttributesRepository
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.ReferenceDataCodeRepository
 import uk.gov.justice.digital.hmpps.prisonperson.utils.AuthenticationFacade
 import java.time.Clock
 import java.time.ZonedDateTime
@@ -17,11 +19,13 @@ import kotlin.jvm.optionals.getOrNull
 @Transactional(readOnly = true)
 class PhysicalAttributesService(
   private val physicalAttributesRepository: PhysicalAttributesRepository,
+  private val referenceDataCodeRepository: ReferenceDataCodeRepository,
   private val prisonerSearchClient: PrisonerSearchClient,
   private val authenticationFacade: AuthenticationFacade,
   private val clock: Clock,
 ) {
-  fun getPhysicalAttributes(prisonNumber: String): PhysicalAttributesDto? = physicalAttributesRepository.findById(prisonNumber).getOrNull()?.toDto()
+  fun getPhysicalAttributes(prisonNumber: String): PhysicalAttributesDto? =
+    physicalAttributesRepository.findById(prisonNumber).getOrNull()?.toDto()
 
   @Transactional
   fun createOrUpdate(
@@ -33,13 +37,24 @@ class PhysicalAttributesService(
     val physicalAttributes = physicalAttributesRepository.findById(prisonerNumber)
       .orElseGet { newPhysicalAttributesFor(prisonerNumber) }
       .apply {
-        height = request.height
-        weight = request.weight
+        request.height.apply(this::height)
+        request.weight.apply(this::weight)
+        request.hair.apply(this::hair, ::toReferenceDataCode)
+        request.facialHair.apply(this::facialHair, ::toReferenceDataCode)
+        request.face.apply(this::face, ::toReferenceDataCode)
+        request.build.apply(this::build, ::toReferenceDataCode)
+        request.leftEyeColour.apply(this::leftEyeColour, ::toReferenceDataCode)
+        request.rightEyeColour.apply(this::rightEyeColour, ::toReferenceDataCode)
       }
       .also { it.updateFieldHistory(now, authenticationFacade.getUserOrSystemInContext()) }
       .also { it.publishUpdateEvent(DPS, now) }
 
     return physicalAttributesRepository.save(physicalAttributes).toDto()
+  }
+
+  private fun toReferenceDataCode(id: String?): ReferenceDataCode? = id?.let {
+    referenceDataCodeRepository.findById(it)
+      .orElseThrow { IllegalArgumentException("Invalid reference data code: $it") }
   }
 
   private fun newPhysicalAttributesFor(prisonerNumber: String): PhysicalAttributes {

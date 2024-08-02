@@ -3,9 +3,10 @@ package uk.gov.justice.digital.hmpps.prisonperson.jpa.repository
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.data.jpa.domain.AbstractAuditable_.lastModifiedBy
 import org.springframework.test.context.transaction.TestTransaction
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.PhysicalAttributes
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.ReferenceDataCode
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.ReferenceDataDomain
 import java.time.ZonedDateTime
 
 class PhysicalAttributesRepositoryTest : RepositoryTest() {
@@ -19,6 +20,12 @@ class PhysicalAttributesRepositoryTest : RepositoryTest() {
       PRISONER_NUMBER,
       PRISONER_HEIGHT,
       PRISONER_WEIGHT,
+      HAIR,
+      FACIAL_HAIR,
+      FACE,
+      BUILD,
+      LEFT_EYE_COLOUR,
+      RIGHT_EYE_COLOUR,
     )
 
     repository.save(physicalAttributes)
@@ -46,6 +53,12 @@ class PhysicalAttributesRepositoryTest : RepositoryTest() {
       assertThat(prisonerNumber).isEqualTo("A1234AA")
       assertThat(height).isNull()
       assertThat(weight).isNull()
+      assertThat(hair).isNull()
+      assertThat(facialHair).isNull()
+      assertThat(face).isNull()
+      assertThat(build).isNull()
+      assertThat(leftEyeColour).isNull()
+      assertThat(rightEyeColour).isNull()
     }
   }
 
@@ -59,6 +72,12 @@ class PhysicalAttributesRepositoryTest : RepositoryTest() {
     val physicalAttributes = repository.getReferenceById("A1234AA")
     physicalAttributes.height = 180
     physicalAttributes.weight = 70
+    physicalAttributes.hair = HAIR
+    physicalAttributes.facialHair = FACIAL_HAIR
+    physicalAttributes.face = FACE
+    physicalAttributes.build = BUILD
+    physicalAttributes.leftEyeColour = LEFT_EYE_COLOUR
+    physicalAttributes.rightEyeColour = RIGHT_EYE_COLOUR
 
     repository.save(physicalAttributes)
     TestTransaction.flagForCommit()
@@ -69,6 +88,12 @@ class PhysicalAttributesRepositoryTest : RepositoryTest() {
       assertThat(prisonerNumber).isEqualTo(PRISONER_NUMBER)
       assertThat(height).isEqualTo(PRISONER_HEIGHT)
       assertThat(weight).isEqualTo(PRISONER_WEIGHT)
+      assertThat(hair).isEqualTo(HAIR)
+      assertThat(facialHair).isEqualTo(FACIAL_HAIR)
+      assertThat(face).isEqualTo(FACE)
+      assertThat(build).isEqualTo(BUILD)
+      assertThat(leftEyeColour).isEqualTo(LEFT_EYE_COLOUR)
+      assertThat(rightEyeColour).isEqualTo(RIGHT_EYE_COLOUR)
     }
   }
 
@@ -103,5 +128,23 @@ class PhysicalAttributesRepositoryTest : RepositoryTest() {
     const val USER1 = "USER1"
 
     val NOW: ZonedDateTime = ZonedDateTime.now(clock)
+
+    val REF_DATA_DOMAIN = ReferenceDataDomain("TEST", "Test domain", 1, ZonedDateTime.now(), "testUser")
+    val REF_DATA_CODE = ReferenceDataCode(
+      id = "TEST_ORANGE",
+      domain = REF_DATA_DOMAIN,
+      code = "ORANGE",
+      description = "Orange",
+      listSequence = 1,
+      createdAt = ZonedDateTime.now(),
+      createdBy = "testUser",
+    )
+
+    val HAIR = REF_DATA_CODE
+    val FACIAL_HAIR = REF_DATA_CODE
+    val FACE = REF_DATA_CODE
+    val BUILD = REF_DATA_CODE
+    val LEFT_EYE_COLOUR = REF_DATA_CODE
+    val RIGHT_EYE_COLOUR = REF_DATA_CODE
   }
 }

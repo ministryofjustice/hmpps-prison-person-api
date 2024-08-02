@@ -10,6 +10,7 @@ class ReferenceDataDomainMapperTest {
 
   private val testDomain = ReferenceDataDomain("HAIR", "Description", 1, ZonedDateTime.now(), "testUser")
   private val testCode = ReferenceDataCode(
+    id = "${testDomain}_MOUSE",
     domain = testDomain,
     code = "MOUSE",
     description = "Default Description",

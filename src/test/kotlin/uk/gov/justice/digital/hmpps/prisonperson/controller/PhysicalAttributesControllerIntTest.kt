@@ -34,7 +34,7 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
     fun fixedClock(): Clock = clock
   }
 
-  @DisplayName("PUT /prisoners/{prisonerNumber}/physical-attributes")
+  @DisplayName("PATCH /prisoners/{prisonerNumber}/physical-attributes")
   @Nested
   inner class SetPhysicalAttributesTest {
 
@@ -43,7 +43,7 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
 
       @Test
       fun `access forbidden when no authority`() {
-        webTestClient.put().uri("/prisoners/${PRISONER_NUMBER}/physical-attributes")
+        webTestClient.patch().uri("/prisoners/${PRISONER_NUMBER}/physical-attributes")
           .header("Content-Type", "application/json")
           .bodyValue(VALID_REQUEST_BODY)
           .exchange()
@@ -52,7 +52,7 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
 
       @Test
       fun `access forbidden when no role`() {
-        webTestClient.put().uri("/prisoners/${PRISONER_NUMBER}/physical-attributes")
+        webTestClient.patch().uri("/prisoners/${PRISONER_NUMBER}/physical-attributes")
           .headers(setAuthorisation(roles = listOf()))
           .header("Content-Type", "application/json")
           .bodyValue(VALID_REQUEST_BODY)
@@ -62,7 +62,7 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
 
       @Test
       fun `access forbidden with wrong role`() {
-        webTestClient.put().uri("/prisoners/${PRISONER_NUMBER}/physical-attributes")
+        webTestClient.patch().uri("/prisoners/${PRISONER_NUMBER}/physical-attributes")
           .headers(setAuthorisation(roles = listOf("ROLE_IS_WRONG")))
           .header("Content-Type", "application/json")
           .bodyValue(VALID_REQUEST_BODY)
@@ -74,6 +74,14 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
     @Nested
     @Sql("classpath:jpa/repository/reset.sql")
     inner class Validation {
+
+      @Test
+      fun `bad request when field type is not as expected`() {
+        expectBadRequestFrom(
+          requestBody = """{ "hair": 123 }""",
+          message = "Validation failure: Couldn't read request body",
+        )
+      }
 
       @Test
       fun `bad request when height below 30cm`() {
@@ -109,17 +117,18 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
 
       @Test
       fun `bad request when prisoner not found`() {
-        webTestClient.put().uri("/prisoners/PRISONER_NOT_FOUND/physical-attributes")
+        webTestClient.patch().uri("/prisoners/PRISONER_NOT_FOUND/physical-attributes")
           .headers(setAuthorisation(USER1, roles = listOf("ROLE_PRISON_PERSON_API__PHYSICAL_ATTRIBUTES__RW")))
           .header("Content-Type", "application/json")
           .bodyValue(VALID_REQUEST_BODY)
           .exchange()
           .expectStatus().isBadRequest
-          .expectBody().jsonPath("userMessage").isEqualTo("Validation failure: Prisoner number 'PRISONER_NOT_FOUND' not found")
+          .expectBody().jsonPath("userMessage")
+          .isEqualTo("Validation failure: Prisoner number 'PRISONER_NOT_FOUND' not found")
       }
 
       private fun expectBadRequestFrom(requestBody: String, message: String) {
-        webTestClient.put().uri("/prisoners/${PRISONER_NUMBER}/physical-attributes")
+        webTestClient.patch().uri("/prisoners/${PRISONER_NUMBER}/physical-attributes")
           .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__PHYSICAL_ATTRIBUTES__RW")))
           .header("Content-Type", "application/json")
           .bodyValue(requestBody)
@@ -135,20 +144,28 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
       @Test
       @Sql("classpath:jpa/repository/reset.sql")
       fun `can create a new set of physical attributes`() {
-        expectSuccessfulUpdateFrom("""{ "height": 180, "weight": 70 }""")
+        expectSuccessfulUpdateFrom("""{ "height": 180 }""")
           .expectBody().json(
             // language=json
             """
             {
               "height": 180,
-              "weight": 70
+              "weight": null,
+              "hair": null,
+              "facialHair": null,
+              "face": null,
+              "build": null,
+              "leftEyeColour": null,
+              "rightEyeColour": null
             }
             """.trimIndent(),
             true,
           )
 
-        expectFieldHistory(HEIGHT, HistoryComparison(value = 180, appliesFrom = NOW, appliesTo = null, createdAt = NOW, createdBy = USER1))
-        expectFieldHistory(WEIGHT, HistoryComparison(value = 70, appliesFrom = NOW, appliesTo = null, createdAt = NOW, createdBy = USER1))
+        expectFieldHistory(
+          HEIGHT,
+          HistoryComparison(value = 180, appliesFrom = NOW, appliesTo = null, createdAt = NOW, createdBy = USER1),
+        )
 
         expectFieldMetadata(
           FieldMetadata(PRISONER_NUMBER, HEIGHT, lastModifiedAt = NOW, lastModifiedBy = USER1),
@@ -161,8 +178,14 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
       @Sql("classpath:controller/physical_attributes.sql")
       @Sql("classpath:controller/physical_attributes_history.sql")
       fun `can update an existing set of physical attributes`() {
-        expectFieldHistory(HEIGHT, HistoryComparison(value = 180, appliesFrom = THEN, appliesTo = null, createdAt = THEN, createdBy = USER1))
-        expectFieldHistory(WEIGHT, HistoryComparison(value = 70, appliesFrom = THEN, appliesTo = null, createdAt = THEN, createdBy = USER1))
+        expectFieldHistory(
+          HEIGHT,
+          HistoryComparison(value = 180, appliesFrom = THEN, appliesTo = null, createdAt = THEN, createdBy = USER1),
+        )
+        expectFieldHistory(
+          WEIGHT,
+          HistoryComparison(value = 70, appliesFrom = THEN, appliesTo = null, createdAt = THEN, createdBy = USER1),
+        )
 
         expectSuccessfulUpdateFrom("""{ "height": 181, "weight": 71 }""", user = USER2)
           .expectBody().json(
@@ -170,7 +193,13 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
             """
             {
               "height": 181,
-              "weight": 71
+              "weight": 71,
+              "hair": null,
+              "facialHair": null,
+              "face": null,
+              "build": null,
+              "leftEyeColour": null,
+              "rightEyeColour": null
             }
             """.trimIndent(),
             true,
@@ -199,8 +228,14 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
       @Sql("classpath:controller/physical_attributes.sql")
       @Sql("classpath:controller/physical_attributes_history.sql")
       fun `can update an existing set of physical attributes a number of times`() {
-        expectFieldHistory(HEIGHT, HistoryComparison(value = 180, appliesFrom = THEN, appliesTo = null, createdAt = THEN, createdBy = USER1))
-        expectFieldHistory(WEIGHT, HistoryComparison(value = 70, appliesFrom = THEN, appliesTo = null, createdAt = THEN, createdBy = USER1))
+        expectFieldHistory(
+          HEIGHT,
+          HistoryComparison(value = 180, appliesFrom = THEN, appliesTo = null, createdAt = THEN, createdBy = USER1),
+        )
+        expectFieldHistory(
+          WEIGHT,
+          HistoryComparison(value = 70, appliesFrom = THEN, appliesTo = null, createdAt = THEN, createdBy = USER1),
+        )
 
         clock.instant = THEN.plusDays(1).toInstant()
         expectSuccessfulUpdateFrom("""{ "height": 181, "weight": 71 }""", user = USER2)
@@ -216,18 +251,66 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
 
         expectFieldHistory(
           HEIGHT,
-          HistoryComparison(value = 180, appliesFrom = THEN, appliesTo = THEN.plusDays(1), createdAt = THEN, createdBy = USER1),
-          HistoryComparison(value = 181, appliesFrom = THEN.plusDays(1), appliesTo = THEN.plusDays(2), createdAt = THEN.plusDays(1), createdBy = USER2),
-          HistoryComparison(value = null, appliesFrom = THEN.plusDays(2), appliesTo = THEN.plusDays(3), createdAt = THEN.plusDays(2), createdBy = USER1),
-          HistoryComparison(value = 183, appliesFrom = THEN.plusDays(3), appliesTo = null, createdAt = THEN.plusDays(3), createdBy = USER2),
+          HistoryComparison(
+            value = 180,
+            appliesFrom = THEN,
+            appliesTo = THEN.plusDays(1),
+            createdAt = THEN,
+            createdBy = USER1,
+          ),
+          HistoryComparison(
+            value = 181,
+            appliesFrom = THEN.plusDays(1),
+            appliesTo = THEN.plusDays(2),
+            createdAt = THEN.plusDays(1),
+            createdBy = USER2,
+          ),
+          HistoryComparison(
+            value = null,
+            appliesFrom = THEN.plusDays(2),
+            appliesTo = THEN.plusDays(3),
+            createdAt = THEN.plusDays(2),
+            createdBy = USER1,
+          ),
+          HistoryComparison(
+            value = 183,
+            appliesFrom = THEN.plusDays(3),
+            appliesTo = null,
+            createdAt = THEN.plusDays(3),
+            createdBy = USER2,
+          ),
         )
 
         expectFieldHistory(
           WEIGHT,
-          HistoryComparison(value = 70, appliesFrom = THEN, appliesTo = THEN.plusDays(1), createdAt = THEN, createdBy = USER1),
-          HistoryComparison(value = 71, appliesFrom = THEN.plusDays(1), appliesTo = THEN.plusDays(2), createdAt = THEN.plusDays(1), createdBy = USER2),
-          HistoryComparison(value = 72, appliesFrom = THEN.plusDays(2), appliesTo = THEN.plusDays(3), createdAt = THEN.plusDays(2), createdBy = USER1),
-          HistoryComparison(value = null, appliesFrom = THEN.plusDays(3), appliesTo = NOW, createdAt = THEN.plusDays(3), createdBy = USER2),
+          HistoryComparison(
+            value = 70,
+            appliesFrom = THEN,
+            appliesTo = THEN.plusDays(1),
+            createdAt = THEN,
+            createdBy = USER1,
+          ),
+          HistoryComparison(
+            value = 71,
+            appliesFrom = THEN.plusDays(1),
+            appliesTo = THEN.plusDays(2),
+            createdAt = THEN.plusDays(1),
+            createdBy = USER2,
+          ),
+          HistoryComparison(
+            value = 72,
+            appliesFrom = THEN.plusDays(2),
+            appliesTo = THEN.plusDays(3),
+            createdAt = THEN.plusDays(2),
+            createdBy = USER1,
+          ),
+          HistoryComparison(
+            value = null,
+            appliesFrom = THEN.plusDays(3),
+            appliesTo = NOW,
+            createdAt = THEN.plusDays(3),
+            createdBy = USER2,
+          ),
           HistoryComparison(value = 74, appliesFrom = NOW, appliesTo = null, createdAt = NOW, createdBy = USER2),
         )
 
@@ -260,7 +343,7 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
       }
 
       private fun expectSuccessfulUpdateFrom(requestBody: String, user: String? = USER1) =
-        webTestClient.put().uri("/prisoners/${PRISONER_NUMBER}/physical-attributes")
+        webTestClient.patch().uri("/prisoners/${PRISONER_NUMBER}/physical-attributes")
           .headers(setAuthorisation(user, roles = listOf("ROLE_PRISON_PERSON_API__PHYSICAL_ATTRIBUTES__RW")))
           .header("Content-Type", "application/json")
           .bodyValue(requestBody)

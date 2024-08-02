@@ -25,6 +25,7 @@ class ReferenceDataCodeMapperTest {
 
   private val testDomain = ReferenceDataDomain("TEST", "Test domain", 1, ZonedDateTime.now(), "testUser")
   private val testCode = ReferenceDataCode(
+    id = "${testDomain}_ORANGE",
     domain = testDomain,
     code = "ORANGE",
     description = "Orange",
@@ -54,6 +55,7 @@ class ReferenceDataCodeMapperTest {
   @Test
   fun `test toDto with default description`() {
     val referenceDataCode = ReferenceDataCode(
+      id = "${testDomain}_ORANGE",
       domain = testDomain,
       code = "ORANGE",
       description = "Orange",

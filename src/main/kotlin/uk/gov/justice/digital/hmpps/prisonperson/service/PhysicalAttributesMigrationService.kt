@@ -11,8 +11,6 @@ import uk.gov.justice.digital.hmpps.prisonperson.dto.response.PhysicalAttributes
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.HEIGHT
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.WEIGHT
 import uk.gov.justice.digital.hmpps.prisonperson.enums.Source.NOMIS
-import uk.gov.justice.digital.hmpps.prisonperson.jpa.FieldHistory
-import uk.gov.justice.digital.hmpps.prisonperson.jpa.FieldMetadata
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.PhysicalAttributes
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.PhysicalAttributesRepository
 import java.time.Clock
@@ -38,22 +36,25 @@ class PhysicalAttributesMigrationService(
     }
 
     val now = ZonedDateTime.now(clock)
-    val latestRecord = migration.last()
 
-    val physicalAttributes = latestRecord.let {
-      PhysicalAttributes(prisonerNumber, height = it.height, weight = it.weight)
+    val physicalAttributes = physicalAttributesRepository.findById(prisonerNumber)
+      .orElseGet { newPhysicalAttributesFor(prisonerNumber) }
+      .also { it.resetHistoryForMigratedFields() }
+
+    migration.forEach { record ->
+      physicalAttributes.apply {
+        height = record.height
+        weight = record.weight
+      }.also {
+        it.updateFieldHistory(
+          record.appliesFrom,
+          record.createdAt,
+          record.createdBy,
+          source = NOMIS,
+          migratedAt = now,
+        )
+      }
     }
-
-    listOf(HEIGHT, WEIGHT).onEach { field ->
-      physicalAttributes.fieldMetadata[field] = FieldMetadata(
-        prisonerNumber = prisonerNumber,
-        field = field,
-        lastModifiedAt = latestRecord.createdAt,
-        lastModifiedBy = latestRecord.createdBy,
-      )
-    }
-
-    migration.forEach { it.addToHistory(physicalAttributes, now) }
 
     return physicalAttributesRepository.save(physicalAttributes).fieldHistory
       .map { it.fieldHistoryId }
@@ -61,21 +62,10 @@ class PhysicalAttributesMigrationService(
       .let { PhysicalAttributesMigrationResponse(it) }
   }
 
-  private fun PhysicalAttributesMigrationRequest.addToHistory(physicalAttributes: PhysicalAttributes, now: ZonedDateTime) {
-    fieldsToMigrate().onEach { (field, value) ->
-      physicalAttributes.fieldHistory.add(
-        FieldHistory(
-          prisonerNumber = physicalAttributes.prisonerNumber,
-          field = field,
-          appliesFrom = appliesFrom,
-          appliesTo = appliesTo,
-          createdAt = createdAt,
-          createdBy = createdBy,
-          source = NOMIS,
-          migratedAt = now,
-        ).also { field.set(it, value()) },
-      )
-    }
+  private fun newPhysicalAttributesFor(prisonerNumber: String): PhysicalAttributes = PhysicalAttributes(prisonerNumber)
+
+  private fun PhysicalAttributes.resetHistoryForMigratedFields() {
+    fieldsToMigrate.forEach { field -> fieldHistory.removeIf { it.field == field } }
   }
 
   private fun trackMigrationEvent(prisonerNumber: String, fieldHistoryIds: List<Long>) {
@@ -90,5 +80,6 @@ class PhysicalAttributesMigrationService(
 
   private companion object {
     val log: Logger = LoggerFactory.getLogger(this::class.java)
+    val fieldsToMigrate = listOf(HEIGHT, WEIGHT)
   }
 }

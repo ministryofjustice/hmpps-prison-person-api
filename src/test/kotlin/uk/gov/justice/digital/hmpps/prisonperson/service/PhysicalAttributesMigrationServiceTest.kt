@@ -120,6 +120,37 @@ class PhysicalAttributesMigrationServiceTest {
     }
 
     @Test
+    fun `ignores history record if physical attributes have not changed`() {
+      val record1 = PHYSICAL_ATTRIBUTES_MIGRATION_REQUEST
+      val record2 = record1.copy(appliesFrom = record1.appliesFrom.plusDays(1))
+
+      assertThat(underTest.migrate(PRISONER_NUMBER, sortedSetOf(record1, record2)))
+        .isInstanceOf(PhysicalAttributesMigrationResponse::class.java)
+
+      with(savedPhysicalAttributes.firstValue) {
+        assertThat(prisonerNumber).isEqualTo(PRISONER_NUMBER)
+        assertThat(height).isEqualTo(PRISONER_HEIGHT)
+        assertThat(weight).isEqualTo(PRISONER_WEIGHT)
+
+        expectFieldHistory(
+          HEIGHT,
+          HistoryComparison(value = PRISONER_HEIGHT, createdAt = THEN, createdBy = USER1, appliesFrom = THEN, appliesTo = null, migratedAt = NOW, source = NOMIS),
+        )
+
+        expectFieldHistory(
+          WEIGHT,
+          HistoryComparison(value = PRISONER_WEIGHT, createdAt = THEN, createdBy = USER1, appliesFrom = THEN, appliesTo = null, migratedAt = NOW, source = NOMIS),
+        )
+      }
+
+      verify(telemetryClient).trackEvent(
+        eq("prison-person-api-physical-attributes-migrated"),
+        argThat { it -> it.containsValue(PRISONER_NUMBER) },
+        isNull(),
+      )
+    }
+
+    @Test
     fun `migrates physical attributes with null height and weight`() {
       assertThat(underTest.migrate(PRISONER_NUMBER, sortedSetOf(PHYSICAL_ATTRIBUTES_MIGRATION_REQUEST.copy(height = null, weight = null))))
         .isInstanceOf(PhysicalAttributesMigrationResponse::class.java)

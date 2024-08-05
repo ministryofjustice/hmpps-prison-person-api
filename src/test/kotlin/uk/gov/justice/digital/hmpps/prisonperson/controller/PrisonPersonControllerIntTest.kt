@@ -43,6 +43,8 @@ class PrisonPersonControllerIntTest : IntegrationTestBase() {
     @Sql(
       "classpath:jpa/repository/reset.sql",
       "classpath:controller/physical_attributes.sql",
+      "classpath:controller/physical_attributes_history.sql",
+      "classpath:controller/physical_attributes_metadata.sql",
     )
     inner class HappyPath {
 
@@ -58,8 +60,16 @@ class PrisonPersonControllerIntTest : IntegrationTestBase() {
               {
                 "prisonerNumber": "A1234AA",
                 "physicalAttributes": {
-                  "height": 180,
-                  "weight": 70,
+                  "height": {
+                    "value":180,
+                    "lastModifiedAt":"2024-01-02T09:10:11.123Z",
+                    "lastModifiedBy":"USER1"
+                  },
+                  "weight": {
+                    "value":70,
+                    "lastModifiedAt":"2024-01-02T09:10:11.123Z",
+                    "lastModifiedBy":"USER1"
+                  },
                   "hair": null,
                   "facialHair": null,
                   "face": null,

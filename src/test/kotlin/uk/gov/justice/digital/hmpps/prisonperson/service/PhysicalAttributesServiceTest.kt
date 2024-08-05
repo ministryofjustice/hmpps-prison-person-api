@@ -21,8 +21,10 @@ import uk.gov.justice.digital.hmpps.prisonperson.client.prisonersearch.PrisonerS
 import uk.gov.justice.digital.hmpps.prisonperson.client.prisonersearch.dto.PrisonerDto
 import uk.gov.justice.digital.hmpps.prisonperson.dto.request.PhysicalAttributesUpdateRequest
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.PhysicalAttributesDto
+import uk.gov.justice.digital.hmpps.prisonperson.dto.response.ValueWithMetadata
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.HEIGHT
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.WEIGHT
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.FieldMetadata
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.PhysicalAttributes
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.PhysicalAttributesRepository
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.ReferenceDataCodeRepository
@@ -74,12 +76,21 @@ class PhysicalAttributesServiceTest {
             prisonerNumber = PRISONER_NUMBER,
             height = PRISONER_HEIGHT,
             weight = PRISONER_WEIGHT,
+            fieldMetadata = mutableMapOf(
+              HEIGHT to FieldMetadata(PRISONER_NUMBER, HEIGHT, THEN, USER1),
+              WEIGHT to FieldMetadata(PRISONER_NUMBER, WEIGHT, THEN, USER1),
+            ),
           ),
         ),
       )
 
       assertThat(underTest.getPhysicalAttributes(PRISONER_NUMBER))
-        .isEqualTo(PhysicalAttributesDto(PRISONER_HEIGHT, PRISONER_WEIGHT))
+        .isEqualTo(
+          PhysicalAttributesDto(
+            height = ValueWithMetadata(PRISONER_HEIGHT, THEN, USER1),
+            weight = ValueWithMetadata(PRISONER_WEIGHT, THEN, USER1),
+          ),
+        )
     }
   }
 
@@ -88,7 +99,9 @@ class PhysicalAttributesServiceTest {
 
     @BeforeEach
     fun beforeEach() {
-      whenever(physicalAttributesRepository.save(savedPhysicalAttributes.capture())).thenAnswer { savedPhysicalAttributes.firstValue }
+      whenever(physicalAttributesRepository.save(savedPhysicalAttributes.capture()))
+        .thenAnswer { savedPhysicalAttributes.firstValue }
+
       whenever(authenticationFacade.getUserOrSystemInContext()).thenReturn(USER1)
     }
 
@@ -98,7 +111,12 @@ class PhysicalAttributesServiceTest {
       whenever(physicalAttributesRepository.findById(PRISONER_NUMBER)).thenReturn(Optional.empty())
 
       assertThat(underTest.createOrUpdate(PRISONER_NUMBER, PHYSICAL_ATTRIBUTES_UPDATE_REQUEST))
-        .isEqualTo(PhysicalAttributesDto(PRISONER_HEIGHT, PRISONER_WEIGHT))
+        .isEqualTo(
+          PhysicalAttributesDto(
+            height = ValueWithMetadata(PRISONER_HEIGHT, NOW, USER1),
+            weight = ValueWithMetadata(PRISONER_WEIGHT, NOW, USER1),
+          ),
+        )
 
       with(savedPhysicalAttributes.firstValue) {
         assertThat(prisonerNumber).isEqualTo(PRISONER_NUMBER)
@@ -154,7 +172,12 @@ class PhysicalAttributesServiceTest {
       )
 
       assertThat(underTest.createOrUpdate(PRISONER_NUMBER, PHYSICAL_ATTRIBUTES_UPDATE_REQUEST))
-        .isEqualTo(PhysicalAttributesDto(PRISONER_HEIGHT, PRISONER_WEIGHT))
+        .isEqualTo(
+          PhysicalAttributesDto(
+            height = ValueWithMetadata(PRISONER_HEIGHT, NOW, USER1),
+            weight = ValueWithMetadata(PRISONER_WEIGHT, NOW, USER1),
+          ),
+        )
 
       with(savedPhysicalAttributes.firstValue) {
         assertThat(prisonerNumber).isEqualTo(PRISONER_NUMBER)
@@ -214,6 +237,7 @@ class PhysicalAttributesServiceTest {
     const val USER2 = "USER2"
 
     val NOW: ZonedDateTime = ZonedDateTime.now()
+    val THEN: ZonedDateTime = NOW.minusDays(1)
 
     val attributes = mutableMapOf<String, Any?>(
       Pair("height", PRISONER_HEIGHT),

@@ -149,8 +149,16 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
             // language=json
             """
             {
-              "height": 180,
-              "weight": null,
+              "height": {
+                "value":180,
+                "lastModifiedAt":"2024-06-14T09:10:11.123+01:00[Europe/London]",
+                "lastModifiedBy":"USER1"
+              },
+              "weight": {
+                "value":null,
+                "lastModifiedAt":"2024-06-14T09:10:11.123+01:00[Europe/London]",
+                "lastModifiedBy":"USER1"
+              },
               "hair": null,
               "facialHair": null,
               "face": null,
@@ -192,8 +200,16 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
             // language=json
             """
             {
-              "height": 181,
-              "weight": 71,
+              "height": {
+                "value":181,
+                "lastModifiedAt":"2024-06-14T09:10:11.123+01:00[Europe/London]",
+                "lastModifiedBy":"USER2"
+              },
+              "weight": {
+                "value":71,
+                "lastModifiedAt":"2024-06-14T09:10:11.123+01:00[Europe/London]",
+                "lastModifiedBy":"USER2"
+              },
               "hair": null,
               "facialHair": null,
               "face": null,

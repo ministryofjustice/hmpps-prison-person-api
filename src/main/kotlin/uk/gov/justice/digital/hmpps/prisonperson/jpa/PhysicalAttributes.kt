@@ -13,6 +13,7 @@ import org.hibernate.Hibernate
 import org.hibernate.annotations.SortNatural
 import org.springframework.data.domain.AbstractAggregateRoot
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.PhysicalAttributesDto
+import uk.gov.justice.digital.hmpps.prisonperson.dto.response.ValueWithMetadata
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.HEIGHT
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.WEIGHT
@@ -91,8 +92,8 @@ class PhysicalAttributes(
 
   fun toDto(): PhysicalAttributesDto =
     PhysicalAttributesDto(
-      height,
-      weight,
+      height = getValueWithMetadata(::height, HEIGHT),
+      weight = getValueWithMetadata(::weight, WEIGHT),
       hair?.toDto(),
       facialHair?.toDto(),
       face?.toDto(),
@@ -100,6 +101,9 @@ class PhysicalAttributes(
       leftEyeColour?.toDto(),
       rightEyeColour?.toDto(),
     )
+
+  private fun <T> getValueWithMetadata(value: KMutableProperty0<T>, field: PrisonPersonField) =
+    fieldMetadata[field]?.let { ValueWithMetadata(value.get(), it.lastModifiedAt, it.lastModifiedBy) }
 
   fun updateFieldHistory(
     lastModifiedAt: ZonedDateTime,

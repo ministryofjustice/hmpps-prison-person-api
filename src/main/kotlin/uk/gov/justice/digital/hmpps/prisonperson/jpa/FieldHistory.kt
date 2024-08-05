@@ -53,7 +53,14 @@ class FieldHistory(
   )
 
   override fun compareTo(other: FieldHistory) =
-    compareValuesBy(this, other, { it.appliesTo?.toInstant() ?: Instant.MAX }, { it.createdAt }, { it.hashCode() })
+    compareValuesBy(
+      this,
+      other,
+      { it.appliesTo?.toInstant() ?: Instant.MAX },
+      { it.createdAt },
+      { it.appliesFrom },
+      { it.hashCode() },
+    )
 
   override fun equals(other: Any?): Boolean {
     if (this === other) return true

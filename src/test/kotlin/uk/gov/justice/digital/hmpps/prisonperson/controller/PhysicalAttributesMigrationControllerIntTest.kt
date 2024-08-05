@@ -123,12 +123,14 @@ class PhysicalAttributesMigrationControllerIntTest : IntegrationTestBase() {
 
         expectFieldHistory(
           HEIGHT,
-          HistoryComparison(value = 189, appliesFrom = NOW.minusDays(1), appliesTo = NOW, createdAt = NOW.minusDays(1), createdBy = USER2, source = NOMIS),
+          HistoryComparison(value = 189, appliesFrom = NOW.minusDays(5), appliesTo = NOW.minusDays(3), createdAt = NOW.minusDays(5), createdBy = USER2, source = NOMIS),
+          HistoryComparison(value = 188, appliesFrom = NOW.minusDays(3), appliesTo = NOW, createdAt = NOW.minusDays(3), createdBy = USER_CHANGING_HEIGHT_ONLY, source = NOMIS),
           HistoryComparison(value = 190, appliesFrom = NOW, appliesTo = null, createdAt = NOW, createdBy = USER1, source = NOMIS),
         )
         expectFieldHistory(
           WEIGHT,
-          HistoryComparison(value = 79, appliesFrom = NOW.minusDays(1), appliesTo = NOW, createdAt = NOW.minusDays(1), createdBy = USER2, source = NOMIS),
+          HistoryComparison(value = 79, appliesFrom = NOW.minusDays(5), appliesTo = NOW.minusDays(2), createdAt = NOW.minusDays(5), createdBy = USER2, source = NOMIS),
+          HistoryComparison(value = 78, appliesFrom = NOW.minusDays(2), appliesTo = NOW, createdAt = NOW.minusDays(2), createdBy = USER_CHANGING_WEIGHT_ONLY, source = NOMIS),
           HistoryComparison(value = 80, appliesFrom = NOW, appliesTo = null, createdAt = NOW, createdBy = USER1, source = NOMIS),
         )
 
@@ -166,6 +168,8 @@ class PhysicalAttributesMigrationControllerIntTest : IntegrationTestBase() {
     const val PRISONER_NUMBER = "A1234AA"
     const val USER1 = "USER1"
     const val USER2 = "USER2"
+    const val USER_CHANGING_HEIGHT_ONLY = "CHANGE_TO_HEIGHT_ONLY"
+    const val USER_CHANGING_WEIGHT_ONLY = "CHANGE_TO_WEIGHT_ONLY"
 
     val NOW = ZonedDateTime.of(2024, 6, 14, 9, 10, 11, 123000000, ZoneId.of("Europe/London"))
 
@@ -195,11 +199,35 @@ class PhysicalAttributesMigrationControllerIntTest : IntegrationTestBase() {
             "createdBy": "USER1"
           },
           { 
+            "height": 188,
+            "weight": 78,
+            "appliesFrom": "2024-06-12T09:10:11.123+01:00[Europe/London]",
+            "appliesTo": "2024-06-13T09:10:11.123+01:00[Europe/London]",
+            "createdAt": "2024-06-12T09:10:11.123+01:00[Europe/London]",
+            "createdBy": "CHANGE_TO_WEIGHT_ONLY"
+          },
+          { 
+            "height": 188,
+            "weight": 79,
+            "appliesFrom": "2024-06-11T09:10:11.123+01:00[Europe/London]",
+            "appliesTo": "2024-06-12T09:10:11.123+01:00[Europe/London]",
+            "createdAt": "2024-06-11T09:10:11.123+01:00[Europe/London]",
+            "createdBy": "CHANGE_TO_HEIGHT_ONLY"
+          },
+          { 
             "height": 189,
             "weight": 79,
-            "appliesFrom": "2024-06-13T09:10:11.123+01:00[Europe/London]",
-            "appliesTo": "2024-06-14T09:10:11.123+01:00[Europe/London]",
-            "createdAt": "2024-06-13T09:10:11.123+01:00[Europe/London]",
+            "appliesFrom": "2024-06-10T09:10:11.123+01:00[Europe/London]",
+            "appliesTo": "2024-06-11T09:10:11.123+01:00[Europe/London]",
+            "createdAt": "2024-06-14T09:10:11.123+01:00[Europe/London]",
+            "createdBy": "NO_CHANGES_MADE"
+          },
+          { 
+            "height": 189,
+            "weight": 79,
+            "appliesFrom": "2024-06-09T09:10:11.123+01:00[Europe/London]",
+            "appliesTo": "2024-06-10T09:10:11.123+01:00[Europe/London]",
+            "createdAt": "2024-06-09T09:10:11.123+01:00[Europe/London]",
             "createdBy": "USER2"
           }
         ]

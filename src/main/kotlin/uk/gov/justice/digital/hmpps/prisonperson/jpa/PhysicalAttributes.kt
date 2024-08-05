@@ -101,7 +101,19 @@ class PhysicalAttributes(
       rightEyeColour?.toDto(),
     )
 
-  fun updateFieldHistory(lastModifiedAt: ZonedDateTime, lastModifiedBy: String, source: Source = DPS) {
+  fun updateFieldHistory(
+    lastModifiedAt: ZonedDateTime,
+    lastModifiedBy: String,
+    source: Source = DPS,
+  ) = updateFieldHistory(lastModifiedAt, lastModifiedAt, lastModifiedBy, source)
+
+  fun updateFieldHistory(
+    appliesFrom: ZonedDateTime,
+    lastModifiedAt: ZonedDateTime,
+    lastModifiedBy: String,
+    source: Source = DPS,
+    migratedAt: ZonedDateTime? = null,
+  ) {
     fieldAccessors().forEach { (field, currentValue) ->
       val previousVersion = fieldHistory.lastOrNull { it.field == field }
       if (previousVersion == null || field.hasChangedFrom(previousVersion, currentValue())) {
@@ -115,16 +127,17 @@ class PhysicalAttributes(
         // Set appliesTo on previous history item if not already set
         previousVersion
           ?.takeIf { it.appliesTo == null }
-          ?.let { it.appliesTo = lastModifiedAt }
+          ?.let { it.appliesTo = appliesFrom }
 
         fieldHistory.add(
           FieldHistory(
             prisonerNumber = this.prisonerNumber,
             field = field,
-            appliesFrom = lastModifiedAt,
+            appliesFrom = appliesFrom,
             createdAt = lastModifiedAt,
             createdBy = lastModifiedBy,
             source = source,
+            migratedAt = migratedAt,
           ).also { field.set(it, currentValue()) },
         )
       }

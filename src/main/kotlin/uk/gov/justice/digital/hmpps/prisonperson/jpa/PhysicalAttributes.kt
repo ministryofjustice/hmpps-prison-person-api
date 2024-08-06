@@ -15,7 +15,13 @@ import org.springframework.data.domain.AbstractAggregateRoot
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.PhysicalAttributesDto
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.ValueWithMetadata
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField
+import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.BUILD
+import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.FACE
+import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.FACIAL_HAIR
+import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.HAIR
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.HEIGHT
+import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.LEFT_EYE_COLOUR
+import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.RIGHT_EYE_COLOUR
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.WEIGHT
 import uk.gov.justice.digital.hmpps.prisonperson.enums.Source
 import uk.gov.justice.digital.hmpps.prisonperson.enums.Source.DPS
@@ -76,13 +82,12 @@ class PhysicalAttributes(
   private fun fieldAccessors(): Map<PrisonPersonField, KMutableProperty0<*>> = mapOf(
     HEIGHT to ::height,
     WEIGHT to ::weight,
-    // TODO get nested reference ???
-//    HAIR to ::hair::id,
-//    FACIAL_HAIR to ::facialHair,
-//    FACE to ::face,
-//    BUILD to ::build,
-//    LEFT_EYE_COLOUR to ::leftEyeColour,
-//    RIGHT_EYE_COLOUR to ::rightEyeColour,
+    HAIR to ::hair,
+    FACIAL_HAIR to ::facialHair,
+    FACE to ::face,
+    BUILD to ::build,
+    LEFT_EYE_COLOUR to ::leftEyeColour,
+    RIGHT_EYE_COLOUR to ::rightEyeColour,
   )
 
   @Suppress("UNCHECKED_CAST")
@@ -120,7 +125,12 @@ class PhysicalAttributes(
   ) {
     fieldAccessors().forEach { (field, currentValue) ->
       val previousVersion = fieldHistory.lastOrNull { it.field == field }
-      if (previousVersion == null || field.hasChangedFrom(previousVersion, currentValue())) {
+      if (previousVersion == null ||
+        field.hasChangedFrom(
+          previousVersion,
+          (currentValue() as? ReferenceDataCode)?.id ?: currentValue(),
+        )
+      ) {
         fieldMetadata[field] = FieldMetadata(
           field = field,
           prisonerNumber = this.prisonerNumber,
@@ -142,7 +152,7 @@ class PhysicalAttributes(
             createdBy = lastModifiedBy,
             source = source,
             migratedAt = migratedAt,
-          ).also { field.set(it, currentValue()) },
+          ).also { field.set(it, (currentValue() as? ReferenceDataCode)?.id ?: currentValue()) },
         )
       }
     }

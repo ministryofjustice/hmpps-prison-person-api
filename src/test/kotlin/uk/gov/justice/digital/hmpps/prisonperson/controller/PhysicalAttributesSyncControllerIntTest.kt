@@ -14,7 +14,13 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Primary
 import org.springframework.test.context.jdbc.Sql
 import uk.gov.justice.digital.hmpps.prisonperson.enums.EventType.PHYSICAL_ATTRIBUTES_UPDATED
+import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.BUILD
+import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.FACE
+import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.FACIAL_HAIR
+import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.HAIR
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.HEIGHT
+import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.LEFT_EYE_COLOUR
+import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.RIGHT_EYE_COLOUR
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.WEIGHT
 import uk.gov.justice.digital.hmpps.prisonperson.enums.Source.DPS
 import uk.gov.justice.digital.hmpps.prisonperson.enums.Source.NOMIS
@@ -105,12 +111,38 @@ class PhysicalAttributesSyncControllerIntTest : IntegrationTestBase() {
         expectSuccessfulSyncFrom(REQUEST_TO_SYNC_LATEST_PHYSICAL_ATTRIBUTES)
           .expectBody().jsonPath("$.fieldHistoryInserted[*]").value(not(hasItem(-1)))
 
-        expectFieldHistory(HEIGHT, HistoryComparison(value = 190, appliesFrom = NOW, appliesTo = null, createdAt = NOW, createdBy = USER1, source = NOMIS))
-        expectFieldHistory(WEIGHT, HistoryComparison(value = 80, appliesFrom = NOW, appliesTo = null, createdAt = NOW, createdBy = USER1, source = NOMIS))
+        expectFieldHistory(
+          HEIGHT,
+          HistoryComparison(
+            value = 190,
+            appliesFrom = NOW,
+            appliesTo = null,
+            createdAt = NOW,
+            createdBy = USER1,
+            source = NOMIS,
+          ),
+        )
+        expectFieldHistory(
+          WEIGHT,
+          HistoryComparison(
+            value = 80,
+            appliesFrom = NOW,
+            appliesTo = null,
+            createdAt = NOW,
+            createdBy = USER1,
+            source = NOMIS,
+          ),
+        )
 
         expectFieldMetadata(
           FieldMetadata(PRISONER_NUMBER, HEIGHT, lastModifiedAt = NOW, lastModifiedBy = USER1),
           FieldMetadata(PRISONER_NUMBER, WEIGHT, lastModifiedAt = NOW, lastModifiedBy = USER1),
+          FieldMetadata(PRISONER_NUMBER, HAIR, lastModifiedAt = NOW, lastModifiedBy = USER1),
+          FieldMetadata(PRISONER_NUMBER, FACIAL_HAIR, lastModifiedAt = NOW, lastModifiedBy = USER1),
+          FieldMetadata(PRISONER_NUMBER, FACE, lastModifiedAt = NOW, lastModifiedBy = USER1),
+          FieldMetadata(PRISONER_NUMBER, BUILD, lastModifiedAt = NOW, lastModifiedBy = USER1),
+          FieldMetadata(PRISONER_NUMBER, LEFT_EYE_COLOUR, lastModifiedAt = NOW, lastModifiedBy = USER1),
+          FieldMetadata(PRISONER_NUMBER, RIGHT_EYE_COLOUR, lastModifiedAt = NOW, lastModifiedBy = USER1),
         )
       }
 
@@ -119,27 +151,62 @@ class PhysicalAttributesSyncControllerIntTest : IntegrationTestBase() {
       @Sql("classpath:controller/physical_attributes.sql")
       @Sql("classpath:controller/physical_attributes_history.sql")
       fun `can sync an update of existing physical attributes`() {
-        expectFieldHistory(HEIGHT, HistoryComparison(value = 180, appliesFrom = THEN, appliesTo = null, createdAt = THEN, createdBy = USER1))
-        expectFieldHistory(WEIGHT, HistoryComparison(value = 70, appliesFrom = THEN, appliesTo = null, createdAt = THEN, createdBy = USER1))
+        expectFieldHistory(
+          HEIGHT,
+          HistoryComparison(value = 180, appliesFrom = THEN, appliesTo = null, createdAt = THEN, createdBy = USER1),
+        )
+        expectFieldHistory(
+          WEIGHT,
+          HistoryComparison(value = 70, appliesFrom = THEN, appliesTo = null, createdAt = THEN, createdBy = USER1),
+        )
 
         expectSuccessfulSyncFrom(REQUEST_TO_SYNC_LATEST_PHYSICAL_ATTRIBUTES)
           .expectBody().jsonPath("$.fieldHistoryInserted[*]").value(not(hasItem(-1)))
 
         expectFieldHistory(
           HEIGHT,
-          HistoryComparison(value = 180, appliesFrom = THEN, appliesTo = NOW, createdAt = THEN, createdBy = USER1, source = DPS),
-          HistoryComparison(value = 190, appliesFrom = NOW, appliesTo = null, createdAt = NOW, createdBy = USER1, source = NOMIS),
+          HistoryComparison(
+            value = 180,
+            appliesFrom = THEN,
+            appliesTo = NOW,
+            createdAt = THEN,
+            createdBy = USER1,
+            source = DPS,
+          ),
+          HistoryComparison(
+            value = 190,
+            appliesFrom = NOW,
+            appliesTo = null,
+            createdAt = NOW,
+            createdBy = USER1,
+            source = NOMIS,
+          ),
         )
 
         expectFieldHistory(
           WEIGHT,
-          HistoryComparison(value = 70, appliesFrom = THEN, appliesTo = NOW, createdAt = THEN, createdBy = USER1, source = DPS),
-          HistoryComparison(value = 80, appliesFrom = NOW, appliesTo = null, createdAt = NOW, createdBy = USER1, source = NOMIS),
+          HistoryComparison(
+            value = 70,
+            appliesFrom = THEN,
+            appliesTo = NOW,
+            createdAt = THEN,
+            createdBy = USER1,
+            source = DPS,
+          ),
+          HistoryComparison(
+            value = 80,
+            appliesFrom = NOW,
+            appliesTo = null,
+            createdAt = NOW,
+            createdBy = USER1,
+            source = NOMIS,
+          ),
         )
 
         expectFieldMetadata(
           FieldMetadata(PRISONER_NUMBER, HEIGHT, lastModifiedAt = NOW, lastModifiedBy = USER1),
           FieldMetadata(PRISONER_NUMBER, WEIGHT, lastModifiedAt = NOW, lastModifiedBy = USER1),
+          FieldMetadata(PRISONER_NUMBER, HAIR, lastModifiedAt = NOW, lastModifiedBy = USER1),
         )
       }
 
@@ -148,22 +215,56 @@ class PhysicalAttributesSyncControllerIntTest : IntegrationTestBase() {
       @Sql("classpath:controller/physical_attributes.sql")
       @Sql("classpath:controller/physical_attributes_history.sql")
       fun `can sync a historical update of physical attributes`() {
-        expectFieldHistory(HEIGHT, HistoryComparison(value = 180, appliesFrom = THEN, appliesTo = null, createdAt = THEN, createdBy = USER1))
-        expectFieldHistory(WEIGHT, HistoryComparison(value = 70, appliesFrom = THEN, appliesTo = null, createdAt = THEN, createdBy = USER1))
+        expectFieldHistory(
+          HEIGHT,
+          HistoryComparison(value = 180, appliesFrom = THEN, appliesTo = null, createdAt = THEN, createdBy = USER1),
+        )
+        expectFieldHistory(
+          WEIGHT,
+          HistoryComparison(value = 70, appliesFrom = THEN, appliesTo = null, createdAt = THEN, createdBy = USER1),
+        )
 
         expectSuccessfulSyncFrom(REQUEST_TO_SYNC_HISTORICAL_PHYSICAL_ATTRIBUTES)
           .expectBody().jsonPath("$.fieldHistoryInserted[*]").value(not(hasItem(-1)))
 
         expectFieldHistory(
           HEIGHT,
-          HistoryComparison(value = 190, appliesFrom = THEN.minusYears(1), appliesTo = NOW.minusYears(1), createdAt = NOW, createdBy = USER1, source = NOMIS),
-          HistoryComparison(value = 180, appliesFrom = THEN, appliesTo = null, createdAt = THEN, createdBy = USER1, source = DPS),
+          HistoryComparison(
+            value = 190,
+            appliesFrom = THEN.minusYears(1),
+            appliesTo = NOW.minusYears(1),
+            createdAt = NOW,
+            createdBy = USER1,
+            source = NOMIS,
+          ),
+          HistoryComparison(
+            value = 180,
+            appliesFrom = THEN,
+            appliesTo = null,
+            createdAt = THEN,
+            createdBy = USER1,
+            source = DPS,
+          ),
         )
 
         expectFieldHistory(
           WEIGHT,
-          HistoryComparison(value = 80, appliesFrom = THEN.minusYears(1), appliesTo = NOW.minusYears(1), createdAt = NOW, createdBy = USER1, source = NOMIS),
-          HistoryComparison(value = 70, appliesFrom = THEN, appliesTo = null, createdAt = THEN, createdBy = USER1, source = DPS),
+          HistoryComparison(
+            value = 80,
+            appliesFrom = THEN.minusYears(1),
+            appliesTo = NOW.minusYears(1),
+            createdAt = NOW,
+            createdBy = USER1,
+            source = NOMIS,
+          ),
+          HistoryComparison(
+            value = 70,
+            appliesFrom = THEN,
+            appliesTo = null,
+            createdAt = THEN,
+            createdBy = USER1,
+            source = DPS,
+          ),
         )
       }
 
@@ -173,8 +274,28 @@ class PhysicalAttributesSyncControllerIntTest : IntegrationTestBase() {
         expectSuccessfulSyncFrom(REQUEST_TO_SYNC_HISTORICAL_PHYSICAL_ATTRIBUTES)
           .expectBody().jsonPath("$.fieldHistoryInserted[*]").value(not(hasItem(-1)))
 
-        expectFieldHistory(HEIGHT, HistoryComparison(value = 190, appliesFrom = THEN.minusYears(1), appliesTo = NOW.minusYears(1), createdAt = NOW, createdBy = USER1, source = NOMIS))
-        expectFieldHistory(WEIGHT, HistoryComparison(value = 80, appliesFrom = THEN.minusYears(1), appliesTo = NOW.minusYears(1), createdAt = NOW, createdBy = USER1, source = NOMIS))
+        expectFieldHistory(
+          HEIGHT,
+          HistoryComparison(
+            value = 190,
+            appliesFrom = THEN.minusYears(1),
+            appliesTo = NOW.minusYears(1),
+            createdAt = NOW,
+            createdBy = USER1,
+            source = NOMIS,
+          ),
+        )
+        expectFieldHistory(
+          WEIGHT,
+          HistoryComparison(
+            value = 80,
+            appliesFrom = THEN.minusYears(1),
+            appliesTo = NOW.minusYears(1),
+            createdAt = NOW,
+            createdBy = USER1,
+            source = NOMIS,
+          ),
+        )
       }
 
       @Test

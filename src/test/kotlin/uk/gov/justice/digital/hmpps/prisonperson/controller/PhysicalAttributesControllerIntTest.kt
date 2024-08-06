@@ -12,7 +12,13 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Primary
 import org.springframework.test.context.jdbc.Sql
 import uk.gov.justice.digital.hmpps.prisonperson.enums.EventType.PHYSICAL_ATTRIBUTES_UPDATED
+import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.BUILD
+import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.FACE
+import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.FACIAL_HAIR
+import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.HAIR
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.HEIGHT
+import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.LEFT_EYE_COLOUR
+import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.RIGHT_EYE_COLOUR
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.WEIGHT
 import uk.gov.justice.digital.hmpps.prisonperson.enums.Source.DPS
 import uk.gov.justice.digital.hmpps.prisonperson.integration.IntegrationTestBase
@@ -178,6 +184,12 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
         expectFieldMetadata(
           FieldMetadata(PRISONER_NUMBER, HEIGHT, lastModifiedAt = NOW, lastModifiedBy = USER1),
           FieldMetadata(PRISONER_NUMBER, WEIGHT, lastModifiedAt = NOW, lastModifiedBy = USER1),
+          FieldMetadata(PRISONER_NUMBER, HAIR, lastModifiedAt = NOW, lastModifiedBy = USER1),
+          FieldMetadata(PRISONER_NUMBER, BUILD, lastModifiedAt = NOW, lastModifiedBy = USER1),
+          FieldMetadata(PRISONER_NUMBER, LEFT_EYE_COLOUR, lastModifiedAt = NOW, lastModifiedBy = USER1),
+          FieldMetadata(PRISONER_NUMBER, RIGHT_EYE_COLOUR, lastModifiedAt = NOW, lastModifiedBy = USER1),
+          FieldMetadata(PRISONER_NUMBER, FACE, lastModifiedAt = NOW, lastModifiedBy = USER1),
+          FieldMetadata(PRISONER_NUMBER, FACIAL_HAIR, lastModifiedAt = NOW, lastModifiedBy = USER1),
         )
       }
 
@@ -194,8 +206,18 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
           WEIGHT,
           HistoryComparison(value = 70, appliesFrom = THEN, appliesTo = null, createdAt = THEN, createdBy = USER1),
         )
+        expectFieldHistory(
+          HAIR,
+          HistoryComparison(
+            value = "HAIR_BLACK",
+            appliesFrom = THEN,
+            appliesTo = null,
+            createdAt = THEN,
+            createdBy = USER1,
+          ),
+        )
 
-        expectSuccessfulUpdateFrom("""{ "height": 181, "weight": 71 }""", user = USER2)
+        expectSuccessfulUpdateFrom("""{ "height": 181, "weight": 71, "hair": "HAIR_GREY" }""", user = USER2)
           .expectBody().json(
             // language=json
             """
@@ -210,7 +232,16 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
                 "lastModifiedAt":"2024-06-14T09:10:11.123+01:00[Europe/London]",
                 "lastModifiedBy":"USER2"
               },
-              "hair": null,
+              "hair": {
+                "id": "HAIR_GREY",
+                "domain": "HAIR",
+                "code": "GREY",
+                "description": "Grey",
+                "listSequence": 0,
+                "isActive": true,
+                "createdAt": "2024-07-11T16:00:00Z",
+                "createdBy": "OMS_OWNER"
+              },
               "facialHair": null,
               "face": null,
               "build": null,
@@ -233,9 +264,28 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
           HistoryComparison(value = 71, appliesFrom = NOW, appliesTo = null, createdAt = NOW, createdBy = USER2),
         )
 
+        expectFieldHistory(
+          HAIR,
+          HistoryComparison(
+            value = "HAIR_BLACK",
+            appliesFrom = THEN,
+            appliesTo = NOW,
+            createdAt = THEN,
+            createdBy = USER1,
+          ),
+          HistoryComparison(
+            value = "HAIR_GREY",
+            appliesFrom = NOW,
+            appliesTo = null,
+            createdAt = NOW,
+            createdBy = USER2,
+          ),
+        )
+
         expectFieldMetadata(
           FieldMetadata(PRISONER_NUMBER, HEIGHT, lastModifiedAt = NOW, lastModifiedBy = USER2),
           FieldMetadata(PRISONER_NUMBER, WEIGHT, lastModifiedAt = NOW, lastModifiedBy = USER2),
+          FieldMetadata(PRISONER_NUMBER, HAIR, lastModifiedAt = NOW, lastModifiedBy = USER2),
         )
       }
 
@@ -252,18 +302,28 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
           WEIGHT,
           HistoryComparison(value = 70, appliesFrom = THEN, appliesTo = null, createdAt = THEN, createdBy = USER1),
         )
+        expectFieldHistory(
+          HAIR,
+          HistoryComparison(
+            value = "HAIR_BLACK",
+            appliesFrom = THEN,
+            appliesTo = null,
+            createdAt = THEN,
+            createdBy = USER1,
+          ),
+        )
 
         clock.instant = THEN.plusDays(1).toInstant()
-        expectSuccessfulUpdateFrom("""{ "height": 181, "weight": 71 }""", user = USER2)
+        expectSuccessfulUpdateFrom("""{ "height": 181, "weight": 71, "hair": "HAIR_GREY" }""", user = USER2)
 
         clock.elapse(Duration.ofDays(1))
-        expectSuccessfulUpdateFrom("""{ "height": null, "weight": 72 }""", user = USER1)
+        expectSuccessfulUpdateFrom("""{ "height": null, "weight": 72, "hair": null }""", user = USER1)
 
         clock.elapse(Duration.ofDays(1))
-        expectSuccessfulUpdateFrom("""{ "height": 183, "weight": null }""", user = USER2)
+        expectSuccessfulUpdateFrom("""{ "height": 183, "weight": null, "hair": "HAIR_BLONDE" }""", user = USER2)
 
         clock.instant = NOW.toInstant()
-        expectSuccessfulUpdateFrom("""{ "height": 183, "weight": 74 }""", user = USER2)
+        expectSuccessfulUpdateFrom("""{ "height": 183, "weight": 74, "hair": "HAIR_GREY" }""", user = USER2)
 
         expectFieldHistory(
           HEIGHT,
@@ -330,9 +390,49 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
           HistoryComparison(value = 74, appliesFrom = NOW, appliesTo = null, createdAt = NOW, createdBy = USER2),
         )
 
+        expectFieldHistory(
+          HAIR,
+          HistoryComparison(
+            value = "HAIR_BLACK",
+            appliesFrom = THEN,
+            appliesTo = THEN.plusDays(1),
+            createdAt = THEN,
+            createdBy = USER1,
+          ),
+          HistoryComparison(
+            value = "HAIR_GREY",
+            appliesFrom = THEN.plusDays(1),
+            appliesTo = THEN.plusDays(2),
+            createdAt = THEN.plusDays(1),
+            createdBy = USER2,
+          ),
+          HistoryComparison(
+            value = null,
+            appliesFrom = THEN.plusDays(2),
+            appliesTo = THEN.plusDays(3),
+            createdAt = THEN.plusDays(2),
+            createdBy = USER1,
+          ),
+          HistoryComparison(
+            value = "HAIR_BLONDE",
+            appliesFrom = THEN.plusDays(3),
+            appliesTo = NOW,
+            createdAt = THEN.plusDays(3),
+            createdBy = USER2,
+          ),
+          HistoryComparison(
+            value = "HAIR_GREY",
+            appliesFrom = NOW,
+            appliesTo = null,
+            createdAt = NOW,
+            createdBy = USER2,
+          ),
+        )
+
         expectFieldMetadata(
           FieldMetadata(PRISONER_NUMBER, HEIGHT, lastModifiedAt = THEN.plusDays(3), lastModifiedBy = USER2),
           FieldMetadata(PRISONER_NUMBER, WEIGHT, lastModifiedAt = NOW, lastModifiedBy = USER2),
+          FieldMetadata(PRISONER_NUMBER, HAIR, lastModifiedAt = NOW, lastModifiedBy = USER2),
         )
       }
 

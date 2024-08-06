@@ -11,6 +11,8 @@ import org.mockito.kotlin.whenever
 import uk.gov.justice.digital.hmpps.prisonperson.config.PrisonPersonDataNotFoundException
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.PhysicalAttributesDto
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.PrisonPersonDto
+import uk.gov.justice.digital.hmpps.prisonperson.dto.response.ValueWithMetadata
+import java.time.ZonedDateTime
 
 @ExtendWith(MockitoExtension::class)
 class PrisonPersonServiceTest {
@@ -42,7 +44,13 @@ class PrisonPersonServiceTest {
     const val PRISONER_NUMBER = "A1234AA"
     const val PRISONER_HEIGHT = 180
     const val PRISONER_WEIGHT = 70
+    const val USER1 = "USER1"
 
-    val PHYSICAL_ATTRIBUTES = PhysicalAttributesDto(PRISONER_HEIGHT, PRISONER_WEIGHT)
+    val NOW = ZonedDateTime.now()
+
+    val PHYSICAL_ATTRIBUTES = PhysicalAttributesDto(
+      height = ValueWithMetadata(PRISONER_HEIGHT, NOW, USER1),
+      weight = ValueWithMetadata(PRISONER_WEIGHT, NOW, USER1),
+    )
   }
 }

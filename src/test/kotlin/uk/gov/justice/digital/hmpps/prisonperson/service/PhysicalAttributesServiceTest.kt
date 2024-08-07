@@ -34,7 +34,7 @@ import uk.gov.justice.digital.hmpps.prisonperson.utils.AuthenticationFacade
 import java.time.Clock
 import java.time.LocalDate
 import java.time.ZonedDateTime
-import java.util.*
+import java.util.Optional
 
 @ExtendWith(MockitoExtension::class)
 @MockitoSettings(strictness = LENIENT)
@@ -115,6 +115,7 @@ class PhysicalAttributesServiceTest {
           PhysicalAttributesDto(
             height = ValueWithMetadata(PRISONER_HEIGHT, NOW, USER1),
             weight = ValueWithMetadata(PRISONER_WEIGHT, NOW, USER1),
+            shoeSize = ValueWithMetadata(null, NOW, USER1),
           ),
         )
 
@@ -176,6 +177,7 @@ class PhysicalAttributesServiceTest {
           PhysicalAttributesDto(
             height = ValueWithMetadata(PRISONER_HEIGHT, NOW, USER1),
             weight = ValueWithMetadata(PRISONER_WEIGHT, NOW, USER1),
+            shoeSize = ValueWithMetadata(null, NOW.minusDays(1), USER2),
           ),
         )
 

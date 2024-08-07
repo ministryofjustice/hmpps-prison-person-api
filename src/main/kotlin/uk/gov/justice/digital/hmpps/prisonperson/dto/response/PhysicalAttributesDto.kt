@@ -29,6 +29,9 @@ data class PhysicalAttributesDto(
 
   @Schema(description = "Right eye colour")
   val rightEyeColour: ReferenceDataCodeDto? = null,
+
+  @Schema(description = "Shoe size")
+  val shoeSize: ValueWithMetadata<String?>? = null,
 )
 
 data class ValueWithMetadata<T>(

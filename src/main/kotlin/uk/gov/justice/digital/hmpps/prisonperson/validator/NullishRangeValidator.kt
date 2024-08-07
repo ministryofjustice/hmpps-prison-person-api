@@ -17,7 +17,7 @@ class NullishRangeValidator : ConstraintValidator<NullishRange, Nullish<out Int>
     this.max = constraintAnnotation.max
   }
 
-  override fun isValid(value: Nullish<out Int>, context: ConstraintValidatorContext): Boolean = when (value) {
+  override fun isValid(value: Nullish<out Int>, context: ConstraintValidatorContext?): Boolean = when (value) {
     Undefined -> true
     is Defined -> value.value == null || value.value in min..max
   }

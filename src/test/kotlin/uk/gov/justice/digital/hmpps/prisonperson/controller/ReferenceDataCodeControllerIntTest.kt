@@ -49,11 +49,7 @@ class ReferenceDataCodeControllerIntTest : IntegrationTestBase() {
                   "listSequence": 1,
                   "isActive": true,
                   "createdAt": "2024-07-11T16:00:00Z",
-                  "createdBy": "OMS_OWNER",
-                  "lastModifiedAt": null,
-                  "lastModifiedBy": null,
-                  "deactivatedAt": null,
-                  "deactivatedBy": null
+                  "createdBy": "OMS_OWNER"
                 },
                 {
                   "domain": "TEST",
@@ -62,11 +58,7 @@ class ReferenceDataCodeControllerIntTest : IntegrationTestBase() {
                   "listSequence": 0,
                   "isActive": true,
                   "createdAt": "2024-07-11T16:00:00Z",
-                  "createdBy": "OMS_OWNER",
-                  "lastModifiedAt": null,
-                  "lastModifiedBy": null,
-                  "deactivatedAt": null,
-                  "deactivatedBy": null
+                  "createdBy": "OMS_OWNER"
                 },
                 {
                   "domain": "TEST",
@@ -75,11 +67,7 @@ class ReferenceDataCodeControllerIntTest : IntegrationTestBase() {
                   "listSequence": 0,
                   "isActive": true,
                   "createdAt": "2024-07-11T16:00:00Z",
-                  "createdBy": "OMS_OWNER",
-                  "lastModifiedAt": null,
-                  "lastModifiedBy": null,
-                  "deactivatedAt": null,
-                  "deactivatedBy": null
+                  "createdBy": "OMS_OWNER"
                 },
                 {
                   "domain": "TEST",
@@ -88,11 +76,7 @@ class ReferenceDataCodeControllerIntTest : IntegrationTestBase() {
                   "listSequence": 0,
                   "isActive": true,
                   "createdAt": "2024-07-11T16:00:00Z",
-                  "createdBy": "OMS_OWNER",
-                  "lastModifiedAt": null,
-                  "lastModifiedBy": null,
-                  "deactivatedAt": null,
-                  "deactivatedBy": null
+                  "createdBy": "OMS_OWNER"
                 }
               ]
             """.trimIndent(),
@@ -142,11 +126,7 @@ class ReferenceDataCodeControllerIntTest : IntegrationTestBase() {
                   "listSequence": 1,
                   "isActive": true,
                   "createdAt": "2024-07-11T16:00:00Z",
-                  "createdBy": "OMS_OWNER",
-                  "lastModifiedAt": null,
-                  "lastModifiedBy": null,
-                  "deactivatedAt": null,
-                  "deactivatedBy": null
+                  "createdBy": "OMS_OWNER"
                 }
             """.trimIndent(),
           )

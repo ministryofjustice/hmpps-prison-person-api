@@ -19,6 +19,7 @@ import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.HAIR
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.HEIGHT
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.LEFT_EYE_COLOUR
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.RIGHT_EYE_COLOUR
+import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.SHOE_SIZE
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.WEIGHT
 import uk.gov.justice.digital.hmpps.prisonperson.enums.Source.DPS
 import uk.gov.justice.digital.hmpps.prisonperson.integration.IntegrationTestBase
@@ -93,7 +94,7 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
       fun `bad request when height below 30cm`() {
         expectBadRequestFrom(
           requestBody = """{ "height": 29 }""",
-          message = "Validation failure(s): The height must be a plausible value in centimetres (between 30 and 274)",
+          message = "Validation failure(s): The height must be a plausible value in centimetres (between 30 and 274), null or Undefined",
         )
       }
 
@@ -101,7 +102,7 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
       fun `bad request when height exceeds 274cm`() {
         expectBadRequestFrom(
           requestBody = """{ "height": 275 }""",
-          message = "Validation failure(s): The height must be a plausible value in centimetres (between 30 and 274)",
+          message = "Validation failure(s): The height must be a plausible value in centimetres (between 30 and 274), null or Undefined",
         )
       }
 
@@ -109,7 +110,7 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
       fun `bad request when weight below 12kg`() {
         expectBadRequestFrom(
           requestBody = """{ "weight": 11 }""",
-          message = "Validation failure(s): The weight must be a plausible value in kilograms (between 12 and 635)",
+          message = "Validation failure(s): The weight must be a plausible value in kilograms (between 12 and 635), null or Undefined",
         )
       }
 
@@ -117,7 +118,7 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
       fun `bad request when weight exceeds 635kg`() {
         expectBadRequestFrom(
           requestBody = """{ "weight": 636 }""",
-          message = "Validation failure(s): The weight must be a plausible value in kilograms (between 12 and 635)",
+          message = "Validation failure(s): The weight must be a plausible value in kilograms (between 12 and 635), null or Undefined",
         )
       }
 
@@ -170,7 +171,12 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
               "face": null,
               "build": null,
               "leftEyeColour": null,
-              "rightEyeColour": null
+              "rightEyeColour": null,
+              "shoeSize": {
+                "value":null,
+                "lastModifiedAt":"2024-06-14T09:10:11.123+01:00[Europe/London]",
+                "lastModifiedBy":"USER1"
+              }
             }
             """.trimIndent(),
             true,
@@ -190,6 +196,7 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
           FieldMetadata(PRISONER_NUMBER, RIGHT_EYE_COLOUR, lastModifiedAt = NOW, lastModifiedBy = USER1),
           FieldMetadata(PRISONER_NUMBER, FACE, lastModifiedAt = NOW, lastModifiedBy = USER1),
           FieldMetadata(PRISONER_NUMBER, FACIAL_HAIR, lastModifiedAt = NOW, lastModifiedBy = USER1),
+          FieldMetadata(PRISONER_NUMBER, SHOE_SIZE, lastModifiedAt = NOW, lastModifiedBy = USER1),
         )
       }
 
@@ -216,21 +223,28 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
             createdBy = USER1,
           ),
         )
+        expectFieldHistory(
+          SHOE_SIZE,
+          HistoryComparison(value = null, appliesFrom = THEN, appliesTo = null, createdAt = THEN, createdBy = USER1),
+        )
 
-        expectSuccessfulUpdateFrom("""{ "height": 181, "weight": 71, "hair": "HAIR_GREY" }""", user = USER2)
+        expectSuccessfulUpdateFrom(
+          """{ "height": 181, "weight": 71, "hair": "HAIR_GREY", "shoeSize": "11" }""",
+          user = USER2,
+        )
           .expectBody().json(
             // language=json
             """
             {
               "height": {
-                "value":181,
-                "lastModifiedAt":"2024-06-14T09:10:11.123+01:00[Europe/London]",
-                "lastModifiedBy":"USER2"
+                "value": 181,
+                "lastModifiedAt": "2024-06-14T09:10:11.123+01:00[Europe/London]",
+                "lastModifiedBy": "USER2"
               },
               "weight": {
-                "value":71,
-                "lastModifiedAt":"2024-06-14T09:10:11.123+01:00[Europe/London]",
-                "lastModifiedBy":"USER2"
+                "value": 71,
+                "lastModifiedAt": "2024-06-14T09:10:11.123+01:00[Europe/London]",
+                "lastModifiedBy": "USER2"
               },
               "hair": {
                 "id": "HAIR_GREY",
@@ -246,7 +260,12 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
               "face": null,
               "build": null,
               "leftEyeColour": null,
-              "rightEyeColour": null
+              "rightEyeColour": null,
+              "shoeSize": {
+                "value": "11",
+                "lastModifiedAt": "2024-06-14T09:10:11.123+01:00[Europe/London]",
+                "lastModifiedBy": "USER2"
+              }
             }
             """.trimIndent(),
             true,
@@ -282,10 +301,29 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
           ),
         )
 
+        expectFieldHistory(
+          SHOE_SIZE,
+          HistoryComparison(
+            value = null,
+            appliesFrom = THEN,
+            appliesTo = NOW,
+            createdAt = THEN,
+            createdBy = USER1,
+          ),
+          HistoryComparison(
+            value = "11",
+            appliesFrom = NOW,
+            appliesTo = null,
+            createdAt = NOW,
+            createdBy = USER2,
+          ),
+        )
+
         expectFieldMetadata(
           FieldMetadata(PRISONER_NUMBER, HEIGHT, lastModifiedAt = NOW, lastModifiedBy = USER2),
           FieldMetadata(PRISONER_NUMBER, WEIGHT, lastModifiedAt = NOW, lastModifiedBy = USER2),
           FieldMetadata(PRISONER_NUMBER, HAIR, lastModifiedAt = NOW, lastModifiedBy = USER2),
+          FieldMetadata(PRISONER_NUMBER, SHOE_SIZE, lastModifiedAt = NOW, lastModifiedBy = USER2),
         )
       }
 
@@ -314,16 +352,25 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
         )
 
         clock.instant = THEN.plusDays(1).toInstant()
-        expectSuccessfulUpdateFrom("""{ "height": 181, "weight": 71, "hair": "HAIR_GREY" }""", user = USER2)
+        expectSuccessfulUpdateFrom(
+          """{ "height": 181, "weight": 71, "hair": "HAIR_GREY", "shoeSize": "9.5" }""",
+          user = USER2,
+        )
 
         clock.elapse(Duration.ofDays(1))
-        expectSuccessfulUpdateFrom("""{ "height": null, "weight": 72, "hair": null }""", user = USER1)
+        expectSuccessfulUpdateFrom("""{ "height": null, "weight": 72, "hair": null, "shoeSize": null }""", user = USER1)
 
         clock.elapse(Duration.ofDays(1))
-        expectSuccessfulUpdateFrom("""{ "height": 183, "weight": null, "hair": "HAIR_BLONDE" }""", user = USER2)
+        expectSuccessfulUpdateFrom(
+          """{ "height": 183, "weight": null, "hair": "HAIR_BLONDE", "shoeSize": "10" }""",
+          user = USER2,
+        )
 
         clock.instant = NOW.toInstant()
-        expectSuccessfulUpdateFrom("""{ "height": 183, "weight": 74, "hair": "HAIR_GREY" }""", user = USER2)
+        expectSuccessfulUpdateFrom(
+          """{ "height": 183, "weight": 74, "hair": "HAIR_GREY", "shoeSize": "11" }""",
+          user = USER2,
+        )
 
         expectFieldHistory(
           HEIGHT,
@@ -429,10 +476,50 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
           ),
         )
 
+        expectFieldHistory(
+          SHOE_SIZE,
+          HistoryComparison(
+            value = null,
+            appliesFrom = THEN,
+            appliesTo = THEN.plusDays(1),
+            createdAt = THEN,
+            createdBy = USER1,
+          ),
+          HistoryComparison(
+            value = "9.5",
+            appliesFrom = THEN.plusDays(1),
+            appliesTo = THEN.plusDays(2),
+            createdAt = THEN.plusDays(1),
+            createdBy = USER2,
+          ),
+          HistoryComparison(
+            value = null,
+            appliesFrom = THEN.plusDays(2),
+            appliesTo = THEN.plusDays(3),
+            createdAt = THEN.plusDays(2),
+            createdBy = USER1,
+          ),
+          HistoryComparison(
+            value = "10",
+            appliesFrom = THEN.plusDays(3),
+            appliesTo = NOW,
+            createdAt = THEN.plusDays(3),
+            createdBy = USER2,
+          ),
+          HistoryComparison(
+            value = "11",
+            appliesFrom = NOW,
+            appliesTo = null,
+            createdAt = NOW,
+            createdBy = USER2,
+          ),
+        )
+
         expectFieldMetadata(
           FieldMetadata(PRISONER_NUMBER, HEIGHT, lastModifiedAt = THEN.plusDays(3), lastModifiedBy = USER2),
           FieldMetadata(PRISONER_NUMBER, WEIGHT, lastModifiedAt = NOW, lastModifiedBy = USER2),
           FieldMetadata(PRISONER_NUMBER, HAIR, lastModifiedAt = NOW, lastModifiedBy = USER2),
+          FieldMetadata(PRISONER_NUMBER, SHOE_SIZE, lastModifiedAt = NOW, lastModifiedBy = USER2),
         )
       }
 

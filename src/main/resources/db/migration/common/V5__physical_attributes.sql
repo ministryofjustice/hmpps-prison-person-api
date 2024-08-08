@@ -9,6 +9,7 @@ CREATE TABLE physical_attributes
     build            VARCHAR(81),
     left_eye_colour  VARCHAR(81),
     right_eye_colour VARCHAR(81),
+    shoe_size        VARCHAR(5),
 
     CONSTRAINT physical_attributes_pk PRIMARY KEY (prisoner_number),
     CONSTRAINT hair_reference_data_code_fk FOREIGN KEY (hair) REFERENCES reference_data_code (id),
@@ -29,5 +30,6 @@ COMMENT ON COLUMN physical_attributes.face IS 'Prisoner face shape, from referen
 COMMENT ON COLUMN physical_attributes.build IS 'Prisoner build, from reference data domain BUILD';
 COMMENT ON COLUMN physical_attributes.left_eye_colour IS 'Prisoner left eye colour, from reference data domain EYE';
 COMMENT ON COLUMN physical_attributes.right_eye_colour IS 'Prisoner right eye colour, from reference data domain EYE';
+COMMENT ON COLUMN physical_attributes.shoe_size IS 'Prisoner shoe size';
 
 GRANT SELECT, INSERT, UPDATE, DELETE ON physical_attributes TO prison_person;

@@ -9,6 +9,7 @@ enum class PrisonPersonField(val get: (FieldValues) -> Any?, val set: (FieldValu
   BUILD({ it.valueRef }, { values, value -> values.valueRef = value as String? }),
   LEFT_EYE_COLOUR({ it.valueRef }, { values, value -> values.valueRef = value as String? }),
   RIGHT_EYE_COLOUR({ it.valueRef }, { values, value -> values.valueRef = value as String? }),
+  SHOE_SIZE({ it.valueString }, { values, value -> values.valueString = value as String? }),
   ;
 
   fun hasChangedFrom(old: FieldValues, new: Any?) = new != get(old)

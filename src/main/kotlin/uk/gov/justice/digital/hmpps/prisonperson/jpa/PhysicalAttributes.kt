@@ -22,6 +22,7 @@ import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.HAIR
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.HEIGHT
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.LEFT_EYE_COLOUR
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.RIGHT_EYE_COLOUR
+import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.SHOE_SIZE
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.WEIGHT
 import uk.gov.justice.digital.hmpps.prisonperson.enums.Source
 import uk.gov.justice.digital.hmpps.prisonperson.enums.Source.DPS
@@ -67,6 +68,9 @@ class PhysicalAttributes(
   @JoinColumn(name = "right_eye_colour", referencedColumnName = "id")
   var rightEyeColour: ReferenceDataCode? = null,
 
+  @Column(name = "shoe_size")
+  var shoeSize: String? = null,
+
   // Stores snapshots of each update to a prisoner's physical attributes
   @OneToMany(mappedBy = "prisonerNumber", fetch = LAZY, cascade = [ALL], orphanRemoval = true)
   @SortNatural
@@ -88,6 +92,7 @@ class PhysicalAttributes(
     BUILD to ::build,
     LEFT_EYE_COLOUR to ::leftEyeColour,
     RIGHT_EYE_COLOUR to ::rightEyeColour,
+    SHOE_SIZE to ::shoeSize,
   )
 
   @Suppress("UNCHECKED_CAST")
@@ -99,12 +104,13 @@ class PhysicalAttributes(
     PhysicalAttributesDto(
       height = getValueWithMetadata(::height, HEIGHT),
       weight = getValueWithMetadata(::weight, WEIGHT),
-      hair?.toDto(),
-      facialHair?.toDto(),
-      face?.toDto(),
-      build?.toDto(),
-      leftEyeColour?.toDto(),
-      rightEyeColour?.toDto(),
+      hair = hair?.toDto(),
+      facialHair = facialHair?.toDto(),
+      face = face?.toDto(),
+      build = build?.toDto(),
+      leftEyeColour = leftEyeColour?.toDto(),
+      rightEyeColour = rightEyeColour?.toDto(),
+      shoeSize = getValueWithMetadata(::shoeSize, SHOE_SIZE),
     )
 
   private fun <T> getValueWithMetadata(value: KMutableProperty0<T>, field: PrisonPersonField) =
@@ -183,6 +189,7 @@ class PhysicalAttributes(
     if (build != other.build) return false
     if (leftEyeColour != other.leftEyeColour) return false
     if (rightEyeColour != other.rightEyeColour) return false
+    if (shoeSize != other.shoeSize) return false
 
     return true
   }
@@ -197,10 +204,15 @@ class PhysicalAttributes(
     result = 31 * result + (build?.id.hashCode())
     result = 31 * result + (leftEyeColour?.id.hashCode())
     result = 31 * result + (rightEyeColour?.id.hashCode())
+    result = 31 * result + (shoeSize.hashCode())
     return result
   }
 
   companion object {
+    /*
+     * Fields to use during merge
+     * Used in the PhysicalAttributesMergeService
+     */
     fun fields() = listOf(HEIGHT, WEIGHT)
   }
 }

@@ -75,7 +75,8 @@ class PrisonPersonControllerIntTest : IntegrationTestBase() {
                   "face": null,
                   "build": null,
                   "leftEyeColour": null,
-                  "rightEyeColour": null
+                  "rightEyeColour": null,
+                  "shoeSize": null
                 }
               }
             """.trimIndent(),

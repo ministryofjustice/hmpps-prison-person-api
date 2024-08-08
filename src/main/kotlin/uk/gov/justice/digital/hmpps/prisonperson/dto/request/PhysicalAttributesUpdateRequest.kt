@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL
 import io.swagger.v3.oas.annotations.media.Schema
 import uk.gov.justice.digital.hmpps.prisonperson.annotation.NullishRange
+import uk.gov.justice.digital.hmpps.prisonperson.annotation.NullishShoeSize
 import kotlin.reflect.KMutableProperty0
 
 @Schema(
@@ -22,7 +23,7 @@ data class PhysicalAttributesUpdateRequest(
   @field:NullishRange(
     min = 30,
     max = 274,
-    message = "The height must be a plausible value in centimetres (between 30 and 274)",
+    message = "The height must be a plausible value in centimetres (between 30 and 274), null or Undefined",
   )
   val height: Nullish<Int> = getAttribute("height")
 
@@ -30,7 +31,7 @@ data class PhysicalAttributesUpdateRequest(
   @field:NullishRange(
     min = 12,
     max = 635,
-    message = "The weight must be a plausible value in kilograms (between 12 and 635)",
+    message = "The weight must be a plausible value in kilograms (between 12 and 635), null or Undefined",
   )
   val weight: Nullish<Int> = getAttribute("weight")
 
@@ -56,6 +57,14 @@ data class PhysicalAttributesUpdateRequest(
 
   @Schema(description = "Right eye colour. `ReferenceDataCode.id`.", example = "EYE_BLUE")
   val rightEyeColour: Nullish<String> = getAttribute("rightEyeColour")
+
+  @Schema(description = "Shoe size (in UK half sizes).", example = "9.5")
+  @field:NullishShoeSize(
+    min = "1",
+    max = "25",
+    message = "The shoe size must be a whole or half size between 1 and 25, null or Undefined",
+  )
+  val shoeSize: Nullish<String> = getAttribute("shoeSize")
 
   /**
    * Get an attribute from the map of `attributes` and push it into a `Nullish` object

@@ -45,6 +45,7 @@ class PhysicalAttributesService(
         request.build.apply(this::build, ::toReferenceDataCode)
         request.leftEyeColour.apply(this::leftEyeColour, ::toReferenceDataCode)
         request.rightEyeColour.apply(this::rightEyeColour, ::toReferenceDataCode)
+        request.shoeSize.apply(this::shoeSize)
       }
       .also { it.updateFieldHistory(now, authenticationFacade.getUserOrSystemInContext()) }
       .also { it.publishUpdateEvent(DPS, now) }

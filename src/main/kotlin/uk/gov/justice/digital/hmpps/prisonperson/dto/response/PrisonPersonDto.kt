@@ -12,4 +12,7 @@ data class PrisonPersonDto(
 
   @Schema(description = "Physical Attributes (height and weight)")
   val physicalAttributes: PhysicalAttributesDto = PhysicalAttributesDto(),
+
+  @Schema(description = "Health information (Smoker/Vaper, Diet)")
+  val health: HealthDto = HealthDto(),
 )

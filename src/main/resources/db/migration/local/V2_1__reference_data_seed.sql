@@ -4,7 +4,8 @@ VALUES ('HAIR', 'Hair type or colour', 0, '2024-07-11 17:00:00+0100', 'OMS_OWNER
        ('FACIAL_HAIR', 'Facial hair type', 0, '2024-07-11 17:00:00+0100', 'OMS_OWNER'),
        ('FACE', 'Face shape', 0, '2024-07-11 17:00:00+0100', 'OMS_OWNER'),
        ('BUILD', 'Build', 0, '2024-07-11 17:00:00+0100', 'OMS_OWNER'),
-       ('EYE', 'Eye colour', 0, '2024-07-11 17:00:00+0100', 'OMS_OWNER');
+       ('EYE', 'Eye colour', 0, '2024-07-11 17:00:00+0100', 'OMS_OWNER'),
+       ('SMOKE', 'Smoker or vaper', 0, '2024-07-11 17:00:00+0100', 'OMS_OWNER');
 
 INSERT INTO reference_data_code (id, domain, code, description, list_sequence, created_at, created_by)
 VALUES
@@ -57,4 +58,14 @@ VALUES
 ('EYE_GREY', 'EYE', 'GREY', 'Grey', 0, '2024-07-11 17:00:00+0100', 'OMS_OWNER'),
 ('EYE_HAZEL', 'EYE', 'HAZEL', 'Hazel', 0, '2024-07-11 17:00:00+0100', 'OMS_OWNER'),
 ('EYE_MISSING', 'EYE', 'MISSING', 'Missing', 0, '2024-07-11 17:00:00+0100', 'OMS_OWNER'),
-('EYE_PINK', 'EYE', 'PINK', 'Pink', 0, '2024-07-11 17:00:00+0100', 'OMS_OWNER');
+('EYE_PINK', 'EYE', 'PINK', 'Pink', 0, '2024-07-11 17:00:00+0100', 'OMS_OWNER'),
+-- Smoker or vaper
+('SMOKE_SMOKER', 'SMOKE', 'SMOKER', 'Yes, they smoke', 0, '2024-07-11 17:00:00+0100', 'OMS_OWNER'),
+('SMOKE_VAPER', 'SMOKE', 'VAPER', 'Yes, they smoke or use nicotine replacement therapy (NRT)', 0, '2024-07-11 17:00:00+0100', 'OMS_OWNER'),
+('SMOKE_NO', 'SMOKE', 'NO', 'No, they do not smoke or vape', 0, '2024-07-11 17:00:00+0100', 'OMS_OWNER');
+
+-- Inactive (Imported from NOMIS)
+INSERT INTO reference_data_code (id, domain, code, description, list_sequence, created_at, created_by, last_modified_at,
+                                 last_modified_by, deactivated_at, deactivated_by)
+VALUES ('SMOKE_YES', 'SMOKE', 'YES', 'Yes (from NOMIS)', 0, '2024-07-11 17:00:00+0100', 'OMS_OWNER',
+        '2024-07-11 17:00:00+0100', 'OMS_OWNER', '2024-07-11 17:00:00+0100', 'OMS_OWNER');

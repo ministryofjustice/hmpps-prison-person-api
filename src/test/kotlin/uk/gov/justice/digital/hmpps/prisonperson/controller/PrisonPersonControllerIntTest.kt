@@ -62,12 +62,12 @@ class PrisonPersonControllerIntTest : IntegrationTestBase() {
                 "physicalAttributes": {
                   "height": {
                     "value":180,
-                    "lastModifiedAt":"2024-01-02T09:10:11.123Z",
+                    "lastModifiedAt":"2024-01-02T09:10:11+0000",
                     "lastModifiedBy":"USER1"
                   },
                   "weight": {
                     "value":70,
-                    "lastModifiedAt":"2024-01-02T09:10:11.123Z",
+                    "lastModifiedAt":"2024-01-02T09:10:11+0000",
                     "lastModifiedBy":"USER1"
                   },
                   "hair": null,

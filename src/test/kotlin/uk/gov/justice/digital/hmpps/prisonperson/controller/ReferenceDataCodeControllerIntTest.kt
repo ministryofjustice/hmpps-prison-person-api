@@ -48,7 +48,7 @@ class ReferenceDataCodeControllerIntTest : IntegrationTestBase() {
                   "description": "Orange",
                   "listSequence": 1,
                   "isActive": true,
-                  "createdAt": "2024-07-11T16:00:00Z",
+                  "createdAt": "2024-07-11T17:00:00+0100",
                   "createdBy": "OMS_OWNER"
                 },
                 {
@@ -57,7 +57,7 @@ class ReferenceDataCodeControllerIntTest : IntegrationTestBase() {
                   "description": "Brown",
                   "listSequence": 0,
                   "isActive": true,
-                  "createdAt": "2024-07-11T16:00:00Z",
+                  "createdAt": "2024-07-11T17:00:00+0100",
                   "createdBy": "OMS_OWNER"
                 },
                 {
@@ -66,7 +66,7 @@ class ReferenceDataCodeControllerIntTest : IntegrationTestBase() {
                   "description": "Red",
                   "listSequence": 0,
                   "isActive": true,
-                  "createdAt": "2024-07-11T16:00:00Z",
+                  "createdAt": "2024-07-11T17:00:00+0100",
                   "createdBy": "OMS_OWNER"
                 },
                 {
@@ -75,7 +75,7 @@ class ReferenceDataCodeControllerIntTest : IntegrationTestBase() {
                   "description": "White",
                   "listSequence": 0,
                   "isActive": true,
-                  "createdAt": "2024-07-11T16:00:00Z",
+                  "createdAt": "2024-07-11T17:00:00+0100",
                   "createdBy": "OMS_OWNER"
                 }
               ]
@@ -125,7 +125,7 @@ class ReferenceDataCodeControllerIntTest : IntegrationTestBase() {
                   "description": "Orange",
                   "listSequence": 1,
                   "isActive": true,
-                  "createdAt": "2024-07-11T16:00:00Z",
+                  "createdAt": "2024-07-11T17:00:00+0100",
                   "createdBy": "OMS_OWNER"
                 }
             """.trimIndent(),

@@ -47,7 +47,7 @@ class ReferenceDataDomainControllerIntTest : IntegrationTestBase() {
                   "description": "Test domain",
                   "listSequence": 1,
                   "isActive": true,
-                  "createdAt": "2024-07-11T16:00:00Z",
+                  "createdAt": "2024-07-11T17:00:00+0100",
                   "createdBy": "OMS_OWNER",
                   "referenceDataCodes": [
                     {
@@ -56,7 +56,7 @@ class ReferenceDataDomainControllerIntTest : IntegrationTestBase() {
                       "description": "Orange",
                       "listSequence": 1,
                       "isActive": true,
-                      "createdAt": "2024-07-11T16:00:00Z",
+                      "createdAt": "2024-07-11T17:00:00+0100",
                       "createdBy": "OMS_OWNER"
                     },
                     {
@@ -65,7 +65,7 @@ class ReferenceDataDomainControllerIntTest : IntegrationTestBase() {
                       "description": "Brown",
                       "listSequence": 0,
                       "isActive": true,
-                      "createdAt": "2024-07-11T16:00:00Z",
+                      "createdAt": "2024-07-11T17:00:00+0100",
                       "createdBy": "OMS_OWNER"
                     },
                     {
@@ -74,7 +74,7 @@ class ReferenceDataDomainControllerIntTest : IntegrationTestBase() {
                       "description": "Red",
                       "listSequence": 0,
                       "isActive": true,
-                      "createdAt": "2024-07-11T16:00:00Z",
+                      "createdAt": "2024-07-11T17:00:00+0100",
                       "createdBy": "OMS_OWNER"
                     },
                     {
@@ -83,7 +83,7 @@ class ReferenceDataDomainControllerIntTest : IntegrationTestBase() {
                       "description": "White",
                       "listSequence": 0,
                       "isActive": true,
-                      "createdAt": "2024-07-11T16:00:00Z",
+                      "createdAt": "2024-07-11T17:00:00+0100",
                       "createdBy": "OMS_OWNER"
                     },
                     {
@@ -92,11 +92,11 @@ class ReferenceDataDomainControllerIntTest : IntegrationTestBase() {
                       "description": "Inactive code for tests",
                       "listSequence": 0,
                       "isActive": false,
-                      "createdAt": "2024-07-11T16:00:00Z",
+                      "createdAt": "2024-07-11T17:00:00+0100",
                       "createdBy": "OMS_OWNER",
-                      "lastModifiedAt": "2024-07-11T16:00:00Z",
+                      "lastModifiedAt": "2024-07-11T17:00:00+0100",
                       "lastModifiedBy": "OMS_OWNER",
-                      "deactivatedAt": "2024-07-11T16:00:00Z",
+                      "deactivatedAt": "2024-07-11T17:00:00+0100",
                       "deactivatedBy": "OMS_OWNER"
                     }
                   ]
@@ -106,7 +106,7 @@ class ReferenceDataDomainControllerIntTest : IntegrationTestBase() {
                   "description": "Hair type or colour",
                   "listSequence": 0,
                   "isActive": true,
-                  "createdAt": "2024-07-11T16:00:00Z",
+                  "createdAt": "2024-07-11T17:00:00+0100",
                   "createdBy": "OMS_OWNER",
                   "referenceDataCodes": [
                     {
@@ -116,7 +116,7 @@ class ReferenceDataDomainControllerIntTest : IntegrationTestBase() {
                       "description": "Black",
                       "listSequence": 0,
                       "isActive": true,
-                      "createdAt": "2024-07-11T16:00:00Z",
+                      "createdAt": "2024-07-11T17:00:00+0100",
                       "createdBy": "OMS_OWNER"
                     },
                     {
@@ -126,7 +126,7 @@ class ReferenceDataDomainControllerIntTest : IntegrationTestBase() {
                       "description": "Grey",
                       "listSequence": 0,
                       "isActive": true,
-                      "createdAt": "2024-07-11T16:00:00Z",
+                      "createdAt": "2024-07-11T17:00:00+0100",
                       "createdBy": "OMS_OWNER"
                     },
                     {
@@ -136,7 +136,7 @@ class ReferenceDataDomainControllerIntTest : IntegrationTestBase() {
                       "description": "Blonde",
                       "listSequence": 0,
                       "isActive": true,
-                      "createdAt": "2024-07-11T16:00:00Z",
+                      "createdAt": "2024-07-11T17:00:00+0100",
                       "createdBy": "OMS_OWNER"
                     }
                   ]
@@ -188,7 +188,7 @@ class ReferenceDataDomainControllerIntTest : IntegrationTestBase() {
                 "description": "Test domain",
                 "listSequence": 1,
                 "isActive": true,
-                "createdAt": "2024-07-11T16:00:00Z",
+                "createdAt": "2024-07-11T17:00:00+0100",
                 "createdBy": "OMS_OWNER",
                 "referenceDataCodes": [
                   {
@@ -197,7 +197,7 @@ class ReferenceDataDomainControllerIntTest : IntegrationTestBase() {
                     "description": "Orange",
                     "listSequence": 1,
                     "isActive": true,
-                    "createdAt": "2024-07-11T16:00:00Z",
+                    "createdAt": "2024-07-11T17:00:00+0100",
                     "createdBy": "OMS_OWNER"
                   },
                   {
@@ -206,7 +206,7 @@ class ReferenceDataDomainControllerIntTest : IntegrationTestBase() {
                     "description": "Brown",
                     "listSequence": 0,
                     "isActive": true,
-                    "createdAt": "2024-07-11T16:00:00Z",
+                    "createdAt": "2024-07-11T17:00:00+0100",
                     "createdBy": "OMS_OWNER"
                   },
                   {
@@ -215,7 +215,7 @@ class ReferenceDataDomainControllerIntTest : IntegrationTestBase() {
                     "description": "Red",
                     "listSequence": 0,
                     "isActive": true,
-                    "createdAt": "2024-07-11T16:00:00Z",
+                    "createdAt": "2024-07-11T17:00:00+0100",
                     "createdBy": "OMS_OWNER"
                   },
                   {
@@ -224,7 +224,7 @@ class ReferenceDataDomainControllerIntTest : IntegrationTestBase() {
                     "description": "White",
                     "listSequence": 0,
                     "isActive": true,
-                    "createdAt": "2024-07-11T16:00:00Z",
+                    "createdAt": "2024-07-11T17:00:00+0100",
                     "createdBy": "OMS_OWNER"
                   },
                   {
@@ -233,11 +233,11 @@ class ReferenceDataDomainControllerIntTest : IntegrationTestBase() {
                     "description": "Inactive code for tests",
                     "listSequence": 0,
                     "isActive": false,
-                    "createdAt": "2024-07-11T16:00:00Z",
+                    "createdAt": "2024-07-11T17:00:00+0100",
                     "createdBy": "OMS_OWNER",
-                    "lastModifiedAt": "2024-07-11T16:00:00Z",
+                    "lastModifiedAt": "2024-07-11T17:00:00+0100",
                     "lastModifiedBy": "OMS_OWNER",
-                    "deactivatedAt": "2024-07-11T16:00:00Z",
+                    "deactivatedAt": "2024-07-11T17:00:00+0100",
                     "deactivatedBy": "OMS_OWNER"
                   }
                 ]

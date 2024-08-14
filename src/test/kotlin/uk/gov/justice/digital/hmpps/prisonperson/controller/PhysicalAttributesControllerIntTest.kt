@@ -94,7 +94,7 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
       fun `bad request when height below 30cm`() {
         expectBadRequestFrom(
           requestBody = """{ "height": 29 }""",
-          message = "Validation failure(s): The height must be a plausible value in centimetres (between 30 and 274), null or Undefined",
+          message = "Validation failure(s): The height must be a plausible value in centimetres (between 30 and 274), null or not provided",
         )
       }
 
@@ -102,7 +102,7 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
       fun `bad request when height exceeds 274cm`() {
         expectBadRequestFrom(
           requestBody = """{ "height": 275 }""",
-          message = "Validation failure(s): The height must be a plausible value in centimetres (between 30 and 274), null or Undefined",
+          message = "Validation failure(s): The height must be a plausible value in centimetres (between 30 and 274), null or not provided",
         )
       }
 
@@ -110,7 +110,7 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
       fun `bad request when weight below 12kg`() {
         expectBadRequestFrom(
           requestBody = """{ "weight": 11 }""",
-          message = "Validation failure(s): The weight must be a plausible value in kilograms (between 12 and 635), null or Undefined",
+          message = "Validation failure(s): The weight must be a plausible value in kilograms (between 12 and 635), null or not provided",
         )
       }
 
@@ -118,7 +118,7 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
       fun `bad request when weight exceeds 635kg`() {
         expectBadRequestFrom(
           requestBody = """{ "weight": 636 }""",
-          message = "Validation failure(s): The weight must be a plausible value in kilograms (between 12 and 635), null or Undefined",
+          message = "Validation failure(s): The weight must be a plausible value in kilograms (between 12 and 635), null or not provided",
         )
       }
 

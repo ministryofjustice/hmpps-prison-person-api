@@ -285,8 +285,8 @@ class PhysicalAttributesMigrationControllerIntTest : IntegrationTestBase() {
           { 
             "height": 190,
             "weight": 80,
-            "appliesFrom": "2024-06-14T09:10:11.123+01:00[Europe/London]",
-            "createdAt": "2024-06-14T09:10:11.123+01:00[Europe/London]",
+            "appliesFrom": "2024-06-14T09:10:11.123+0100",
+            "createdAt": "2024-06-14T09:10:11.123+0100",
             "createdBy": "USER1"
           }
         ]
@@ -299,40 +299,40 @@ class PhysicalAttributesMigrationControllerIntTest : IntegrationTestBase() {
           { 
             "height": 190,
             "weight": 80,
-            "appliesFrom": "2024-06-14T09:10:11.123+01:00[Europe/London]",
-            "createdAt": "2024-06-14T09:10:11.123+01:00[Europe/London]",
+            "appliesFrom": "2024-06-14T09:10:11.123+0100",
+            "createdAt": "2024-06-14T09:10:11.123+0100",
             "createdBy": "USER1"
           },
           { 
             "height": 188,
             "weight": 78,
-            "appliesFrom": "2024-06-12T09:10:11.123+01:00[Europe/London]",
-            "appliesTo": "2024-06-13T09:10:11.123+01:00[Europe/London]",
-            "createdAt": "2024-06-12T09:10:11.123+01:00[Europe/London]",
+            "appliesFrom": "2024-06-12T09:10:11.123+0100",
+            "appliesTo": "2024-06-13T09:10:11.123+0100",
+            "createdAt": "2024-06-12T09:10:11.123+0100",
             "createdBy": "CHANGE_TO_WEIGHT_ONLY"
           },
           { 
             "height": 188,
             "weight": 79,
-            "appliesFrom": "2024-06-11T09:10:11.123+01:00[Europe/London]",
-            "appliesTo": "2024-06-12T09:10:11.123+01:00[Europe/London]",
-            "createdAt": "2024-06-11T09:10:11.123+01:00[Europe/London]",
+            "appliesFrom": "2024-06-11T09:10:11.123+0100",
+            "appliesTo": "2024-06-12T09:10:11.123+0100",
+            "createdAt": "2024-06-11T09:10:11.123+0100",
             "createdBy": "CHANGE_TO_HEIGHT_ONLY"
           },
           { 
             "height": 189,
             "weight": 79,
-            "appliesFrom": "2024-06-10T09:10:11.123+01:00[Europe/London]",
-            "appliesTo": "2024-06-11T09:10:11.123+01:00[Europe/London]",
-            "createdAt": "2024-06-14T09:10:11.123+01:00[Europe/London]",
+            "appliesFrom": "2024-06-10T09:10:11.123+0100",
+            "appliesTo": "2024-06-11T09:10:11.123+0100",
+            "createdAt": "2024-06-14T09:10:11.123+0100",
             "createdBy": "NO_CHANGES_MADE"
           },
           { 
             "height": 189,
             "weight": 79,
-            "appliesFrom": "2024-06-09T09:10:11.123+01:00[Europe/London]",
-            "appliesTo": "2024-06-10T09:10:11.123+01:00[Europe/London]",
-            "createdAt": "2024-06-09T09:10:11.123+01:00[Europe/London]",
+            "appliesFrom": "2024-06-09T09:10:11.123+0100",
+            "appliesTo": "2024-06-10T09:10:11.123+0100",
+            "createdAt": "2024-06-09T09:10:11.123+0100",
             "createdBy": "USER2"
           }
         ]

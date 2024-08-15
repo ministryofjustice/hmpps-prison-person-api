@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.prisonperson.service
 
+import com.microsoft.applicationinsights.TelemetryClient
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
@@ -12,9 +13,13 @@ import org.mockito.Spy
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.junit.jupiter.MockitoSettings
 import org.mockito.kotlin.any
+import org.mockito.kotlin.argThat
 import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.eq
+import org.mockito.kotlin.isNull
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import org.mockito.quality.Strictness.LENIENT
 import uk.gov.justice.digital.hmpps.prisonperson.client.prisonersearch.PrisonerSearchClient
@@ -46,6 +51,9 @@ class PhysicalAttributesSyncServiceTest {
 
   @Mock
   lateinit var prisonerSearchClient: PrisonerSearchClient
+
+  @Mock
+  lateinit var telemetryClient: TelemetryClient
 
   @Spy
   val clock: Clock? = Clock.fixed(NOW.toInstant(), NOW.zone)
@@ -88,6 +96,12 @@ class PhysicalAttributesSyncServiceTest {
           HistoryComparison(value = PRISONER_WEIGHT, createdAt = NOW, createdBy = USER1, appliesFrom = NOW, appliesTo = null, source = NOMIS),
         )
       }
+
+      verify(telemetryClient).trackEvent(
+        eq("prison-person-api-physical-attributes-synced"),
+        argThat { it -> it.containsValue(PRISONER_NUMBER) },
+        isNull(),
+      )
     }
 
     @Test
@@ -100,6 +114,7 @@ class PhysicalAttributesSyncServiceTest {
         .hasMessage("Prisoner number '$PRISONER_NUMBER' not found")
 
       verify(physicalAttributesRepository, never()).save(any())
+      verifyNoInteractions(telemetryClient)
     }
 
     @Test
@@ -138,6 +153,12 @@ class PhysicalAttributesSyncServiceTest {
           HistoryComparison(value = PRISONER_WEIGHT, createdAt = NOW, createdBy = USER2, appliesFrom = NOW, appliesTo = null, source = NOMIS),
         )
       }
+
+      verify(telemetryClient).trackEvent(
+        eq("prison-person-api-physical-attributes-synced"),
+        argThat { it -> it.containsValue(PRISONER_NUMBER) },
+        isNull(),
+      )
     }
 
     @Test
@@ -192,6 +213,12 @@ class PhysicalAttributesSyncServiceTest {
           source = NOMIS,
         ),
       )
+
+      verify(telemetryClient).trackEvent(
+        eq("prison-person-api-physical-attributes-synced"),
+        argThat { it -> it.containsValue(PRISONER_NUMBER) },
+        isNull(),
+      )
     }
 
     @Test
@@ -217,6 +244,12 @@ class PhysicalAttributesSyncServiceTest {
           HistoryComparison(value = null, createdAt = NOW, createdBy = USER1, appliesFrom = NOW, appliesTo = null, source = NOMIS),
         )
       }
+
+      verify(telemetryClient).trackEvent(
+        eq("prison-person-api-physical-attributes-synced"),
+        argThat { it -> it.containsValue(PRISONER_NUMBER) },
+        isNull(),
+      )
     }
   }
 

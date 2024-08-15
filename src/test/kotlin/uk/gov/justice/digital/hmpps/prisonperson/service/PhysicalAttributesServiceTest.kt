@@ -115,6 +115,12 @@ class PhysicalAttributesServiceTest {
           PhysicalAttributesDto(
             height = ValueWithMetadata(PRISONER_HEIGHT, NOW, USER1),
             weight = ValueWithMetadata(PRISONER_WEIGHT, NOW, USER1),
+            hair = ValueWithMetadata(null, NOW, USER1),
+            facialHair = ValueWithMetadata(null, NOW, USER1),
+            face = ValueWithMetadata(null, NOW, USER1),
+            build = ValueWithMetadata(null, NOW, USER1),
+            leftEyeColour = ValueWithMetadata(null, NOW, USER1),
+            rightEyeColour = ValueWithMetadata(null, NOW, USER1),
             shoeSize = ValueWithMetadata(null, NOW, USER1),
           ),
         )
@@ -177,6 +183,12 @@ class PhysicalAttributesServiceTest {
           PhysicalAttributesDto(
             height = ValueWithMetadata(PRISONER_HEIGHT, NOW, USER1),
             weight = ValueWithMetadata(PRISONER_WEIGHT, NOW, USER1),
+            hair = ValueWithMetadata(null, NOW.minusDays(1), USER2),
+            facialHair = ValueWithMetadata(null, NOW.minusDays(1), USER2),
+            face = ValueWithMetadata(null, NOW.minusDays(1), USER2),
+            build = ValueWithMetadata(null, NOW.minusDays(1), USER2),
+            leftEyeColour = ValueWithMetadata(null, NOW.minusDays(1), USER2),
+            rightEyeColour = ValueWithMetadata(null, NOW.minusDays(1), USER2),
             shoeSize = ValueWithMetadata(null, NOW.minusDays(1), USER2),
           ),
         )

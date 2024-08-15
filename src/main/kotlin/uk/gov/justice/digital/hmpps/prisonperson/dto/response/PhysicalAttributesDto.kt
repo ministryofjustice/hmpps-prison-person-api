@@ -13,22 +13,22 @@ data class PhysicalAttributesDto(
   val weight: ValueWithMetadata<Int?>? = null,
 
   @Schema(description = "Hair type or colour")
-  val hair: ReferenceDataCodeDto? = null,
+  val hair: ValueWithMetadata<ReferenceDataCodeDto?>? = null,
 
   @Schema(description = "Facial hair type")
-  val facialHair: ReferenceDataCodeDto? = null,
+  val facialHair: ValueWithMetadata<ReferenceDataCodeDto?>? = null,
 
   @Schema(description = "Face shape")
-  val face: ReferenceDataCodeDto? = null,
+  val face: ValueWithMetadata<ReferenceDataCodeDto?>? = null,
 
   @Schema(description = "Build")
-  val build: ReferenceDataCodeDto? = null,
+  val build: ValueWithMetadata<ReferenceDataCodeDto?>? = null,
 
   @Schema(description = "Left eye colour")
-  val leftEyeColour: ReferenceDataCodeDto? = null,
+  val leftEyeColour: ValueWithMetadata<ReferenceDataCodeDto?>? = null,
 
   @Schema(description = "Right eye colour")
-  val rightEyeColour: ReferenceDataCodeDto? = null,
+  val rightEyeColour: ValueWithMetadata<ReferenceDataCodeDto?>? = null,
 
   @Schema(description = "Shoe size")
   val shoeSize: ValueWithMetadata<String?>? = null,

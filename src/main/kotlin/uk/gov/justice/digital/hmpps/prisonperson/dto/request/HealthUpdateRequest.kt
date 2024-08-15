@@ -3,8 +3,6 @@ package uk.gov.justice.digital.hmpps.prisonperson.dto.request
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL
 import io.swagger.v3.oas.annotations.media.Schema
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 
 @Schema(
   description = "Request object for updating a prisoner's health information. Can include one or multiple fields. " +

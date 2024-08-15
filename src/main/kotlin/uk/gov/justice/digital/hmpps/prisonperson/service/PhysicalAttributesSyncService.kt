@@ -1,8 +1,12 @@
 package uk.gov.justice.digital.hmpps.prisonperson.service
 
+import com.microsoft.applicationinsights.TelemetryClient
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.prisonperson.client.prisonersearch.PrisonerSearchClient
+import uk.gov.justice.digital.hmpps.prisonperson.config.trackEvent
 import uk.gov.justice.digital.hmpps.prisonperson.dto.request.PhysicalAttributesSyncRequest
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.PhysicalAttributesSyncResponse
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.HEIGHT
@@ -21,6 +25,7 @@ class PhysicalAttributesSyncService(
   private val physicalAttributesRepository: PhysicalAttributesRepository,
   private val fieldHistoryRepository: FieldHistoryRepository,
   private val prisonerSearchClient: PrisonerSearchClient,
+  private val telemetryClient: TelemetryClient,
   private val clock: Clock,
 ) {
   fun sync(
@@ -33,6 +38,8 @@ class PhysicalAttributesSyncService(
   }
 
   private fun syncLatestPhysicalAttributes(prisonerNumber: String, request: PhysicalAttributesSyncRequest): PhysicalAttributesSyncResponse {
+    log.debug("Syncing latest physical attributes update from NOMIS for prisoner: $prisonerNumber")
+
     val now = ZonedDateTime.now(clock)
 
     val physicalAttributes = physicalAttributesRepository.findById(prisonerNumber)
@@ -44,12 +51,14 @@ class PhysicalAttributesSyncService(
       .also { it.updateFieldHistory(request.createdAt, request.createdBy, NOMIS) }
       .also { it.publishUpdateEvent(NOMIS, now) }
 
-    return PhysicalAttributesSyncResponse(
-      physicalAttributesRepository.save(physicalAttributes).getLatestFieldHistoryIds(),
-    )
+    return physicalAttributesRepository.save(physicalAttributes).getLatestFieldHistoryIds()
+      .also { trackSyncEvent(prisonerNumber, it) }
+      .let { PhysicalAttributesSyncResponse(it) }
   }
 
   private fun syncHistoricalPhysicalAttributes(prisonerNumber: String, request: PhysicalAttributesSyncRequest): PhysicalAttributesSyncResponse {
+    log.debug("Syncing historical physical attributes update from NOMIS for prisoner: $prisonerNumber")
+
     physicalAttributesRepository.findById(prisonerNumber)
       .orElseGet {
         physicalAttributesRepository.save(
@@ -59,8 +68,10 @@ class PhysicalAttributesSyncService(
           },
         )
       }
-
-    return PhysicalAttributesSyncResponse(request.addToHistory(prisonerNumber).map { it.fieldHistoryId })
+    return request.addToHistory(prisonerNumber)
+      .map { it.fieldHistoryId }
+      .also { trackSyncEvent(prisonerNumber, it) }
+      .let { PhysicalAttributesSyncResponse(it) }
   }
 
   private fun PhysicalAttributesSyncRequest.addToHistory(prisonerNumber: String): List<FieldHistory> {
@@ -96,4 +107,18 @@ class PhysicalAttributesSyncService(
     fieldHistory.last { it.field == HEIGHT },
     fieldHistory.last { it.field == WEIGHT },
   ).map { it.fieldHistoryId }
+
+  private fun trackSyncEvent(prisonerNumber: String, fieldHistoryIds: List<Long>) {
+    telemetryClient.trackEvent(
+      "prison-person-api-physical-attributes-synced",
+      mapOf(
+        "prisonerNumber" to prisonerNumber,
+        "fieldHistoryIds" to fieldHistoryIds.toString(),
+      ),
+    )
+  }
+
+  private companion object {
+    val log: Logger = LoggerFactory.getLogger(this::class.java)
+  }
 }

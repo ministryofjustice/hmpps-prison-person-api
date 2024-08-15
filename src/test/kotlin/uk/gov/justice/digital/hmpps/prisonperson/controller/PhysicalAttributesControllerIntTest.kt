@@ -94,7 +94,7 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
       fun `bad request when height below 30cm`() {
         expectBadRequestFrom(
           requestBody = """{ "height": 29 }""",
-          message = "Validation failure(s): The height must be a plausible value in centimetres (between 30 and 274), null or Undefined",
+          message = "Validation failure(s): The height must be a plausible value in centimetres (between 30 and 274), null or not provided",
         )
       }
 
@@ -102,7 +102,7 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
       fun `bad request when height exceeds 274cm`() {
         expectBadRequestFrom(
           requestBody = """{ "height": 275 }""",
-          message = "Validation failure(s): The height must be a plausible value in centimetres (between 30 and 274), null or Undefined",
+          message = "Validation failure(s): The height must be a plausible value in centimetres (between 30 and 274), null or not provided",
         )
       }
 
@@ -110,7 +110,7 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
       fun `bad request when weight below 12kg`() {
         expectBadRequestFrom(
           requestBody = """{ "weight": 11 }""",
-          message = "Validation failure(s): The weight must be a plausible value in kilograms (between 12 and 635), null or Undefined",
+          message = "Validation failure(s): The weight must be a plausible value in kilograms (between 12 and 635), null or not provided",
         )
       }
 
@@ -118,7 +118,7 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
       fun `bad request when weight exceeds 635kg`() {
         expectBadRequestFrom(
           requestBody = """{ "weight": 636 }""",
-          message = "Validation failure(s): The weight must be a plausible value in kilograms (between 12 and 635), null or Undefined",
+          message = "Validation failure(s): The weight must be a plausible value in kilograms (between 12 and 635), null or not provided",
         )
       }
 
@@ -166,12 +166,36 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
                 "lastModifiedAt":"2024-06-14T09:10:11.123+01:00[Europe/London]",
                 "lastModifiedBy":"USER1"
               },
-              "hair": null,
-              "facialHair": null,
-              "face": null,
-              "build": null,
-              "leftEyeColour": null,
-              "rightEyeColour": null,
+              "hair": {
+                "value":null,
+                "lastModifiedAt":"2024-06-14T09:10:11.123+01:00[Europe/London]",
+                "lastModifiedBy":"USER1"
+              },
+              "facialHair": {
+                "value":null,
+                "lastModifiedAt":"2024-06-14T09:10:11.123+01:00[Europe/London]",
+                "lastModifiedBy":"USER1"
+              },
+              "face": {
+                "value":null,
+                "lastModifiedAt":"2024-06-14T09:10:11.123+01:00[Europe/London]",
+                "lastModifiedBy":"USER1"
+              },
+              "build": {
+                "value":null,
+                "lastModifiedAt":"2024-06-14T09:10:11.123+01:00[Europe/London]",
+                "lastModifiedBy":"USER1"
+              },
+              "leftEyeColour": {
+                "value":null,
+                "lastModifiedAt":"2024-06-14T09:10:11.123+01:00[Europe/London]",
+                "lastModifiedBy":"USER1"
+              },
+              "rightEyeColour": {
+                "value":null,
+                "lastModifiedAt":"2024-06-14T09:10:11.123+01:00[Europe/London]",
+                "lastModifiedBy":"USER1"
+              },
               "shoeSize": {
                 "value":null,
                 "lastModifiedAt":"2024-06-14T09:10:11.123+01:00[Europe/London]",
@@ -247,14 +271,18 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
                 "lastModifiedBy": "USER2"
               },
               "hair": {
-                "id": "HAIR_GREY",
-                "domain": "HAIR",
-                "code": "GREY",
-                "description": "Grey",
-                "listSequence": 0,
-                "isActive": true,
-                "createdAt": "2024-07-11T16:00:00Z",
-                "createdBy": "OMS_OWNER"
+                "value": {
+                  "id": "HAIR_GREY",
+                  "domain": "HAIR",
+                  "code": "GREY",
+                  "description": "Grey",
+                  "listSequence": 0,
+                  "isActive": true,
+                  "createdAt": "2024-07-11T16:00:00Z",
+                  "createdBy": "OMS_OWNER"
+                },
+                "lastModifiedAt":"2024-06-14T09:10:11.123+01:00[Europe/London]",
+                "lastModifiedBy":"USER2"
               },
               "facialHair": null,
               "face": null,

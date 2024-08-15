@@ -1,7 +1,5 @@
 package uk.gov.justice.digital.hmpps.prisonperson.service
 
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.prisonperson.client.prisonersearch.PrisonerSearchClient
@@ -26,10 +24,7 @@ class HealthService(
     prisonerNumber: String,
     request: HealthUpdateRequest,
   ): HealthDto {
-    val log: Logger = LoggerFactory.getLogger(this::class.java)
-    log.info(request.toString())
     val health = healthRepository.findById(prisonerNumber).orElseGet { newHealthFor(prisonerNumber) }.apply {
-      log.info(request.smokerOrVaper.toString())
       request.smokerOrVaper.apply(this::smokerOrVaper, ::toReferenceDataCode)
     }
 

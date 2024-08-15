@@ -12,6 +12,7 @@ import jakarta.persistence.OneToMany
 import org.hibernate.Hibernate
 import org.hibernate.annotations.SortNatural
 import org.springframework.data.domain.AbstractAggregateRoot
+import uk.gov.justice.digital.hmpps.prisonperson.dto.ReferenceDataCodeDto
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.PhysicalAttributesDto
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.ValueWithMetadata
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField
@@ -104,17 +105,35 @@ class PhysicalAttributes(
     PhysicalAttributesDto(
       height = getValueWithMetadata(::height, HEIGHT),
       weight = getValueWithMetadata(::weight, WEIGHT),
-      hair = hair?.toDto(),
-      facialHair = facialHair?.toDto(),
-      face = face?.toDto(),
-      build = build?.toDto(),
-      leftEyeColour = leftEyeColour?.toDto(),
-      rightEyeColour = rightEyeColour?.toDto(),
+      hair = getRefDataValueWithMetadata(::hair, HAIR),
+      facialHair = getRefDataValueWithMetadata(::facialHair, FACIAL_HAIR),
+      face = getRefDataValueWithMetadata(::face, FACE),
+      build = getRefDataValueWithMetadata(::build, BUILD),
+      leftEyeColour = getRefDataValueWithMetadata(::leftEyeColour, LEFT_EYE_COLOUR),
+      rightEyeColour = getRefDataValueWithMetadata(::rightEyeColour, RIGHT_EYE_COLOUR),
       shoeSize = getValueWithMetadata(::shoeSize, SHOE_SIZE),
     )
 
   private fun <T> getValueWithMetadata(value: KMutableProperty0<T>, field: PrisonPersonField) =
-    fieldMetadata[field]?.let { ValueWithMetadata(value.get(), it.lastModifiedAt, it.lastModifiedBy) }
+    fieldMetadata[field]?.let {
+      ValueWithMetadata(
+        value.get(),
+        it.lastModifiedAt,
+        it.lastModifiedBy,
+      )
+    }
+
+  private fun getRefDataValueWithMetadata(
+    value: KMutableProperty0<ReferenceDataCode?>,
+    field: PrisonPersonField,
+  ): ValueWithMetadata<ReferenceDataCodeDto?>? =
+    fieldMetadata[field]?.let {
+      ValueWithMetadata(
+        value.get()?.toDto(),
+        it.lastModifiedAt,
+        it.lastModifiedBy,
+      )
+    }
 
   fun updateFieldHistory(
     lastModifiedAt: ZonedDateTime,

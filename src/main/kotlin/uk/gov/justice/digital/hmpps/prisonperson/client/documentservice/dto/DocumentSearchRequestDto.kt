@@ -2,7 +2,7 @@ package uk.gov.justice.digital.hmpps.prisonperson.client.documentservice.dto
 
 enum class DocumentType {
   PRISONER_PROFILE_PICTURE,
-  SOMETHING_ELSE,
+  PHYSICAL_IDENTIFIER_PICTURE,
 }
 
 enum class OrderBy {

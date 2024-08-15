@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.method.annotation.HandlerMethodValidationException
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException
+import org.springframework.web.multipart.support.MissingServletRequestPartException
 import org.springframework.web.servlet.resource.NoResourceFoundException
 import uk.gov.justice.hmpps.kotlin.common.ErrorResponse
 
@@ -220,6 +221,18 @@ class HmppsPrisonPersonApiExceptionHandler {
       ),
     ).also { log.error("Unexpected exception", e) }
 
+  @ExceptionHandler(MissingServletRequestPartException::class)
+  fun handleMissingServletRequestPartException(e: MissingServletRequestPartException): ResponseEntity<ErrorResponse> =
+    ResponseEntity
+      .status(BAD_REQUEST)
+      .body(
+        ErrorResponse(
+          status = BAD_REQUEST,
+          userMessage = "Required request part is missing: ${e.message}",
+          developerMessage = e.message,
+        ),
+      ).also { log.info("Missing request part exception: {}", e.message) }
+
   private companion object {
     private val log = LoggerFactory.getLogger(this::class.java)
   }
@@ -227,7 +240,6 @@ class HmppsPrisonPersonApiExceptionHandler {
 
 class PrisonPersonDataNotFoundException(prisonerNumber: String) : Exception("No data for '$prisonerNumber'")
 class ReferenceDataDomainNotFoundException(code: String) : Exception("No data for domain '$code'")
-class ReferenceDataCodeNotFoundException(code: String, domain: String) :
-  Exception("No data for code '$code' in domain '$domain'")
+class ReferenceDataCodeNotFoundException(code: String, domain: String) : Exception("No data for code '$code' in domain '$domain'")
 
 class DownstreamServiceException(message: String, cause: Throwable) : Exception(message, cause)

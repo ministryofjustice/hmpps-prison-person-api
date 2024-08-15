@@ -63,11 +63,30 @@ class DocumentServiceServer : WireMockServer(WIREMOCK_PORT) {
         ),
     )
 
-  fun stubGetAllPicturesForPrisonerException(prisonNumber: String = PRISONER_NUMBER_THROW_EXCEPTION): StubMapping =
+  fun stubGetAllPicturesForPrisonerException(): StubMapping =
     stubFor(post("/documents/search").willReturn(aResponse().withStatus(500)))
+
+  fun stubPostNewDocument(uuid: String = "xxx", documentType: DocumentType = DocumentType.PRISONER_PROFILE_PICTURE, result: DocumentDto?): StubMapping =
+    stubFor(
+      post("/documents/$documentType/$uuid")
+        .willReturn(
+          aResponse()
+            .withHeader("Content-Type", "application/json")
+            .withBody(
+              mapper.writeValueAsString(result),
+            )
+            .withStatus(200),
+        ),
+    )
+
+  fun stubPostNewDocumentException(documentType: DocumentType = DocumentType.PRISONER_PROFILE_PICTURE, uuid: String = "xxx"): StubMapping =
+    stubFor(post("/documents/$documentType/$uuid").willReturn(aResponse().withStatus(500)))
 }
 
-class DocumentServiceExtension : BeforeAllCallback, AfterAllCallback, BeforeEachCallback {
+class DocumentServiceExtension :
+  BeforeAllCallback,
+  AfterAllCallback,
+  BeforeEachCallback {
   companion object {
     @JvmField
     val documentService = DocumentServiceServer()

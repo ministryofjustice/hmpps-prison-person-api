@@ -12,9 +12,12 @@ import org.springframework.http.MediaType
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestPart
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.multipart.MultipartFile
 import uk.gov.justice.digital.hmpps.prisonperson.annotation.ActiveCaseLoadIdHeader
 import uk.gov.justice.digital.hmpps.prisonperson.annotation.ServiceNameHeader
 import uk.gov.justice.digital.hmpps.prisonperson.annotation.UsernameHeader
@@ -28,9 +31,9 @@ import uk.gov.justice.hmpps.kotlin.common.ErrorResponse
 @ActiveCaseLoadIdHeader
 @UsernameHeader
 @Tag(name = "Prison Person Photographs", description = "The photographs linked to a prisoner")
-@RequestMapping("/photographs/{prisonerNumber}/all", produces = [MediaType.APPLICATION_JSON_VALUE])
+@RequestMapping("/photographs")
 class PrisonerPhotographController(private val photographService: PhotographService) {
-  @GetMapping
+  @GetMapping("/{prisonerNumber}/all", produces = [MediaType.APPLICATION_JSON_VALUE])
   @ResponseStatus(HttpStatus.OK)
   @PreAuthorize("hasRole('ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RO')")
   @Operation(
@@ -60,7 +63,7 @@ class PrisonerPhotographController(private val photographService: PhotographServ
       ),
     ],
   )
-  fun getAllPhotosForPrisoner(
+  fun getAllProfilePicturesForPrisoner(
     @PathVariable
     @Parameter(
       description = "The prisoner number",
@@ -69,7 +72,59 @@ class PrisonerPhotographController(private val photographService: PhotographServ
     )
     prisonerNumber: String,
     request: HttpServletRequest,
-  ): List<DocumentDto> = photographService.getPhotographsForPrisoner(prisonerNumber, request.documentRequestContext())
+  ): List<DocumentDto> = photographService.getProfilePicsForPrisoner(prisonerNumber, request.documentRequestContext())
+
+  @PostMapping("/prisoner-profile", produces = [MediaType.APPLICATION_JSON_VALUE])
+  @ResponseStatus(HttpStatus.OK)
+  @PreAuthorize("hasRole('ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RO')")
+  @Operation(
+    summary = "Post aprofile picture for a prisoner",
+    description = "description = \"Stores a profile picture supplied on the file attribute of a multipart/form-date submission  \n" +
+      "returns the meta data for the stored document\"\n" +
+      "Requires role `ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RO`",
+    responses = [
+      ApiResponse(
+        responseCode = "200",
+        description = "Returns uploaded photograph document data",
+      ),
+      ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized to access this endpoint",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
+      ),
+      ApiResponse(
+        responseCode = "403",
+        description = "Missing required role. Requires ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RO",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
+      ),
+      ApiResponse(
+        responseCode = "404",
+        description = "Data not found",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
+      ),
+    ],
+  )
+  fun putPrisonerProfilePicture(
+    @RequestPart
+    @Parameter(
+      description = "The prisoner number",
+      example = "A1234AA",
+      required = true,
+    )
+    prisonerNumber: String,
+    @RequestPart
+    @Parameter(
+      description = "File part of the multipart request",
+      required = true,
+    )
+    file: MultipartFile,
+    request: HttpServletRequest,
+  ): DocumentDto = photographService.postProfilePicToDocumentService(
+    file,
+    fileType = MediaType.parseMediaType(file.contentType ?: MediaType.APPLICATION_OCTET_STREAM_VALUE),
+    prisonerNumber,
+    documentRequestContext = request.documentRequestContext(),
+  )
 
   private fun HttpServletRequest.documentRequestContext() =
     getAttribute(DocumentRequestContext::class.simpleName) as DocumentRequestContext

@@ -23,7 +23,7 @@ import uk.gov.justice.digital.hmpps.prisonperson.service.PhysicalAttributesServi
 import uk.gov.justice.hmpps.kotlin.common.ErrorResponse
 
 @RestController
-@Tag(name = "Physical Attributes", description = "The height and weight of a prisoner")
+@Tag(name = "Physical Attributes", description = "The physical attributes, such as height and weight, of a prisoner")
 @RequestMapping("/prisoners/{prisonerNumber}/physical-attributes", produces = [MediaType.APPLICATION_JSON_VALUE])
 class PhysicalAttributesController(private val physicalAttributesService: PhysicalAttributesService) {
 
@@ -35,7 +35,7 @@ class PhysicalAttributesController(private val physicalAttributesService: Physic
     responses = [
       ApiResponse(
         responseCode = "200",
-        description = "Returns Prison Person Data",
+        description = "Returns the prisoner's physical attributes",
       ),
       ApiResponse(
         responseCode = "401",

@@ -18,6 +18,11 @@ data class HistoryComparison<T>(
   val migratedAt: ZonedDateTime? = null,
 )
 
+fun expectNoFieldHistoryFor(field: PrisonPersonField, history: Collection<FieldHistory>) {
+  val fieldHistory = history.filter { it.field == field }.toList()
+  assertThat(fieldHistory).isEmpty()
+}
+
 fun <T> expectFieldHistory(field: PrisonPersonField, history: Collection<FieldHistory>, vararg comparison: HistoryComparison<T>) {
   val fieldHistory = history.filter { it.field == field }.toList()
   assertThat(fieldHistory).hasSize(comparison.size)

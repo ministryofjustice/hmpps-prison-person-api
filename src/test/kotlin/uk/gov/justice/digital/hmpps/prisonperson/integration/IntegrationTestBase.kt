@@ -31,6 +31,7 @@ import uk.gov.justice.digital.hmpps.prisonperson.integration.wiremock.PrisonerSe
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.FieldMetadata
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.utils.HistoryComparison
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.utils.expectFieldHistory
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.utils.expectNoFieldHistoryFor
 import uk.gov.justice.digital.hmpps.prisonperson.service.event.DomainEvent
 import uk.gov.justice.hmpps.sqs.HmppsQueue
 import uk.gov.justice.hmpps.sqs.HmppsQueueService
@@ -99,6 +100,11 @@ abstract class IntegrationTestBase : TestBase() {
 
   protected fun <T> expectFieldHistory(field: PrisonPersonField, vararg comparison: HistoryComparison<T>) =
     expectFieldHistory(field, fieldHistoryRepository.findAllByPrisonerNumber(PRISONER_NUMBER), *comparison)
+
+  protected fun expectNoFieldHistoryFor(vararg field: PrisonPersonField) {
+    val history = fieldHistoryRepository.findAllByPrisonerNumber(PRISONER_NUMBER)
+    field.forEach { expectNoFieldHistoryFor(it, history) }
+  }
 
   protected fun expectFieldMetadata(prisonerNumber: String, vararg comparison: FieldMetadata) {
     assertThat(fieldMetadataRepository.findAllByPrisonerNumber(prisonerNumber)).containsExactlyInAnyOrder(*comparison)

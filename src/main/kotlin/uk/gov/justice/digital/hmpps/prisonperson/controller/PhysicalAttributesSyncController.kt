@@ -21,7 +21,7 @@ import uk.gov.justice.digital.hmpps.prisonperson.service.PhysicalAttributesSyncS
 import uk.gov.justice.hmpps.kotlin.common.ErrorResponse
 
 @RestController
-@Tag(name = "Physical Attributes", description = "The height and weight of a prisoner")
+@Tag(name = "Physical Attributes")
 @Tag(name = "Sync with NOMIS", description = "Endpoints to keep the Prison Person database in sync with changes in the NOMIS database")
 @RequestMapping("/sync/prisoners/{prisonerNumber}/physical-attributes", produces = [MediaType.APPLICATION_JSON_VALUE])
 class PhysicalAttributesSyncController(private val physicalAttributesSyncService: PhysicalAttributesSyncService) {

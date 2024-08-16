@@ -22,7 +22,7 @@ import uk.gov.justice.hmpps.kotlin.common.ErrorResponse
 import java.util.SortedSet
 
 @RestController
-@Tag(name = "Physical Attributes", description = "The height and weight of a prisoner")
+@Tag(name = "Physical Attributes")
 @Tag(name = "Migration from NOMIS", description = "Endpoints to facilitate migration of data from NOMIS to the Prison Person database")
 @RequestMapping("/migration/prisoners/{prisonerNumber}/physical-attributes", produces = [MediaType.APPLICATION_JSON_VALUE])
 class PhysicalAttributesMigrationController(private val physicalAttributesMigrationService: PhysicalAttributesMigrationService) {

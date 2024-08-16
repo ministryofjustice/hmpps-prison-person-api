@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.media.Schema.RequiredMode.NOT_REQUIRED
 import uk.gov.justice.digital.hmpps.prisonperson.annotation.NullishRange
 import uk.gov.justice.digital.hmpps.prisonperson.annotation.NullishShoeSize
+import uk.gov.justice.digital.hmpps.prisonperson.utils.NullishUtils
 import kotlin.reflect.KMutableProperty0
 
 @Schema(
@@ -30,7 +31,7 @@ data class PhysicalAttributesUpdateRequest(
     max = 274,
     message = "The height must be a plausible value in centimetres (between 30 and 274), null or not provided",
   )
-  val height: Nullish<Int> = getAttribute("height")
+  val height: Nullish<Int> = NullishUtils.getAttribute<Int>(attributes, "height")
 
   @Schema(
     description = "Weight (in kilograms).",
@@ -44,7 +45,7 @@ data class PhysicalAttributesUpdateRequest(
     max = 635,
     message = "The weight must be a plausible value in kilograms (between 12 and 635), null or not provided",
   )
-  val weight: Nullish<Int> = getAttribute("weight")
+  val weight: Nullish<Int> = NullishUtils.getAttribute<Int>(attributes, "weight")
 
   @Schema(
     description = "Hair type or colour. `ReferenceDataCode.id`.",
@@ -53,7 +54,7 @@ data class PhysicalAttributesUpdateRequest(
     requiredMode = NOT_REQUIRED,
     nullable = true,
   )
-  val hair: Nullish<String> = getAttribute("hair")
+  val hair: Nullish<String> = NullishUtils.getAttribute<String>(attributes, "hair")
 
   @Schema(
     description = "Facial hair type. `ReferenceDataCode.id`.",
@@ -62,7 +63,7 @@ data class PhysicalAttributesUpdateRequest(
     requiredMode = NOT_REQUIRED,
     nullable = true,
   )
-  val facialHair: Nullish<String> = getAttribute("facialHair")
+  val facialHair: Nullish<String> = NullishUtils.getAttribute<String>(attributes, "facialHair")
 
   @Schema(
     description = "Face shape. `ReferenceDataCode.id`.",
@@ -71,7 +72,7 @@ data class PhysicalAttributesUpdateRequest(
     requiredMode = NOT_REQUIRED,
     nullable = true,
   )
-  val face: Nullish<String> = getAttribute("face")
+  val face: Nullish<String> = NullishUtils.getAttribute<String>(attributes, "face")
 
   @Schema(
     description = "Build. `ReferenceDataCode.id`.",
@@ -80,7 +81,7 @@ data class PhysicalAttributesUpdateRequest(
     requiredMode = NOT_REQUIRED,
     nullable = true,
   )
-  val build: Nullish<String> = getAttribute("build")
+  val build: Nullish<String> = NullishUtils.getAttribute<String>(attributes, "build")
 
   @Schema(
     description = "Left eye colour. `ReferenceDataCode.id`.",
@@ -89,7 +90,7 @@ data class PhysicalAttributesUpdateRequest(
     requiredMode = NOT_REQUIRED,
     nullable = true,
   )
-  val leftEyeColour: Nullish<String> = getAttribute("leftEyeColour")
+  val leftEyeColour: Nullish<String> = NullishUtils.getAttribute<String>(attributes, "leftEyeColour")
 
   @Schema(
     description = "Right eye colour. `ReferenceDataCode.id`.",
@@ -98,7 +99,7 @@ data class PhysicalAttributesUpdateRequest(
     requiredMode = NOT_REQUIRED,
     nullable = true,
   )
-  val rightEyeColour: Nullish<String> = getAttribute("rightEyeColour")
+  val rightEyeColour: Nullish<String> = NullishUtils.getAttribute<String>(attributes, "rightEyeColour")
 
   @Schema(
     description = "Shoe size (in UK half sizes).",
@@ -112,26 +113,8 @@ data class PhysicalAttributesUpdateRequest(
     max = "25",
     message = "The shoe size must be a whole or half size between 1 and 25, null or not provided",
   )
-  val shoeSize: Nullish<String> = getAttribute("shoeSize")
+  val shoeSize: Nullish<String> = NullishUtils.getAttribute<String>(attributes, "shoeSize")
 
-  /**
-   * Get an attribute from the map of `attributes` and push it into a `Nullish` object
-   *
-   * @param name the name of the attribute to get
-   */
-  private inline fun <reified T> getAttribute(name: String): Nullish<T> {
-    if (!attributes.containsKey(name)) {
-      @Suppress("UNCHECKED_CAST")
-      return Nullish.Undefined as Nullish<T>
-    }
-
-    val value = attributes[name]
-    if (value is T || value == null) {
-      return Nullish.Defined(value as? T)
-    } else {
-      throw IllegalArgumentException("$name is not an instance of ${T::class.java.simpleName}")
-    }
-  }
 }
 
 /**

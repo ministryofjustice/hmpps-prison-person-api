@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.prisonperson.service
 
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -18,14 +19,23 @@ import uk.gov.justice.digital.hmpps.prisonperson.client.documentservice.dto.Docu
 import uk.gov.justice.digital.hmpps.prisonperson.client.documentservice.dto.DocumentType
 import uk.gov.justice.digital.hmpps.prisonperson.client.documentservice.dto.OrderBy
 import uk.gov.justice.digital.hmpps.prisonperson.client.documentservice.dto.OrderByDirection
+import uk.gov.justice.digital.hmpps.prisonperson.utils.AuthenticationFacade
 
 @ExtendWith(MockitoExtension::class)
 class PhotographServiceTest {
   @Mock
   lateinit var documentServiceClient: DocumentServiceClient
 
+  @Mock
+  lateinit var authenticationFacade: AuthenticationFacade
+
   @InjectMocks
   lateinit var underTest: PhotographService
+
+  @BeforeEach
+  fun beforeEach() {
+    whenever(authenticationFacade.getUserOrSystemInContext()).thenReturn(USER1)
+  }
 
   @Nested
   inner class GetPhotosForPrisoner {
@@ -33,7 +43,7 @@ class PhotographServiceTest {
     fun `photographs not found`() {
       whenever(documentServiceClient.getPhotosForPrisoner(PRISONER_NUMBER, DOCUMENT_REQ_CONTEXT)).thenReturn(EMPTY_RESPONSE)
 
-      val result = underTest.getProfilePicsForPrisoner(PRISONER_NUMBER, DOCUMENT_REQ_CONTEXT)
+      val result = underTest.getProfilePicsForPrisoner(PRISONER_NUMBER)
 
       assertThat(result).isEqualTo(EMPTY_RESPONSE.results)
     }
@@ -42,7 +52,7 @@ class PhotographServiceTest {
     fun `photographs retrieved`() {
       whenever(documentServiceClient.getPhotosForPrisoner(PRISONER_NUMBER, DOCUMENT_REQ_CONTEXT)).thenReturn(SUCCESSFUL_SEARCH_RESPONSE)
 
-      val result = underTest.getProfilePicsForPrisoner(PRISONER_NUMBER, DOCUMENT_REQ_CONTEXT)
+      val result = underTest.getProfilePicsForPrisoner(PRISONER_NUMBER)
 
       assertThat(result).isEqualTo(SUCCESSFUL_SEARCH_RESPONSE.results)
     }
@@ -77,7 +87,7 @@ class PhotographServiceTest {
       )
       whenever(documentServiceClient.putDocument(file.bytes, "fileName.jpg", DocumentType.PRISONER_PROFILE_PICTURE, mapOf("prisonerNumber" to "A1234AA"), fileType, DOCUMENT_REQ_CONTEXT)).thenReturn(documentDto)
 
-      val result = underTest.postProfilePicToDocumentService(file, fileType, PRISONER_NUMBER, DOCUMENT_REQ_CONTEXT)
+      val result = underTest.postProfilePicToDocumentService(file, fileType, PRISONER_NUMBER)
 
       assertThat(result).isEqualTo(documentDto)
     }
@@ -86,10 +96,11 @@ class PhotographServiceTest {
   private companion object {
     const val PRISONER_NUMBER = "A1234AA"
 
+    const val USER1 = "USER1"
+
     val DOCUMENT_REQ_CONTEXT = DocumentRequestContext(
-      serviceName = "hmpps-prisoner-profile",
-      activeCaseLoadId = "MDI",
-      username = "USERNAME",
+      serviceName = "hmpps-prison-person-api",
+      username = USER1,
     )
 
     val REQUEST_DTO = DocumentSearchRequestDto(

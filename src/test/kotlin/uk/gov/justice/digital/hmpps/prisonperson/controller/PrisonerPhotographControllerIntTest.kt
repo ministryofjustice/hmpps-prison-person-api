@@ -29,11 +29,6 @@ class PrisonerPhotographControllerIntTest : IntegrationTestBase() {
       @Test
       fun `access forbidden when no authority`() {
         webTestClient.get().uri("/photographs/A1234AA/all")
-          .headers { headers ->
-            headers.set("Service-Name", "hmpps-prisoner-profile")
-            headers.set("Username", "TEST_USER")
-            headers.set("Active-Case-Load-Id", "MDI")
-          }
           .exchange()
           .expectStatus().isUnauthorized
       }
@@ -41,12 +36,7 @@ class PrisonerPhotographControllerIntTest : IntegrationTestBase() {
       @Test
       fun `access forbidden when no role`() {
         webTestClient.get().uri("/photographs/A1234AA/all")
-          .headers { headers ->
-            setAuthorisation(roles = listOf())(headers)
-            headers.set("Service-Name", "hmpps-prisoner-profile")
-            headers.set("Username", "TEST_USER")
-            headers.set("Active-Case-Load-Id", "MDI")
-          }
+          .headers(setAuthorisation(roles = listOf()))
           .exchange()
           .expectStatus().isForbidden
       }
@@ -54,12 +44,7 @@ class PrisonerPhotographControllerIntTest : IntegrationTestBase() {
       @Test
       fun `access forbidden with wrong role`() {
         webTestClient.get().uri("/photographs/A1234AA/all")
-          .headers { headers ->
-            setAuthorisation(roles = listOf("ROLE_IS_WRONG"))(headers)
-            headers.set("Service-Name", "hmpps-prisoner-profile")
-            headers.set("Username", "TEST_USER")
-            headers.set("Active-Case-Load-Id", "MDI")
-          }
+          .headers(setAuthorisation(roles = listOf("ROLE_IS_WRONG")))
           .exchange()
           .expectStatus().isForbidden
       }
@@ -73,12 +58,7 @@ class PrisonerPhotographControllerIntTest : IntegrationTestBase() {
         documentService.stubGetAllPicturesForPrisoner()
 
         webTestClient.get().uri("/photographs/A1234AA/all")
-          .headers { headers ->
-            setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RO"))(headers)
-            headers.set("Service-Name", "hmpps-prisoner-profile")
-            headers.set("Username", "TEST_USER")
-            headers.set("Active-Case-Load-Id", "MDI")
-          }
+          .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RO")))
           .exchange()
           .expectStatus().isOk
           .expectBody().json(
@@ -97,31 +77,10 @@ class PrisonerPhotographControllerIntTest : IntegrationTestBase() {
         documentService.stubGetAllPicturesForPrisoner(documentResponse)
 
         webTestClient.get().uri("/photographs/A1234AA/all")
-          .headers { headers ->
-            setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RO"))(headers)
-            headers.set("Service-Name", "hmpps-prisoner-profile")
-            headers.set("Username", "TEST_USER")
-            headers.set("Active-Case-Load-Id", "MDI")
-          }
+          .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RO")))
           .exchange()
           .expectStatus().isOk
           .expectBody().json(objectMapper.writeValueAsString(documentResponse))
-      }
-
-      @Nested
-      inner class Validation {
-
-        @Test
-        fun `bad request when no Service-Name header`() {
-          webTestClient.get().uri("/photographs/A1234AA/all")
-            .headers { headers ->
-              setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RO"))(headers)
-              headers.set("Username", "TEST_USER")
-              headers.set("Active-Case-Load-Id", "MDI")
-            }
-            .exchange()
-            .expectStatus().isBadRequest
-        }
       }
     }
 
@@ -144,12 +103,7 @@ class PrisonerPhotographControllerIntTest : IntegrationTestBase() {
         webTestClient.post().uri("/photographs/prisoner-profile")
           .contentType(MediaType.MULTIPART_FORM_DATA)
           .bodyValue(bodyBuilder.build())
-          .headers { headers ->
-            setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RO"))(headers)
-            headers.set("Service-Name", "hmpps-prisoner-profile")
-            headers.set("Username", "TEST_USER")
-            headers.set("Active-Case-Load-Id", "MDI")
-          }
+          .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RO")))
           .exchange()
           .expectStatus().isOk
           .expectBody().json(objectMapper.writeValueAsString(DOCUMENT_DTO))
@@ -160,26 +114,6 @@ class PrisonerPhotographControllerIntTest : IntegrationTestBase() {
 
     @Nested
     inner class PostImageValidation {
-
-      @Test
-      fun `bad request when no Service-Name header`() {
-        val bodyBuilder = MultipartBodyBuilder()
-        bodyBuilder.part("file", ByteArrayResource(MULTIPART_FILE.bytes))
-          .header("Content-Disposition", "form-data; name=file; filename=filename.jpg")
-        bodyBuilder.part("prisonerNumber", "A1234AA")
-
-        webTestClient.post().uri("/photographs/prisoner-profile")
-          .contentType(MediaType.MULTIPART_FORM_DATA)
-          .bodyValue(bodyBuilder.build())
-          .headers { headers ->
-            setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RO"))(headers)
-            headers.set("Username", "TEST_USER")
-            headers.set("Active-Case-Load-Id", "MDI")
-          }
-          .exchange()
-          .expectStatus().isBadRequest
-      }
-
       @Test
       fun `bad request when no file`() {
         val bodyBuilder = MultipartBodyBuilder()
@@ -188,12 +122,7 @@ class PrisonerPhotographControllerIntTest : IntegrationTestBase() {
         webTestClient.post().uri("/photographs/prisoner-profile")
           .contentType(MediaType.MULTIPART_FORM_DATA)
           .bodyValue(bodyBuilder.build())
-          .headers { headers ->
-            setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RO"))(headers)
-            headers.set("Service-Name", "hmpps-prisoner-profile")
-            headers.set("Username", "TEST_USER")
-            headers.set("Active-Case-Load-Id", "MDI")
-          }
+          .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RO")))
           .exchange()
           .expectStatus().isBadRequest
       }
@@ -207,12 +136,7 @@ class PrisonerPhotographControllerIntTest : IntegrationTestBase() {
         webTestClient.post().uri("/photographs/prisoner-profile")
           .contentType(MediaType.MULTIPART_FORM_DATA)
           .bodyValue(bodyBuilder.build())
-          .headers { headers ->
-            setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RO"))(headers)
-            headers.set("Service-Name", "hmpps-prisoner-profile")
-            headers.set("Username", "TEST_USER")
-            headers.set("Active-Case-Load-Id", "MDI")
-          }
+          .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RO")))
           .exchange()
           .expectStatus().isBadRequest
       }

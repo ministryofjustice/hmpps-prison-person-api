@@ -6,7 +6,6 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
-import jakarta.servlet.http.HttpServletRequest
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.security.access.prepost.PreAuthorize
@@ -18,18 +17,11 @@ import org.springframework.web.bind.annotation.RequestPart
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.multipart.MultipartFile
-import uk.gov.justice.digital.hmpps.prisonperson.annotation.ActiveCaseLoadIdHeader
-import uk.gov.justice.digital.hmpps.prisonperson.annotation.ServiceNameHeader
-import uk.gov.justice.digital.hmpps.prisonperson.annotation.UsernameHeader
 import uk.gov.justice.digital.hmpps.prisonperson.client.documentservice.dto.DocumentDto
-import uk.gov.justice.digital.hmpps.prisonperson.client.documentservice.dto.DocumentRequestContext
 import uk.gov.justice.digital.hmpps.prisonperson.service.PhotographService
 import uk.gov.justice.hmpps.kotlin.common.ErrorResponse
 
 @RestController
-@ServiceNameHeader
-@ActiveCaseLoadIdHeader
-@UsernameHeader
 @Tag(name = "Prison Person Photographs", description = "The photographs linked to a prisoner")
 @RequestMapping("/photographs")
 class PrisonerPhotographController(private val photographService: PhotographService) {
@@ -71,14 +63,13 @@ class PrisonerPhotographController(private val photographService: PhotographServ
       required = true,
     )
     prisonerNumber: String,
-    request: HttpServletRequest,
-  ): List<DocumentDto> = photographService.getProfilePicsForPrisoner(prisonerNumber, request.documentRequestContext())
+  ): List<DocumentDto> = photographService.getProfilePicsForPrisoner(prisonerNumber)
 
   @PostMapping("/prisoner-profile", produces = [MediaType.APPLICATION_JSON_VALUE])
   @ResponseStatus(HttpStatus.OK)
   @PreAuthorize("hasRole('ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RO')")
   @Operation(
-    summary = "Post aprofile picture for a prisoner",
+    summary = "Post a profile picture for a prisoner",
     description = "description = \"Stores a profile picture supplied on the file attribute of a multipart/form-date submission  \n" +
       "returns the meta data for the stored document\"\n" +
       "Requires role `ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RO`",
@@ -118,14 +109,9 @@ class PrisonerPhotographController(private val photographService: PhotographServ
       required = true,
     )
     file: MultipartFile,
-    request: HttpServletRequest,
   ): DocumentDto = photographService.postProfilePicToDocumentService(
     file,
     fileType = MediaType.parseMediaType(file.contentType ?: MediaType.APPLICATION_OCTET_STREAM_VALUE),
     prisonerNumber,
-    documentRequestContext = request.documentRequestContext(),
   )
-
-  private fun HttpServletRequest.documentRequestContext() =
-    getAttribute(DocumentRequestContext::class.simpleName) as DocumentRequestContext
 }

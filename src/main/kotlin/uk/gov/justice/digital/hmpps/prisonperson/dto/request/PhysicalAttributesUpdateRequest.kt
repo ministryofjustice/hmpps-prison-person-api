@@ -114,7 +114,6 @@ data class PhysicalAttributesUpdateRequest(
     message = "The shoe size must be a whole or half size between 1 and 25, null or not provided",
   )
   val shoeSize: Nullish<String> = NullishUtils.getAttribute<String>(attributes, "shoeSize")
-
 }
 
 /**

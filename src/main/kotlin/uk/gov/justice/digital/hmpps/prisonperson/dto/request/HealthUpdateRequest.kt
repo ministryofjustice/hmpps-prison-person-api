@@ -8,8 +8,8 @@ import uk.gov.justice.digital.hmpps.prisonperson.utils.NullishUtils
 
 @Schema(
   description = "Request object for updating a prisoner's health information. Can include one or multiple fields. " +
-          "If an attribute is provided and set to 'null' it will be updated equal to 'null'. " +
-          "If it is not provided it is not updated",
+    "If an attribute is provided and set to 'null' it will be updated equal to 'null'. " +
+    "If it is not provided it is not updated",
 )
 @JsonInclude(NON_NULL)
 data class HealthUpdateRequest(
@@ -21,7 +21,7 @@ data class HealthUpdateRequest(
     type = "string",
     example = "SMOKE_NO",
     requiredMode = NOT_REQUIRED,
-    nullable = true
+    nullable = true,
   )
   val smokerOrVaper: Nullish<String> = NullishUtils.getAttribute<String>(attributes, "smokerOrVaper")
 }

@@ -28,7 +28,8 @@ class HealthService(
     val health = healthRepository.findById(prisonerNumber).orElseGet { newHealthFor(prisonerNumber) }.apply {
       request.smokerOrVaper.apply(
         this::smokerOrVaper,
-        fun(smokerOrVaper) = ReferenceCodeUtils.toReferenceDataCode(referenceDataCodeRepository, smokerOrVaper))
+        fun(smokerOrVaper) = ReferenceCodeUtils.toReferenceDataCode(referenceDataCodeRepository, smokerOrVaper),
+      )
     }
 
     return healthRepository.save(health).toDto()

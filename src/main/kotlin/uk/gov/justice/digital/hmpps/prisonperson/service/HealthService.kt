@@ -6,9 +6,10 @@ import uk.gov.justice.digital.hmpps.prisonperson.client.prisonersearch.PrisonerS
 import uk.gov.justice.digital.hmpps.prisonperson.dto.request.HealthUpdateRequest
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.HealthDto
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.Health
-import uk.gov.justice.digital.hmpps.prisonperson.jpa.ReferenceDataCode
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.HealthRepository
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.ReferenceDataCodeRepository
+import uk.gov.justice.digital.hmpps.prisonperson.utils.PrisonerNumberUtils
+import uk.gov.justice.digital.hmpps.prisonperson.utils.ReferenceCodeUtils
 import kotlin.jvm.optionals.getOrNull
 
 @Service
@@ -25,22 +26,16 @@ class HealthService(
     request: HealthUpdateRequest,
   ): HealthDto {
     val health = healthRepository.findById(prisonerNumber).orElseGet { newHealthFor(prisonerNumber) }.apply {
-      request.smokerOrVaper.apply(this::smokerOrVaper, ::toReferenceDataCode)
+      request.smokerOrVaper.apply(
+        this::smokerOrVaper,
+        fun(smokerOrVaper) = ReferenceCodeUtils.toReferenceDataCode(referenceDataCodeRepository, smokerOrVaper))
     }
 
     return healthRepository.save(health).toDto()
   }
 
   private fun newHealthFor(prisonerNumber: String): Health {
-    validatePrisonerNumber(prisonerNumber)
+    PrisonerNumberUtils.validatePrisonerNumber(prisonerSearchClient, prisonerNumber)
     return Health(prisonerNumber)
   }
-
-  private fun toReferenceDataCode(id: String?): ReferenceDataCode? = id?.let {
-    referenceDataCodeRepository.findById(it)
-      .orElseThrow { IllegalArgumentException("Invalid reference data code: $it") }
-  }
-
-  private fun validatePrisonerNumber(prisonerNumber: String) =
-    require(prisonerSearchClient.getPrisoner(prisonerNumber) != null) { "Prisoner number '$prisonerNumber' not found" }
 }

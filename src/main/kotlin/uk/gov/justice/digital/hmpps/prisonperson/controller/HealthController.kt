@@ -57,7 +57,7 @@ class HealthController(private val healthService: HealthService) {
       ),
       ApiResponse(
         responseCode = "403",
-        description = "Missing required role. Requires ROLE_PRISON_PERSON_API__PHYSICAL_ATTRIBUTES__RW",
+        description = "Missing required role. Requires ROLE_PRISON_PERSON_API__HEALTH__RW",
         content = [
           Content(
             mediaType = "application/json",
@@ -67,7 +67,7 @@ class HealthController(private val healthService: HealthService) {
       ),
     ],
   )
-  fun setPhysicalAttributes(
+  fun createOrUpdateHealth(
     @Schema(description = "The prisoner number", example = "A1234AA", required = true)
     @PathVariable
     prisonerNumber: String,

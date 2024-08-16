@@ -41,6 +41,97 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
     fun fixedClock(): Clock = clock
   }
 
+  @DisplayName("GET /prisoners/{prisonerNumber}/physical-attributes")
+  @Nested
+  inner class GetPhysicalAttributesTest {
+
+    @Nested
+    inner class Security {
+
+      @Test
+      fun `access forbidden when no authority`() {
+        webTestClient.get().uri("/prisoners/${PRISONER_NUMBER}/physical-attributes")
+          .header("Content-Type", "application/json")
+          .exchange()
+          .expectStatus().isUnauthorized
+      }
+
+      @Test
+      fun `access forbidden when no role`() {
+        webTestClient.get().uri("/prisoners/${PRISONER_NUMBER}/physical-attributes")
+          .headers(setAuthorisation(roles = listOf()))
+          .header("Content-Type", "application/json")
+          .exchange()
+          .expectStatus().isForbidden
+      }
+
+      @Test
+      fun `access forbidden with wrong role`() {
+        webTestClient.get().uri("/prisoners/${PRISONER_NUMBER}/physical-attributes")
+          .headers(setAuthorisation(roles = listOf("ROLE_IS_WRONG")))
+          .header("Content-Type", "application/json")
+          .exchange()
+          .expectStatus().isForbidden
+      }
+    }
+
+    @Nested
+    inner class HappyPath {
+
+      @Test
+      @Sql("classpath:jpa/repository/reset.sql")
+      fun `not found response returned when there are no physical attributes recorded yet for the prisoner`() {
+        webTestClient.get().uri("/prisoners/${PRISONER_NUMBER}/physical-attributes")
+          .headers(setAuthorisation(USER1, roles = listOf("ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RO")))
+          .header("Content-Type", "application/json")
+          .exchange()
+          .expectStatus().isNotFound
+      }
+
+      @Test
+      @Sql(
+        "classpath:jpa/repository/reset.sql",
+        "classpath:controller/physical_attributes.sql",
+        "classpath:controller/physical_attributes_history.sql",
+        "classpath:controller/physical_attributes_metadata.sql",
+      )
+      fun `can return physical attributes`() {
+        expectSuccessfulGetRequest().expectBody()
+          .json(
+            // language=json
+            """
+            { 
+              "height": {
+                "value":180,
+                "lastModifiedAt":"2024-01-02T09:10:11+0000",
+                "lastModifiedBy":"USER1"
+              },
+              "weight": {
+                "value":70,
+                "lastModifiedAt":"2024-01-02T09:10:11+0000",
+                "lastModifiedBy":"USER1"
+              },
+              "hair": null,
+              "facialHair": null,
+              "face": null,
+              "build": null,
+              "leftEyeColour": null,
+              "rightEyeColour": null,
+              "shoeSize": null
+            }
+            """,
+          )
+      }
+    }
+
+    private fun expectSuccessfulGetRequest() =
+      webTestClient.get().uri("/prisoners/${PRISONER_NUMBER}/physical-attributes")
+        .headers(setAuthorisation(USER1, roles = listOf("ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RO")))
+        .header("Content-Type", "application/json")
+        .exchange()
+        .expectStatus().isOk
+  }
+
   @DisplayName("PATCH /prisoners/{prisonerNumber}/physical-attributes")
   @Nested
   inner class SetPhysicalAttributesTest {

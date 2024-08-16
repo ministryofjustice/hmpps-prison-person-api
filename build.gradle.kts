@@ -1,9 +1,9 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "6.0.1"
-  kotlin("plugin.spring") version "2.0.0"
-  kotlin("plugin.jpa") version "2.0.0"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "6.0.3"
+  kotlin("plugin.spring") version "2.0.10"
+  kotlin("plugin.jpa") version "2.0.10"
   jacoco
   idea
 }
@@ -14,13 +14,13 @@ configurations {
 
 dependencies {
   // Spring Boot
-  implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:1.0.2")
+  implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:1.0.4")
   implementation("org.springframework.boot:spring-boot-starter-webflux")
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
   implementation("org.springframework.boot:spring-boot-starter-validation")
 
   // AWS
-  implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:4.0.0")
+  implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:4.3.1")
 
   // OpenAPI
   implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0")
@@ -41,12 +41,12 @@ dependencies {
   testImplementation("io.jsonwebtoken:jjwt-jackson:0.12.6")
   testImplementation("io.mockk:mockk:1.13.12")
   testImplementation("org.wiremock:wiremock-standalone:3.9.1")
-  testImplementation("org.testcontainers:junit-jupiter:1.20.0")
-  testImplementation("org.testcontainers:postgresql:1.20.0")
-  testImplementation("org.testcontainers:localstack:1.20.0")
-  testImplementation("org.awaitility:awaitility-kotlin:4.2.1")
+  testImplementation("org.testcontainers:junit-jupiter:1.20.1")
+  testImplementation("org.testcontainers:postgresql:1.20.1")
+  testImplementation("org.testcontainers:localstack:1.20.1")
+  testImplementation("org.awaitility:awaitility-kotlin:4.2.2")
   testImplementation("org.springframework.security:spring-security-test")
-  testImplementation("io.opentelemetry:opentelemetry-sdk-testing:1.40.0")
+  testImplementation("io.opentelemetry:opentelemetry-sdk-testing:1.41.0")
 
   // Developer experience
   developmentOnly("org.springframework.boot:spring-boot-devtools")

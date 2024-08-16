@@ -158,47 +158,47 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
             {
               "height": {
                 "value":180,
-                "lastModifiedAt":"2024-06-14T09:10:11.123+01:00[Europe/London]",
+                "lastModifiedAt":"2024-06-14T09:10:11+0100",
                 "lastModifiedBy":"USER1"
               },
               "weight": {
                 "value":null,
-                "lastModifiedAt":"2024-06-14T09:10:11.123+01:00[Europe/London]",
+                "lastModifiedAt":"2024-06-14T09:10:11+0100",
                 "lastModifiedBy":"USER1"
               },
               "hair": {
                 "value":null,
-                "lastModifiedAt":"2024-06-14T09:10:11.123+01:00[Europe/London]",
+                "lastModifiedAt":"2024-06-14T09:10:11+0100",
                 "lastModifiedBy":"USER1"
               },
               "facialHair": {
                 "value":null,
-                "lastModifiedAt":"2024-06-14T09:10:11.123+01:00[Europe/London]",
+                "lastModifiedAt":"2024-06-14T09:10:11+0100",
                 "lastModifiedBy":"USER1"
               },
               "face": {
                 "value":null,
-                "lastModifiedAt":"2024-06-14T09:10:11.123+01:00[Europe/London]",
+                "lastModifiedAt":"2024-06-14T09:10:11+0100",
                 "lastModifiedBy":"USER1"
               },
               "build": {
                 "value":null,
-                "lastModifiedAt":"2024-06-14T09:10:11.123+01:00[Europe/London]",
+                "lastModifiedAt":"2024-06-14T09:10:11+0100",
                 "lastModifiedBy":"USER1"
               },
               "leftEyeColour": {
                 "value":null,
-                "lastModifiedAt":"2024-06-14T09:10:11.123+01:00[Europe/London]",
+                "lastModifiedAt":"2024-06-14T09:10:11+0100",
                 "lastModifiedBy":"USER1"
               },
               "rightEyeColour": {
                 "value":null,
-                "lastModifiedAt":"2024-06-14T09:10:11.123+01:00[Europe/London]",
+                "lastModifiedAt":"2024-06-14T09:10:11+0100",
                 "lastModifiedBy":"USER1"
               },
               "shoeSize": {
                 "value":null,
-                "lastModifiedAt":"2024-06-14T09:10:11.123+01:00[Europe/London]",
+                "lastModifiedAt":"2024-06-14T09:10:11+0100",
                 "lastModifiedBy":"USER1"
               }
             }
@@ -262,12 +262,12 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
             {
               "height": {
                 "value": 181,
-                "lastModifiedAt": "2024-06-14T09:10:11.123+01:00[Europe/London]",
+                "lastModifiedAt": "2024-06-14T09:10:11+0100",
                 "lastModifiedBy": "USER2"
               },
               "weight": {
                 "value": 71,
-                "lastModifiedAt": "2024-06-14T09:10:11.123+01:00[Europe/London]",
+                "lastModifiedAt": "2024-06-14T09:10:11+0100",
                 "lastModifiedBy": "USER2"
               },
               "hair": {
@@ -278,11 +278,11 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
                   "description": "Grey",
                   "listSequence": 0,
                   "isActive": true,
-                  "createdAt": "2024-07-11T16:00:00Z",
+                  "createdAt": "2024-07-11T17:00:00+0100",
                   "createdBy": "OMS_OWNER"
                 },
-                "lastModifiedAt":"2024-06-14T09:10:11.123+01:00[Europe/London]",
-                "lastModifiedBy":"USER2"
+                "lastModifiedAt":"2024-06-14T09:10:11+0100",
+                "lastModifiedBy":"USER2" 
               },
               "facialHair": null,
               "face": null,
@@ -291,7 +291,7 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
               "rightEyeColour": null,
               "shoeSize": {
                 "value": "11",
-                "lastModifiedAt": "2024-06-14T09:10:11.123+01:00[Europe/London]",
+                "lastModifiedAt": "2024-06-14T09:10:11+0100",
                 "lastModifiedBy": "USER2"
               }
             }

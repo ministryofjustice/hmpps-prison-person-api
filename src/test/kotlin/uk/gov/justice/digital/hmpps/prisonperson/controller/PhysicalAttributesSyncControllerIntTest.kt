@@ -345,9 +345,9 @@ class PhysicalAttributesSyncControllerIntTest : IntegrationTestBase() {
         { 
           "height": 190,
           "weight": 80,
-          "appliesFrom": "2023-01-02T09:10:11.123+00:00[Europe/London]",
-          "appliesTo": "2023-06-14T09:10:11.123+01:00[Europe/London]",
-          "createdAt": "2024-06-14T09:10:11.123+01:00[Europe/London]",
+          "appliesFrom": "2023-01-02T09:10:11.123+0000",
+          "appliesTo": "2023-06-14T09:10:11.123+0100",
+          "createdAt": "2024-06-14T09:10:11.123+0100",
           "createdBy": "USER1"
         }
       """.trimIndent()
@@ -358,8 +358,8 @@ class PhysicalAttributesSyncControllerIntTest : IntegrationTestBase() {
         { 
           "height": 190,
           "weight": 80,
-          "appliesFrom": "2024-06-14T09:10:11.123+01:00[Europe/London]",
-          "createdAt": "2024-06-14T09:10:11.123+01:00[Europe/London]",
+          "appliesFrom": "2024-06-14T09:10:11.123+0100",
+          "createdAt": "2024-06-14T09:10:11.123+0100",
           "createdBy": "USER1"
         }
       """.trimIndent()

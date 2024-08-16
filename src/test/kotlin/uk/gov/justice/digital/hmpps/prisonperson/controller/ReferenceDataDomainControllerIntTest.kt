@@ -146,7 +146,7 @@ class ReferenceDataDomainControllerIntTest : IntegrationTestBase() {
                   "description": "Smoker or vaper",
                   "listSequence": 0,
                   "isActive": true,
-                  "createdAt": "2024-07-11T16:00:00Z",
+                  "createdAt": "2024-07-11T17:00:00+0100",
                   "createdBy": "OMS_OWNER",
                   "referenceDataCodes": [
                     {
@@ -156,7 +156,7 @@ class ReferenceDataDomainControllerIntTest : IntegrationTestBase() {
                       "description": "Yes, they smoke",
                       "listSequence": 0,
                       "isActive": true,
-                      "createdAt": "2024-07-11T16:00:00Z",
+                      "createdAt": "2024-07-11T17:00:00+0100",
                       "createdBy": "OMS_OWNER"
                     },
                     {
@@ -166,7 +166,7 @@ class ReferenceDataDomainControllerIntTest : IntegrationTestBase() {
                       "description": "Yes, they smoke or use nicotine replacement therapy (NRT)",
                       "listSequence": 0,
                       "isActive": true,
-                      "createdAt": "2024-07-11T16:00:00Z",
+                      "createdAt": "2024-07-11T17:00:00+0100",
                       "createdBy": "OMS_OWNER"
                     },
                     {
@@ -176,7 +176,7 @@ class ReferenceDataDomainControllerIntTest : IntegrationTestBase() {
                       "description": "No, they do not smoke or vape",
                       "listSequence": 0,
                       "isActive": true,
-                      "createdAt": "2024-07-11T16:00:00Z",
+                      "createdAt": "2024-07-11T17:00:00+0100",
                       "createdBy": "OMS_OWNER"
                     }
                   ]

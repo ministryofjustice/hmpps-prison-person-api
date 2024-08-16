@@ -55,6 +55,7 @@ class HealthControllerIntTest : IntegrationTestBase() {
       @Test
       fun `bad request when field type is not as expected`() {
         expectBadRequestFrom(
+          prisonerNumber = PRISONER_NUMBER,
           requestBody = """{ "smokerOrVaper": 123 }""",
           message = "Validation failure: Couldn't read request body",
         )
@@ -62,15 +63,15 @@ class HealthControllerIntTest : IntegrationTestBase() {
 
       @Test
       fun `bad request when prisoner not found`() {
-        webTestClient.patch().uri("/prisoners/PRISONER_NOT_FOUND/health")
-          .headers(setAuthorisation(USER1, roles = listOf("ROLE_PRISON_PERSON_API__HEALTH__RW")))
-          .header("Content-Type", "application/json").bodyValue(VALID_REQUEST_BODY).exchange()
-          .expectStatus().isBadRequest.expectBody().jsonPath("userMessage")
-          .isEqualTo("Validation failure: Prisoner number 'PRISONER_NOT_FOUND' not found")
+        expectBadRequestFrom(
+          prisonerNumber = "PRISONER_NOT_FOUND",
+          requestBody = VALID_REQUEST_BODY,
+          message = "Validation failure: Prisoner number 'PRISONER_NOT_FOUND' not found"
+        )
       }
 
-      private fun expectBadRequestFrom(requestBody: String, message: String) {
-        webTestClient.patch().uri("/prisoners/${PRISONER_NUMBER}/health")
+      private fun expectBadRequestFrom(prisonerNumber: String, requestBody: String, message: String) {
+        webTestClient.patch().uri("/prisoners/${prisonerNumber}/health")
           .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__HEALTH__RW")))
           .header("Content-Type", "application/json").bodyValue(requestBody).exchange()
           .expectStatus().isBadRequest.expectBody().jsonPath("userMessage").isEqualTo(message)
@@ -159,7 +160,7 @@ class HealthControllerIntTest : IntegrationTestBase() {
           "description": "No, they do not smoke or vape",
           "listSequence": 0,
           "isActive": true,
-          "createdAt": "2024-07-11T16:00:00Z",
+          "createdAt": "2024-07-11T17:00:00+0100",
           "createdBy": "OMS_OWNER"
         } 
       }

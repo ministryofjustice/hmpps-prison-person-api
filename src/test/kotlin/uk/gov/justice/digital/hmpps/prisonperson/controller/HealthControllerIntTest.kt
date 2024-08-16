@@ -66,12 +66,12 @@ class HealthControllerIntTest : IntegrationTestBase() {
         expectBadRequestFrom(
           prisonerNumber = "PRISONER_NOT_FOUND",
           requestBody = VALID_REQUEST_BODY,
-          message = "Validation failure: Prisoner number 'PRISONER_NOT_FOUND' not found"
+          message = "Validation failure: Prisoner number 'PRISONER_NOT_FOUND' not found",
         )
       }
 
       private fun expectBadRequestFrom(prisonerNumber: String, requestBody: String, message: String) {
-        webTestClient.patch().uri("/prisoners/${prisonerNumber}/health")
+        webTestClient.patch().uri("/prisoners/$prisonerNumber/health")
           .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__HEALTH__RW")))
           .header("Content-Type", "application/json").bodyValue(requestBody).exchange()
           .expectStatus().isBadRequest.expectBody().jsonPath("userMessage").isEqualTo(message)

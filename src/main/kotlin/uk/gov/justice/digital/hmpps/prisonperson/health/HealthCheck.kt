@@ -12,3 +12,6 @@ class HmppsAuthApiHealth(@Qualifier("authHealthWebClient") webClient: WebClient)
 
 @Component("prisonerSearch")
 class PrisonerSearchHealthPingCheck(@Qualifier("prisonerSearchHealthWebClient") webClient: WebClient) : HealthPingCheck(webClient)
+
+@Component("documentService")
+class DocumentServiceHealthPingCheck(@Qualifier("documentServiceWebClient") webClient: WebClient) : HealthPingCheck(webClient)

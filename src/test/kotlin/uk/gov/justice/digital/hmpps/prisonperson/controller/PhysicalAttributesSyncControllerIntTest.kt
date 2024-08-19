@@ -114,44 +114,24 @@ class PhysicalAttributesSyncControllerIntTest : IntegrationTestBase() {
 
         expectFieldHistory(
           HEIGHT,
-          HistoryComparison(
-            value = 190,
-            appliesFrom = NOW,
-            appliesTo = null,
-            createdAt = NOW,
-            createdBy = USER1,
-            source = NOMIS,
-          ),
+          HistoryComparison(value = 190, appliesFrom = NOW, appliesTo = null, createdAt = NOW, createdBy = USER1, source = NOMIS),
         )
         expectFieldHistory(
           WEIGHT,
-          HistoryComparison(
-            value = 80,
-            appliesFrom = NOW,
-            appliesTo = null,
-            createdAt = NOW,
-            createdBy = USER1,
-            source = NOMIS,
-          ),
+          HistoryComparison(value = 80, appliesFrom = NOW, appliesTo = null, createdAt = NOW, createdBy = USER1, source = NOMIS),
         )
+        expectNoFieldHistoryFor(HAIR, FACIAL_HAIR, FACE, BUILD, LEFT_EYE_COLOUR, RIGHT_EYE_COLOUR, SHOE_SIZE)
 
         expectFieldMetadata(
           FieldMetadata(PRISONER_NUMBER, HEIGHT, lastModifiedAt = NOW, lastModifiedBy = USER1),
           FieldMetadata(PRISONER_NUMBER, WEIGHT, lastModifiedAt = NOW, lastModifiedBy = USER1),
-          FieldMetadata(PRISONER_NUMBER, HAIR, lastModifiedAt = NOW, lastModifiedBy = USER1),
-          FieldMetadata(PRISONER_NUMBER, FACIAL_HAIR, lastModifiedAt = NOW, lastModifiedBy = USER1),
-          FieldMetadata(PRISONER_NUMBER, FACE, lastModifiedAt = NOW, lastModifiedBy = USER1),
-          FieldMetadata(PRISONER_NUMBER, BUILD, lastModifiedAt = NOW, lastModifiedBy = USER1),
-          FieldMetadata(PRISONER_NUMBER, LEFT_EYE_COLOUR, lastModifiedAt = NOW, lastModifiedBy = USER1),
-          FieldMetadata(PRISONER_NUMBER, RIGHT_EYE_COLOUR, lastModifiedAt = NOW, lastModifiedBy = USER1),
-          FieldMetadata(PRISONER_NUMBER, SHOE_SIZE, lastModifiedAt = NOW, lastModifiedBy = USER1),
         )
       }
 
       @Test
       @Sql("classpath:jpa/repository/reset.sql")
-      @Sql("classpath:controller/physical_attributes.sql")
-      @Sql("classpath:controller/physical_attributes_history.sql")
+      @Sql("classpath:controller/physicalattributes/sync/physical_attributes.sql")
+      @Sql("classpath:controller/physicalattributes/sync/field_history.sql")
       fun `can sync an update of existing physical attributes`() {
         expectFieldHistory(
           HEIGHT,
@@ -161,61 +141,33 @@ class PhysicalAttributesSyncControllerIntTest : IntegrationTestBase() {
           WEIGHT,
           HistoryComparison(value = 70, appliesFrom = THEN, appliesTo = null, createdAt = THEN, createdBy = USER1),
         )
+        expectNoFieldHistoryFor(HAIR, FACIAL_HAIR, FACE, BUILD, LEFT_EYE_COLOUR, RIGHT_EYE_COLOUR, SHOE_SIZE)
 
         expectSuccessfulSyncFrom(REQUEST_TO_SYNC_LATEST_PHYSICAL_ATTRIBUTES)
           .expectBody().jsonPath("$.fieldHistoryInserted[*]").value(not(hasItem(-1)))
 
         expectFieldHistory(
           HEIGHT,
-          HistoryComparison(
-            value = 180,
-            appliesFrom = THEN,
-            appliesTo = NOW,
-            createdAt = THEN,
-            createdBy = USER1,
-            source = DPS,
-          ),
-          HistoryComparison(
-            value = 190,
-            appliesFrom = NOW,
-            appliesTo = null,
-            createdAt = NOW,
-            createdBy = USER1,
-            source = NOMIS,
-          ),
+          HistoryComparison(value = 180, appliesFrom = THEN, appliesTo = NOW, createdAt = THEN, createdBy = USER1, source = DPS),
+          HistoryComparison(value = 190, appliesFrom = NOW, appliesTo = null, createdAt = NOW, createdBy = USER1, source = NOMIS),
         )
 
         expectFieldHistory(
           WEIGHT,
-          HistoryComparison(
-            value = 70,
-            appliesFrom = THEN,
-            appliesTo = NOW,
-            createdAt = THEN,
-            createdBy = USER1,
-            source = DPS,
-          ),
-          HistoryComparison(
-            value = 80,
-            appliesFrom = NOW,
-            appliesTo = null,
-            createdAt = NOW,
-            createdBy = USER1,
-            source = NOMIS,
-          ),
+          HistoryComparison(value = 70, appliesFrom = THEN, appliesTo = NOW, createdAt = THEN, createdBy = USER1, source = DPS),
+          HistoryComparison(value = 80, appliesFrom = NOW, appliesTo = null, createdAt = NOW, createdBy = USER1, source = NOMIS),
         )
 
         expectFieldMetadata(
           FieldMetadata(PRISONER_NUMBER, HEIGHT, lastModifiedAt = NOW, lastModifiedBy = USER1),
           FieldMetadata(PRISONER_NUMBER, WEIGHT, lastModifiedAt = NOW, lastModifiedBy = USER1),
-          FieldMetadata(PRISONER_NUMBER, HAIR, lastModifiedAt = NOW, lastModifiedBy = USER1),
         )
       }
 
       @Test
       @Sql("classpath:jpa/repository/reset.sql")
-      @Sql("classpath:controller/physical_attributes.sql")
-      @Sql("classpath:controller/physical_attributes_history.sql")
+      @Sql("classpath:controller/physicalattributes/sync/physical_attributes.sql")
+      @Sql("classpath:controller/physicalattributes/sync/field_history.sql")
       fun `can sync a historical update of physical attributes`() {
         expectFieldHistory(
           HEIGHT,
@@ -231,43 +183,15 @@ class PhysicalAttributesSyncControllerIntTest : IntegrationTestBase() {
 
         expectFieldHistory(
           HEIGHT,
-          HistoryComparison(
-            value = 190,
-            appliesFrom = THEN.minusYears(1),
-            appliesTo = NOW.minusYears(1),
-            createdAt = NOW,
-            createdBy = USER1,
-            source = NOMIS,
-          ),
-          HistoryComparison(
-            value = 180,
-            appliesFrom = THEN,
-            appliesTo = null,
-            createdAt = THEN,
-            createdBy = USER1,
-            source = DPS,
-          ),
+          HistoryComparison(value = 190, appliesFrom = THEN.minusYears(1), appliesTo = NOW.minusYears(1), createdAt = NOW, createdBy = USER1, source = NOMIS),
+          HistoryComparison(value = 180, appliesFrom = THEN, appliesTo = null, createdAt = THEN, createdBy = USER1, source = DPS),
         )
-
         expectFieldHistory(
           WEIGHT,
-          HistoryComparison(
-            value = 80,
-            appliesFrom = THEN.minusYears(1),
-            appliesTo = NOW.minusYears(1),
-            createdAt = NOW,
-            createdBy = USER1,
-            source = NOMIS,
-          ),
-          HistoryComparison(
-            value = 70,
-            appliesFrom = THEN,
-            appliesTo = null,
-            createdAt = THEN,
-            createdBy = USER1,
-            source = DPS,
-          ),
+          HistoryComparison(value = 80, appliesFrom = THEN.minusYears(1), appliesTo = NOW.minusYears(1), createdAt = NOW, createdBy = USER1, source = NOMIS),
+          HistoryComparison(value = 70, appliesFrom = THEN, appliesTo = null, createdAt = THEN, createdBy = USER1, source = DPS),
         )
+        expectNoFieldHistoryFor(HAIR, FACIAL_HAIR, FACE, BUILD, LEFT_EYE_COLOUR, RIGHT_EYE_COLOUR, SHOE_SIZE)
       }
 
       @Test
@@ -278,26 +202,13 @@ class PhysicalAttributesSyncControllerIntTest : IntegrationTestBase() {
 
         expectFieldHistory(
           HEIGHT,
-          HistoryComparison(
-            value = 190,
-            appliesFrom = THEN.minusYears(1),
-            appliesTo = NOW.minusYears(1),
-            createdAt = NOW,
-            createdBy = USER1,
-            source = NOMIS,
-          ),
+          HistoryComparison(value = 190, appliesFrom = THEN.minusYears(1), appliesTo = NOW.minusYears(1), createdAt = NOW, createdBy = USER1, source = NOMIS),
         )
         expectFieldHistory(
           WEIGHT,
-          HistoryComparison(
-            value = 80,
-            appliesFrom = THEN.minusYears(1),
-            appliesTo = NOW.minusYears(1),
-            createdAt = NOW,
-            createdBy = USER1,
-            source = NOMIS,
-          ),
+          HistoryComparison(value = 80, appliesFrom = THEN.minusYears(1), appliesTo = NOW.minusYears(1), createdAt = NOW, createdBy = USER1, source = NOMIS),
         )
+        expectNoFieldHistoryFor(HAIR, FACIAL_HAIR, FACE, BUILD, LEFT_EYE_COLOUR, RIGHT_EYE_COLOUR, SHOE_SIZE)
       }
 
       @Test

@@ -50,4 +50,11 @@ data class PhysicalAttributesSyncRequest(
     required = true,
   )
   val createdBy: String,
+
+  @Schema(
+    description = "An indication of whether the edit was performed to the latest booking. If this is not the latest " +
+      "booking, the edit will be inserted into field history but the physical attributes table will not be updated.",
+    example = "true",
+  )
+  val latestBooking: Boolean? = true,
 )

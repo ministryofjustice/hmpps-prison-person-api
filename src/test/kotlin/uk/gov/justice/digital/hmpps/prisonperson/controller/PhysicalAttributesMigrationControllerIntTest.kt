@@ -110,37 +110,17 @@ class PhysicalAttributesMigrationControllerIntTest : IntegrationTestBase() {
 
         expectFieldHistory(
           HEIGHT,
-          HistoryComparison(
-            value = 190,
-            appliesFrom = NOW,
-            appliesTo = null,
-            createdAt = NOW,
-            createdBy = USER1,
-            source = NOMIS,
-          ),
+          HistoryComparison(value = 190, appliesFrom = NOW, appliesTo = null, createdAt = NOW, createdBy = USER1, source = NOMIS),
         )
         expectFieldHistory(
           WEIGHT,
-          HistoryComparison(
-            value = 80,
-            appliesFrom = NOW,
-            appliesTo = null,
-            createdAt = NOW,
-            createdBy = USER1,
-            source = NOMIS,
-          ),
+          HistoryComparison(value = 80, appliesFrom = NOW, appliesTo = null, createdAt = NOW, createdBy = USER1, source = NOMIS),
         )
+        expectNoFieldHistoryFor(HAIR, FACIAL_HAIR, FACE, BUILD, LEFT_EYE_COLOUR, RIGHT_EYE_COLOUR, SHOE_SIZE)
 
         expectFieldMetadata(
           FieldMetadata(PRISONER_NUMBER, HEIGHT, lastModifiedAt = NOW, lastModifiedBy = USER1),
           FieldMetadata(PRISONER_NUMBER, WEIGHT, lastModifiedAt = NOW, lastModifiedBy = USER1),
-          FieldMetadata(PRISONER_NUMBER, HAIR, lastModifiedAt = NOW, lastModifiedBy = USER1),
-          FieldMetadata(PRISONER_NUMBER, FACIAL_HAIR, lastModifiedAt = NOW, lastModifiedBy = USER1),
-          FieldMetadata(PRISONER_NUMBER, FACE, lastModifiedAt = NOW, lastModifiedBy = USER1),
-          FieldMetadata(PRISONER_NUMBER, BUILD, lastModifiedAt = NOW, lastModifiedBy = USER1),
-          FieldMetadata(PRISONER_NUMBER, LEFT_EYE_COLOUR, lastModifiedAt = NOW, lastModifiedBy = USER1),
-          FieldMetadata(PRISONER_NUMBER, RIGHT_EYE_COLOUR, lastModifiedAt = NOW, lastModifiedBy = USER1),
-          FieldMetadata(PRISONER_NUMBER, SHOE_SIZE, lastModifiedAt = NOW, lastModifiedBy = USER1),
         )
       }
 
@@ -157,76 +137,28 @@ class PhysicalAttributesMigrationControllerIntTest : IntegrationTestBase() {
 
         expectFieldHistory(
           HEIGHT,
-          HistoryComparison(
-            value = 189,
-            appliesFrom = NOW.minusDays(5),
-            appliesTo = NOW.minusDays(3),
-            createdAt = NOW.minusDays(5),
-            createdBy = USER2,
-            source = NOMIS,
-          ),
-          HistoryComparison(
-            value = 188,
-            appliesFrom = NOW.minusDays(3),
-            appliesTo = NOW,
-            createdAt = NOW.minusDays(3),
-            createdBy = USER_CHANGING_HEIGHT_ONLY,
-            source = NOMIS,
-          ),
-          HistoryComparison(
-            value = 190,
-            appliesFrom = NOW,
-            appliesTo = null,
-            createdAt = NOW,
-            createdBy = USER1,
-            source = NOMIS,
-          ),
+          HistoryComparison(value = 189, appliesFrom = NOW.minusDays(5), appliesTo = NOW.minusDays(3), createdAt = NOW.minusDays(5), createdBy = USER2, source = NOMIS),
+          HistoryComparison(value = 188, appliesFrom = NOW.minusDays(3), appliesTo = NOW, createdAt = NOW.minusDays(3), createdBy = USER_CHANGING_HEIGHT_ONLY, source = NOMIS),
+          HistoryComparison(value = 190, appliesFrom = NOW, appliesTo = null, createdAt = NOW, createdBy = USER1, source = NOMIS),
         )
         expectFieldHistory(
           WEIGHT,
-          HistoryComparison(
-            value = 79,
-            appliesFrom = NOW.minusDays(5),
-            appliesTo = NOW.minusDays(2),
-            createdAt = NOW.minusDays(5),
-            createdBy = USER2,
-            source = NOMIS,
-          ),
-          HistoryComparison(
-            value = 78,
-            appliesFrom = NOW.minusDays(2),
-            appliesTo = NOW,
-            createdAt = NOW.minusDays(2),
-            createdBy = USER_CHANGING_WEIGHT_ONLY,
-            source = NOMIS,
-          ),
-          HistoryComparison(
-            value = 80,
-            appliesFrom = NOW,
-            appliesTo = null,
-            createdAt = NOW,
-            createdBy = USER1,
-            source = NOMIS,
-          ),
+          HistoryComparison(value = 79, appliesFrom = NOW.minusDays(5), appliesTo = NOW.minusDays(2), createdAt = NOW.minusDays(5), createdBy = USER2, source = NOMIS),
+          HistoryComparison(value = 78, appliesFrom = NOW.minusDays(2), appliesTo = NOW, createdAt = NOW.minusDays(2), createdBy = USER_CHANGING_WEIGHT_ONLY, source = NOMIS),
+          HistoryComparison(value = 80, appliesFrom = NOW, appliesTo = null, createdAt = NOW, createdBy = USER1, source = NOMIS),
         )
+        expectNoFieldHistoryFor(HAIR, FACIAL_HAIR, FACE, BUILD, LEFT_EYE_COLOUR, RIGHT_EYE_COLOUR, SHOE_SIZE)
 
         expectFieldMetadata(
           FieldMetadata(PRISONER_NUMBER, HEIGHT, lastModifiedAt = NOW, lastModifiedBy = USER1),
           FieldMetadata(PRISONER_NUMBER, WEIGHT, lastModifiedAt = NOW, lastModifiedBy = USER1),
-          FieldMetadata(PRISONER_NUMBER, HAIR, lastModifiedAt = THEN, lastModifiedBy = USER2),
-          FieldMetadata(PRISONER_NUMBER, FACIAL_HAIR, lastModifiedAt = THEN, lastModifiedBy = USER2),
-          FieldMetadata(PRISONER_NUMBER, FACE, lastModifiedAt = THEN, lastModifiedBy = USER2),
-          FieldMetadata(PRISONER_NUMBER, BUILD, lastModifiedAt = THEN, lastModifiedBy = USER2),
-          FieldMetadata(PRISONER_NUMBER, LEFT_EYE_COLOUR, lastModifiedAt = THEN, lastModifiedBy = USER2),
-          FieldMetadata(PRISONER_NUMBER, RIGHT_EYE_COLOUR, lastModifiedAt = THEN, lastModifiedBy = USER2),
-          FieldMetadata(PRISONER_NUMBER, SHOE_SIZE, lastModifiedAt = THEN, lastModifiedBy = USER2),
         )
       }
 
       @Test
       @Sql("classpath:jpa/repository/reset.sql")
-      @Sql("classpath:controller/physical_attributes.sql")
-      @Sql("classpath:controller/physical_attributes_history.sql")
+      @Sql("classpath:controller/physicalattributes/migration/physical_attributes.sql")
+      @Sql("classpath:controller/physicalattributes/migration/field_history.sql")
       fun `migration rerun for a prisoner with existing physical attributes data simply overwrites what was there`() {
         webTestClient.put().uri("/migration/prisoners/A1234AA/physical-attributes")
           .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__PHYSICAL_ATTRIBUTES_MIGRATION__RW")))
@@ -238,31 +170,17 @@ class PhysicalAttributesMigrationControllerIntTest : IntegrationTestBase() {
 
         expectFieldHistory(
           HEIGHT,
-          HistoryComparison(
-            value = 190,
-            appliesFrom = NOW,
-            appliesTo = null,
-            createdAt = NOW,
-            createdBy = USER1,
-            source = NOMIS,
-          ),
+          HistoryComparison(value = 190, appliesFrom = NOW, appliesTo = null, createdAt = NOW, createdBy = USER1, source = NOMIS),
         )
         expectFieldHistory(
           WEIGHT,
-          HistoryComparison(
-            value = 80,
-            appliesFrom = NOW,
-            appliesTo = null,
-            createdAt = NOW,
-            createdBy = USER1,
-            source = NOMIS,
-          ),
+          HistoryComparison(value = 80, appliesFrom = NOW, appliesTo = null, createdAt = NOW, createdBy = USER1, source = NOMIS),
         )
+        expectNoFieldHistoryFor(HAIR, FACIAL_HAIR, FACE, BUILD, LEFT_EYE_COLOUR, RIGHT_EYE_COLOUR, SHOE_SIZE)
 
         expectFieldMetadata(
           FieldMetadata(PRISONER_NUMBER, HEIGHT, lastModifiedAt = NOW, lastModifiedBy = USER1),
           FieldMetadata(PRISONER_NUMBER, WEIGHT, lastModifiedAt = NOW, lastModifiedBy = USER1),
-          FieldMetadata(PRISONER_NUMBER, HAIR, lastModifiedAt = NOW, lastModifiedBy = USER1),
         )
       }
     }
@@ -276,7 +194,6 @@ class PhysicalAttributesMigrationControllerIntTest : IntegrationTestBase() {
     const val USER_CHANGING_WEIGHT_ONLY = "CHANGE_TO_WEIGHT_ONLY"
 
     val NOW = ZonedDateTime.of(2024, 6, 14, 9, 10, 11, 123000000, ZoneId.of("Europe/London"))
-    val THEN = ZonedDateTime.of(2024, 6, 9, 9, 10, 11, 123000000, ZoneId.of("Europe/London"))
 
     val SINGLE_CURRENT_RECORD_MIGRATION =
       // language=json

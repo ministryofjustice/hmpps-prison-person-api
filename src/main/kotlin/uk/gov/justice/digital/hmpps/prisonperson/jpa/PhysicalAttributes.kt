@@ -139,48 +139,52 @@ class PhysicalAttributes(
     lastModifiedAt: ZonedDateTime,
     lastModifiedBy: String,
     source: Source = DPS,
-  ) = updateFieldHistory(lastModifiedAt, lastModifiedAt, lastModifiedBy, source)
+    fields: Collection<PrisonPersonField> = allFields,
+  ) = updateFieldHistory(lastModifiedAt, lastModifiedAt, lastModifiedBy, source, fields)
 
   fun updateFieldHistory(
     appliesFrom: ZonedDateTime,
     lastModifiedAt: ZonedDateTime,
     lastModifiedBy: String,
     source: Source = DPS,
+    fields: Collection<PrisonPersonField>,
     migratedAt: ZonedDateTime? = null,
   ) {
-    fieldAccessors().forEach { (field, currentValue) ->
-      val previousVersion = fieldHistory.lastOrNull { it.field == field }
-      if (previousVersion == null ||
-        field.hasChangedFrom(
-          previousVersion,
-          (currentValue() as? ReferenceDataCode)?.id ?: currentValue(),
-        )
-      ) {
-        fieldMetadata[field] = FieldMetadata(
-          field = field,
-          prisonerNumber = this.prisonerNumber,
-          lastModifiedAt = lastModifiedAt,
-          lastModifiedBy = lastModifiedBy,
-        )
-
-        // Set appliesTo on previous history item if not already set
-        previousVersion
-          ?.takeIf { it.appliesTo == null }
-          ?.let { it.appliesTo = appliesFrom }
-
-        fieldHistory.add(
-          FieldHistory(
-            prisonerNumber = this.prisonerNumber,
+    fieldAccessors()
+      .filter { fields.contains(it.key) }
+      .forEach { (field, currentValue) ->
+        val previousVersion = fieldHistory.lastOrNull { it.field == field }
+        if (previousVersion == null ||
+          field.hasChangedFrom(
+            previousVersion,
+            (currentValue() as? ReferenceDataCode)?.id ?: currentValue(),
+          )
+        ) {
+          fieldMetadata[field] = FieldMetadata(
             field = field,
-            appliesFrom = appliesFrom,
-            createdAt = lastModifiedAt,
-            createdBy = lastModifiedBy,
-            source = source,
-            migratedAt = migratedAt,
-          ).also { field.set(it, (currentValue() as? ReferenceDataCode)?.id ?: currentValue()) },
-        )
+            prisonerNumber = this.prisonerNumber,
+            lastModifiedAt = lastModifiedAt,
+            lastModifiedBy = lastModifiedBy,
+          )
+
+          // Set appliesTo on previous history item if not already set
+          previousVersion
+            ?.takeIf { it.appliesTo == null }
+            ?.let { it.appliesTo = appliesFrom }
+
+          fieldHistory.add(
+            FieldHistory(
+              prisonerNumber = this.prisonerNumber,
+              field = field,
+              appliesFrom = appliesFrom,
+              createdAt = lastModifiedAt,
+              createdBy = lastModifiedBy,
+              source = source,
+              migratedAt = migratedAt,
+            ).also { field.set(it, (currentValue() as? ReferenceDataCode)?.id ?: currentValue()) },
+          )
+        }
       }
-    }
   }
 
   fun publishUpdateEvent(source: Source, now: ZonedDateTime) {
@@ -228,10 +232,16 @@ class PhysicalAttributes(
   }
 
   companion object {
-    /*
-     * Fields to use during merge
-     * Used in the PhysicalAttributesMergeService
-     */
-    fun fields() = listOf(HEIGHT, WEIGHT)
+    val allFields = listOf(
+      HEIGHT,
+      WEIGHT,
+      HAIR,
+      FACIAL_HAIR,
+      FACE,
+      BUILD,
+      LEFT_EYE_COLOUR,
+      RIGHT_EYE_COLOUR,
+      SHOE_SIZE,
+    )
   }
 }

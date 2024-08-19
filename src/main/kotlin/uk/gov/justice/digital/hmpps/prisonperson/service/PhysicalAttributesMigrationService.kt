@@ -51,6 +51,7 @@ class PhysicalAttributesMigrationService(
           record.createdAt,
           record.createdBy,
           source = NOMIS,
+          fields = fieldsToMigrate,
           migratedAt = now,
         )
       }

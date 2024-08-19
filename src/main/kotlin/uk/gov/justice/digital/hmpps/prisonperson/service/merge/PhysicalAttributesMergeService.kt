@@ -1,12 +1,12 @@
 package uk.gov.justice.digital.hmpps.prisonperson.service.merge
 
 import org.slf4j.LoggerFactory
-import org.springframework.data.jpa.domain.AbstractAuditable_.createdBy
-import org.springframework.data.jpa.domain.AbstractAuditable_.lastModifiedBy
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.prisonperson.client.prisonersearch.PrisonerSearchClient
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField
+import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.HEIGHT
+import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.WEIGHT
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.FieldHistory
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.PhysicalAttributes
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.FieldHistoryRepository
@@ -54,7 +54,7 @@ class PhysicalAttributesMergeService(
       newPhysicalAttributesFor(prisonerNumberTo)
     }
 
-    PhysicalAttributes.fields().forEach { field ->
+    fieldsToMerge.forEach { field ->
       val latestFrom = historyFrom.last { it.field == field }
       val latestTo = historyTo.lastOrNull { it.field == field }
 
@@ -134,5 +134,6 @@ class PhysicalAttributesMergeService(
 
   private companion object {
     private val log = LoggerFactory.getLogger(this::class.java)
+    val fieldsToMerge = listOf(HEIGHT, WEIGHT)
   }
 }

@@ -7,10 +7,11 @@ import uk.gov.justice.digital.hmpps.prisonperson.dto.request.PhysicalAttributesU
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.PhysicalAttributesDto
 import uk.gov.justice.digital.hmpps.prisonperson.enums.Source.DPS
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.PhysicalAttributes
-import uk.gov.justice.digital.hmpps.prisonperson.jpa.ReferenceDataCode
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.PhysicalAttributesRepository
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.ReferenceDataCodeRepository
 import uk.gov.justice.digital.hmpps.prisonperson.utils.AuthenticationFacade
+import uk.gov.justice.digital.hmpps.prisonperson.utils.PrisonerNumberUtils
+import uk.gov.justice.digital.hmpps.prisonperson.utils.ReferenceCodeUtils
 import java.time.Clock
 import java.time.ZonedDateTime
 import kotlin.jvm.optionals.getOrNull
@@ -33,6 +34,7 @@ class PhysicalAttributesService(
     request: PhysicalAttributesUpdateRequest,
   ): PhysicalAttributesDto {
     val now = ZonedDateTime.now(clock)
+    fun toReferenceDataCode(x: String?) = ReferenceCodeUtils.toReferenceDataCode(referenceDataCodeRepository, x)
 
     val physicalAttributes = physicalAttributesRepository.findById(prisonerNumber)
       .orElseGet { newPhysicalAttributesFor(prisonerNumber) }
@@ -53,16 +55,8 @@ class PhysicalAttributesService(
     return physicalAttributesRepository.save(physicalAttributes).toDto()
   }
 
-  private fun toReferenceDataCode(id: String?): ReferenceDataCode? = id?.let {
-    referenceDataCodeRepository.findById(it)
-      .orElseThrow { IllegalArgumentException("Invalid reference data code: $it") }
-  }
-
   private fun newPhysicalAttributesFor(prisonerNumber: String): PhysicalAttributes {
-    validatePrisonerNumber(prisonerNumber)
+    PrisonerNumberUtils.validatePrisonerNumber(prisonerSearchClient, prisonerNumber)
     return PhysicalAttributes(prisonerNumber)
   }
-
-  private fun validatePrisonerNumber(prisonerNumber: String) =
-    require(prisonerSearchClient.getPrisoner(prisonerNumber) != null) { "Prisoner number '$prisonerNumber' not found" }
 }

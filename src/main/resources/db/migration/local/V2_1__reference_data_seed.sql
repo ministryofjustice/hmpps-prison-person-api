@@ -63,9 +63,3 @@ VALUES
 ('SMOKE_SMOKER', 'SMOKE', 'SMOKER', 'Yes, they smoke', 0, '2024-07-11 17:00:00+0100', 'OMS_OWNER'),
 ('SMOKE_VAPER', 'SMOKE', 'VAPER', 'Yes, they smoke or use nicotine replacement therapy (NRT)', 0, '2024-07-11 17:00:00+0100', 'OMS_OWNER'),
 ('SMOKE_NO', 'SMOKE', 'NO', 'No, they do not smoke or vape', 0, '2024-07-11 17:00:00+0100', 'OMS_OWNER');
-
--- Inactive (Imported from NOMIS)
-INSERT INTO reference_data_code (id, domain, code, description, list_sequence, created_at, created_by, last_modified_at,
-                                 last_modified_by, deactivated_at, deactivated_by)
-VALUES ('SMOKE_YES', 'SMOKE', 'YES', 'Yes (from NOMIS)', 0, '2024-07-11 17:00:00+0100', 'OMS_OWNER',
-        '2024-07-11 17:00:00+0100', 'OMS_OWNER', '2024-07-11 17:00:00+0100', 'OMS_OWNER');

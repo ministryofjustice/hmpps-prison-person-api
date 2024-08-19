@@ -140,6 +140,46 @@ class ReferenceDataDomainControllerIntTest : IntegrationTestBase() {
                       "createdBy": "OMS_OWNER"
                     }
                   ]
+                },
+                {
+                  "code": "SMOKE",
+                  "description": "Smoker or vaper",
+                  "listSequence": 0,
+                  "isActive": true,
+                  "createdAt": "2024-07-11T17:00:00+0100",
+                  "createdBy": "OMS_OWNER",
+                  "referenceDataCodes": [
+                    {
+                      "id": "SMOKE_SMOKER",
+                      "domain": "SMOKE",
+                      "code": "SMOKER",
+                      "description": "Yes, they smoke",
+                      "listSequence": 0,
+                      "isActive": true,
+                      "createdAt": "2024-07-11T17:00:00+0100",
+                      "createdBy": "OMS_OWNER"
+                    },
+                    {
+                      "id": "SMOKE_VAPER",
+                      "domain": "SMOKE",
+                      "code": "VAPER",
+                      "description": "Yes, they smoke or use nicotine replacement therapy (NRT)",
+                      "listSequence": 0,
+                      "isActive": true,
+                      "createdAt": "2024-07-11T17:00:00+0100",
+                      "createdBy": "OMS_OWNER"
+                    },
+                    {
+                      "id": "SMOKE_NO",
+                      "domain": "SMOKE",
+                      "code": "NO",
+                      "description": "No, they do not smoke or vape",
+                      "listSequence": 0,
+                      "isActive": true,
+                      "createdAt": "2024-07-11T17:00:00+0100",
+                      "createdBy": "OMS_OWNER"
+                    }
+                  ]
                 }
               ]
 

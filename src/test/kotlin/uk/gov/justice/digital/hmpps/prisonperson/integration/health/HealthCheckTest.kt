@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.prisonperson.integration.health
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.prisonperson.integration.IntegrationTestBase
+import uk.gov.justice.digital.hmpps.prisonperson.integration.wiremock.DocumentServiceExtension.Companion.documentService
 import uk.gov.justice.digital.hmpps.prisonperson.integration.wiremock.HmppsAuthApiExtension.Companion.hmppsAuth
 import uk.gov.justice.digital.hmpps.prisonperson.integration.wiremock.PrisonerSearchExtension.Companion.prisonerSearch
 import java.time.LocalDateTime
@@ -25,6 +26,7 @@ class HealthCheckTest : IntegrationTestBase() {
       .jsonPath("components.db.status").isEqualTo("UP")
       .jsonPath("components.hmppsAuth.status").isEqualTo("UP")
       .jsonPath("components.prisonerSearch.status").isEqualTo("UP")
+      .jsonPath("components.documentService.status").isEqualTo("UP")
   }
 
   @Test
@@ -40,6 +42,7 @@ class HealthCheckTest : IntegrationTestBase() {
       .jsonPath("components.db.status").isEqualTo("UP")
       .jsonPath("components.hmppsAuth.status").isEqualTo("DOWN")
       .jsonPath("components.prisonerSearch.status").isEqualTo("DOWN")
+      .jsonPath("components.documentService.status").isEqualTo("DOWN")
   }
 
   @Test
@@ -124,5 +127,6 @@ class HealthCheckTest : IntegrationTestBase() {
   private fun stubPingWithResponse(status: Int) {
     hmppsAuth.stubHealthPing(status)
     prisonerSearch.stubHealthPing(status)
+    documentService.stubHealthPing(status)
   }
 }

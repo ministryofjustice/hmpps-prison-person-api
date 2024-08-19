@@ -48,7 +48,7 @@ class PhysicalAttributesSyncService(
         height = request.height
         weight = request.weight
       }
-      .also { it.updateFieldHistory(request.createdAt, request.createdBy, NOMIS) }
+      .also { it.updateFieldHistory(request.createdAt, request.createdBy, NOMIS, fieldsToSync) }
       .also { it.publishUpdateEvent(NOMIS, now) }
 
     return physicalAttributesRepository.save(physicalAttributes).getLatestFieldHistoryIds()
@@ -120,5 +120,6 @@ class PhysicalAttributesSyncService(
 
   private companion object {
     val log: Logger = LoggerFactory.getLogger(this::class.java)
+    val fieldsToSync = listOf(HEIGHT, WEIGHT)
   }
 }

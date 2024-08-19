@@ -91,9 +91,9 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
       @Test
       @Sql(
         "classpath:jpa/repository/reset.sql",
-        "classpath:controller/physical_attributes.sql",
-        "classpath:controller/physical_attributes_history.sql",
-        "classpath:controller/physical_attributes_metadata.sql",
+        "classpath:controller/physicalattributes/physical_attributes.sql",
+        "classpath:controller/physicalattributes/field_history.sql",
+        "classpath:controller/physicalattributes/field_metadata.sql",
       )
       fun `can return physical attributes`() {
         expectSuccessfulGetRequest().expectBody()
@@ -317,8 +317,8 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
 
       @Test
       @Sql("classpath:jpa/repository/reset.sql")
-      @Sql("classpath:controller/physical_attributes.sql")
-      @Sql("classpath:controller/physical_attributes_history.sql")
+      @Sql("classpath:controller/physicalattributes/physical_attributes.sql")
+      @Sql("classpath:controller/physicalattributes/field_history.sql")
       fun `can update an existing set of physical attributes`() {
         expectFieldHistory(
           HEIGHT,
@@ -448,8 +448,8 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
 
       @Test
       @Sql("classpath:jpa/repository/reset.sql")
-      @Sql("classpath:controller/physical_attributes.sql")
-      @Sql("classpath:controller/physical_attributes_history.sql")
+      @Sql("classpath:controller/physicalattributes/physical_attributes.sql")
+      @Sql("classpath:controller/physicalattributes/field_history.sql")
       fun `can update an existing set of physical attributes a number of times`() {
         expectFieldHistory(
           HEIGHT,

@@ -8,6 +8,7 @@ import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import org.hibernate.Hibernate
+import uk.gov.justice.digital.hmpps.prisonperson.dto.response.FieldHistoryDto
 import uk.gov.justice.digital.hmpps.prisonperson.enums.FieldValues
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField
 import uk.gov.justice.digital.hmpps.prisonperson.enums.Source
@@ -50,6 +51,22 @@ class FieldHistory(
     field = field,
     lastModifiedAt = createdAt,
     lastModifiedBy = createdBy,
+  )
+
+  fun toDto() = FieldHistoryDto(
+    prisonerNumber = prisonerNumber,
+    field = field,
+    valueInt = valueInt,
+    valueString = valueString,
+    valueRef = null, // TODO get RDC DTO
+    appliesFrom = appliesFrom,
+    appliesTo = appliesTo,
+    createdAt = createdAt,
+    createdBy = createdBy,
+    migratedAt = migratedAt,
+    mergedAt = mergedAt,
+    mergedFrom = mergedFrom,
+    source = source.toString(),
   )
 
   override fun compareTo(other: FieldHistory) =

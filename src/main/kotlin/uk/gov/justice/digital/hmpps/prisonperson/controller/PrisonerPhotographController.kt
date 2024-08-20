@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
+import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -114,4 +115,49 @@ class PrisonerPhotographController(private val photographService: PhotographServ
     fileType = MediaType.parseMediaType(file.contentType ?: MediaType.APPLICATION_OCTET_STREAM_VALUE),
     prisonerNumber,
   )
+
+  @GetMapping(value = ["/{uuid}/file"])
+  @ResponseStatus(HttpStatus.OK)
+  @PreAuthorize("hasRole('ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RO')")
+  @Operation(
+    summary = "Get a document file from documents service using document uuid.",
+    description = "Get a document from documents service using document uuid. Requires ROLE_CVL_ADMIN.",
+
+    responses = [
+      ApiResponse(
+        responseCode = "200",
+        description = "Returns uploaded photograph",
+      ),
+      ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized to access this endpoint",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
+      ),
+      ApiResponse(
+        responseCode = "403",
+        description = "Missing required role. Requires ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RO",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
+      ),
+      ApiResponse(
+        responseCode = "404",
+        description = "Data not found",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
+      ),
+    ],
+  )
+  fun getDocumentFileByUUI(
+    @PathVariable("uuid")
+    @Parameter(
+      name = "uuid",
+      description = "The uuid of the photograph required",
+      required = true,
+    )
+    uuid: String,
+  ): ResponseEntity<ByteArray?> {
+    val (body, contentType) = photographService.getPicByUuid(uuid)
+    return ResponseEntity
+      .ok()
+      .header("Content-Type", contentType ?: MediaType.APPLICATION_OCTET_STREAM_VALUE)
+      .body(body)
+  }
 }

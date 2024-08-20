@@ -20,6 +20,9 @@ import uk.gov.justice.digital.hmpps.prisonperson.client.documentservice.dto.Docu
 import uk.gov.justice.digital.hmpps.prisonperson.client.documentservice.dto.OrderBy
 import uk.gov.justice.digital.hmpps.prisonperson.client.documentservice.dto.OrderByDirection
 import uk.gov.justice.digital.hmpps.prisonperson.utils.AuthenticationFacade
+import java.nio.file.Files
+import java.nio.file.Paths
+import java.util.UUID
 
 @ExtendWith(MockitoExtension::class)
 class PhotographServiceTest {
@@ -90,6 +93,24 @@ class PhotographServiceTest {
       val result = underTest.postProfilePicToDocumentService(file, fileType, PRISONER_NUMBER)
 
       assertThat(result).isEqualTo(documentDto)
+    }
+  }
+
+  @Nested
+  inner class GetPicByUuid {
+    @Test
+    fun `post profile pic to document service`() {
+      val uuid = UUID.randomUUID().toString()
+      val file = Files.readAllBytes(
+        Paths.get("src/test/kotlin/uk/gov/justice/digital/hmpps/prisonperson/integration/assets/profile.jpeg"),
+      )
+      val fileType = "image/jpeg"
+
+      whenever(documentServiceClient.getDocumentByUuid(uuid, DOCUMENT_REQ_CONTEXT)).thenReturn(Pair(file, fileType))
+
+      val result = underTest.getPicByUuid(uuid)
+
+      assertThat(result).isEqualTo(Pair(file, fileType))
     }
   }
 

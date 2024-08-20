@@ -18,6 +18,8 @@ import uk.gov.justice.digital.hmpps.prisonperson.client.documentservice.dto.Docu
 import uk.gov.justice.digital.hmpps.prisonperson.client.documentservice.dto.DocumentType
 import uk.gov.justice.digital.hmpps.prisonperson.client.documentservice.dto.OrderBy
 import uk.gov.justice.digital.hmpps.prisonperson.client.documentservice.dto.OrderByDirection
+import java.nio.file.Files
+import java.nio.file.Paths
 
 class DocumentServiceServer : WireMockServer(WIREMOCK_PORT) {
   companion object {
@@ -81,6 +83,20 @@ class DocumentServiceServer : WireMockServer(WIREMOCK_PORT) {
 
   fun stubPostNewDocumentException(documentType: DocumentType = DocumentType.PRISONER_PROFILE_PICTURE, uuid: String = "xxx"): StubMapping =
     stubFor(post("/documents/$documentType/$uuid").willReturn(aResponse().withStatus(500)))
+
+  fun stubGetDocumentByUuid(uuid: String = "xxx"): StubMapping =
+    stubFor(
+      get("/documents/$uuid/file")
+        .willReturn(
+          aResponse()
+            .withHeader("Content-Type", "image/jpeg")
+            .withBody(Files.readAllBytes(Paths.get("src/test/kotlin/uk/gov/justice/digital/hmpps/prisonperson/integration/assets/profile.jpeg")))
+            .withStatus(200),
+        ),
+    )
+
+  fun stubGetDocumentByUuidException(uuid: String = "xxx"): StubMapping =
+    stubFor(get("/documents/$uuid/file").willReturn(aResponse().withStatus(500)))
 }
 
 class DocumentServiceExtension :

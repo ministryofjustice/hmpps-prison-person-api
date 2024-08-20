@@ -8,8 +8,8 @@ import uk.gov.justice.digital.hmpps.prisonperson.dto.response.HealthDto
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.Health
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.HealthRepository
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.ReferenceDataCodeRepository
-import uk.gov.justice.digital.hmpps.prisonperson.utils.PrisonerNumberUtils
-import uk.gov.justice.digital.hmpps.prisonperson.utils.ReferenceCodeUtils
+import uk.gov.justice.digital.hmpps.prisonperson.utils.toReferenceDataCode
+import uk.gov.justice.digital.hmpps.prisonperson.utils.validatePrisonerNumber
 import kotlin.jvm.optionals.getOrNull
 
 @Service
@@ -28,7 +28,7 @@ class HealthService(
     val health = healthRepository.findById(prisonerNumber).orElseGet { newHealthFor(prisonerNumber) }.apply {
       request.smokerOrVaper.apply(
         this::smokerOrVaper,
-        fun(smokerOrVaper) = ReferenceCodeUtils.toReferenceDataCode(referenceDataCodeRepository, smokerOrVaper),
+        { toReferenceDataCode(referenceDataCodeRepository, it) },
       )
     }
 
@@ -36,7 +36,7 @@ class HealthService(
   }
 
   private fun newHealthFor(prisonerNumber: String): Health {
-    PrisonerNumberUtils.validatePrisonerNumber(prisonerSearchClient, prisonerNumber)
+    validatePrisonerNumber(prisonerSearchClient, prisonerNumber)
     return Health(prisonerNumber)
   }
 }

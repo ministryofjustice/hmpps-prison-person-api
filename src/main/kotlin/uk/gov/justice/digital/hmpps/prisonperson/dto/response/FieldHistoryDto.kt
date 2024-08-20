@@ -3,7 +3,7 @@ package uk.gov.justice.digital.hmpps.prisonperson.dto.response
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL
 import io.swagger.v3.oas.annotations.media.Schema
-import uk.gov.justice.digital.hmpps.prisonperson.dto.ReferenceDataCodeDto
+import uk.gov.justice.digital.hmpps.prisonperson.dto.ReferenceDataSimpleDto
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField
 import java.time.ZonedDateTime
 
@@ -23,7 +23,7 @@ data class FieldHistoryDto(
   val valueString: String? = null,
 
   @Schema(description = "Reference Data Code value of the field in the date range `appliesFrom` to `appliesTo`")
-  val valueRef: ReferenceDataCodeDto? = null,
+  val valueRef: ReferenceDataSimpleDto? = null,
 
   @Schema(description = "The timestamp the field value applies from")
   val appliesFrom: ZonedDateTime = ZonedDateTime.now(),

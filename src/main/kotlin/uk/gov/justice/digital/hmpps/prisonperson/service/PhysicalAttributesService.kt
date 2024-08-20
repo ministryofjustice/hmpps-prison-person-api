@@ -10,8 +10,8 @@ import uk.gov.justice.digital.hmpps.prisonperson.jpa.PhysicalAttributes
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.PhysicalAttributesRepository
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.ReferenceDataCodeRepository
 import uk.gov.justice.digital.hmpps.prisonperson.utils.AuthenticationFacade
-import uk.gov.justice.digital.hmpps.prisonperson.utils.PrisonerNumberUtils
-import uk.gov.justice.digital.hmpps.prisonperson.utils.ReferenceCodeUtils
+import uk.gov.justice.digital.hmpps.prisonperson.utils.toReferenceDataCode
+import uk.gov.justice.digital.hmpps.prisonperson.utils.validatePrisonerNumber
 import java.time.Clock
 import java.time.ZonedDateTime
 import kotlin.jvm.optionals.getOrNull
@@ -34,20 +34,19 @@ class PhysicalAttributesService(
     request: PhysicalAttributesUpdateRequest,
   ): PhysicalAttributesDto {
     val now = ZonedDateTime.now(clock)
-    fun toReferenceDataCode(x: String?) = ReferenceCodeUtils.toReferenceDataCode(referenceDataCodeRepository, x)
 
     val physicalAttributes = physicalAttributesRepository.findById(prisonerNumber)
       .orElseGet { newPhysicalAttributesFor(prisonerNumber) }
       .apply {
-        request.height.apply(this::height)
-        request.weight.apply(this::weight)
-        request.hair.apply(this::hair, ::toReferenceDataCode)
-        request.facialHair.apply(this::facialHair, ::toReferenceDataCode)
-        request.face.apply(this::face, ::toReferenceDataCode)
-        request.build.apply(this::build, ::toReferenceDataCode)
-        request.leftEyeColour.apply(this::leftEyeColour, ::toReferenceDataCode)
-        request.rightEyeColour.apply(this::rightEyeColour, ::toReferenceDataCode)
-        request.shoeSize.apply(this::shoeSize)
+        request.height.apply(::height)
+        request.weight.apply(::weight)
+        request.hair.apply(::hair, { toReferenceDataCode(referenceDataCodeRepository, it) })
+        request.facialHair.apply(::facialHair, { toReferenceDataCode(referenceDataCodeRepository, it) })
+        request.face.apply(::face, { toReferenceDataCode(referenceDataCodeRepository, it) })
+        request.build.apply(::build, { toReferenceDataCode(referenceDataCodeRepository, it) })
+        request.leftEyeColour.apply(::leftEyeColour, { toReferenceDataCode(referenceDataCodeRepository, it) })
+        request.rightEyeColour.apply(::rightEyeColour, { toReferenceDataCode(referenceDataCodeRepository, it) })
+        request.shoeSize.apply(::shoeSize)
       }
       .also { it.updateFieldHistory(now, authenticationFacade.getUserOrSystemInContext()) }
       .also { it.publishUpdateEvent(DPS, now) }
@@ -56,7 +55,7 @@ class PhysicalAttributesService(
   }
 
   private fun newPhysicalAttributesFor(prisonerNumber: String): PhysicalAttributes {
-    PrisonerNumberUtils.validatePrisonerNumber(prisonerSearchClient, prisonerNumber)
+    validatePrisonerNumber(prisonerSearchClient, prisonerNumber)
     return PhysicalAttributes(prisonerNumber)
   }
 }

@@ -7,11 +7,14 @@ import jakarta.persistence.Enumerated
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
+import jakarta.persistence.JoinColumn
+import jakarta.persistence.ManyToOne
 import org.hibernate.Hibernate
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.FieldHistoryDto
 import uk.gov.justice.digital.hmpps.prisonperson.enums.FieldValues
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField
 import uk.gov.justice.digital.hmpps.prisonperson.enums.Source
+import uk.gov.justice.digital.hmpps.prisonperson.mapper.toSimpleDto
 import java.time.Instant
 import java.time.ZonedDateTime
 
@@ -30,7 +33,10 @@ class FieldHistory(
 
   override var valueInt: Int? = null,
   override var valueString: String? = null,
-  override var valueRef: String? = null,
+
+  @ManyToOne
+  @JoinColumn(name = "valueRef", referencedColumnName = "id")
+  override var valueRef: ReferenceDataCode? = null,
 
   val appliesFrom: ZonedDateTime = ZonedDateTime.now(),
   var appliesTo: ZonedDateTime? = null,
@@ -58,7 +64,7 @@ class FieldHistory(
     field = field,
     valueInt = valueInt,
     valueString = valueString,
-    valueRef = null, // TODO get RDC DTO
+    valueRef = valueRef?.toSimpleDto(),
     appliesFrom = appliesFrom,
     appliesTo = appliesTo,
     createdAt = createdAt,

@@ -6,8 +6,8 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.media.Schema.RequiredMode.NOT_REQUIRED
 import uk.gov.justice.digital.hmpps.prisonperson.annotation.NullishRange
 import uk.gov.justice.digital.hmpps.prisonperson.annotation.NullishShoeSize
-import uk.gov.justice.digital.hmpps.prisonperson.utils.NullishUtils
-import kotlin.reflect.KMutableProperty0
+import uk.gov.justice.digital.hmpps.prisonperson.utils.Nullish
+import uk.gov.justice.digital.hmpps.prisonperson.utils.getAttributeAsNullish
 
 @Schema(
   description = "Request object for updating a prisoner's physical attributes. Can include one or multiple attributes. " +
@@ -31,7 +31,7 @@ data class PhysicalAttributesUpdateRequest(
     max = 274,
     message = "The height must be a plausible value in centimetres (between 30 and 274), null or not provided",
   )
-  val height: Nullish<Int> = NullishUtils.getAttribute<Int>(attributes, "height")
+  val height: Nullish<Int> = getAttributeAsNullish<Int>(attributes, "height")
 
   @Schema(
     description = "Weight (in kilograms).",
@@ -45,7 +45,7 @@ data class PhysicalAttributesUpdateRequest(
     max = 635,
     message = "The weight must be a plausible value in kilograms (between 12 and 635), null or not provided",
   )
-  val weight: Nullish<Int> = NullishUtils.getAttribute<Int>(attributes, "weight")
+  val weight: Nullish<Int> = getAttributeAsNullish<Int>(attributes, "weight")
 
   @Schema(
     description = "Hair type or colour. `ReferenceDataCode.id`.",
@@ -54,7 +54,7 @@ data class PhysicalAttributesUpdateRequest(
     requiredMode = NOT_REQUIRED,
     nullable = true,
   )
-  val hair: Nullish<String> = NullishUtils.getAttribute<String>(attributes, "hair")
+  val hair: Nullish<String> = getAttributeAsNullish<String>(attributes, "hair")
 
   @Schema(
     description = "Facial hair type. `ReferenceDataCode.id`.",
@@ -63,7 +63,7 @@ data class PhysicalAttributesUpdateRequest(
     requiredMode = NOT_REQUIRED,
     nullable = true,
   )
-  val facialHair: Nullish<String> = NullishUtils.getAttribute<String>(attributes, "facialHair")
+  val facialHair: Nullish<String> = getAttributeAsNullish<String>(attributes, "facialHair")
 
   @Schema(
     description = "Face shape. `ReferenceDataCode.id`.",
@@ -72,7 +72,7 @@ data class PhysicalAttributesUpdateRequest(
     requiredMode = NOT_REQUIRED,
     nullable = true,
   )
-  val face: Nullish<String> = NullishUtils.getAttribute<String>(attributes, "face")
+  val face: Nullish<String> = getAttributeAsNullish<String>(attributes, "face")
 
   @Schema(
     description = "Build. `ReferenceDataCode.id`.",
@@ -81,7 +81,7 @@ data class PhysicalAttributesUpdateRequest(
     requiredMode = NOT_REQUIRED,
     nullable = true,
   )
-  val build: Nullish<String> = NullishUtils.getAttribute<String>(attributes, "build")
+  val build: Nullish<String> = getAttributeAsNullish<String>(attributes, "build")
 
   @Schema(
     description = "Left eye colour. `ReferenceDataCode.id`.",
@@ -90,7 +90,7 @@ data class PhysicalAttributesUpdateRequest(
     requiredMode = NOT_REQUIRED,
     nullable = true,
   )
-  val leftEyeColour: Nullish<String> = NullishUtils.getAttribute<String>(attributes, "leftEyeColour")
+  val leftEyeColour: Nullish<String> = getAttributeAsNullish<String>(attributes, "leftEyeColour")
 
   @Schema(
     description = "Right eye colour. `ReferenceDataCode.id`.",
@@ -99,7 +99,7 @@ data class PhysicalAttributesUpdateRequest(
     requiredMode = NOT_REQUIRED,
     nullable = true,
   )
-  val rightEyeColour: Nullish<String> = NullishUtils.getAttribute<String>(attributes, "rightEyeColour")
+  val rightEyeColour: Nullish<String> = getAttributeAsNullish<String>(attributes, "rightEyeColour")
 
   @Schema(
     description = "Shoe size (in UK half sizes).",
@@ -113,51 +113,5 @@ data class PhysicalAttributesUpdateRequest(
     max = "25",
     message = "The shoe size must be a whole or half size between 1 and 25, null or not provided",
   )
-  val shoeSize: Nullish<String> = NullishUtils.getAttribute<String>(attributes, "shoeSize")
-}
-
-/**
- * Nullish sealed interface to define a type that can have a **Defined** `value` including `null`, or be **Undefined**
- */
-sealed interface Nullish<T> {
-  data object Undefined : Nullish<Nothing>
-  data class Defined<T>(val value: T?) : Nullish<T>
-
-  /**
-   * `apply` the value of the Nullish object to the nullable property `prop`
-   *
-   * If the Nullish object is **Undefined**, do nothing
-   *
-   * Otherwise, set the **Defined** `value` of the Nullish on the `prop` even if the `value` is `null`
-   *
-   * @param prop the nullable property to set to the **Defined** `value`
-   */
-  fun apply(prop: KMutableProperty0<T?>) {
-    when (this) {
-      Undefined -> return
-      is Defined -> prop.set(value)
-    }
-  }
-
-  /**
-   * `apply` the value of the Nullish object to the nullable property `prop` after mapping via `fn`
-   *
-   * If the Nullish object is **Undefined**, do nothing
-   *
-   * Otherwise, map the **Defined** `value` of the Nullish using `fn` and set the mapped value
-   * on the `prop` even if the `value` is `null`
-   *
-   * @param prop the nullable property to set to a mapped version of the **Defined** `value`
-   * @param fn a function to map the `value` before setting on the `prop`
-   */
-  fun <U> apply(prop: KMutableProperty0<U?>, fn: (T) -> U?) {
-    when (this) {
-      is Undefined -> return
-      is Defined -> {
-        val currentValue = value
-        val modifiedValue = currentValue?.let { fn(it) }
-        prop.set(modifiedValue)
-      }
-    }
-  }
+  val shoeSize: Nullish<String> = getAttributeAsNullish<String>(attributes, "shoeSize")
 }

@@ -12,7 +12,7 @@ import jakarta.persistence.OneToMany
 import org.hibernate.Hibernate
 import org.hibernate.annotations.SortNatural
 import org.springframework.data.domain.AbstractAggregateRoot
-import uk.gov.justice.digital.hmpps.prisonperson.dto.ReferenceDataCodeDto
+import uk.gov.justice.digital.hmpps.prisonperson.dto.ReferenceDataSimpleDto
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.PhysicalAttributesDto
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.ValueWithMetadata
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField
@@ -27,7 +27,7 @@ import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.SHOE_SI
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.WEIGHT
 import uk.gov.justice.digital.hmpps.prisonperson.enums.Source
 import uk.gov.justice.digital.hmpps.prisonperson.enums.Source.DPS
-import uk.gov.justice.digital.hmpps.prisonperson.mapper.toDto
+import uk.gov.justice.digital.hmpps.prisonperson.mapper.toSimpleDto
 import uk.gov.justice.digital.hmpps.prisonperson.service.event.publish.PhysicalAttributesUpdatedEvent
 import java.time.ZonedDateTime
 import java.util.SortedSet
@@ -126,10 +126,10 @@ class PhysicalAttributes(
   private fun getRefDataValueWithMetadata(
     value: KMutableProperty0<ReferenceDataCode?>,
     field: PrisonPersonField,
-  ): ValueWithMetadata<ReferenceDataCodeDto?>? =
+  ): ValueWithMetadata<ReferenceDataSimpleDto?>? =
     fieldMetadata[field]?.let {
       ValueWithMetadata(
-        value.get()?.toDto(),
+        value.get()?.toSimpleDto(),
         it.lastModifiedAt,
         it.lastModifiedBy,
       )
@@ -157,7 +157,7 @@ class PhysicalAttributes(
         if (previousVersion == null ||
           field.hasChangedFrom(
             previousVersion,
-            (currentValue() as? ReferenceDataCode)?.id ?: currentValue(),
+            currentValue(),
           )
         ) {
           fieldMetadata[field] = FieldMetadata(
@@ -181,7 +181,7 @@ class PhysicalAttributes(
               createdBy = lastModifiedBy,
               source = source,
               migratedAt = migratedAt,
-            ).also { field.set(it, (currentValue() as? ReferenceDataCode)?.id ?: currentValue()) },
+            ).also { field.set(it, currentValue()) },
           )
         }
       }

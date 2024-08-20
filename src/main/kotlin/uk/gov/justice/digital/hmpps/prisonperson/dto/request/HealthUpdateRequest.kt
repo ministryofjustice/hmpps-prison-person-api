@@ -4,7 +4,8 @@ import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.media.Schema.RequiredMode.NOT_REQUIRED
-import uk.gov.justice.digital.hmpps.prisonperson.utils.NullishUtils
+import uk.gov.justice.digital.hmpps.prisonperson.utils.Nullish
+import uk.gov.justice.digital.hmpps.prisonperson.utils.getAttributeAsNullish
 
 @Schema(
   description = "Request object for updating a prisoner's health information. Can include one or multiple fields. " +
@@ -23,5 +24,5 @@ data class HealthUpdateRequest(
     requiredMode = NOT_REQUIRED,
     nullable = true,
   )
-  val smokerOrVaper: Nullish<String> = NullishUtils.getAttribute<String>(attributes, "smokerOrVaper")
+  val smokerOrVaper: Nullish<String> = getAttributeAsNullish<String>(attributes, "smokerOrVaper")
 }

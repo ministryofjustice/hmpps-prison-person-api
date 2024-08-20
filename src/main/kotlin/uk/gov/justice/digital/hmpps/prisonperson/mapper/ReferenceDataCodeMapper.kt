@@ -1,11 +1,8 @@
 package uk.gov.justice.digital.hmpps.prisonperson.mapper
 
 import uk.gov.justice.digital.hmpps.prisonperson.dto.ReferenceDataCodeDto
-import uk.gov.justice.digital.hmpps.prisonperson.dto.response.ValueWithMetadata
-import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.ReferenceDataCode
 import java.time.ZonedDateTime
-import kotlin.reflect.KMutableProperty0
 
 /*
  * Map some NOMIS descriptions to new DPS descriptions based on `domain` and `code`

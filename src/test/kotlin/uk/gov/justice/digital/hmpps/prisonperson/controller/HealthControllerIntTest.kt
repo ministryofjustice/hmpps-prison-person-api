@@ -8,8 +8,12 @@ import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Primary
 import org.springframework.test.context.jdbc.Sql
+import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.SMOKER_OR_VAPER
 import uk.gov.justice.digital.hmpps.prisonperson.integration.IntegrationTestBase
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.utils.HistoryComparison
 import java.time.Clock
+import java.time.ZoneId
+import java.time.ZonedDateTime
 
 class HealthControllerIntTest : IntegrationTestBase() {
 
@@ -88,22 +92,75 @@ class HealthControllerIntTest : IntegrationTestBase() {
           SMOKER_NO_RESPONSE,
           true,
         )
-      }
 
-      @Test
-      @Sql("classpath:jpa/repository/reset.sql")
-      @Sql("classpath:controller/health.sql")
-      fun `can update existing health information`() {
-        expectSuccessfulUpdateFrom(VALID_REQUEST_BODY).expectBody().json(
-          SMOKER_NO_RESPONSE,
-          true,
+        expectFieldHistory(
+          SMOKER_OR_VAPER,
+          HistoryComparison(
+            value = "SMOKE_NO",
+            appliesFrom = NOW,
+            appliesTo = null,
+            createdAt = NOW,
+            createdBy = USER1,
+          ),
         )
       }
 
       @Test
       @Sql("classpath:jpa/repository/reset.sql")
-      @Sql("classpath:controller/health.sql")
+      @Sql("classpath:controller/health/health.sql")
+      @Sql("classpath:controller/health/field_history.sql")
+      fun `can update existing health information`() {
+        expectFieldHistory(
+          SMOKER_OR_VAPER,
+          HistoryComparison(
+            value = "SMOKE_SMOKER",
+            appliesFrom = THEN,
+            appliesTo = null,
+            createdAt = THEN,
+            createdBy = USER1,
+          ),
+        )
+
+        expectSuccessfulUpdateFrom(VALID_REQUEST_BODY).expectBody().json(
+          SMOKER_NO_RESPONSE,
+          true,
+        )
+
+        expectFieldHistory(
+          SMOKER_OR_VAPER,
+          HistoryComparison(
+            value = "SMOKE_SMOKER",
+            appliesFrom = THEN,
+            appliesTo = NOW,
+            createdAt = THEN,
+            createdBy = USER1,
+          ),
+          HistoryComparison(
+            value = "SMOKE_NO",
+            appliesFrom = NOW,
+            appliesTo = null,
+            createdAt = NOW,
+            createdBy = USER1,
+          ),
+        )
+      }
+
+      @Test
+      @Sql("classpath:jpa/repository/reset.sql")
+      @Sql("classpath:controller/health/health.sql")
+      @Sql("classpath:controller/health/field_history.sql")
       fun `can update existing health information to null`() {
+        expectFieldHistory(
+          SMOKER_OR_VAPER,
+          HistoryComparison(
+            value = "SMOKE_SMOKER",
+            appliesFrom = THEN,
+            appliesTo = null,
+            createdAt = THEN,
+            createdBy = USER1,
+          ),
+        )
+
         expectSuccessfulUpdateFrom(
           // language=json
           """
@@ -112,16 +169,33 @@ class HealthControllerIntTest : IntegrationTestBase() {
         ).expectBody().json(
           // language=json
           """
-            { "smokerOrVaper": null }
+            { "smokerOrVaper": {
+                "value":  null,
+                "lastModifiedAt":"2024-06-14T09:10:11+0100",
+                "lastModifiedBy":"USER1"
+              } 
+            }
           """.trimIndent(),
           true,
         )
-      }
 
-      @Test
-      @Disabled("Skipped until history implemented")
-      @Sql("classpath:jpa/repository/reset.sql")
-      fun `can update an existing set of health information a number of times`() {
+        expectFieldHistory(
+          SMOKER_OR_VAPER,
+          HistoryComparison(
+            value = "SMOKE_SMOKER",
+            appliesFrom = THEN,
+            appliesTo = NOW,
+            createdAt = THEN,
+            createdBy = USER1,
+          ),
+          HistoryComparison(
+            value = null,
+            appliesFrom = NOW,
+            appliesTo = null,
+            createdAt = NOW,
+            createdBy = USER1,
+          ),
+        )
       }
 
       @Test
@@ -140,6 +214,9 @@ class HealthControllerIntTest : IntegrationTestBase() {
   private companion object {
     const val PRISONER_NUMBER = "A1234AA"
     const val USER1 = "USER1"
+    val NOW = ZonedDateTime.now(clock)
+    val THEN = ZonedDateTime.of(2024, 1, 2, 9, 10, 11, 123000000, ZoneId.of("Europe/London"))
+
 
     val VALID_REQUEST_BODY =
       // language=json
@@ -154,14 +231,18 @@ class HealthControllerIntTest : IntegrationTestBase() {
       """
       {
         "smokerOrVaper": {
-          "id": "SMOKE_NO",
-          "domain": "SMOKE",
-          "code": "NO",
-          "description": "No, they do not smoke or vape",
-          "listSequence": 0,
-          "isActive": true,
-          "createdAt": "2024-07-11T17:00:00+0100",
-          "createdBy": "OMS_OWNER"
+          "value": {
+            "id": "SMOKE_NO",
+            "domain": "SMOKE",
+            "code": "NO",
+            "description": "No, they do not smoke or vape",
+            "listSequence": 0,
+            "isActive": true,
+            "createdAt": "2024-07-11T17:00:00+0100",
+            "createdBy": "OMS_OWNER"
+          },
+          "lastModifiedAt": "2024-06-14T09:10:11+0100",
+          "lastModifiedBy": "USER1"
         } 
       }
       """.trimIndent()

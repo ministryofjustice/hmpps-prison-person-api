@@ -72,19 +72,22 @@ class PrisonPersonServiceTest {
     )
 
     val HEALTH = HealthDto(
-      smokerOrVaper = ReferenceDataCodeDto(
-        description = "Example",
-        code = "EXAMPLE",
-        id = "EXAMPLE_CODE",
-        domain = "EXAMPLE",
-        createdAt = NOW,
-        createdBy = "Example",
-        listSequence = 0,
-        isActive = true,
-        deactivatedAt = null,
-        deactivatedBy = null,
-        lastModifiedAt = null,
-        lastModifiedBy = null,
+      smokerOrVaper = ValueWithMetadata(
+        ReferenceDataCodeDto(
+          description = "Example",
+          code = "EXAMPLE",
+          id = "EXAMPLE_CODE",
+          domain = "EXAMPLE",
+          createdAt = NOW,
+          createdBy = "Example",
+          listSequence = 0,
+          isActive = true,
+          deactivatedAt = null,
+          deactivatedBy = null,
+          lastModifiedAt = NOW,
+          lastModifiedBy = USER1,
+        ),
+        NOW, USER1,
       ),
     )
   }

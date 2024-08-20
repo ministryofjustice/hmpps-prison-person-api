@@ -183,6 +183,7 @@ class PhysicalAttributesSyncServiceTest {
             appliesTo = NOW.minusDays(5),
             createdAt = NOW,
             createdBy = USER2,
+            latestBooking = false,
           ),
         ),
       )

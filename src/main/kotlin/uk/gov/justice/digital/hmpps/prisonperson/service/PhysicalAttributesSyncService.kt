@@ -31,7 +31,7 @@ class PhysicalAttributesSyncService(
   fun sync(
     prisonerNumber: String,
     request: PhysicalAttributesSyncRequest,
-  ): PhysicalAttributesSyncResponse = if (request.appliesTo === null) {
+  ): PhysicalAttributesSyncResponse = if (request.latestBooking == true) {
     syncLatestPhysicalAttributes(prisonerNumber, request)
   } else {
     syncHistoricalPhysicalAttributes(prisonerNumber, request)

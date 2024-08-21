@@ -14,7 +14,7 @@ services:
       - DELIUS_ENABLED=false
       - NOMIS_ENABLED=false
 
-  locations-inside-prison-db:
+  prison-person-data-db:
     image: postgres
     networks:
       - hmpps

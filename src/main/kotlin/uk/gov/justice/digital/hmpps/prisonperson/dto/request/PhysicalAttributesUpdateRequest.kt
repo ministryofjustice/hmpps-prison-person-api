@@ -6,7 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.media.Schema.RequiredMode.NOT_REQUIRED
 import uk.gov.justice.digital.hmpps.prisonperson.annotation.NullishRange
 import uk.gov.justice.digital.hmpps.prisonperson.annotation.NullishShoeSize
-import uk.gov.justice.digital.hmpps.prisonperson.utils.NullishUtils
+import uk.gov.justice.digital.hmpps.prisonperson.utils.NullishUtils.Companion.getAttribute
 import kotlin.reflect.KMutableProperty0
 
 @Schema(
@@ -31,7 +31,7 @@ data class PhysicalAttributesUpdateRequest(
     max = 274,
     message = "The height must be a plausible value in centimetres (between 30 and 274), null or not provided",
   )
-  val height: Nullish<Int> = NullishUtils.getAttribute<Int>(attributes, "height")
+  val height: Nullish<Int> = getAttribute(attributes, "height")
 
   @Schema(
     description = "Weight (in kilograms).",
@@ -45,7 +45,7 @@ data class PhysicalAttributesUpdateRequest(
     max = 635,
     message = "The weight must be a plausible value in kilograms (between 12 and 635), null or not provided",
   )
-  val weight: Nullish<Int> = NullishUtils.getAttribute<Int>(attributes, "weight")
+  val weight: Nullish<Int> = getAttribute(attributes, "weight")
 
   @Schema(
     description = "Hair type or colour. `ReferenceDataCode.id`.",
@@ -54,7 +54,7 @@ data class PhysicalAttributesUpdateRequest(
     requiredMode = NOT_REQUIRED,
     nullable = true,
   )
-  val hair: Nullish<String> = NullishUtils.getAttribute<String>(attributes, "hair")
+  val hair: Nullish<String> = getAttribute(attributes, "hair")
 
   @Schema(
     description = "Facial hair type. `ReferenceDataCode.id`.",
@@ -63,7 +63,7 @@ data class PhysicalAttributesUpdateRequest(
     requiredMode = NOT_REQUIRED,
     nullable = true,
   )
-  val facialHair: Nullish<String> = NullishUtils.getAttribute<String>(attributes, "facialHair")
+  val facialHair: Nullish<String> = getAttribute(attributes, "facialHair")
 
   @Schema(
     description = "Face shape. `ReferenceDataCode.id`.",
@@ -72,7 +72,7 @@ data class PhysicalAttributesUpdateRequest(
     requiredMode = NOT_REQUIRED,
     nullable = true,
   )
-  val face: Nullish<String> = NullishUtils.getAttribute<String>(attributes, "face")
+  val face: Nullish<String> = getAttribute(attributes, "face")
 
   @Schema(
     description = "Build. `ReferenceDataCode.id`.",
@@ -81,7 +81,7 @@ data class PhysicalAttributesUpdateRequest(
     requiredMode = NOT_REQUIRED,
     nullable = true,
   )
-  val build: Nullish<String> = NullishUtils.getAttribute<String>(attributes, "build")
+  val build: Nullish<String> = getAttribute(attributes, "build")
 
   @Schema(
     description = "Left eye colour. `ReferenceDataCode.id`.",
@@ -90,7 +90,7 @@ data class PhysicalAttributesUpdateRequest(
     requiredMode = NOT_REQUIRED,
     nullable = true,
   )
-  val leftEyeColour: Nullish<String> = NullishUtils.getAttribute<String>(attributes, "leftEyeColour")
+  val leftEyeColour: Nullish<String> = getAttribute(attributes, "leftEyeColour")
 
   @Schema(
     description = "Right eye colour. `ReferenceDataCode.id`.",
@@ -99,7 +99,7 @@ data class PhysicalAttributesUpdateRequest(
     requiredMode = NOT_REQUIRED,
     nullable = true,
   )
-  val rightEyeColour: Nullish<String> = NullishUtils.getAttribute<String>(attributes, "rightEyeColour")
+  val rightEyeColour: Nullish<String> = getAttribute(attributes, "rightEyeColour")
 
   @Schema(
     description = "Shoe size (in UK half sizes).",
@@ -113,7 +113,7 @@ data class PhysicalAttributesUpdateRequest(
     max = "25",
     message = "The shoe size must be a whole or half size between 1 and 25, null or not provided",
   )
-  val shoeSize: Nullish<String> = NullishUtils.getAttribute<String>(attributes, "shoeSize")
+  val shoeSize: Nullish<String> = getAttribute(attributes, "shoeSize")
 }
 
 /**

@@ -16,7 +16,7 @@ import uk.gov.justice.digital.hmpps.prisonperson.utils.getAttributeAsNullish
 data class HealthUpdateRequest(
   @Schema(hidden = true)
   private val attributes: MutableMap<String, Any?> = mutableMapOf(),
-) : MutableMap<String, Any?> by attributes {
+) {
   @Schema(
     description = "Smoker or vaper. `ReferenceDataCode`.`id`.",
     type = "string",

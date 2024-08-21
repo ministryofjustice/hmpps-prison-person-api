@@ -10,6 +10,8 @@ import org.springframework.context.annotation.Primary
 import org.springframework.test.context.jdbc.Sql
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.SMOKER_OR_VAPER
 import uk.gov.justice.digital.hmpps.prisonperson.integration.IntegrationTestBase
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.ReferenceDataCode
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.ReferenceDataDomain
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.utils.HistoryComparison
 import java.time.Clock
 import java.time.ZoneId
@@ -96,7 +98,7 @@ class HealthControllerIntTest : IntegrationTestBase() {
         expectFieldHistory(
           SMOKER_OR_VAPER,
           HistoryComparison(
-            value = "SMOKE_NO",
+            value = SMOKER_NO,
             appliesFrom = NOW,
             appliesTo = null,
             createdAt = NOW,
@@ -113,7 +115,7 @@ class HealthControllerIntTest : IntegrationTestBase() {
         expectFieldHistory(
           SMOKER_OR_VAPER,
           HistoryComparison(
-            value = "SMOKE_SMOKER",
+            value = SMOKE_SMOKER,
             appliesFrom = THEN,
             appliesTo = null,
             createdAt = THEN,
@@ -129,14 +131,14 @@ class HealthControllerIntTest : IntegrationTestBase() {
         expectFieldHistory(
           SMOKER_OR_VAPER,
           HistoryComparison(
-            value = "SMOKE_SMOKER",
+            value = SMOKE_SMOKER,
             appliesFrom = THEN,
             appliesTo = NOW,
             createdAt = THEN,
             createdBy = USER1,
           ),
           HistoryComparison(
-            value = "SMOKE_NO",
+            value = SMOKER_NO,
             appliesFrom = NOW,
             appliesTo = null,
             createdAt = NOW,
@@ -153,7 +155,7 @@ class HealthControllerIntTest : IntegrationTestBase() {
         expectFieldHistory(
           SMOKER_OR_VAPER,
           HistoryComparison(
-            value = "SMOKE_SMOKER",
+            value = SMOKE_SMOKER,
             appliesFrom = THEN,
             appliesTo = null,
             createdAt = THEN,
@@ -182,7 +184,7 @@ class HealthControllerIntTest : IntegrationTestBase() {
         expectFieldHistory(
           SMOKER_OR_VAPER,
           HistoryComparison(
-            value = "SMOKE_SMOKER",
+            value = SMOKE_SMOKER,
             appliesFrom = THEN,
             appliesTo = NOW,
             createdAt = THEN,
@@ -224,6 +226,34 @@ class HealthControllerIntTest : IntegrationTestBase() {
           "smokerOrVaper": "SMOKE_NO"
         }
       """.trimIndent()
+
+    val SMOKER_DOMAIN = ReferenceDataDomain(
+      code = "SMOKE",
+      description = "Smoker or vaper",
+      listSequence = 0,
+      createdAt = THEN,
+      createdBy = "OMS_OWNER",
+    )
+
+    val SMOKER_NO = ReferenceDataCode(
+      id = "SMOKE_NO",
+      domain = SMOKER_DOMAIN,
+      code = "NO",
+      description = "No, they do not smoke or vape",
+      listSequence = 0,
+      createdAt = THEN,
+      createdBy = "OMS_OWNER",
+    )
+
+    val SMOKE_SMOKER = ReferenceDataCode(
+      id = "SMOKE_SMOKER",
+      domain = SMOKER_DOMAIN,
+      code = "SMOKER",
+      description = "Yes, they smoke",
+      listSequence = 0,
+      createdAt = THEN,
+      createdBy = "OMS_OWNER",
+    )
 
     val SMOKER_NO_RESPONSE =
       // language=json

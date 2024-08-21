@@ -184,35 +184,42 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
       }
 
       @Test
-      fun `bad request when height below 30cm`() {
+      fun `bad request when height below 50cm`() {
         expectBadRequestFrom(
-          requestBody = """{ "height": 29 }""",
-          message = "Validation failure(s): The height must be a plausible value in centimetres (between 30 and 274), null or not provided",
+          requestBody = """{ "height": 49 }""",
+          message = "Validation failure(s): The height must be a plausible value in centimetres (between 50 and 280), null or not provided",
         )
+
+        expectSuccessfulUpdateFrom("""{ "height": 50 }""")
       }
 
       @Test
-      fun `bad request when height exceeds 274cm`() {
+      fun `bad request when height exceeds 280cm`() {
         expectBadRequestFrom(
-          requestBody = """{ "height": 275 }""",
-          message = "Validation failure(s): The height must be a plausible value in centimetres (between 30 and 274), null or not provided",
+          requestBody = """{ "height": 281 }""",
+          message = "Validation failure(s): The height must be a plausible value in centimetres (between 50 and 280), null or not provided",
         )
+
+        expectSuccessfulUpdateFrom("""{ "height": 280 }""")
       }
 
       @Test
       fun `bad request when weight below 12kg`() {
         expectBadRequestFrom(
           requestBody = """{ "weight": 11 }""",
-          message = "Validation failure(s): The weight must be a plausible value in kilograms (between 12 and 635), null or not provided",
+          message = "Validation failure(s): The weight must be a plausible value in kilograms (between 12 and 640), null or not provided",
         )
+
+        expectSuccessfulUpdateFrom("""{ "weight": 12 }""")
       }
 
       @Test
-      fun `bad request when weight exceeds 635kg`() {
+      fun `bad request when weight exceeds 640kg`() {
         expectBadRequestFrom(
-          requestBody = """{ "weight": 636 }""",
-          message = "Validation failure(s): The weight must be a plausible value in kilograms (between 12 and 635), null or not provided",
+          requestBody = """{ "weight": 641 }""",
+          message = "Validation failure(s): The weight must be a plausible value in kilograms (between 12 and 640), null or not provided",
         )
+        expectSuccessfulUpdateFrom("""{ "weight": 640 }""")
       }
 
       @Test
@@ -661,15 +668,15 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
           ),
         )
       }
-
-      private fun expectSuccessfulUpdateFrom(requestBody: String, user: String? = USER1) =
-        webTestClient.patch().uri("/prisoners/${PRISONER_NUMBER}/physical-attributes")
-          .headers(setAuthorisation(user, roles = listOf("ROLE_PRISON_PERSON_API__PHYSICAL_ATTRIBUTES__RW")))
-          .header("Content-Type", "application/json")
-          .bodyValue(requestBody)
-          .exchange()
-          .expectStatus().isOk
     }
+
+    private fun expectSuccessfulUpdateFrom(requestBody: String, user: String? = USER1) =
+      webTestClient.patch().uri("/prisoners/${PRISONER_NUMBER}/physical-attributes")
+        .headers(setAuthorisation(user, roles = listOf("ROLE_PRISON_PERSON_API__PHYSICAL_ATTRIBUTES__RW")))
+        .header("Content-Type", "application/json")
+        .bodyValue(requestBody)
+        .exchange()
+        .expectStatus().isOk
   }
 
   private companion object {

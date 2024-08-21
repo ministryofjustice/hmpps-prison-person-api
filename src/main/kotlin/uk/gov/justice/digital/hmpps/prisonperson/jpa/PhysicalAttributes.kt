@@ -11,7 +11,6 @@ import jakarta.persistence.MapKey
 import jakarta.persistence.OneToMany
 import org.hibernate.Hibernate
 import org.hibernate.annotations.SortNatural
-import org.springframework.data.domain.AbstractAggregateRoot
 import uk.gov.justice.digital.hmpps.prisonperson.dto.ReferenceDataCodeDto
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.PhysicalAttributesDto
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.ValueWithMetadata
@@ -37,7 +36,7 @@ import kotlin.reflect.KMutableProperty0
 class PhysicalAttributes(
   @Id
   @Column(name = "prisoner_number", updatable = false, nullable = false)
-  val prisonerNumber: String,
+  override val prisonerNumber: String,
 
   @Column(name = "height_cm")
   var height: Int? = null,
@@ -75,16 +74,16 @@ class PhysicalAttributes(
   // Stores snapshots of each update to a prisoner's physical attributes
   @OneToMany(mappedBy = "prisonerNumber", fetch = LAZY, cascade = [ALL], orphanRemoval = true)
   @SortNatural
-  val fieldHistory: SortedSet<FieldHistory> = sortedSetOf(),
+  override val fieldHistory: SortedSet<FieldHistory> = sortedSetOf(),
 
   // Stores timestamps of when each individual field was changed
   @OneToMany(mappedBy = "prisonerNumber", fetch = LAZY, cascade = [ALL], orphanRemoval = true)
   @MapKey(name = "field")
-  val fieldMetadata: MutableMap<PrisonPersonField, FieldMetadata> = mutableMapOf(),
+  override val fieldMetadata: MutableMap<PrisonPersonField, FieldMetadata> = mutableMapOf(),
 
-) : AbstractAggregateRoot<PhysicalAttributes>() {
+  ) : WithFieldHistory<PhysicalAttributes>() {
 
-  private fun fieldAccessors(): Map<PrisonPersonField, KMutableProperty0<*>> = mapOf(
+  override fun fieldAccessors(): Map<PrisonPersonField, KMutableProperty0<*>> = mapOf(
     HEIGHT to ::height,
     WEIGHT to ::weight,
     HAIR to ::hair,
@@ -135,57 +134,10 @@ class PhysicalAttributes(
       )
     }
 
-  fun updateFieldHistory(
+  override fun updateFieldHistory(
     lastModifiedAt: ZonedDateTime,
     lastModifiedBy: String,
-    source: Source = DPS,
-    fields: Collection<PrisonPersonField> = allFields,
-  ) = updateFieldHistory(lastModifiedAt, lastModifiedAt, lastModifiedBy, source, fields)
-
-  fun updateFieldHistory(
-    appliesFrom: ZonedDateTime,
-    lastModifiedAt: ZonedDateTime,
-    lastModifiedBy: String,
-    source: Source = DPS,
-    fields: Collection<PrisonPersonField>,
-    migratedAt: ZonedDateTime? = null,
-  ) {
-    fieldAccessors()
-      .filter { fields.contains(it.key) }
-      .forEach { (field, currentValue) ->
-        val previousVersion = fieldHistory.lastOrNull { it.field == field }
-        if (previousVersion == null ||
-          field.hasChangedFrom(
-            previousVersion,
-            (currentValue() as? ReferenceDataCode)?.id ?: currentValue(),
-          )
-        ) {
-          fieldMetadata[field] = FieldMetadata(
-            field = field,
-            prisonerNumber = this.prisonerNumber,
-            lastModifiedAt = lastModifiedAt,
-            lastModifiedBy = lastModifiedBy,
-          )
-
-          // Set appliesTo on previous history item if not already set
-          previousVersion
-            ?.takeIf { it.appliesTo == null }
-            ?.let { it.appliesTo = appliesFrom }
-
-          fieldHistory.add(
-            FieldHistory(
-              prisonerNumber = this.prisonerNumber,
-              field = field,
-              appliesFrom = appliesFrom,
-              createdAt = lastModifiedAt,
-              createdBy = lastModifiedBy,
-              source = source,
-              migratedAt = migratedAt,
-            ).also { field.set(it, (currentValue() as? ReferenceDataCode)?.id ?: currentValue()) },
-          )
-        }
-      }
-  }
+  ) = updateFieldHistory(lastModifiedAt, lastModifiedAt, lastModifiedBy, DPS, allFields)
 
   fun publishUpdateEvent(source: Source, now: ZonedDateTime) {
     registerEvent(

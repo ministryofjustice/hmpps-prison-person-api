@@ -24,6 +24,8 @@ import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.WEIGHT
 import uk.gov.justice.digital.hmpps.prisonperson.enums.Source.DPS
 import uk.gov.justice.digital.hmpps.prisonperson.integration.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.FieldMetadata
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.ReferenceDataCode
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.ReferenceDataDomain
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.utils.HistoryComparison
 import uk.gov.justice.digital.hmpps.prisonperson.service.event.DomainEvent
 import uk.gov.justice.digital.hmpps.prisonperson.service.event.PrisonPersonAdditionalInformation
@@ -331,7 +333,7 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
         expectFieldHistory(
           HAIR,
           HistoryComparison(
-            value = "HAIR_BLACK",
+            value = HAIR_BLACK,
             appliesFrom = THEN,
             appliesTo = null,
             createdAt = THEN,
@@ -364,13 +366,9 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
               "hair": {
                 "value": {
                   "id": "HAIR_GREY",
-                  "domain": "HAIR",
-                  "code": "GREY",
                   "description": "Grey",
                   "listSequence": 0,
-                  "isActive": true,
-                  "createdAt": "2024-07-11T17:00:00+0100",
-                  "createdBy": "OMS_OWNER"
+                  "isActive": true
                 },
                 "lastModifiedAt":"2024-06-14T09:10:11+0100",
                 "lastModifiedBy":"USER2" 
@@ -405,14 +403,14 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
         expectFieldHistory(
           HAIR,
           HistoryComparison(
-            value = "HAIR_BLACK",
+            value = HAIR_BLACK,
             appliesFrom = THEN,
             appliesTo = NOW,
             createdAt = THEN,
             createdBy = USER1,
           ),
           HistoryComparison(
-            value = "HAIR_GREY",
+            value = HAIR_GREY,
             appliesFrom = NOW,
             appliesTo = null,
             createdAt = NOW,
@@ -462,7 +460,7 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
         expectFieldHistory(
           HAIR,
           HistoryComparison(
-            value = "HAIR_BLACK",
+            value = HAIR_BLACK,
             appliesFrom = THEN,
             appliesTo = null,
             createdAt = THEN,
@@ -559,14 +557,14 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
         expectFieldHistory(
           HAIR,
           HistoryComparison(
-            value = "HAIR_BLACK",
+            value = HAIR_BLACK,
             appliesFrom = THEN,
             appliesTo = THEN.plusDays(1),
             createdAt = THEN,
             createdBy = USER1,
           ),
           HistoryComparison(
-            value = "HAIR_GREY",
+            value = HAIR_GREY,
             appliesFrom = THEN.plusDays(1),
             appliesTo = THEN.plusDays(2),
             createdAt = THEN.plusDays(1),
@@ -580,14 +578,14 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
             createdBy = USER1,
           ),
           HistoryComparison(
-            value = "HAIR_BLONDE",
+            value = HAIR_BLONDE,
             appliesFrom = THEN.plusDays(3),
             appliesTo = NOW,
             createdAt = THEN.plusDays(3),
             createdBy = USER2,
           ),
           HistoryComparison(
-            value = "HAIR_GREY",
+            value = HAIR_GREY,
             appliesFrom = NOW,
             appliesTo = null,
             createdAt = NOW,
@@ -690,5 +688,35 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
 
     val NOW = ZonedDateTime.now(clock)
     val THEN = ZonedDateTime.of(2024, 1, 2, 9, 10, 11, 123000000, ZoneId.of("Europe/London"))
+
+    val HAIR_DOMAIN =
+      ReferenceDataDomain("HAIR", "Hair type or colour", 0, THEN, "OMS_OWNER")
+    val HAIR_BLACK = ReferenceDataCode(
+      id = "HAIR_BLACK",
+      domain = HAIR_DOMAIN,
+      code = "BLACK",
+      description = "Black",
+      listSequence = 0,
+      createdAt = THEN,
+      createdBy = "OMS_OWNER",
+    )
+    val HAIR_BLONDE = ReferenceDataCode(
+      id = "HAIR_BLONDE",
+      domain = HAIR_DOMAIN,
+      code = "BLONDE",
+      description = "Blonde",
+      listSequence = 0,
+      createdAt = THEN,
+      createdBy = "OMS_OWNER",
+    )
+    val HAIR_GREY = ReferenceDataCode(
+      id = "HAIR_GREY",
+      domain = HAIR_DOMAIN,
+      code = "GREY",
+      description = "Grey",
+      listSequence = 0,
+      createdAt = THEN,
+      createdBy = "OMS_OWNER",
+    )
   }
 }

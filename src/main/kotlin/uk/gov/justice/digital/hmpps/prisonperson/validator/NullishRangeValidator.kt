@@ -3,9 +3,9 @@ package uk.gov.justice.digital.hmpps.prisonperson.validator
 import jakarta.validation.ConstraintValidator
 import jakarta.validation.ConstraintValidatorContext
 import uk.gov.justice.digital.hmpps.prisonperson.annotation.NullishRange
-import uk.gov.justice.digital.hmpps.prisonperson.dto.request.Nullish
-import uk.gov.justice.digital.hmpps.prisonperson.dto.request.Nullish.Defined
-import uk.gov.justice.digital.hmpps.prisonperson.dto.request.Nullish.Undefined
+import uk.gov.justice.digital.hmpps.prisonperson.utils.Nullish
+import uk.gov.justice.digital.hmpps.prisonperson.utils.Nullish.Defined
+import uk.gov.justice.digital.hmpps.prisonperson.utils.Nullish.Undefined
 
 class NullishRangeValidator : ConstraintValidator<NullishRange, Nullish<out Int>> {
 

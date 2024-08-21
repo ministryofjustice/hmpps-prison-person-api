@@ -27,9 +27,9 @@ data class PhysicalAttributesUpdateRequest(
     nullable = true,
   )
   @field:NullishRange(
-    min = 30,
-    max = 274,
-    message = "The height must be a plausible value in centimetres (between 30 and 274), null or not provided",
+    min = 50,
+    max = 280,
+    message = "The height must be a plausible value in centimetres (between 50 and 280), null or not provided",
   )
   val height: Nullish<Int> = getAttributeAsNullish<Int>(attributes, "height")
 
@@ -42,8 +42,8 @@ data class PhysicalAttributesUpdateRequest(
   )
   @field:NullishRange(
     min = 12,
-    max = 635,
-    message = "The weight must be a plausible value in kilograms (between 12 and 635), null or not provided",
+    max = 640,
+    message = "The weight must be a plausible value in kilograms (between 12 and 640), null or not provided",
   )
   val weight: Nullish<Int> = getAttributeAsNullish<Int>(attributes, "weight")
 

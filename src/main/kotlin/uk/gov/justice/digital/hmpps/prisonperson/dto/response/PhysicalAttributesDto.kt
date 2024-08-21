@@ -1,7 +1,7 @@
 package uk.gov.justice.digital.hmpps.prisonperson.dto.response
 
 import io.swagger.v3.oas.annotations.media.Schema
-import uk.gov.justice.digital.hmpps.prisonperson.dto.ReferenceDataCodeDto
+import uk.gov.justice.digital.hmpps.prisonperson.dto.ReferenceDataSimpleDto
 import java.time.ZonedDateTime
 
 @Schema(description = "Physical Attributes")
@@ -13,22 +13,22 @@ data class PhysicalAttributesDto(
   val weight: ValueWithMetadata<Int?>? = null,
 
   @Schema(description = "Hair type or colour")
-  val hair: ValueWithMetadata<ReferenceDataCodeDto?>? = null,
+  val hair: ValueWithMetadata<ReferenceDataSimpleDto?>? = null,
 
   @Schema(description = "Facial hair type")
-  val facialHair: ValueWithMetadata<ReferenceDataCodeDto?>? = null,
+  val facialHair: ValueWithMetadata<ReferenceDataSimpleDto?>? = null,
 
   @Schema(description = "Face shape")
-  val face: ValueWithMetadata<ReferenceDataCodeDto?>? = null,
+  val face: ValueWithMetadata<ReferenceDataSimpleDto?>? = null,
 
   @Schema(description = "Build")
-  val build: ValueWithMetadata<ReferenceDataCodeDto?>? = null,
+  val build: ValueWithMetadata<ReferenceDataSimpleDto?>? = null,
 
   @Schema(description = "Left eye colour")
-  val leftEyeColour: ValueWithMetadata<ReferenceDataCodeDto?>? = null,
+  val leftEyeColour: ValueWithMetadata<ReferenceDataSimpleDto?>? = null,
 
   @Schema(description = "Right eye colour")
-  val rightEyeColour: ValueWithMetadata<ReferenceDataCodeDto?>? = null,
+  val rightEyeColour: ValueWithMetadata<ReferenceDataSimpleDto?>? = null,
 
   @Schema(description = "Shoe size")
   val shoeSize: ValueWithMetadata<String?>? = null,

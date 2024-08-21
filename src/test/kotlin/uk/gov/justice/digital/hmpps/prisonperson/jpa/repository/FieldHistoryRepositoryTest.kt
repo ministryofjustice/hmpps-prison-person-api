@@ -4,11 +4,14 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
 import org.springframework.dao.DataIntegrityViolationException
+import org.springframework.orm.jpa.JpaObjectRetrievalFailureException
 import org.springframework.test.context.transaction.TestTransaction
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.HAIR
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.WEIGHT
 import uk.gov.justice.digital.hmpps.prisonperson.enums.Source.DPS
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.FieldHistory
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.ReferenceDataCode
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.ReferenceDataDomain
 import java.time.ZonedDateTime
 
 class FieldHistoryRepositoryTest : RepositoryTest() {
@@ -88,7 +91,7 @@ class FieldHistoryRepositoryTest : RepositoryTest() {
     val fieldHistory = FieldHistory(
       prisonerNumber = PRISONER_NUMBER,
       field = WEIGHT,
-      valueRef = REF_DATA_ID_VALUE,
+      valueRef = REF_DATA_CODE,
       migratedAt = NOW,
       createdAt = NOW,
       createdBy = USER1,
@@ -108,7 +111,7 @@ class FieldHistoryRepositoryTest : RepositoryTest() {
       assertThat(field).isEqualTo(WEIGHT)
       assertThat(valueInt).isNull()
       assertThat(valueString).isNull()
-      assertThat(valueRef).isEqualTo(REF_DATA_ID_VALUE)
+      assertThat(valueRef).isEqualTo(REF_DATA_CODE)
       assertThat(migratedAt).isEqualTo(NOW)
       assertThat(createdAt).isEqualTo(NOW)
       assertThat(createdBy).isEqualTo(USER1)
@@ -124,7 +127,7 @@ class FieldHistoryRepositoryTest : RepositoryTest() {
       prisonerNumber = PRISONER_NUMBER,
       field = WEIGHT,
       valueInt = INT_VALUE,
-      valueRef = REF_DATA_ID_VALUE,
+      valueRef = REF_DATA_CODE,
       migratedAt = NOW,
       createdAt = NOW,
       createdBy = USER1,
@@ -147,7 +150,7 @@ class FieldHistoryRepositoryTest : RepositoryTest() {
     val fieldHistory = FieldHistory(
       prisonerNumber = PRISONER_NUMBER,
       field = WEIGHT,
-      valueRef = INVALID_FK_VALUE,
+      valueRef = INVALID_REF_DATA_CODE,
       migratedAt = NOW,
       createdAt = NOW,
       createdBy = USER1,
@@ -156,7 +159,7 @@ class FieldHistoryRepositoryTest : RepositoryTest() {
       source = DPS,
     )
 
-    assertThrows(DataIntegrityViolationException::class.java) {
+    assertThrows(JpaObjectRetrievalFailureException::class.java) {
       fieldHistoryRepository.save(fieldHistory).fieldHistoryId
 
       TestTransaction.flagForCommit()
@@ -191,7 +194,7 @@ class FieldHistoryRepositoryTest : RepositoryTest() {
       FieldHistory(
         prisonerNumber = PRISONER_NUMBER,
         field = HAIR,
-        valueRef = REF_DATA_ID_VALUE,
+        valueRef = REF_DATA_CODE,
         appliesFrom = NOW,
         createdAt = NOW,
         createdBy = USER1,
@@ -200,7 +203,7 @@ class FieldHistoryRepositoryTest : RepositoryTest() {
       FieldHistory(
         prisonerNumber = PRISONER_NUMBER,
         field = HAIR,
-        valueRef = REF_DATA_ID_VALUE,
+        valueRef = REF_DATA_CODE,
         appliesFrom = NOW,
         createdAt = NOW,
         createdBy = USER1,
@@ -231,7 +234,7 @@ class FieldHistoryRepositoryTest : RepositoryTest() {
       FieldHistory(
         prisonerNumber = PRISONER_NUMBER,
         field = HAIR,
-        valueRef = REF_DATA_ID_VALUE,
+        valueRef = REF_DATA_CODE,
         appliesFrom = NOW,
         createdAt = NOW,
         createdBy = USER1,
@@ -240,7 +243,7 @@ class FieldHistoryRepositoryTest : RepositoryTest() {
       FieldHistory(
         prisonerNumber = "Z1234ZZ",
         field = HAIR,
-        valueRef = REF_DATA_ID_VALUE,
+        valueRef = REF_DATA_CODE,
         appliesFrom = NOW,
         createdAt = NOW,
         createdBy = USER1,
@@ -264,7 +267,7 @@ class FieldHistoryRepositoryTest : RepositoryTest() {
       FieldHistory(
         prisonerNumber = PRISONER_NUMBER,
         field = HAIR,
-        valueRef = REF_DATA_ID_VALUE,
+        valueRef = REF_DATA_CODE,
         createdAt = NOW,
         createdBy = USER1,
       ).toString(),
@@ -277,8 +280,25 @@ class FieldHistoryRepositoryTest : RepositoryTest() {
 
     const val INT_VALUE = 123
     const val STRING_VALUE = "VALUE"
-    const val REF_DATA_ID_VALUE = "TEST_ORANGE" // Valid ReferenceDataCode record populated by test seed script
-    const val INVALID_FK_VALUE = "INVALID"
+    val REF_DATA_DOMAIN = ReferenceDataDomain("TEST", "Test domain", 1, ZonedDateTime.now(), "testUser")
+    val REF_DATA_CODE = ReferenceDataCode(
+      id = "TEST_ORANGE",
+      domain = REF_DATA_DOMAIN,
+      code = "ORANGE",
+      description = "Orange",
+      listSequence = 1,
+      createdAt = ZonedDateTime.now(),
+      createdBy = "testUser",
+    )
+    val INVALID_REF_DATA_CODE = ReferenceDataCode(
+      id = "TEST_INVALID",
+      domain = REF_DATA_DOMAIN,
+      code = "INVALID",
+      description = "INVALID",
+      listSequence = 1,
+      createdAt = ZonedDateTime.now(),
+      createdBy = "testUser",
+    )
 
     val NOW: ZonedDateTime = ZonedDateTime.now(clock)
   }

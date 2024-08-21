@@ -9,18 +9,16 @@ import uk.gov.justice.digital.hmpps.prisonperson.config.DownstreamServiceExcepti
 
 @Component
 class PrisonerSearchClient(@Qualifier("prisonerSearchWebClient") private val webClient: WebClient) {
-  fun getPrisoner(prisonerNumber: String): PrisonerDto? {
-    return try {
-      webClient
-        .get()
-        .uri("/prisoner/{prisonerNumber}", prisonerNumber)
-        .retrieve()
-        .bodyToMono(PrisonerDto::class.java)
-        .block()
-    } catch (e: NotFound) {
-      null
-    } catch (e: Exception) {
-      throw DownstreamServiceException("Get prisoner request failed", e)
-    }
+  fun getPrisoner(prisonerNumber: String): PrisonerDto? = try {
+    webClient
+      .get()
+      .uri("/prisoner/{prisonerNumber}", prisonerNumber)
+      .retrieve()
+      .bodyToMono(PrisonerDto::class.java)
+      .block()
+  } catch (e: NotFound) {
+    null
+  } catch (e: Exception) {
+    throw DownstreamServiceException("Get prisoner request failed", e)
   }
 }

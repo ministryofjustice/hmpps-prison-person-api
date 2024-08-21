@@ -168,6 +168,42 @@ class PhysicalAttributesSyncControllerIntTest : IntegrationTestBase() {
       @Sql("classpath:jpa/repository/reset.sql")
       @Sql("classpath:controller/physicalattributes/sync/physical_attributes.sql")
       @Sql("classpath:controller/physicalattributes/sync/field_history.sql")
+      fun `can sync an update of the existing physical attributes when the booking has an end date`() {
+        expectFieldHistory(
+          HEIGHT,
+          HistoryComparison(value = 180, appliesFrom = THEN, appliesTo = null, createdAt = THEN, createdBy = USER1),
+        )
+        expectFieldHistory(
+          WEIGHT,
+          HistoryComparison(value = 70, appliesFrom = THEN, appliesTo = null, createdAt = THEN, createdBy = USER1),
+        )
+        expectNoFieldHistoryFor(HAIR, FACIAL_HAIR, FACE, BUILD, LEFT_EYE_COLOUR, RIGHT_EYE_COLOUR, SHOE_SIZE)
+
+        expectSuccessfulSyncFrom(REQUEST_TO_SYNC_PHYSICAL_ATTRIBUTES_FOR_LATEST_BOOKING_WITH_END_DATE)
+          .expectBody().jsonPath("$.fieldHistoryInserted[*]").value(not(hasItem(-1)))
+
+        expectFieldHistory(
+          HEIGHT,
+          HistoryComparison(value = 180, appliesFrom = THEN, appliesTo = NOW, createdAt = THEN, createdBy = USER1, source = DPS),
+          HistoryComparison(value = 190, appliesFrom = NOW, appliesTo = null, createdAt = NOW, createdBy = USER1, source = NOMIS),
+        )
+
+        expectFieldHistory(
+          WEIGHT,
+          HistoryComparison(value = 70, appliesFrom = THEN, appliesTo = NOW, createdAt = THEN, createdBy = USER1, source = DPS),
+          HistoryComparison(value = 80, appliesFrom = NOW, appliesTo = null, createdAt = NOW, createdBy = USER1, source = NOMIS),
+        )
+
+        expectFieldMetadata(
+          FieldMetadata(PRISONER_NUMBER, HEIGHT, lastModifiedAt = NOW, lastModifiedBy = USER1),
+          FieldMetadata(PRISONER_NUMBER, WEIGHT, lastModifiedAt = NOW, lastModifiedBy = USER1),
+        )
+      }
+
+      @Test
+      @Sql("classpath:jpa/repository/reset.sql")
+      @Sql("classpath:controller/physicalattributes/sync/physical_attributes.sql")
+      @Sql("classpath:controller/physicalattributes/sync/field_history.sql")
       fun `can sync a historical update of physical attributes`() {
         expectFieldHistory(
           HEIGHT,
@@ -250,6 +286,20 @@ class PhysicalAttributesSyncControllerIntTest : IntegrationTestBase() {
     val NOW = ZonedDateTime.now(clock)
     val THEN = ZonedDateTime.of(2024, 1, 2, 9, 10, 11, 123000000, ZoneId.of("Europe/London"))
 
+    val REQUEST_TO_SYNC_PHYSICAL_ATTRIBUTES_FOR_LATEST_BOOKING_WITH_END_DATE =
+      // language=json
+      """
+        { 
+          "height": 190,
+          "weight": 80,
+          "appliesFrom": "2023-01-02T09:10:11.123+0000",
+          "appliesTo": "2023-06-14T09:10:11.123+0100",
+          "createdAt": "2024-06-14T09:10:11.123+0100",
+          "createdBy": "USER1",
+          "latestBooking": true 
+        }
+      """.trimIndent()
+
     val REQUEST_TO_SYNC_HISTORICAL_PHYSICAL_ATTRIBUTES =
       // language=json
       """
@@ -259,7 +309,8 @@ class PhysicalAttributesSyncControllerIntTest : IntegrationTestBase() {
           "appliesFrom": "2023-01-02T09:10:11.123+0000",
           "appliesTo": "2023-06-14T09:10:11.123+0100",
           "createdAt": "2024-06-14T09:10:11.123+0100",
-          "createdBy": "USER1"
+          "createdBy": "USER1",
+          "latestBooking": false
         }
       """.trimIndent()
 

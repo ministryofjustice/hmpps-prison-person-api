@@ -26,6 +26,7 @@ import uk.gov.justice.digital.hmpps.prisonperson.config.JwtAuthHelper
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField
 import uk.gov.justice.digital.hmpps.prisonperson.integration.testcontainers.LocalStackContainer
 import uk.gov.justice.digital.hmpps.prisonperson.integration.testcontainers.LocalStackContainer.setLocalStackProperties
+import uk.gov.justice.digital.hmpps.prisonperson.integration.wiremock.DocumentServiceExtension
 import uk.gov.justice.digital.hmpps.prisonperson.integration.wiremock.HmppsAuthApiExtension
 import uk.gov.justice.digital.hmpps.prisonperson.integration.wiremock.PrisonerSearchExtension
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.FieldMetadata
@@ -40,7 +41,7 @@ import uk.gov.justice.hmpps.sqs.MissingTopicException
 import uk.gov.justice.hmpps.sqs.countAllMessagesOnQueue
 
 @SpringBootTest(webEnvironment = RANDOM_PORT)
-@ExtendWith(HmppsAuthApiExtension::class, PrisonerSearchExtension::class)
+@ExtendWith(HmppsAuthApiExtension::class, PrisonerSearchExtension::class, DocumentServiceExtension::class)
 abstract class IntegrationTestBase : TestBase() {
 
   @Autowired

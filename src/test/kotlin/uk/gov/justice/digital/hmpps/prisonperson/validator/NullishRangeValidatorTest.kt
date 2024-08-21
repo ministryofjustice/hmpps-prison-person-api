@@ -4,8 +4,8 @@ import io.opentelemetry.sdk.testing.assertj.OpenTelemetryAssertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.prisonperson.annotation.NullishRange
-import uk.gov.justice.digital.hmpps.prisonperson.dto.request.Nullish.Defined
-import uk.gov.justice.digital.hmpps.prisonperson.dto.request.Nullish.Undefined
+import uk.gov.justice.digital.hmpps.prisonperson.utils.Nullish.Defined
+import uk.gov.justice.digital.hmpps.prisonperson.utils.Nullish.Undefined
 
 class NullishRangeValidatorTest {
 

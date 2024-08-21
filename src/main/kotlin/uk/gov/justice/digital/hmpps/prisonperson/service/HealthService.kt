@@ -9,10 +9,10 @@ import uk.gov.justice.digital.hmpps.prisonperson.jpa.Health
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.HealthRepository
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.ReferenceDataCodeRepository
 import uk.gov.justice.digital.hmpps.prisonperson.utils.AuthenticationFacade
-import uk.gov.justice.digital.hmpps.prisonperson.utils.PrisonerNumberUtils
-import uk.gov.justice.digital.hmpps.prisonperson.utils.ReferenceCodeUtils
 import java.time.Clock
 import java.time.ZonedDateTime
+import uk.gov.justice.digital.hmpps.prisonperson.utils.toReferenceDataCode
+import uk.gov.justice.digital.hmpps.prisonperson.utils.validatePrisonerNumber
 import kotlin.jvm.optionals.getOrNull
 
 @Service
@@ -37,7 +37,7 @@ class HealthService(
       .apply {
         request.smokerOrVaper.apply(
           this::smokerOrVaper,
-          fun(smokerOrVaper) = ReferenceCodeUtils.toReferenceDataCode(referenceDataCodeRepository, smokerOrVaper),
+          { toReferenceDataCode(referenceDataCodeRepository, it) },
         )
       }.also { it.updateFieldHistory(now, authenticationFacade.getUserOrSystemInContext()) }
 
@@ -45,7 +45,7 @@ class HealthService(
   }
 
   private fun newHealthFor(prisonerNumber: String): Health {
-    PrisonerNumberUtils.validatePrisonerNumber(prisonerSearchClient, prisonerNumber)
+    validatePrisonerNumber(prisonerSearchClient, prisonerNumber)
     return Health(prisonerNumber)
   }
 }

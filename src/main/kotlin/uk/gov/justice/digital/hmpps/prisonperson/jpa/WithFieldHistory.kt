@@ -43,7 +43,7 @@ abstract class WithFieldHistory<T : AbstractAggregateRoot<T>?> : AbstractAggrega
         if (previousVersion == null ||
           field.hasChangedFrom(
             previousVersion,
-            (currentValue() as? ReferenceDataCode)?.id ?: currentValue(),
+            currentValue(),
           )
         ) {
           fieldMetadata[field] = FieldMetadata(
@@ -67,7 +67,7 @@ abstract class WithFieldHistory<T : AbstractAggregateRoot<T>?> : AbstractAggrega
               createdBy = lastModifiedBy,
               source = source,
               migratedAt = migratedAt,
-            ).also { field.set(it, (currentValue() as? ReferenceDataCode)?.id ?: currentValue()) },
+            ).also { field.set(it, currentValue()) },
           )
         }
       }

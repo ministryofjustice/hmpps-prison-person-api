@@ -9,10 +9,10 @@ import uk.gov.justice.digital.hmpps.prisonperson.jpa.Health
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.HealthRepository
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.ReferenceDataCodeRepository
 import uk.gov.justice.digital.hmpps.prisonperson.utils.AuthenticationFacade
-import java.time.Clock
-import java.time.ZonedDateTime
 import uk.gov.justice.digital.hmpps.prisonperson.utils.toReferenceDataCode
 import uk.gov.justice.digital.hmpps.prisonperson.utils.validatePrisonerNumber
+import java.time.Clock
+import java.time.ZonedDateTime
 import kotlin.jvm.optionals.getOrNull
 
 @Service

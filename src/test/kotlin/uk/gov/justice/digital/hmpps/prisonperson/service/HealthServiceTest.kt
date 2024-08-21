@@ -78,25 +78,26 @@ class HealthServiceTest {
 
     val result = underTest.getHealth(PRISONER_NUMBER)
     assertThat(result).isEqualTo(
-        HealthDto(
-            smokerOrVaper = ValueWithMetadata(
-                ReferenceDataCodeDto(
-                    id = REFERENCE_DATA_CODE_ID,
-                    domain = REFERENCE_DATA_DOMAIN_CODE,
-                    code = REFERENCE_DATA_CODE,
-                    createdBy = USER1,
-                    createdAt = NOW,
-                    description = REFERENCE_DATA_CODE_DESCRPTION,
-                    listSequence = REFERENCE_DATA_LIST_SEQUENCE,
-                    deactivatedAt = null,
-                    deactivatedBy = null,
-                    lastModifiedBy = USER1,
-                    lastModifiedAt = NOW,
-                    isActive = true,
-                ),
-                NOW, USER1,
-            ),
+      HealthDto(
+        smokerOrVaper = ValueWithMetadata(
+          ReferenceDataCodeDto(
+            id = REFERENCE_DATA_CODE_ID,
+            domain = REFERENCE_DATA_DOMAIN_CODE,
+            code = REFERENCE_DATA_CODE,
+            createdBy = USER1,
+            createdAt = NOW,
+            description = REFERENCE_DATA_CODE_DESCRPTION,
+            listSequence = REFERENCE_DATA_LIST_SEQUENCE,
+            deactivatedAt = null,
+            deactivatedBy = null,
+            lastModifiedBy = USER1,
+            lastModifiedAt = NOW,
+            isActive = true,
+          ),
+          NOW,
+          USER1,
         ),
+      ),
     )
   }
 

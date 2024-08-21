@@ -217,7 +217,6 @@ class HealthControllerIntTest : IntegrationTestBase() {
     val NOW = ZonedDateTime.now(clock)
     val THEN = ZonedDateTime.of(2024, 1, 2, 9, 10, 11, 123000000, ZoneId.of("Europe/London"))
 
-
     val VALID_REQUEST_BODY =
       // language=json
       """

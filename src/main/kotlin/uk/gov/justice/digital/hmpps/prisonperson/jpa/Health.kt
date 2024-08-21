@@ -1,15 +1,21 @@
 package uk.gov.justice.digital.hmpps.prisonperson.jpa
 
-import jakarta.persistence.*
 import jakarta.persistence.CascadeType.ALL
+import jakarta.persistence.Column
+import jakarta.persistence.Entity
 import jakarta.persistence.FetchType.LAZY
+import jakarta.persistence.Id
+import jakarta.persistence.JoinColumn
+import jakarta.persistence.ManyToOne
+import jakarta.persistence.MapKey
+import jakarta.persistence.OneToMany
 import org.hibernate.Hibernate
 import org.hibernate.annotations.SortNatural
 import uk.gov.justice.digital.hmpps.prisonperson.dto.ReferenceDataCodeDto
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.HealthDto
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.ValueWithMetadata
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField
-import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.*
+import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.SMOKER_OR_VAPER
 import uk.gov.justice.digital.hmpps.prisonperson.enums.Source.DPS
 import uk.gov.justice.digital.hmpps.prisonperson.mapper.toDto
 import java.time.ZonedDateTime

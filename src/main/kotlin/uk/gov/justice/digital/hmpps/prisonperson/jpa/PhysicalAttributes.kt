@@ -81,7 +81,7 @@ class PhysicalAttributes(
   @MapKey(name = "field")
   override val fieldMetadata: MutableMap<PrisonPersonField, FieldMetadata> = mutableMapOf(),
 
-  ) : WithFieldHistory<PhysicalAttributes>() {
+) : WithFieldHistory<PhysicalAttributes>() {
 
   override fun fieldAccessors(): Map<PrisonPersonField, KMutableProperty0<*>> = mapOf(
     HEIGHT to ::height,

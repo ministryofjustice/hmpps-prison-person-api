@@ -87,7 +87,8 @@ class PrisonPersonServiceTest {
           lastModifiedAt = NOW,
           lastModifiedBy = USER1,
         ),
-        NOW, USER1,
+        NOW,
+        USER1,
       ),
     )
   }

@@ -15,11 +15,12 @@ import org.mockito.kotlin.whenever
 import org.mockito.quality.Strictness.LENIENT
 import uk.gov.justice.digital.hmpps.prisonperson.client.prisonersearch.PrisonerSearchClient
 import uk.gov.justice.digital.hmpps.prisonperson.client.prisonersearch.dto.PrisonerDto
-import uk.gov.justice.digital.hmpps.prisonperson.dto.ReferenceDataCodeDto
+import uk.gov.justice.digital.hmpps.prisonperson.dto.ReferenceDataSimpleDto
 import uk.gov.justice.digital.hmpps.prisonperson.dto.request.HealthUpdateRequest
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.HealthDto
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.ValueWithMetadata
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.FieldMetadata
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.Health
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.ReferenceDataCode
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.ReferenceDataDomain
@@ -27,7 +28,7 @@ import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.HealthRepository
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.ReferenceDataCodeRepository
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.utils.HistoryComparison
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.utils.expectFieldHistory
-import uk.gov.justice.digital.hmpps.prisonperson.mapper.toDto
+import uk.gov.justice.digital.hmpps.prisonperson.mapper.toSimpleDto
 import uk.gov.justice.digital.hmpps.prisonperson.utils.AuthenticationFacade
 import java.time.Clock
 import java.time.LocalDate
@@ -57,6 +58,12 @@ class HealthServiceTest {
 
   private val savedHealth = argumentCaptor<Health>()
 
+  @BeforeEach
+  fun beforeEach() {
+    whenever(referenceDataCodeRepository.findById(REFERENCE_DATA_CODE_ID)).thenReturn(Optional.of(SMOKER_OR_VAPER))
+    whenever(authenticationFacade.getUserOrSystemInContext()).thenReturn(USER1)
+  }
+
   @Test
   fun `prison person data not found`() {
     whenever(healthRepository.findById(PRISONER_NUMBER)).thenReturn(Optional.empty())
@@ -72,26 +79,27 @@ class HealthServiceTest {
         Health(
           prisonerNumber = PRISONER_NUMBER,
           smokerOrVaper = SMOKER_OR_VAPER,
+          fieldMetadata = mutableMapOf(
+            PrisonPersonField.SMOKER_OR_VAPER to FieldMetadata(
+              PRISONER_NUMBER,
+              PrisonPersonField.SMOKER_OR_VAPER,
+              NOW,
+              USER1,
+            ),
+          ),
         ),
       ),
     )
 
     val result = underTest.getHealth(PRISONER_NUMBER)
+
     assertThat(result).isEqualTo(
       HealthDto(
         smokerOrVaper = ValueWithMetadata(
-          ReferenceDataCodeDto(
+          ReferenceDataSimpleDto(
             id = REFERENCE_DATA_CODE_ID,
-            domain = REFERENCE_DATA_DOMAIN_CODE,
-            code = REFERENCE_DATA_CODE,
-            createdBy = USER1,
-            createdAt = NOW,
             description = REFERENCE_DATA_CODE_DESCRPTION,
             listSequence = REFERENCE_DATA_LIST_SEQUENCE,
-            deactivatedAt = null,
-            deactivatedBy = null,
-            lastModifiedBy = USER1,
-            lastModifiedAt = NOW,
             isActive = true,
           ),
           NOW,
@@ -107,8 +115,6 @@ class HealthServiceTest {
     @BeforeEach
     fun beforeEach() {
       whenever(healthRepository.save(savedHealth.capture())).thenAnswer { savedHealth.firstValue }
-      whenever(referenceDataCodeRepository.findById(REFERENCE_DATA_CODE_ID)).thenReturn(Optional.of(SMOKER_OR_VAPER))
-      whenever(authenticationFacade.getUserOrSystemInContext()).thenReturn(USER1)
     }
 
     @Test
@@ -126,7 +132,7 @@ class HealthServiceTest {
         ),
       ).isEqualTo(
         HealthDto(
-          ValueWithMetadata(SMOKER_OR_VAPER.toDto(), NOW, USER1),
+          ValueWithMetadata(SMOKER_OR_VAPER.toSimpleDto(), NOW, USER1),
         ),
       )
 
@@ -138,7 +144,7 @@ class HealthServiceTest {
           PrisonPersonField.SMOKER_OR_VAPER,
           fieldHistory,
           HistoryComparison(
-            value = REFERENCE_DATA_CODE_ID,
+            value = SMOKER_OR_VAPER,
             createdAt = NOW,
             createdBy = USER1,
             appliesFrom = NOW,
@@ -163,7 +169,11 @@ class HealthServiceTest {
         ),
       )
 
-      assertThat(underTest.createOrUpdate(PRISONER_NUMBER, HEALTH_UPDATE_REQUEST_WITH_NULL)).isEqualTo(HealthDto(null))
+      assertThat(underTest.createOrUpdate(PRISONER_NUMBER, HEALTH_UPDATE_REQUEST_WITH_NULL)).isEqualTo(
+        HealthDto(
+          ValueWithMetadata(null, NOW, USER1),
+        ),
+      )
 
       with(savedHealth.firstValue) {
         assertThat(prisonerNumber).isEqualTo(PRISONER_NUMBER)
@@ -173,7 +183,7 @@ class HealthServiceTest {
           PrisonPersonField.SMOKER_OR_VAPER,
           fieldHistory,
           HistoryComparison(
-            value = REFERENCE_DATA_CODE_ID,
+            value = SMOKER_OR_VAPER,
             createdAt = NOW.minusDays(1),
             createdBy = USER2,
             appliesFrom = NOW.minusDays(1),

@@ -11,13 +11,13 @@ import jakarta.persistence.MapKey
 import jakarta.persistence.OneToMany
 import org.hibernate.Hibernate
 import org.hibernate.annotations.SortNatural
-import uk.gov.justice.digital.hmpps.prisonperson.dto.ReferenceDataCodeDto
+import uk.gov.justice.digital.hmpps.prisonperson.dto.ReferenceDataSimpleDto
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.HealthDto
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.ValueWithMetadata
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.SMOKER_OR_VAPER
 import uk.gov.justice.digital.hmpps.prisonperson.enums.Source.DPS
-import uk.gov.justice.digital.hmpps.prisonperson.mapper.toDto
+import uk.gov.justice.digital.hmpps.prisonperson.mapper.toSimpleDto
 import java.time.ZonedDateTime
 import java.util.SortedSet
 import kotlin.reflect.KMutableProperty0
@@ -59,10 +59,10 @@ class Health(
   private fun getRefDataValueWithMetadata(
     value: KMutableProperty0<ReferenceDataCode?>,
     field: PrisonPersonField,
-  ): ValueWithMetadata<ReferenceDataCodeDto?>? =
+  ): ValueWithMetadata<ReferenceDataSimpleDto?>? =
     fieldMetadata[field]?.let {
       ValueWithMetadata(
-        value.get()?.toDto(),
+        value.get()?.toSimpleDto(),
         it.lastModifiedAt,
         it.lastModifiedBy,
       )

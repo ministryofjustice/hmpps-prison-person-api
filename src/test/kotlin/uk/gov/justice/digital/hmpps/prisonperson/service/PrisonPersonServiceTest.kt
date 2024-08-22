@@ -9,7 +9,7 @@ import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.whenever
 import uk.gov.justice.digital.hmpps.prisonperson.config.PrisonPersonDataNotFoundException
-import uk.gov.justice.digital.hmpps.prisonperson.dto.ReferenceDataCodeDto
+import uk.gov.justice.digital.hmpps.prisonperson.dto.ReferenceDataSimpleDto
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.HealthDto
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.PhysicalAttributesDto
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.PrisonPersonDto
@@ -73,19 +73,11 @@ class PrisonPersonServiceTest {
 
     val HEALTH = HealthDto(
       smokerOrVaper = ValueWithMetadata(
-        ReferenceDataCodeDto(
+        ReferenceDataSimpleDto(
           description = "Example",
-          code = "EXAMPLE",
           id = "EXAMPLE_CODE",
-          domain = "EXAMPLE",
-          createdAt = NOW,
-          createdBy = "Example",
           listSequence = 0,
           isActive = true,
-          deactivatedAt = null,
-          deactivatedBy = null,
-          lastModifiedAt = NOW,
-          lastModifiedBy = USER1,
         ),
         NOW,
         USER1,

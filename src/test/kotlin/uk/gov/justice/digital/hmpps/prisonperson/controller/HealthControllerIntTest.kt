@@ -262,13 +262,9 @@ class HealthControllerIntTest : IntegrationTestBase() {
         "smokerOrVaper": {
           "value": {
             "id": "SMOKE_NO",
-            "domain": "SMOKE",
-            "code": "NO",
             "description": "No, they do not smoke or vape",
             "listSequence": 0,
-            "isActive": true,
-            "createdAt": "2024-07-11T17:00:00+0100",
-            "createdBy": "OMS_OWNER"
+            "isActive": true
           },
           "lastModifiedAt": "2024-06-14T09:10:11+0100",
           "lastModifiedBy": "USER1"

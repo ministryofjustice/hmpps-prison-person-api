@@ -5,7 +5,11 @@ VALUES ('HAIR', 'Hair type or colour', 0, '2024-07-11 17:00:00+0100', 'OMS_OWNER
        ('FACE', 'Face shape', 0, '2024-07-11 17:00:00+0100', 'OMS_OWNER'),
        ('BUILD', 'Build', 0, '2024-07-11 17:00:00+0100', 'OMS_OWNER'),
        ('EYE', 'Eye colour', 0, '2024-07-11 17:00:00+0100', 'OMS_OWNER'),
-       ('SMOKE', 'Smoker or vaper', 0, '2024-07-11 17:00:00+0100', 'OMS_OWNER');
+       ('SMOKE', 'Smoker or vaper', 0, '2024-07-11 17:00:00+0100', 'OMS_OWNER'),
+       ('MARK_TYPE', 'Type of identifying mark', 0, '2024-07-21 14:00:00+0100', 'OMS_OWNER'),
+       ('SIDE', 'Side identifying mark is on', 0, '2024-07-21 14:00:00+0100', 'OMS_OWNER'),
+       ('PART_ORIENT', 'Position of identifying mark', 0, '2024-07-21 14:00:00+0100', 'OMS_OWNER'),
+       ('BODY_PART', 'Body part identifying mark is on', 0, '2024-07-21 14:00:00+0100', 'OMS_OWNER');
 
 INSERT INTO reference_data_code (id, domain, code, description, list_sequence, created_at, created_by)
 VALUES
@@ -74,3 +78,50 @@ INSERT INTO reference_data_code (id, domain, code, description, list_sequence, c
                                  last_modified_by, deactivated_at, deactivated_by)
 VALUES ('FACE_INACTIVE', 'FACE', 'INACTIVE', 'Inactive code for tests', 0, '2024-07-11 17:00:00+0100', 'OMS_OWNER',
         '2024-07-11 17:00:00+0100', 'OMS_OWNER', '2024-07-11 17:00:00+0100', 'OMS_OWNER');
+
+-- Smoker or vaper
+INSERT INTO reference_data_code (id, domain, code, description, list_sequence, created_at, created_by)
+VALUES ('SMOKE_SMOKER', 'SMOKE', 'SMOKER', 'Yes, they smoke', 0, '2024-07-11 17:00:00+0100', 'OMS_OWNER'),
+       ('SMOKE_VAPER', 'SMOKE', 'VAPER', 'Yes, they smoke or use nicotine replacement therapy (NRT)', 0,
+        '2024-07-11 17:00:00+0100', 'OMS_OWNER'),
+       ('SMOKE_NO', 'SMOKE', 'NO', 'No, they do not smoke or vape', 0, '2024-07-11 17:00:00+0100', 'OMS_OWNER');
+
+-- Distinguishing marks
+INSERT INTO reference_data_code (id, domain, code, description, list_sequence, created_at, created_by)
+VALUES ('MARK_TYPE_MARK', 'MARK_TYPE', 'MARK', 'Mark', 0, '2024-07-21 14:00:00+0100', 'OMS_OWNER'),
+       ('MARK_TYPE_OTH', 'MARK_TYPE', 'OTH', 'Other', 0, '2024-07-21 14:00:00+0100', 'OMS_OWNER'),
+       ('MARK_TYPE_SCAR', 'MARK_TYPE', 'SCAR', 'Scar', 0, '2024-07-21 14:00:00+0100', 'OMS_OWNER'),
+       ('MARK_TYPE_TAT', 'MARK_TYPE', 'TAT', 'Tattoo', 0, '2024-07-21 14:00:00+0100', 'OMS_OWNER');
+
+INSERT INTO reference_data_code (id, domain, code, description, list_sequence, created_at, created_by)
+VALUES ('SIDE_B', 'SIDE', 'B', 'Back', 3, '2024-07-21 14:00:00+0100', 'OMS_OWNER'),
+       ('SIDE_F', 'SIDE', 'F', 'Front', 4, '2024-07-21 14:00:00+0100', 'OMS_OWNER'),
+       ('SIDE_L', 'SIDE', 'L', 'Left', 2, '2024-07-21 14:00:00+0100', 'OMS_OWNER'),
+       ('SIDE_R', 'SIDE', 'R', 'Right', 1, '2024-07-21 14:00:00+0100', 'OMS_OWNER'),
+       ('SIDE_S', 'SIDE', 'S', 'Side', 5, '2024-07-21 14:00:00+0100', 'OMS_OWNER');
+
+INSERT INTO reference_data_code (id, domain, code, description, list_sequence, created_at, created_by)
+VALUES ('PART_ORIENT_CENTR', 'PART_ORIENT', 'CENTR', 'Centre', 0, '2024-07-21 14:00:00+0100', 'OMS_OWNER'),
+       ('PART_ORIENT_FACE', 'PART_ORIENT', 'FACE', 'Facing', 0, '2024-07-21 14:00:00+0100', 'OMS_OWNER'),
+       ('PART_ORIENT_LOW', 'PART_ORIENT', 'LOW', 'Low', 0, '2024-07-21 14:00:00+0100', 'OMS_OWNER'),
+       ('PART_ORIENT_UPP', 'PART_ORIENT', 'UPP', 'Upper', 0, '2024-07-21 14:00:00+0100', 'OMS_OWNER');
+
+INSERT INTO reference_data_code (id, domain, code, description, list_sequence, created_at, created_by)
+VALUES ('BODY_PART_ANKLE', 'BODY_PART', 'ANKLE', 'Ankle', 0, '2024-07-21 14:00:00+0100', 'OMS_OWNER'),
+       ('BODY_PART_ARM', 'BODY_PART', 'ARM', 'Arm', 0, '2024-07-21 14:00:00+0100', 'OMS_OWNER'),
+       ('BODY_PART_EAR', 'BODY_PART', 'EAR', 'Ear', 0, '2024-07-21 14:00:00+0100', 'OMS_OWNER'),
+       ('BODY_PART_ELBOW', 'BODY_PART', 'ELBOW', 'Elbow', 0, '2024-07-21 14:00:00+0100', 'OMS_OWNER'),
+       ('BODY_PART_FACE', 'BODY_PART', 'FACE', 'Face', 0, '2024-07-21 14:00:00+0100', 'OMS_OWNER'),
+       ('BODY_PART_FINGER', 'BODY_PART', 'FINGER', 'Finger', 0, '2024-07-21 14:00:00+0100', 'OMS_OWNER'),
+       ('BODY_PART_FOOT', 'BODY_PART', 'FOOT', 'Foot', 0, '2024-07-21 14:00:00+0100', 'OMS_OWNER'),
+       ('BODY_PART_HAND', 'BODY_PART', 'HAND', 'Hand', 0, '2024-07-21 14:00:00+0100', 'OMS_OWNER'),
+       ('BODY_PART_HEAD', 'BODY_PART', 'HEAD', 'Head', 0, '2024-07-21 14:00:00+0100', 'OMS_OWNER'),
+       ('BODY_PART_KNEE', 'BODY_PART', 'KNEE', 'Knee', 0, '2024-07-21 14:00:00+0100', 'OMS_OWNER'),
+       ('BODY_PART_LEG', 'BODY_PART', 'LEG', 'Leg', 0, '2024-07-21 14:00:00+0100', 'OMS_OWNER'),
+       ('BODY_PART_LIP', 'BODY_PART', 'LIP', 'Lip', 0, '2024-07-21 14:00:00+0100', 'OMS_OWNER'),
+       ('BODY_PART_NECK', 'BODY_PART', 'NECK', 'Neck', 0, '2024-07-21 14:00:00+0100', 'OMS_OWNER'),
+       ('BODY_PART_NOSE', 'BODY_PART', 'NOSE', 'Nose', 0, '2024-07-21 14:00:00+0100', 'OMS_OWNER'),
+       ('BODY_PART_SHOULDER', 'BODY_PART', 'SHOULDER', 'Shoulder', 0, '2024-07-21 14:00:00+0100', 'OMS_OWNER'),
+       ('BODY_PART_THIGH', 'BODY_PART', 'THIGH', 'Thigh', 0, '2024-07-21 14:00:00+0100', 'OMS_OWNER'),
+       ('BODY_PART_TOE', 'BODY_PART', 'TOE', 'Toe', 0, '2024-07-21 14:00:00+0100', 'OMS_OWNER'),
+       ('BODY_PART_TORSO', 'BODY_PART', 'TORSO', 'Torso', 0, '2024-07-21 14:00:00+0100', 'OMS_OWNER');

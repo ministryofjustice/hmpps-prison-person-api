@@ -32,7 +32,7 @@ class Health(
   @JoinColumn(name = "smoker_or_vaper", referencedColumnName = "id")
   var smokerOrVaper: ReferenceDataCode? = null,
 
-  // Stores snapshots of each update to a prisoner's physical attributes
+  // Stores snapshots of each update to a prisoner's health information
   @OneToMany(mappedBy = "prisonerNumber", fetch = LAZY, cascade = [ALL], orphanRemoval = true)
   @SortNatural
   override val fieldHistory: SortedSet<FieldHistory> = sortedSetOf(),

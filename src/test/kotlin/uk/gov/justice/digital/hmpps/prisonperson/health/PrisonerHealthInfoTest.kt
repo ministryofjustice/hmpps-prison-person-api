@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.boot.info.BuildProperties
 import java.util.Properties
 
-class HealthInfoTest {
+class PrisonerHealthInfoTest {
   @Test
   fun `should include version info`() {
     val properties = Properties().apply { setProperty("version", "somever") }

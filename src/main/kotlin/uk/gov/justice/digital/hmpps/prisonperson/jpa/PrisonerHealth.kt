@@ -12,7 +12,7 @@ import jakarta.persistence.OneToMany
 import org.hibernate.Hibernate
 import org.hibernate.annotations.SortNatural
 import uk.gov.justice.digital.hmpps.prisonperson.dto.ReferenceDataSimpleDto
-import uk.gov.justice.digital.hmpps.prisonperson.dto.response.HealthDto
+import uk.gov.justice.digital.hmpps.prisonperson.dto.response.PrisonerHealthDto
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.ValueWithMetadata
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.SMOKER_OR_VAPER
@@ -23,7 +23,7 @@ import java.util.SortedSet
 import kotlin.reflect.KMutableProperty0
 
 @Entity
-class Health(
+class PrisonerHealth(
   @Id
   @Column(name = "prisoner_number", updatable = false, nullable = false)
   override val prisonerNumber: String,
@@ -41,13 +41,13 @@ class Health(
   @OneToMany(mappedBy = "prisonerNumber", fetch = LAZY, cascade = [ALL], orphanRemoval = true)
   @MapKey(name = "field")
   override val fieldMetadata: MutableMap<PrisonPersonField, FieldMetadata> = mutableMapOf(),
-) : WithFieldHistory<Health>() {
+) : WithFieldHistory<PrisonerHealth>() {
 
   override fun fieldAccessors(): Map<PrisonPersonField, KMutableProperty0<*>> = mapOf(
     SMOKER_OR_VAPER to ::smokerOrVaper,
   )
 
-  fun toDto(): HealthDto = HealthDto(
+  fun toDto(): PrisonerHealthDto = PrisonerHealthDto(
     smokerOrVaper = getRefDataValueWithMetadata(::smokerOrVaper, SMOKER_OR_VAPER),
   )
 
@@ -72,7 +72,7 @@ class Health(
     if (this === other) return true
     if (other == null || Hibernate.getClass(this) != Hibernate.getClass(other)) return false
 
-    other as Health
+    other as PrisonerHealth
 
     if (prisonerNumber != other.prisonerNumber) return false
     if (smokerOrVaper != other.smokerOrVaper) return false

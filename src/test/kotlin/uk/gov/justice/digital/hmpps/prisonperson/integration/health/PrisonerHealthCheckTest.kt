@@ -10,7 +10,7 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.function.Consumer
 
-class HealthCheckTest : IntegrationTestBase() {
+class PrisonerHealthCheckTest : IntegrationTestBase() {
 
   @Test
   fun `Health page reports ok`() {

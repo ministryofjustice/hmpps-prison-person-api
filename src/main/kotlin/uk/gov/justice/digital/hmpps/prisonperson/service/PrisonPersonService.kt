@@ -3,28 +3,28 @@ package uk.gov.justice.digital.hmpps.prisonperson.service
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.prisonperson.config.PrisonPersonDataNotFoundException
-import uk.gov.justice.digital.hmpps.prisonperson.dto.response.HealthDto
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.PhysicalAttributesDto
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.PrisonPersonDto
+import uk.gov.justice.digital.hmpps.prisonperson.dto.response.PrisonerHealthDto
 
 @Service
 @Transactional(readOnly = true)
 class PrisonPersonService(
   private val physicalAttributesService: PhysicalAttributesService,
-  private val healthService: HealthService,
+  private val prisonerHealthService: PrisonerHealthService,
 ) {
   fun getPrisonPersonData(prisonerNumber: String): PrisonPersonDto? {
     val physicalAttributes = physicalAttributesService.getPhysicalAttributes(prisonerNumber)
-    val health = healthService.getHealth(prisonerNumber)
+    val prisonerHealth = prisonerHealthService.getHealth(prisonerNumber)
 
-    if (physicalAttributes == null && health == null) {
+    if (physicalAttributes == null && prisonerHealth == null) {
       throw PrisonPersonDataNotFoundException(prisonerNumber)
     }
 
     return PrisonPersonDto(
       prisonerNumber,
       physicalAttributes ?: PhysicalAttributesDto(),
-      health ?: HealthDto(),
+      prisonerHealth ?: PrisonerHealthDto(),
     )
   }
 }

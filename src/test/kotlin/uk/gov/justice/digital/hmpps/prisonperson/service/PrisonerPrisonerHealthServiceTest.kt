@@ -16,15 +16,15 @@ import org.mockito.quality.Strictness.LENIENT
 import uk.gov.justice.digital.hmpps.prisonperson.client.prisonersearch.PrisonerSearchClient
 import uk.gov.justice.digital.hmpps.prisonperson.client.prisonersearch.dto.PrisonerDto
 import uk.gov.justice.digital.hmpps.prisonperson.dto.ReferenceDataSimpleDto
-import uk.gov.justice.digital.hmpps.prisonperson.dto.request.HealthUpdateRequest
-import uk.gov.justice.digital.hmpps.prisonperson.dto.response.HealthDto
+import uk.gov.justice.digital.hmpps.prisonperson.dto.request.PrisonerHealthUpdateRequest
+import uk.gov.justice.digital.hmpps.prisonperson.dto.response.PrisonerHealthDto
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.ValueWithMetadata
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.FieldMetadata
-import uk.gov.justice.digital.hmpps.prisonperson.jpa.Health
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.PrisonerHealth
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.ReferenceDataCode
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.ReferenceDataDomain
-import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.HealthRepository
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.PrisonerHealthRepository
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.ReferenceDataCodeRepository
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.utils.HistoryComparison
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.utils.expectFieldHistory
@@ -37,9 +37,9 @@ import java.util.*
 
 @ExtendWith(MockitoExtension::class)
 @MockitoSettings(strictness = LENIENT)
-class HealthServiceTest {
+class PrisonerPrisonerHealthServiceTest {
   @Mock
-  lateinit var healthRepository: HealthRepository
+  lateinit var prisonerHealthRepository: PrisonerHealthRepository
 
   @Mock
   lateinit var prisonerSearchClient: PrisonerSearchClient
@@ -54,9 +54,9 @@ class HealthServiceTest {
   val clock: Clock? = Clock.fixed(NOW.toInstant(), NOW.zone)
 
   @InjectMocks
-  lateinit var underTest: HealthService
+  lateinit var underTest: PrisonerHealthService
 
-  private val savedHealth = argumentCaptor<Health>()
+  private val savedPrisonerHealth = argumentCaptor<PrisonerHealth>()
 
   @BeforeEach
   fun beforeEach() {
@@ -66,7 +66,7 @@ class HealthServiceTest {
 
   @Test
   fun `prison person data not found`() {
-    whenever(healthRepository.findById(PRISONER_NUMBER)).thenReturn(Optional.empty())
+    whenever(prisonerHealthRepository.findById(PRISONER_NUMBER)).thenReturn(Optional.empty())
 
     val result = underTest.getHealth(PRISONER_NUMBER)
     assertThat(result).isNull()
@@ -74,9 +74,9 @@ class HealthServiceTest {
 
   @Test
   fun `prison health data is found`() {
-    whenever(healthRepository.findById(PRISONER_NUMBER)).thenReturn(
+    whenever(prisonerHealthRepository.findById(PRISONER_NUMBER)).thenReturn(
       Optional.of(
-        Health(
+        PrisonerHealth(
           prisonerNumber = PRISONER_NUMBER,
           smokerOrVaper = SMOKER_OR_VAPER,
           fieldMetadata = mutableMapOf(
@@ -94,7 +94,7 @@ class HealthServiceTest {
     val result = underTest.getHealth(PRISONER_NUMBER)
 
     assertThat(result).isEqualTo(
-      HealthDto(
+      PrisonerHealthDto(
         smokerOrVaper = ValueWithMetadata(
           ReferenceDataSimpleDto(
             id = REFERENCE_DATA_CODE_ID,
@@ -110,11 +110,11 @@ class HealthServiceTest {
   }
 
   @Nested
-  inner class CreateOrUpdateHealth {
+  inner class CreateOrUpdatePrisonerHealth {
 
     @BeforeEach
     fun beforeEach() {
-      whenever(healthRepository.save(savedHealth.capture())).thenAnswer { savedHealth.firstValue }
+      whenever(prisonerHealthRepository.save(savedPrisonerHealth.capture())).thenAnswer { savedPrisonerHealth.firstValue }
     }
 
     @Test
@@ -123,7 +123,7 @@ class HealthServiceTest {
         PRISONER_SEARCH_RESPONSE,
       )
 
-      whenever(healthRepository.findById(PRISONER_NUMBER)).thenReturn(Optional.empty())
+      whenever(prisonerHealthRepository.findById(PRISONER_NUMBER)).thenReturn(Optional.empty())
 
       assertThat(
         underTest.createOrUpdate(
@@ -131,12 +131,12 @@ class HealthServiceTest {
           HEALTH_UPDATE_REQUEST,
         ),
       ).isEqualTo(
-        HealthDto(
+        PrisonerHealthDto(
           ValueWithMetadata(SMOKER_OR_VAPER.toSimpleDto(), NOW, USER1),
         ),
       )
 
-      with(savedHealth.firstValue) {
+      with(savedPrisonerHealth.firstValue) {
         assertThat(prisonerNumber).isEqualTo(PRISONER_NUMBER)
         assertThat(smokerOrVaper).isEqualTo(SMOKER_OR_VAPER)
 
@@ -160,9 +160,9 @@ class HealthServiceTest {
         PRISONER_SEARCH_RESPONSE,
       )
 
-      whenever(healthRepository.findById(PRISONER_NUMBER)).thenReturn(
+      whenever(prisonerHealthRepository.findById(PRISONER_NUMBER)).thenReturn(
         Optional.of(
-          Health(
+          PrisonerHealth(
             prisonerNumber = PRISONER_NUMBER,
             smokerOrVaper = SMOKER_OR_VAPER,
           ).also { it.updateFieldHistory(lastModifiedAt = NOW.minusDays(1), lastModifiedBy = USER2) },
@@ -170,12 +170,12 @@ class HealthServiceTest {
       )
 
       assertThat(underTest.createOrUpdate(PRISONER_NUMBER, HEALTH_UPDATE_REQUEST_WITH_NULL)).isEqualTo(
-        HealthDto(
+        PrisonerHealthDto(
           ValueWithMetadata(null, NOW, USER1),
         ),
       )
 
-      with(savedHealth.firstValue) {
+      with(savedPrisonerHealth.firstValue) {
         assertThat(prisonerNumber).isEqualTo(PRISONER_NUMBER)
         assertThat(smokerOrVaper).isEqualTo(null)
 
@@ -218,12 +218,12 @@ class HealthServiceTest {
     val attributes = mutableMapOf<String, Any?>(
       Pair("smokerOrVaper", REFERENCE_DATA_CODE_ID),
     )
-    val HEALTH_UPDATE_REQUEST = HealthUpdateRequest(attributes)
+    val HEALTH_UPDATE_REQUEST = PrisonerHealthUpdateRequest(attributes)
 
     val attributes_undefined = mutableMapOf<String, Any?>(
       Pair("smokerOrVaper", null),
     )
-    val HEALTH_UPDATE_REQUEST_WITH_NULL = HealthUpdateRequest(attributes_undefined)
+    val HEALTH_UPDATE_REQUEST_WITH_NULL = PrisonerHealthUpdateRequest(attributes_undefined)
 
     val SMOKER_OR_VAPER = ReferenceDataCode(
       id = REFERENCE_DATA_CODE_ID,

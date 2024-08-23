@@ -17,7 +17,7 @@ import java.time.Clock
 import java.time.ZoneId
 import java.time.ZonedDateTime
 
-class HealthControllerIntTest : IntegrationTestBase() {
+class PrisonerPrisonerHealthControllerIntTest : IntegrationTestBase() {
 
   @TestConfiguration
   class FixedClockConfig {
@@ -28,7 +28,7 @@ class HealthControllerIntTest : IntegrationTestBase() {
 
   @DisplayName("PATCH /prisoners/{prisonerNumber}/health")
   @Nested
-  inner class SetHealthTest {
+  inner class SetPrisonerHealthTest {
 
     @Nested
     inner class Security {
@@ -109,8 +109,8 @@ class HealthControllerIntTest : IntegrationTestBase() {
 
       @Test
       @Sql("classpath:jpa/repository/reset.sql")
-      @Sql("classpath:controller/health/health.sql")
-      @Sql("classpath:controller/health/field_history.sql")
+      @Sql("classpath:controller/prisoner_health/health.sql")
+      @Sql("classpath:controller/prisoner_health/field_history.sql")
       fun `can update existing health information`() {
         expectFieldHistory(
           SMOKER_OR_VAPER,
@@ -149,8 +149,8 @@ class HealthControllerIntTest : IntegrationTestBase() {
 
       @Test
       @Sql("classpath:jpa/repository/reset.sql")
-      @Sql("classpath:controller/health/health.sql")
-      @Sql("classpath:controller/health/field_history.sql")
+      @Sql("classpath:controller/prisoner_health/health.sql")
+      @Sql("classpath:controller/prisoner_health/field_history.sql")
       fun `can update existing health information to null`() {
         expectFieldHistory(
           SMOKER_OR_VAPER,

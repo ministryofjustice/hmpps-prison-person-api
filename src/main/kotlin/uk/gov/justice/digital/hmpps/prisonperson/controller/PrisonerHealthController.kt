@@ -15,15 +15,15 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
-import uk.gov.justice.digital.hmpps.prisonperson.dto.request.HealthUpdateRequest
-import uk.gov.justice.digital.hmpps.prisonperson.dto.response.HealthDto
-import uk.gov.justice.digital.hmpps.prisonperson.service.HealthService
+import uk.gov.justice.digital.hmpps.prisonperson.dto.request.PrisonerHealthUpdateRequest
+import uk.gov.justice.digital.hmpps.prisonperson.dto.response.PrisonerHealthDto
+import uk.gov.justice.digital.hmpps.prisonperson.service.PrisonerHealthService
 import uk.gov.justice.hmpps.kotlin.common.ErrorResponse
 
 @RestController
 @Tag(name = "Health", description = "The health information for a prisoner")
 @RequestMapping("/prisoners/{prisonerNumber}/health", produces = [MediaType.APPLICATION_JSON_VALUE])
-class HealthController(private val healthService: HealthService) {
+class PrisonerHealthController(private val prisonerHealthService: PrisonerHealthService) {
   @PatchMapping
   @ResponseStatus(HttpStatus.OK)
   @PreAuthorize("hasRole('ROLE_PRISON_PERSON_API__HEALTH__RW')")
@@ -73,6 +73,6 @@ class HealthController(private val healthService: HealthService) {
     prisonerNumber: String,
     @RequestBody
     @Valid
-    healthUpdateRequest: HealthUpdateRequest,
-  ): HealthDto = healthService.createOrUpdate(prisonerNumber, healthUpdateRequest)
+    prisonerHealthUpdateRequest: PrisonerHealthUpdateRequest,
+  ): PrisonerHealthDto = prisonerHealthService.createOrUpdate(prisonerNumber, prisonerHealthUpdateRequest)
 }

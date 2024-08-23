@@ -4,18 +4,18 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.transaction.TestTransaction
-import uk.gov.justice.digital.hmpps.prisonperson.jpa.Health
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.PrisonerHealth
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.ReferenceDataCode
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.ReferenceDataDomain
 import java.time.ZonedDateTime
 
-class HealthRepositoryTest : RepositoryTest() {
+class PrisonerPrisonerHealthRepositoryTest : RepositoryTest() {
 
   @Autowired
-  lateinit var repository: HealthRepository
+  lateinit var repository: PrisonerHealthRepository
 
-  fun save(health: Health) {
-    repository.save(health)
+  fun save(prisonerHealth: PrisonerHealth) {
+    repository.save(prisonerHealth)
     TestTransaction.flagForCommit()
     TestTransaction.end()
     TestTransaction.start()
@@ -23,8 +23,8 @@ class HealthRepositoryTest : RepositoryTest() {
 
   @Test
   fun `can persist health`() {
-    val health = Health(PRISONER_NUMBER, SMOKER_OR_VAPER)
-    save(health)
+    val prisonerHealth = PrisonerHealth(PRISONER_NUMBER, SMOKER_OR_VAPER)
+    save(prisonerHealth)
 
     with(repository.getReferenceById(PRISONER_NUMBER)) {
       assertThat(prisonerNumber).isEqualTo(PRISONER_NUMBER)
@@ -34,8 +34,8 @@ class HealthRepositoryTest : RepositoryTest() {
 
   @Test
   fun `can persist health with null values`() {
-    val health = Health(PRISONER_NUMBER)
-    save(health)
+    val prisonerHealth = PrisonerHealth(PRISONER_NUMBER)
+    save(prisonerHealth)
 
     with(repository.getReferenceById(PRISONER_NUMBER)) {
       assertThat(prisonerNumber).isEqualTo(PRISONER_NUMBER)
@@ -45,7 +45,7 @@ class HealthRepositoryTest : RepositoryTest() {
 
   @Test
   fun `can update health`() {
-    repository.save(Health(PRISONER_NUMBER))
+    repository.save(PrisonerHealth(PRISONER_NUMBER))
     TestTransaction.flagForCommit()
     TestTransaction.end()
     TestTransaction.start()
@@ -66,9 +66,9 @@ class HealthRepositoryTest : RepositoryTest() {
 
   @Test
   fun `can test for equality`() {
-    assertThat(Health(PRISONER_NUMBER)).isEqualTo(Health(PRISONER_NUMBER))
+    assertThat(PrisonerHealth(PRISONER_NUMBER)).isEqualTo(PrisonerHealth(PRISONER_NUMBER))
 
-    assertThat(Health(PRISONER_NUMBER)).isNotEqualTo(Health("Example"))
+    assertThat(PrisonerHealth(PRISONER_NUMBER)).isNotEqualTo(PrisonerHealth("Example"))
   }
 
   @Test

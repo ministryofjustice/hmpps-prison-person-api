@@ -10,9 +10,9 @@ import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.whenever
 import uk.gov.justice.digital.hmpps.prisonperson.config.PrisonPersonDataNotFoundException
 import uk.gov.justice.digital.hmpps.prisonperson.dto.ReferenceDataSimpleDto
-import uk.gov.justice.digital.hmpps.prisonperson.dto.response.HealthDto
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.PhysicalAttributesDto
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.PrisonPersonDto
+import uk.gov.justice.digital.hmpps.prisonperson.dto.response.PrisonerHealthDto
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.ValueWithMetadata
 import java.time.ZonedDateTime
 
@@ -22,7 +22,7 @@ class PrisonPersonServiceTest {
   lateinit var physicalAttributesService: PhysicalAttributesService
 
   @Mock
-  lateinit var healthService: HealthService
+  lateinit var prisonerHealthService: PrisonerHealthService
 
   @InjectMocks
   lateinit var underTest: PrisonPersonService
@@ -30,7 +30,7 @@ class PrisonPersonServiceTest {
   @Test
   fun `prison person data not found`() {
     whenever(physicalAttributesService.getPhysicalAttributes(PRISONER_NUMBER)).thenReturn(null)
-    whenever(healthService.getHealth(PRISONER_NUMBER)).thenReturn(null)
+    whenever(prisonerHealthService.getHealth(PRISONER_NUMBER)).thenReturn(null)
     assertThatThrownBy { underTest.getPrisonPersonData(PRISONER_NUMBER) }
       .isInstanceOf(PrisonPersonDataNotFoundException::class.java)
       .hasMessage("No data for '$PRISONER_NUMBER'")
@@ -39,10 +39,10 @@ class PrisonPersonServiceTest {
   @Test
   fun `physical attributes data retrieved`() {
     whenever(physicalAttributesService.getPhysicalAttributes(PRISONER_NUMBER)).thenReturn(PHYSICAL_ATTRIBUTES)
-    whenever(healthService.getHealth(PRISONER_NUMBER)).thenReturn(null)
+    whenever(prisonerHealthService.getHealth(PRISONER_NUMBER)).thenReturn(null)
 
     val result = underTest.getPrisonPersonData(PRISONER_NUMBER)
-    val expected = PrisonPersonDto(PRISONER_NUMBER, PHYSICAL_ATTRIBUTES, HealthDto())
+    val expected = PrisonPersonDto(PRISONER_NUMBER, PHYSICAL_ATTRIBUTES, PrisonerHealthDto())
 
     assertThat(result).isEqualTo(expected)
   }
@@ -50,7 +50,7 @@ class PrisonPersonServiceTest {
   @Test
   fun `health data retrieved`() {
     whenever(physicalAttributesService.getPhysicalAttributes(PRISONER_NUMBER)).thenReturn(null)
-    whenever(healthService.getHealth(PRISONER_NUMBER)).thenReturn(HEALTH)
+    whenever(prisonerHealthService.getHealth(PRISONER_NUMBER)).thenReturn(HEALTH)
 
     val result = underTest.getPrisonPersonData(PRISONER_NUMBER)
     val expected = PrisonPersonDto(PRISONER_NUMBER, PhysicalAttributesDto(), HEALTH)
@@ -71,7 +71,7 @@ class PrisonPersonServiceTest {
       weight = ValueWithMetadata(PRISONER_WEIGHT, NOW, USER1),
     )
 
-    val HEALTH = HealthDto(
+    val HEALTH = PrisonerHealthDto(
       smokerOrVaper = ValueWithMetadata(
         ReferenceDataSimpleDto(
           description = "Example",

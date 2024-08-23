@@ -24,6 +24,7 @@ import org.mockito.kotlin.whenever
 import org.mockito.quality.Strictness.LENIENT
 import uk.gov.justice.digital.hmpps.prisonperson.client.prisonersearch.PrisonerSearchClient
 import uk.gov.justice.digital.hmpps.prisonperson.client.prisonersearch.dto.PrisonerDto
+import uk.gov.justice.digital.hmpps.prisonperson.config.IllegalFieldHistoryException
 import uk.gov.justice.digital.hmpps.prisonperson.dto.request.PhysicalAttributesSyncRequest
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.PhysicalAttributesSyncResponse
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.HEIGHT
@@ -251,6 +252,32 @@ class PhysicalAttributesSyncServiceTest {
         argThat { it -> it.containsValue(PRISONER_NUMBER) },
         isNull(),
       )
+    }
+
+    @Test
+    fun `throws exception if history would have illogical applies_to and applies_from timestamps`() {
+      whenever(physicalAttributesRepository.findById(PRISONER_NUMBER)).thenReturn(
+        Optional.of(
+          PhysicalAttributes(
+            prisonerNumber = PRISONER_NUMBER,
+            height = PRISONER_HEIGHT,
+            weight = PRISONER_WEIGHT,
+          ).also { it.updateFieldHistory(lastModifiedAt = NOW.minusDays(1), lastModifiedBy = USER1) },
+        ),
+      )
+
+      assertThatThrownBy {
+        underTest.sync(
+          PRISONER_NUMBER,
+          PHYSICAL_ATTRIBUTES_SYNC_REQUEST.copy(
+            height = PRISONER_HEIGHT + 1,
+            createdAt = NOW.minusYears(1),
+          ),
+        )
+      }
+        .isInstanceOf(IllegalFieldHistoryException::class.java)
+
+      verify(physicalAttributesRepository, never()).save(any())
     }
   }
 

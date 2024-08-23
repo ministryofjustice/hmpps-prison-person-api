@@ -139,7 +139,7 @@ class PhysicalAttributes(
     lastModifiedBy: String,
   ) = updateFieldHistory(lastModifiedAt, lastModifiedAt, lastModifiedBy, DPS, allFields)
 
-  fun publishUpdateEvent(source: Source, now: ZonedDateTime) {
+  override fun publishUpdateEvent(source: Source, now: ZonedDateTime) {
     registerEvent(
       PhysicalAttributesUpdatedEvent(
         prisonerNumber = prisonerNumber,

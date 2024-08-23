@@ -72,11 +72,15 @@ abstract class IntegrationTestBase : TestBase() {
 
   @BeforeEach
   fun `clear queues`() {
-    publishTestQueue.sqsClient.purgeQueue(PurgeQueueRequest.builder().queueUrl(publishTestQueue.queueUrl).build()).get()
-    prisonPersonQueue.sqsClient.purgeQueue(PurgeQueueRequest.builder().queueUrl(prisonPersonQueue.queueUrl).build()).get()
+    await untilCallTo {
+      publishTestQueue.sqsClient.purgeQueue(PurgeQueueRequest.builder().queueUrl(publishTestQueue.queueUrl).build()).get()
+      publishTestQueue.countAllMessagesOnQueue()
+    } matches { it == 0 }
 
-    await untilCallTo { publishTestQueue.countAllMessagesOnQueue() } matches { it == 0 }
-    await untilCallTo { prisonPersonQueue.countAllMessagesOnQueue() } matches { it == 0 }
+    await untilCallTo {
+      prisonPersonQueue.sqsClient.purgeQueue(PurgeQueueRequest.builder().queueUrl(prisonPersonQueue.queueUrl).build()).get()
+      prisonPersonQueue.countAllMessagesOnQueue()
+    } matches { it == 0 }
   }
 
   protected fun setAuthorisation(

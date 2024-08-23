@@ -6,7 +6,7 @@ import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField
 import uk.gov.justice.digital.hmpps.prisonperson.enums.Source
 import uk.gov.justice.digital.hmpps.prisonperson.enums.Source.DPS
 import java.time.ZonedDateTime
-import java.util.*
+import java.util.SortedSet
 import kotlin.reflect.KMutableProperty0
 
 abstract class WithFieldHistory<T : AbstractAggregateRoot<T>?> : AbstractAggregateRoot<T>() {
@@ -19,6 +19,8 @@ abstract class WithFieldHistory<T : AbstractAggregateRoot<T>?> : AbstractAggrega
     lastModifiedAt: ZonedDateTime,
     lastModifiedBy: String,
   )
+
+  abstract fun publishUpdateEvent(source: Source, now: ZonedDateTime)
 
   fun updateFieldHistory(
     lastModifiedAt: ZonedDateTime,

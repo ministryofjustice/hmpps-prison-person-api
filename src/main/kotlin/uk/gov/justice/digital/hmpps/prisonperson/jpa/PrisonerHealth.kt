@@ -17,6 +17,7 @@ import uk.gov.justice.digital.hmpps.prisonperson.dto.response.HealthDto
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.ValueWithMetadata
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.SMOKER_OR_VAPER
+import uk.gov.justice.digital.hmpps.prisonperson.enums.Source
 import uk.gov.justice.digital.hmpps.prisonperson.enums.Source.DPS
 import uk.gov.justice.digital.hmpps.prisonperson.mapper.toSimpleDto
 import java.time.ZonedDateTime
@@ -57,6 +58,10 @@ class PrisonerHealth(
     lastModifiedAt: ZonedDateTime,
     lastModifiedBy: String,
   ) = updateFieldHistory(lastModifiedAt, lastModifiedAt, lastModifiedBy, DPS, allFields)
+
+  override fun publishUpdateEvent(source: Source, now: ZonedDateTime) {
+    // No-op for now
+  }
 
   private fun getRefDataValueWithMetadata(
     value: KMutableProperty0<ReferenceDataCode?>,

@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import uk.gov.justice.digital.hmpps.prisonperson.dto.ReferenceDataSimpleDto
 
 @Schema(description = "Prison person health")
-data class PrisonerHealthDto(
+data class HealthDto(
   @Schema(description = "Smoker or vaper")
   val smokerOrVaper: ValueWithMetadata<ReferenceDataSimpleDto?>? = null,
 )

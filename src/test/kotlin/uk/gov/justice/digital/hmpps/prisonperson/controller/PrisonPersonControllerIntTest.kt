@@ -78,7 +78,7 @@ class PrisonPersonControllerIntTest : IntegrationTestBase() {
                   "rightEyeColour": null,
                   "shoeSize": null
                 },
-                "prisonerHealth": {
+                "health": {
                   "smokerOrVaper": null
                 }
               }

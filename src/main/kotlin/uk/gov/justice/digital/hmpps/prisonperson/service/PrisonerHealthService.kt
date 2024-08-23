@@ -4,7 +4,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.prisonperson.client.prisonersearch.PrisonerSearchClient
 import uk.gov.justice.digital.hmpps.prisonperson.dto.request.PrisonerHealthUpdateRequest
-import uk.gov.justice.digital.hmpps.prisonperson.dto.response.PrisonerHealthDto
+import uk.gov.justice.digital.hmpps.prisonperson.dto.response.HealthDto
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.PrisonerHealth
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.PrisonerHealthRepository
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.ReferenceDataCodeRepository
@@ -24,13 +24,13 @@ class PrisonerHealthService(
   private val authenticationFacade: AuthenticationFacade,
   private val clock: Clock,
 ) {
-  fun getHealth(prisonerNumber: String): PrisonerHealthDto? = prisonerHealthRepository.findById(prisonerNumber).getOrNull()?.toDto()
+  fun getHealth(prisonerNumber: String): HealthDto? = prisonerHealthRepository.findById(prisonerNumber).getOrNull()?.toDto()
 
   @Transactional
   fun createOrUpdate(
     prisonerNumber: String,
     request: PrisonerHealthUpdateRequest,
-  ): PrisonerHealthDto {
+  ): HealthDto {
     val now = ZonedDateTime.now(clock)
     val health = prisonerHealthRepository.findById(prisonerNumber)
       .orElseGet { newHealthFor(prisonerNumber) }

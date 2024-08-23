@@ -9,10 +9,11 @@ import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.MapKey
 import jakarta.persistence.OneToMany
+import jakarta.persistence.Table
 import org.hibernate.Hibernate
 import org.hibernate.annotations.SortNatural
 import uk.gov.justice.digital.hmpps.prisonperson.dto.ReferenceDataSimpleDto
-import uk.gov.justice.digital.hmpps.prisonperson.dto.response.PrisonerHealthDto
+import uk.gov.justice.digital.hmpps.prisonperson.dto.response.HealthDto
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.ValueWithMetadata
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.SMOKER_OR_VAPER
@@ -23,6 +24,7 @@ import java.util.SortedSet
 import kotlin.reflect.KMutableProperty0
 
 @Entity
+@Table(name = "health")
 class PrisonerHealth(
   @Id
   @Column(name = "prisoner_number", updatable = false, nullable = false)
@@ -47,7 +49,7 @@ class PrisonerHealth(
     SMOKER_OR_VAPER to ::smokerOrVaper,
   )
 
-  fun toDto(): PrisonerHealthDto = PrisonerHealthDto(
+  fun toDto(): HealthDto = HealthDto(
     smokerOrVaper = getRefDataValueWithMetadata(::smokerOrVaper, SMOKER_OR_VAPER),
   )
 

@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.prisonperson.dto.request.PrisonerHealthUpdateRequest
-import uk.gov.justice.digital.hmpps.prisonperson.dto.response.PrisonerHealthDto
+import uk.gov.justice.digital.hmpps.prisonperson.dto.response.HealthDto
 import uk.gov.justice.digital.hmpps.prisonperson.service.PrisonerHealthService
 import uk.gov.justice.hmpps.kotlin.common.ErrorResponse
 
@@ -74,5 +74,5 @@ class PrisonerHealthController(private val prisonerHealthService: PrisonerHealth
     @RequestBody
     @Valid
     prisonerHealthUpdateRequest: PrisonerHealthUpdateRequest,
-  ): PrisonerHealthDto = prisonerHealthService.createOrUpdate(prisonerNumber, prisonerHealthUpdateRequest)
+  ): HealthDto = prisonerHealthService.createOrUpdate(prisonerNumber, prisonerHealthUpdateRequest)
 }

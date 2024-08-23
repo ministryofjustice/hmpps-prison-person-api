@@ -10,9 +10,9 @@ import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.whenever
 import uk.gov.justice.digital.hmpps.prisonperson.config.PrisonPersonDataNotFoundException
 import uk.gov.justice.digital.hmpps.prisonperson.dto.ReferenceDataSimpleDto
+import uk.gov.justice.digital.hmpps.prisonperson.dto.response.HealthDto
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.PhysicalAttributesDto
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.PrisonPersonDto
-import uk.gov.justice.digital.hmpps.prisonperson.dto.response.PrisonerHealthDto
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.ValueWithMetadata
 import java.time.ZonedDateTime
 
@@ -42,7 +42,7 @@ class PrisonPersonServiceTest {
     whenever(prisonerHealthService.getHealth(PRISONER_NUMBER)).thenReturn(null)
 
     val result = underTest.getPrisonPersonData(PRISONER_NUMBER)
-    val expected = PrisonPersonDto(PRISONER_NUMBER, PHYSICAL_ATTRIBUTES, PrisonerHealthDto())
+    val expected = PrisonPersonDto(PRISONER_NUMBER, PHYSICAL_ATTRIBUTES, HealthDto())
 
     assertThat(result).isEqualTo(expected)
   }
@@ -71,7 +71,7 @@ class PrisonPersonServiceTest {
       weight = ValueWithMetadata(PRISONER_WEIGHT, NOW, USER1),
     )
 
-    val HEALTH = PrisonerHealthDto(
+    val HEALTH = HealthDto(
       smokerOrVaper = ValueWithMetadata(
         ReferenceDataSimpleDto(
           description = "Example",

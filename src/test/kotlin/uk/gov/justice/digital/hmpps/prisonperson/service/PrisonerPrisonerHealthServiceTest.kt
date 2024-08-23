@@ -17,7 +17,7 @@ import uk.gov.justice.digital.hmpps.prisonperson.client.prisonersearch.PrisonerS
 import uk.gov.justice.digital.hmpps.prisonperson.client.prisonersearch.dto.PrisonerDto
 import uk.gov.justice.digital.hmpps.prisonperson.dto.ReferenceDataSimpleDto
 import uk.gov.justice.digital.hmpps.prisonperson.dto.request.PrisonerHealthUpdateRequest
-import uk.gov.justice.digital.hmpps.prisonperson.dto.response.PrisonerHealthDto
+import uk.gov.justice.digital.hmpps.prisonperson.dto.response.HealthDto
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.ValueWithMetadata
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.FieldMetadata
@@ -94,7 +94,7 @@ class PrisonerPrisonerHealthServiceTest {
     val result = underTest.getHealth(PRISONER_NUMBER)
 
     assertThat(result).isEqualTo(
-      PrisonerHealthDto(
+      HealthDto(
         smokerOrVaper = ValueWithMetadata(
           ReferenceDataSimpleDto(
             id = REFERENCE_DATA_CODE_ID,
@@ -131,7 +131,7 @@ class PrisonerPrisonerHealthServiceTest {
           HEALTH_UPDATE_REQUEST,
         ),
       ).isEqualTo(
-        PrisonerHealthDto(
+        HealthDto(
           ValueWithMetadata(SMOKER_OR_VAPER.toSimpleDto(), NOW, USER1),
         ),
       )
@@ -170,7 +170,7 @@ class PrisonerPrisonerHealthServiceTest {
       )
 
       assertThat(underTest.createOrUpdate(PRISONER_NUMBER, HEALTH_UPDATE_REQUEST_WITH_NULL)).isEqualTo(
-        PrisonerHealthDto(
+        HealthDto(
           ValueWithMetadata(null, NOW, USER1),
         ),
       )

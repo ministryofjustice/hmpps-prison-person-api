@@ -12,6 +12,7 @@ import jakarta.persistence.OneToMany
 import org.hibernate.Hibernate
 import org.hibernate.annotations.SortNatural
 import org.springframework.data.domain.AbstractAggregateRoot
+import uk.gov.justice.digital.hmpps.prisonperson.config.IllegalFieldHistoryException
 import uk.gov.justice.digital.hmpps.prisonperson.dto.ReferenceDataSimpleDto
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.PhysicalAttributesDto
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.ValueWithMetadata
@@ -154,12 +155,8 @@ class PhysicalAttributes(
       .filter { fields.contains(it.key) }
       .forEach { (field, currentValue) ->
         val previousVersion = fieldHistory.lastOrNull { it.field == field }
-        if (previousVersion == null ||
-          field.hasChangedFrom(
-            previousVersion,
-            currentValue(),
-          )
-        ) {
+
+        if (previousVersion == null || field.hasChangedFrom(previousVersion, currentValue())) {
           fieldMetadata[field] = FieldMetadata(
             field = field,
             prisonerNumber = this.prisonerNumber,
@@ -170,7 +167,12 @@ class PhysicalAttributes(
           // Set appliesTo on previous history item if not already set
           previousVersion
             ?.takeIf { it.appliesTo == null }
-            ?.let { it.appliesTo = appliesFrom }
+            ?.let {
+              it.appliesTo = appliesFrom
+
+              // If the resulting update to appliesTo causes it to be less than appliesFrom, throw exception:
+              if (it.appliesFrom > it.appliesTo) throw IllegalFieldHistoryException(prisonerNumber, it)
+            }
 
           fieldHistory.add(
             FieldHistory(

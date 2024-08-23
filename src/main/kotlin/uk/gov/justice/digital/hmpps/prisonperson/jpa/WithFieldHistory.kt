@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.prisonperson.jpa
 
 import org.springframework.data.domain.AbstractAggregateRoot
+import uk.gov.justice.digital.hmpps.prisonperson.config.IllegalFieldHistoryException
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField
 import uk.gov.justice.digital.hmpps.prisonperson.enums.Source
 import uk.gov.justice.digital.hmpps.prisonperson.enums.Source.DPS
@@ -40,12 +41,8 @@ abstract class WithFieldHistory<T : AbstractAggregateRoot<T>?> : AbstractAggrega
       .filter { fields.contains(it.key) }
       .forEach { (field, currentValue) ->
         val previousVersion = fieldHistory.lastOrNull { it.field == field }
-        if (previousVersion == null ||
-          field.hasChangedFrom(
-            previousVersion,
-            currentValue(),
-          )
-        ) {
+
+        if (previousVersion == null || field.hasChangedFrom(previousVersion, currentValue())) {
           fieldMetadata[field] = FieldMetadata(
             field = field,
             prisonerNumber = this.prisonerNumber,
@@ -56,7 +53,12 @@ abstract class WithFieldHistory<T : AbstractAggregateRoot<T>?> : AbstractAggrega
           // Set appliesTo on previous history item if not already set
           previousVersion
             ?.takeIf { it.appliesTo == null }
-            ?.let { it.appliesTo = appliesFrom }
+            ?.let {
+              it.appliesTo = appliesFrom
+
+              // If the resulting update to appliesTo causes it to be less than appliesFrom, throw exception:
+              if (it.appliesFrom > it.appliesTo) throw IllegalFieldHistoryException(prisonerNumber, it)
+            }
 
           fieldHistory.add(
             FieldHistory(

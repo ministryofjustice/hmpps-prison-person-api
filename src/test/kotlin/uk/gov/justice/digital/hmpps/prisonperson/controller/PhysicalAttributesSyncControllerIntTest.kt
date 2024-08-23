@@ -279,6 +279,34 @@ class PhysicalAttributesSyncControllerIntTest : IntegrationTestBase() {
     }
   }
 
+  @Nested
+  inner class ErrorConditions {
+
+    @Test
+    @Sql("classpath:jpa/repository/reset.sql")
+    @Sql("classpath:controller/physicalattributes/sync/physical_attributes.sql")
+    @Sql("classpath:controller/physicalattributes/sync/field_history.sql")
+    fun `returns 500 if history would have illogical applies_to and applies_from timestamps`() {
+      webTestClient.put().uri("/sync/prisoners/${PRISONER_NUMBER}/physical-attributes")
+        .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__PHYSICAL_ATTRIBUTES_SYNC__RW")))
+        .header("Content-Type", "application/json")
+        .bodyValue(
+          // language=json
+          """
+          { 
+            "height": 200,
+            "weight": 100,
+            "appliesFrom": "2024-06-14T09:10:11.123+0100",
+            "createdAt": "1990-01-01T09:10:11.123+0100",
+            "createdBy": "USER1"
+          }
+          """.trimIndent(),
+        )
+        .exchange()
+        .expectStatus().is5xxServerError
+    }
+  }
+
   private companion object {
     const val PRISONER_NUMBER = "A1234AA"
     const val USER1 = "USER1"

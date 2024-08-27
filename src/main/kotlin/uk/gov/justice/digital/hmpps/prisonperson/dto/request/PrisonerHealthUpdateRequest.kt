@@ -13,7 +13,7 @@ import uk.gov.justice.digital.hmpps.prisonperson.utils.getAttributeAsNullish
     "If it is not provided it is not updated",
 )
 @JsonInclude(NON_NULL)
-data class HealthUpdateRequest(
+data class PrisonerHealthUpdateRequest(
   @Schema(hidden = true)
   private val attributes: MutableMap<String, Any?> = mutableMapOf(),
 ) {

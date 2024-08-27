@@ -11,11 +11,11 @@ import uk.gov.justice.digital.hmpps.prisonperson.dto.response.PrisonPersonDto
 @Transactional(readOnly = true)
 class PrisonPersonService(
   private val physicalAttributesService: PhysicalAttributesService,
-  private val healthService: HealthService,
+  private val prisonerHealthService: PrisonerHealthService,
 ) {
   fun getPrisonPersonData(prisonerNumber: String): PrisonPersonDto? {
     val physicalAttributes = physicalAttributesService.getPhysicalAttributes(prisonerNumber)
-    val health = healthService.getHealth(prisonerNumber)
+    val health = prisonerHealthService.getHealth(prisonerNumber)
 
     if (physicalAttributes == null && health == null) {
       throw PrisonPersonDataNotFoundException(prisonerNumber)

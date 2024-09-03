@@ -15,35 +15,35 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
-import uk.gov.justice.digital.hmpps.prisonperson.dto.request.PhysicalAttributesMigrationRequest
-import uk.gov.justice.digital.hmpps.prisonperson.dto.response.PhysicalAttributesMigrationResponse
-import uk.gov.justice.digital.hmpps.prisonperson.service.PhysicalAttributesMigrationService
+import uk.gov.justice.digital.hmpps.prisonperson.dto.request.ProfileDetailsPhysicalAttributesMigrationRequest
+import uk.gov.justice.digital.hmpps.prisonperson.dto.response.ProfileDetailsPhysicalAttributesMigrationResponse
+import uk.gov.justice.digital.hmpps.prisonperson.service.ProfileDetailsPhysicalAttributesMigrationService
 import uk.gov.justice.hmpps.kotlin.common.ErrorResponse
 import java.util.SortedSet
 
 @RestController
-@Tag(name = "Physical Attributes")
+@Tag(name = "Profile Details Physical Attributes")
 @Tag(
   name = "Migration from NOMIS",
   description = "Endpoints to facilitate migration of data from NOMIS to the Prison Person database",
 )
 @RequestMapping(
-  "/migration/prisoners/{prisonerNumber}/physical-attributes",
+  "/migration/prisoners/{prisonerNumber}/profile-details-physical-attributes",
   produces = [MediaType.APPLICATION_JSON_VALUE],
 )
-class PhysicalAttributesMigrationController(private val physicalAttributesMigrationService: PhysicalAttributesMigrationService) {
+class ProfileDetailsPhysicalAttributesMigrationController(private val profileDetailsPhysicalAttributesMigrationService: ProfileDetailsPhysicalAttributesMigrationService) {
 
   @PutMapping
   @ResponseStatus(HttpStatus.OK)
-  @PreAuthorize("hasRole('ROLE_PRISON_PERSON_API__PHYSICAL_ATTRIBUTES_MIGRATION__RW')")
+  @PreAuthorize("hasRole('ROLE_PRISON_PERSON_API__PROFILE_DETAILS_PHYSICAL_ATTRIBUTES_MIGRATION__RW')")
   @Operation(
-    summary = "MIGRATION endpoint to sync changes to physical attributes made in NOMIS",
+    summary = "MIGRATION endpoint to sync changes to profile details physical attributes made in NOMIS",
     description = "This endpoint <b>SHOULD ONLY BE USED IN ORDER TO MIGRATE DATA.</b>" +
-      "<br/><br/>Requires role `ROLE_PRISON_PERSON_API__PHYSICAL_ATTRIBUTES_MIGRATION__RW` user made the edit.",
+      "<br/><br/>Requires role `ROLE_PRISON_PERSON_API__PROFILE_DETAILS_PHYSICAL_ATTRIBUTES_MIGRATION__RW` user made the edit.",
     responses = [
       ApiResponse(
         responseCode = "201",
-        description = "Returns prisoner's physical attributes",
+        description = "Returns a list of IDS of field history records created during the migration",
       ),
       ApiResponse(
         responseCode = "400",
@@ -57,18 +57,18 @@ class PhysicalAttributesMigrationController(private val physicalAttributesMigrat
       ),
       ApiResponse(
         responseCode = "403",
-        description = "Missing required role. Requires ROLE_PRISON_PERSON_API__PHYSICAL_ATTRIBUTES_MIGRATION__RW",
+        description = "Missing required role. Requires ROLE_PRISON_PERSON_API__PROFILE_DETAILS_PHYSICAL_ATTRIBUTES_MIGRATION__RW",
         content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
       ),
     ],
   )
-  fun migratePhysicalAttributes(
+  fun migratePersonalDetailsPhysicalAttributes(
     @Schema(description = "The prisoner number", example = "A1234AA", required = true)
     @PathVariable
     prisonerNumber: String,
     @RequestBody
     @Validated
-    physicalAttributesMigration: SortedSet<PhysicalAttributesMigrationRequest>,
-  ): PhysicalAttributesMigrationResponse =
-    physicalAttributesMigrationService.migrate(prisonerNumber, physicalAttributesMigration)
+    physicalAttributesMigration: SortedSet<ProfileDetailsPhysicalAttributesMigrationRequest>,
+  ): ProfileDetailsPhysicalAttributesMigrationResponse =
+    profileDetailsPhysicalAttributesMigrationService.migrate(prisonerNumber, physicalAttributesMigration)
 }

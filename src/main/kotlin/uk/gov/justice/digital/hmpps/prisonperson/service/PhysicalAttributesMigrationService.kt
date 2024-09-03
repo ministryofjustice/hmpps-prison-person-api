@@ -58,6 +58,7 @@ class PhysicalAttributesMigrationService(
     }
 
     return physicalAttributesRepository.save(physicalAttributes).fieldHistory
+      .filter { it.migratedAt == now }
       .map { it.fieldHistoryId }
       .also { trackMigrationEvent(prisonerNumber, it) }
       .let { PhysicalAttributesMigrationResponse(it) }

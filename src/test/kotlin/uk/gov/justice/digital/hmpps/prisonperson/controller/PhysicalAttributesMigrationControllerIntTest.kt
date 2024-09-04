@@ -157,6 +157,64 @@ class PhysicalAttributesMigrationControllerIntTest : IntegrationTestBase() {
 
       @Test
       @Sql("classpath:jpa/repository/reset.sql")
+      fun `can migrate nested bookings`() {
+        webTestClient.put().uri("/migration/prisoners/A1234AA/physical-attributes")
+          .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__PHYSICAL_ATTRIBUTES_MIGRATION__RW")))
+          .header("Content-Type", "application/json")
+          .bodyValue(PHYSICAL_ATTRIBUTES_WITH_NESTED_BOOKINGS)
+          .exchange()
+          .expectStatus().is2xxSuccessful
+          .expectBody().jsonPath("$.fieldHistoryInserted[*]").value(not(hasItem(-1)))
+
+        expectFieldHistory(
+          HEIGHT,
+          HistoryComparison(value = 189, appliesFrom = NOW.minusYears(2), appliesTo = NOW.minusYears(1), createdAt = NOW.minusYears(2), createdBy = USER2, source = NOMIS),
+          HistoryComparison(value = 190, appliesFrom = NOW.minusYears(3), appliesTo = null, createdAt = NOW.minusYears(3), createdBy = USER1, source = NOMIS),
+        )
+        expectFieldHistory(
+          WEIGHT,
+          HistoryComparison(value = 79, appliesFrom = NOW.minusYears(2), appliesTo = NOW.minusYears(1), createdAt = NOW.minusYears(2), createdBy = USER2, source = NOMIS),
+          HistoryComparison(value = 80, appliesFrom = NOW.minusYears(3), appliesTo = null, createdAt = NOW.minusYears(3), createdBy = USER1, source = NOMIS),
+        )
+        expectNoFieldHistoryFor(HAIR, FACIAL_HAIR, FACE, BUILD, LEFT_EYE_COLOUR, RIGHT_EYE_COLOUR, SHOE_SIZE)
+
+        expectFieldMetadata(
+          FieldMetadata(PRISONER_NUMBER, HEIGHT, lastModifiedAt = NOW.minusYears(3), lastModifiedBy = USER1),
+          FieldMetadata(PRISONER_NUMBER, WEIGHT, lastModifiedAt = NOW.minusYears(3), lastModifiedBy = USER1),
+        )
+      }
+
+      @Test
+      @Sql("classpath:jpa/repository/reset.sql")
+      fun `can migrate booking nested in active booking`() {
+        webTestClient.put().uri("/migration/prisoners/A1234AA/physical-attributes")
+          .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__PHYSICAL_ATTRIBUTES_MIGRATION__RW")))
+          .header("Content-Type", "application/json")
+          .bodyValue(PHYSICAL_ATTRIBUTES_WITH_BOOKING_NESTED_IN_ACTIVE_BOOKING)
+          .exchange()
+          .expectStatus().is2xxSuccessful
+          .expectBody().jsonPath("$.fieldHistoryInserted[*]").value(not(hasItem(-1)))
+
+        expectFieldHistory(
+          HEIGHT,
+          HistoryComparison(value = 189, appliesFrom = NOW.minusYears(2), appliesTo = NOW.minusYears(1), createdAt = NOW.minusYears(2), createdBy = USER2, source = NOMIS),
+          HistoryComparison(value = 190, appliesFrom = NOW.minusYears(3), appliesTo = null, createdAt = NOW.minusYears(3), createdBy = USER1, source = NOMIS),
+        )
+        expectFieldHistory(
+          WEIGHT,
+          HistoryComparison(value = 79, appliesFrom = NOW.minusYears(2), appliesTo = NOW.minusYears(1), createdAt = NOW.minusYears(2), createdBy = USER2, source = NOMIS),
+          HistoryComparison(value = 80, appliesFrom = NOW.minusYears(3), appliesTo = null, createdAt = NOW.minusYears(3), createdBy = USER1, source = NOMIS),
+        )
+        expectNoFieldHistoryFor(HAIR, FACIAL_HAIR, FACE, BUILD, LEFT_EYE_COLOUR, RIGHT_EYE_COLOUR, SHOE_SIZE)
+
+        expectFieldMetadata(
+          FieldMetadata(PRISONER_NUMBER, HEIGHT, lastModifiedAt = NOW.minusYears(3), lastModifiedBy = USER1),
+          FieldMetadata(PRISONER_NUMBER, WEIGHT, lastModifiedAt = NOW.minusYears(3), lastModifiedBy = USER1),
+        )
+      }
+
+      @Test
+      @Sql("classpath:jpa/repository/reset.sql")
       @Sql("classpath:controller/physicalattributes/migration/physical_attributes.sql")
       @Sql("classpath:controller/physicalattributes/migration/field_history.sql")
       fun `migration rerun for a prisoner with existing physical attributes data simply overwrites what was there`() {
@@ -251,6 +309,51 @@ class PhysicalAttributesMigrationControllerIntTest : IntegrationTestBase() {
             "appliesTo": "2024-06-10T09:10:11.123+0100",
             "createdAt": "2024-06-09T09:10:11.123+0100",
             "createdBy": "USER2"
+          }
+        ]
+      """.trimIndent()
+
+    val PHYSICAL_ATTRIBUTES_WITH_NESTED_BOOKINGS =
+      // language=json
+      """
+        [
+          { 
+            "height": 189,
+            "weight": 79,
+            "appliesFrom": "2022-06-14T09:10:11.123+0100",
+            "appliesTo": "2023-06-14T09:10:11.123+0100",
+            "createdAt": "2022-06-14T09:10:11.123+0100",
+            "createdBy": "USER2"
+          },
+          { 
+            "height": 190,
+            "weight": 80,
+            "appliesFrom": "2021-06-14T09:10:11.123+0100",
+            "appliesTo": "2024-06-14T09:10:11.123+0100",
+            "createdAt": "2021-06-14T09:10:11.123+0100",
+            "createdBy": "USER1"
+          }
+        ]
+      """.trimIndent()
+
+    val PHYSICAL_ATTRIBUTES_WITH_BOOKING_NESTED_IN_ACTIVE_BOOKING =
+      // language=json
+      """
+        [
+          { 
+            "height": 189,
+            "weight": 79,
+            "appliesFrom": "2022-06-14T09:10:11.123+0100",
+            "appliesTo": "2023-06-14T09:10:11.123+0100",
+            "createdAt": "2022-06-14T09:10:11.123+0100",
+            "createdBy": "USER2"
+          },
+          { 
+            "height": 190,
+            "weight": 80,
+            "appliesFrom": "2021-06-14T09:10:11.123+0100",
+            "createdAt": "2021-06-14T09:10:11.123+0100",
+            "createdBy": "USER1"
           }
         ]
       """.trimIndent()

@@ -37,22 +37,24 @@
 
 VERSION=0.1.0
 SUBJECT=sync-reconciliation-differences-back-to-nomis
+TOKEN_REFRESH_RATE=100 # Retrieve a new token after this number of requests
 DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)
+. "$DIR"/token-functions.sh
 
 # --- BASH version check -------------------------------------------
 set -e
 if ! echo "$BASH_VERSION" | grep -E "^[45]" &>/dev/null; then
-    echo "Found bash version: $BASH_VERSION"
-    echo "Ensure you are using bash version 4 or 5"
-    exit 1
+  echo "Found bash version: $BASH_VERSION"
+  echo "Ensure you are using bash version 4 or 5"
+  exit 1
 fi
 
 # --- Options processing -------------------------------------------
 usage() {
-    echo "$0 usage: "
-    echo "Ensure ENV, CLIENTID and CLIENTSECRET are set via environment variables."
-    echo "Then supply options:" && grep " .)\ \#" "$0"
-    exit 1
+  echo "$0 usage: "
+  echo "Ensure ENV, CLIENTID and CLIENTSECRET are set via environment variables."
+  echo "Then supply options:" && grep " .)\ \#" "$0"
+  exit 1
 }
 
 enforce_var_set() {
@@ -67,8 +69,8 @@ enforce_var_set CLIENTID
 enforce_var_set CLIENTSECRET
 
 if [ $# == 0 ] ; then
-    usage
-    exit 1;
+  usage
+  exit 1;
 fi
 
 while getopts ":f:vh" optname
@@ -106,8 +108,8 @@ shift $(($OPTIND - 1))
 # --- Locks -------------------------------------------------------
 LOCK_FILE=/tmp/$SUBJECT.lock
 if [ -f "$LOCK_FILE" ]; then
-   echo "Script is already running"
-   exit
+  echo "Script is already running"
+  exit
 fi
 
 trap "rm -f $LOCK_FILE" EXIT
@@ -135,29 +137,28 @@ prisonerToNomisUpdateHostname() {
 }
 
 echo "Checking prisoner numbers file exists..."
-if [[ -f "$PRISONER_NUMBERS_FILE" ]]; then
-    echo "   ...$PRISONER_NUMBERS_FILE exits"
-else
-    echo "   ...$PRISONER_NUMBERS_FILE does not exist"
-    exit 1
-fi
+checkFile $PRISONER_NUMBERS_FILE
 
 echo "Getting token from HMPPS Auth..."
-. "$DIR"/token-functions.sh
-CLIENT="$CLIENTID:$CLIENTSECRET"
-HMPPS_AUTH_HOST=$(calculateHmppsAuthHostname "$ENV")
-AUTH_TOKEN_HEADER=$(authenticate "$CLIENT")
-
 PRISONER_TO_NOMIS_UPDATE_HOST=$(prisonerToNomisUpdateHostname "$ENV")
 echo "Determined host: $PRISONER_TO_NOMIS_UPDATE_HOST"
 
 echo "Loading prisoner numbers from file..."
 . "$PRISONER_NUMBERS_FILE" 
 
-for prisonerNumber in "${prisonerNumbers[@]}"
+numberOfSyncs=${#prisonerNumbers[@]}
+echo "Syncing $numberOfSyncs prisoners..."
+for (( i=0; i<numberOfSyncs; i++ ));
 do
-    echo "Syncing $prisonerNumber..."
-    authenticated_request PUT "$PRISONER_TO_NOMIS_UPDATE_HOST/prisonperson/$prisonerNumber/physical-attributes"
+  if [[ $((i % TOKEN_REFRESH_RATE)) -eq 0 ]]; then
+    echo "Refreshing auth token..."
+    CLIENT="$CLIENTID:$CLIENTSECRET"
+    HMPPS_AUTH_HOST=$(calculateHmppsAuthHostname "$ENV")
+    AUTH_TOKEN_HEADER=$(authenticate "$CLIENT")
+  fi
+
+  echo "Syncing ${prisonerNumbers[$i]}..."
+  authenticated_request PUT "$PRISONER_TO_NOMIS_UPDATE_HOST/prisonperson/${prisonerNumbers[$i]}/physical-attributes"
 done
 
 echo "Sync request sent for all prisoner numbers."

@@ -180,7 +180,7 @@ class HmppsPrisonPersonApiExceptionHandler {
           userMessage = "Illegal field history: ${e.message}",
           developerMessage = e.message,
         ),
-      ).also { log.info("Illegal field history exception: {}", e.message) }
+      ).also { log.error("Illegal field history exception: {}", e.message) }
 
   @ExceptionHandler(NoResourceFoundException::class)
   fun handleNoResourceFoundException(e: NoResourceFoundException): ResponseEntity<ErrorResponse> = ResponseEntity

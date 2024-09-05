@@ -73,11 +73,14 @@ class PhysicalAttributesMigrationService(
    */
   private fun PhysicalAttributesMigrationRequest.isNestedBooking(
     others: SortedSet<PhysicalAttributesMigrationRequest>,
-  ): Boolean = others.find { other ->
-    this.appliesTo != null &&
-      other.appliesFrom < this.appliesFrom &&
-      (other.appliesTo == null || other.appliesTo > this.appliesTo)
-  } != null
+  ): Boolean =
+    others
+      .filterNot { it == this }
+      .find { other ->
+        this.appliesTo != null &&
+          other.appliesFrom <= this.appliesFrom &&
+          (other.appliesTo == null || other.appliesTo >= this.appliesTo)
+      } != null
 
   private fun newPhysicalAttributesFor(prisonerNumber: String): PhysicalAttributes = PhysicalAttributes(prisonerNumber)
 

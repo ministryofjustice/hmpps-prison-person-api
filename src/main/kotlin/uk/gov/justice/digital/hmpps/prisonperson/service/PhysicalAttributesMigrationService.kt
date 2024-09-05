@@ -42,14 +42,17 @@ class PhysicalAttributesMigrationService(
       .also { it.resetHistoryForMigratedFields() }
 
     migration.forEach { record ->
+      val appliesTo = record.appliesTo?.takeIf { record.isNestedBooking(migration) }
+
       physicalAttributes.apply {
         height = record.height
         weight = record.weight
       }.also {
         it.updateFieldHistory(
-          record.appliesFrom,
-          record.createdAt,
-          record.createdBy,
+          appliesFrom = record.appliesFrom,
+          appliesTo = appliesTo,
+          lastModifiedAt = record.createdAt,
+          lastModifiedBy = record.createdBy,
           source = NOMIS,
           fields = fieldsToMigrate,
           migratedAt = now,
@@ -62,6 +65,19 @@ class PhysicalAttributesMigrationService(
       .also { trackMigrationEvent(prisonerNumber, it) }
       .let { PhysicalAttributesMigrationResponse(it) }
   }
+
+  /*
+    This handles the case where there is an overlap in booking dates, and
+    we can't define a logical boundary between one attribute being applicable with the next,
+    so we explicitly set the appliesTo date.
+   */
+  private fun PhysicalAttributesMigrationRequest.isNestedBooking(
+    others: SortedSet<PhysicalAttributesMigrationRequest>,
+  ): Boolean = others.find { other ->
+    this.appliesTo != null &&
+      other.appliesFrom < this.appliesFrom &&
+      (other.appliesTo == null || other.appliesTo > this.appliesTo)
+  } != null
 
   private fun newPhysicalAttributesFor(prisonerNumber: String): PhysicalAttributes = PhysicalAttributes(prisonerNumber)
 

@@ -57,7 +57,7 @@ class PrisonerHealth(
   override fun updateFieldHistory(
     lastModifiedAt: ZonedDateTime,
     lastModifiedBy: String,
-  ) = updateFieldHistory(lastModifiedAt, lastModifiedAt, lastModifiedBy, DPS, allFields)
+  ) = updateFieldHistory(lastModifiedAt, null, lastModifiedAt, lastModifiedBy, DPS, allFields)
 
   override fun publishUpdateEvent(source: Source, now: ZonedDateTime) {
     // No-op for now

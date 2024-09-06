@@ -5,6 +5,9 @@ import org.awaitility.kotlin.await
 import org.awaitility.kotlin.matches
 import org.awaitility.kotlin.untilCallTo
 import org.junit.jupiter.api.Test
+import org.mockito.kotlin.eq
+import org.mockito.kotlin.isNull
+import org.mockito.kotlin.verify
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
@@ -192,6 +195,28 @@ class PhysicalAttributesMergeIntTest : IntegrationTestBase() {
     assertThat(fieldHistoryIds(NO_PRISON_PERSON_DATA)).isEmpty()
     assertThat(physicalAttributesRepository.findByIdOrNull(NO_PRISON_PERSON_DATA)).isNull()
     assertThat(fieldMetadataRepository.findAllByPrisonerNumber(NO_PRISON_PERSON_DATA)).isEmpty()
+  }
+
+  @Test
+  @Sql("classpath:jpa/repository/reset.sql")
+  @Sql("classpath:service/event/physical_attributes.sql")
+  @Sql("classpath:service/event/physical_attributes_metadata.sql")
+  @Sql("classpath:service/event/physical_attributes_history.sql")
+  fun `telemetry event raised when merge completes`() {
+    publishPrisonerMergedMessage(PRISONER_MERGE_TO, PRISONER_MERGE_FROM)
+    awaitAtMost30Secs untilCallTo { prisonPersonQueue.countAllMessagesOnQueue() } matches { it == 0 }
+    awaitAtMost30Secs untilCallTo { fieldHistoryIds(PRISONER_MERGE_FROM).size } matches { it == 0 }
+
+    verify(telemetryClient).trackEvent(
+      eq("prison-person-api-merge-complete"),
+      eq(
+        mapOf(
+          "prisonerNumberFrom" to PRISONER_MERGE_FROM,
+          "prisonerNumberTo" to PRISONER_MERGE_TO,
+        ),
+      ),
+      isNull(),
+    )
   }
 
   private fun fieldHistoryIds(prisonerNumber: String) = fieldHistoryRepository.findAllByPrisonerNumber(prisonerNumber)

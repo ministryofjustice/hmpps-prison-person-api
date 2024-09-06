@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.PropertyNamingStrategies
 import com.fasterxml.jackson.databind.annotation.JsonNaming
 import com.fasterxml.jackson.module.kotlin.readValue
+import com.microsoft.applicationinsights.TelemetryClient
 import org.assertj.core.api.Assertions.assertThat
 import org.awaitility.kotlin.await
 import org.awaitility.kotlin.matches
@@ -55,6 +56,9 @@ abstract class IntegrationTestBase : TestBase() {
 
   @SpyBean
   lateinit var hmppsQueueService: HmppsQueueService
+
+  @SpyBean
+  lateinit var telemetryClient: TelemetryClient
 
   protected val domainEventsTopic by lazy {
     hmppsQueueService.findByTopicId("domainevents") ?: throw MissingTopicException("domainevents not found")

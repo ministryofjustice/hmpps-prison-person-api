@@ -58,10 +58,10 @@ abstract class WithFieldHistory<T : AbstractAggregateRoot<T>?> : AbstractAggrega
           previousVersion
             ?.takeIf { it.appliesTo == null }
             ?.let {
-              it.appliesTo = appliesFrom
+              it.appliesTo = if (appliesFrom > it.appliesFrom) appliesFrom else lastModifiedAt
 
               // If the resulting update to appliesTo causes it to be less than appliesFrom, throw exception:
-              if (it.appliesFrom > it.appliesTo) throw IllegalFieldHistoryException(prisonerNumber, it)
+              if (it.appliesFrom > it.appliesTo) throw IllegalFieldHistoryException(prisonerNumber)
             }
 
           fieldHistory.add(

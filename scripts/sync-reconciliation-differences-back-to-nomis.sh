@@ -105,21 +105,11 @@ while getopts ":f:vh" optname
 
 shift $(($OPTIND - 1))
 
-# --- Locks -------------------------------------------------------
-LOCK_FILE=/tmp/$SUBJECT.lock
-if [ -f "$LOCK_FILE" ]; then
-  echo "Script is already running"
-  exit
-fi
-
-trap "rm -f $LOCK_FILE" EXIT
-touch $LOCK_FILE
-
 # --- Body --------------------------------------------------------
 echo "---------------"
 
 authenticated_request() {
-  http "$@" "$AUTH_TOKEN_HEADER"
+  http --check-status "$@" "$AUTH_TOKEN_HEADER"
 }
 
 prisonerToNomisUpdateHostname() {
@@ -157,7 +147,7 @@ do
     AUTH_TOKEN_HEADER=$(authenticate "$CLIENT")
   fi
 
-  echo "Syncing ${prisonerNumbers[$i]}..."
+  echo "Syncing prisoner $((i + 1)) of $numberOfSyncs: ${prisonerNumbers[$i]}..."
   authenticated_request PUT "$PRISONER_TO_NOMIS_UPDATE_HOST/prisonperson/${prisonerNumbers[$i]}/physical-attributes"
 done
 

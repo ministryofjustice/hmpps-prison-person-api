@@ -8,11 +8,13 @@ generic-service:
     host: prison-person-api-dev.prison.service.justice.gov.uk
 
   env:
-    APPLICATIONINSIGHTS_CONFIGURATION_FILE: applicationinsights.dev.json
+    EVENTS_PUBLISH: true
+    EVENTS_SUBSCRIBE: true
     EVENTS_BASE_URL: https://prison-person-api-dev.prison.service.justice.gov.uk
     API_BASE_URL_OAUTH: https://sign-in-dev.hmpps.service.justice.gov.uk/auth
     API_BASE_URL_PRISONER_SEARCH: https://prisoner-search-dev.prison.service.justice.gov.uk
     API_BASE_URL_DOCUMENT_SERVICE: https://document-api-dev.hmpps.service.justice.gov.uk
+    APPLICATIONINSIGHTS_CONFIGURATION_FILE: applicationinsights.dev.json
 
   scheduledDowntime:
     enabled: true

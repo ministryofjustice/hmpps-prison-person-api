@@ -22,7 +22,6 @@ import org.springframework.web.method.annotation.HandlerMethodValidationExceptio
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException
 import org.springframework.web.multipart.support.MissingServletRequestPartException
 import org.springframework.web.servlet.resource.NoResourceFoundException
-import uk.gov.justice.digital.hmpps.prisonperson.jpa.FieldHistory
 import uk.gov.justice.hmpps.kotlin.common.ErrorResponse
 
 @RestControllerAdvice
@@ -180,7 +179,7 @@ class HmppsPrisonPersonApiExceptionHandler {
           userMessage = "Illegal field history: ${e.message}",
           developerMessage = e.message,
         ),
-      ).also { log.info("Illegal field history exception: {}", e.message) }
+      ).also { log.error("Illegal field history exception: {}", e.message) }
 
   @ExceptionHandler(NoResourceFoundException::class)
   fun handleNoResourceFoundException(e: NoResourceFoundException): ResponseEntity<ErrorResponse> = ResponseEntity
@@ -254,6 +253,6 @@ class HmppsPrisonPersonApiExceptionHandler {
 class PrisonPersonDataNotFoundException(prisonerNumber: String) : Exception("No data for '$prisonerNumber'")
 class ReferenceDataDomainNotFoundException(code: String) : Exception("No data for domain '$code'")
 class ReferenceDataCodeNotFoundException(code: String, domain: String) : Exception("No data for code '$code' in domain '$domain'")
-class IllegalFieldHistoryException(prisonerNumber: String, fieldHistory: FieldHistory) : Exception("Cannot update field history for prisoner: '$prisonerNumber', history id: '${fieldHistory.fieldHistoryId}'")
+class IllegalFieldHistoryException(prisonerNumber: String) : Exception("Cannot update field history for prisoner: '$prisonerNumber'")
 
 class DownstreamServiceException(message: String, cause: Throwable) : Exception(message, cause)

@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.prisonperson.jpa
 
 import org.springframework.data.domain.AbstractAggregateRoot
+import org.springframework.data.jpa.domain.AbstractAuditable_.lastModifiedBy
 import uk.gov.justice.digital.hmpps.prisonperson.config.IllegalFieldHistoryException
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField
 import uk.gov.justice.digital.hmpps.prisonperson.enums.Source
@@ -28,11 +29,12 @@ abstract class WithFieldHistory<T : AbstractAggregateRoot<T>?> : AbstractAggrega
     source: Source,
     fields: Collection<PrisonPersonField>,
   ) {
-    updateFieldHistory(lastModifiedAt, lastModifiedAt, lastModifiedBy, source, fields)
+    updateFieldHistory(lastModifiedAt, null, lastModifiedAt, lastModifiedBy, source, fields)
   }
 
   fun updateFieldHistory(
     appliesFrom: ZonedDateTime,
+    appliesTo: ZonedDateTime?,
     lastModifiedAt: ZonedDateTime,
     lastModifiedBy: String,
     source: Source = DPS,
@@ -56,10 +58,10 @@ abstract class WithFieldHistory<T : AbstractAggregateRoot<T>?> : AbstractAggrega
           previousVersion
             ?.takeIf { it.appliesTo == null }
             ?.let {
-              it.appliesTo = appliesFrom
+              it.appliesTo = if (appliesFrom > it.appliesFrom) appliesFrom else lastModifiedAt
 
               // If the resulting update to appliesTo causes it to be less than appliesFrom, throw exception:
-              if (it.appliesFrom > it.appliesTo) throw IllegalFieldHistoryException(prisonerNumber, it)
+              if (it.appliesFrom > it.appliesTo) throw IllegalFieldHistoryException(prisonerNumber)
             }
 
           fieldHistory.add(
@@ -67,6 +69,7 @@ abstract class WithFieldHistory<T : AbstractAggregateRoot<T>?> : AbstractAggrega
               prisonerNumber = this.prisonerNumber,
               field = field,
               appliesFrom = appliesFrom,
+              appliesTo = appliesTo,
               createdAt = lastModifiedAt,
               createdBy = lastModifiedBy,
               source = source,

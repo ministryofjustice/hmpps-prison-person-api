@@ -52,6 +52,8 @@ class ProfileDetailsPhysicalAttributesMigrationService(
       .also { it.resetHistoryForMigratedFields() }
 
     migration.forEach { record ->
+      val appliesTo = record.appliesTo?.takeIf { record.isNestedBooking(migration) }
+
       physicalAttributes.apply {
         hair = toReferenceDataCode(referenceDataCodeRepository, record.hair?.value)
         facialHair = toReferenceDataCode(referenceDataCodeRepository, record.facialHair?.value)
@@ -61,13 +63,13 @@ class ProfileDetailsPhysicalAttributesMigrationService(
         rightEyeColour = toReferenceDataCode(referenceDataCodeRepository, record.rightEyeColour?.value)
         shoeSize = record.shoeSize?.value
       }.also {
-        updateFieldHistory(record.hair, record, HAIR, it, now)
-        updateFieldHistory(record.facialHair, record, FACIAL_HAIR, it, now)
-        updateFieldHistory(record.face, record, FACE, it, now)
-        updateFieldHistory(record.build, record, BUILD, it, now)
-        updateFieldHistory(record.leftEyeColour, record, LEFT_EYE_COLOUR, it, now)
-        updateFieldHistory(record.rightEyeColour, record, RIGHT_EYE_COLOUR, it, now)
-        updateFieldHistory(record.shoeSize, record, SHOE_SIZE, it, now)
+        updateFieldHistory(record.hair, record, HAIR, it, now, appliesTo)
+        updateFieldHistory(record.facialHair, record, FACIAL_HAIR, it, now, appliesTo)
+        updateFieldHistory(record.face, record, FACE, it, now, appliesTo)
+        updateFieldHistory(record.build, record, BUILD, it, now, appliesTo)
+        updateFieldHistory(record.leftEyeColour, record, LEFT_EYE_COLOUR, it, now, appliesTo)
+        updateFieldHistory(record.rightEyeColour, record, RIGHT_EYE_COLOUR, it, now, appliesTo)
+        updateFieldHistory(record.shoeSize, record, SHOE_SIZE, it, now, appliesTo)
       }
     }
 
@@ -84,10 +86,12 @@ class ProfileDetailsPhysicalAttributesMigrationService(
     field: PrisonPersonField,
     physicalAttributes: PhysicalAttributes,
     now: ZonedDateTime,
+    appliesTo: ZonedDateTime?,
   ) {
     attribute?.let {
       physicalAttributes.updateFieldHistory(
         appliesFrom = record.appliesFrom,
+        appliesTo = appliesTo,
         lastModifiedAt = it.lastModifiedAt,
         lastModifiedBy = it.lastModifiedBy,
         source = NOMIS,
@@ -97,7 +101,22 @@ class ProfileDetailsPhysicalAttributesMigrationService(
     }
   }
 
-  private fun newPhysicalAttributesFor(prisonerNumber: String): PhysicalAttributes = PhysicalAttributes(prisonerNumber)
+    /*
+    This handles the case where there is an overlap in booking dates, and
+    we can't define a logical boundary between one attribute being applicable with the next,
+    so we explicitly set the appliesTo date.
+     */
+  private fun ProfileDetailsPhysicalAttributesMigrationRequest.isNestedBooking(others: SortedSet<ProfileDetailsPhysicalAttributesMigrationRequest>): Boolean =
+    others
+      .filterNot { it == this }
+      .find { other ->
+        this.appliesTo != null &&
+          other.appliesFrom <= this.appliesFrom &&
+          (other.appliesTo == null || other.appliesTo >= this.appliesTo)
+      } != null
+
+  private fun newPhysicalAttributesFor(prisonerNumber: String): PhysicalAttributes =
+    PhysicalAttributes(prisonerNumber)
 
   private fun PhysicalAttributes.resetHistoryForMigratedFields() {
     fieldsToMigrate.forEach { field -> fieldHistory.removeIf { it.field == field } }

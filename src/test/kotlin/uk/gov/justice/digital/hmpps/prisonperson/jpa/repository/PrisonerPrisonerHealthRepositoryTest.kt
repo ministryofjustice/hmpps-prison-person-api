@@ -79,15 +79,15 @@ class PrisonerPrisonerHealthRepositoryTest : RepositoryTest() {
   private companion object {
     const val PRISONER_NUMBER = "A1234AA"
 
-    val REF_DATA_DOMAIN = ReferenceDataDomain("TEST", "Test domain", 1, ZonedDateTime.now(), "testUser")
+    val REF_DATA_DOMAIN = ReferenceDataDomain("SMOKE", "Smoker or vaper", 0, ZonedDateTime.now(), "OMS_OWNER")
     val REF_DATA_CODE = ReferenceDataCode(
-      id = "TEST_ORANGE",
+      id = "SMOKE_SMOKER",
       domain = REF_DATA_DOMAIN,
-      code = "ORANGE",
-      description = "Orange",
-      listSequence = 1,
+      code = "SMOKER",
+      description = "Yes, they smoke",
+      listSequence = 0,
       createdAt = ZonedDateTime.now(),
-      createdBy = "testUser",
+      createdBy = "OMS_OWNER",
     )
 
     val SMOKER_OR_VAPER = REF_DATA_CODE

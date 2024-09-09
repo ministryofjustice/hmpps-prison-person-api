@@ -16,6 +16,7 @@ import uk.gov.justice.digital.hmpps.prisonperson.client.documentservice.dto.Docu
 import uk.gov.justice.digital.hmpps.prisonperson.client.documentservice.dto.OrderBy
 import uk.gov.justice.digital.hmpps.prisonperson.client.documentservice.dto.OrderByDirection
 import uk.gov.justice.digital.hmpps.prisonperson.config.DownstreamServiceException
+import uk.gov.justice.digital.hmpps.prisonperson.utils.UuidV7Generator.Companion.uuidGenerator
 
 @Component
 class DocumentServiceClient(@Qualifier("documentServiceWebClient") private val webClient: WebClient) {
@@ -52,7 +53,7 @@ class DocumentServiceClient(@Qualifier("documentServiceWebClient") private val w
     fileType: MediaType,
     documentRequestContext: DocumentRequestContext,
   ): DocumentDto = try {
-    val documentUuid = java.util.UUID.randomUUID().toString()
+    val documentUuid = uuidGenerator.generate().toString()
     log.info("Saving file: $documentUuid")
 
     val request = webClient

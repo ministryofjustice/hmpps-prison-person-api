@@ -27,6 +27,7 @@ dependencies {
 
   // Jackson
   implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.17.2")
+  implementation("com.fasterxml.uuid:java-uuid-generator:5.1.0")
 
   // Database
   implementation("com.zaxxer:HikariCP:5.1.0")

@@ -1,8 +1,8 @@
 package uk.gov.justice.digital.hmpps.prisonperson.controller
 
 import io.mockk.every
-import io.mockk.mockkStatic
-import io.mockk.unmockkStatic
+import io.mockk.mockkObject
+import io.mockk.unmockkObject
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -15,6 +15,7 @@ import uk.gov.justice.digital.hmpps.prisonperson.client.documentservice.dto.Docu
 import uk.gov.justice.digital.hmpps.prisonperson.client.documentservice.dto.DocumentType
 import uk.gov.justice.digital.hmpps.prisonperson.integration.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.prisonperson.integration.wiremock.DocumentServiceExtension.Companion.documentService
+import uk.gov.justice.digital.hmpps.prisonperson.utils.UuidV7Generator.Companion.uuidGenerator
 import java.util.UUID
 
 class PrisonerPhotographControllerIntTest : IntegrationTestBase() {
@@ -89,11 +90,11 @@ class PrisonerPhotographControllerIntTest : IntegrationTestBase() {
 
       @Test
       fun `can post prisoner profile picture to document service`() {
-        mockkStatic(UUID::class)
-        val mockUuid = UUID.randomUUID().toString()
-        every { UUID.randomUUID().toString() } returns mockUuid
+        mockkObject(uuidGenerator)
+        val mockUuid = UUID.randomUUID()
+        every { uuidGenerator.generate() } returns mockUuid
 
-        documentService.stubPostNewDocument(uuid = mockUuid, result = DOCUMENT_DTO)
+        documentService.stubPostNewDocument(uuid = mockUuid.toString(), result = DOCUMENT_DTO)
 
         val bodyBuilder = MultipartBodyBuilder()
         bodyBuilder.part("file", ByteArrayResource(MULTIPART_FILE.bytes))
@@ -108,7 +109,7 @@ class PrisonerPhotographControllerIntTest : IntegrationTestBase() {
           .expectStatus().isOk
           .expectBody().json(objectMapper.writeValueAsString(DOCUMENT_DTO))
 
-        unmockkStatic(UUID::class)
+        unmockkObject(uuidGenerator)
       }
     }
 

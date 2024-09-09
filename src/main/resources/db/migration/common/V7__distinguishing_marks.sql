@@ -1,12 +1,12 @@
 CREATE TABLE identifying_marks
 (
-    identifying_mark_id      BIGSERIAL                NOT NULL,
+    identifying_mark_id      UUID                     NOT NULL,
     prisoner_number          VARCHAR(7)               NOT NULL,
-    body_part_code           VARCHAR(12),
-    mark_type                VARCHAR(12),
-    side_code                VARCHAR(12),
-    part_orientation         VARCHAR(12),
-    comment_Text             VARCHAR(240),
+    body_part_code           VARCHAR(24),
+    mark_type                VARCHAR(24),
+    side_code                VARCHAR(24),
+    part_orientation         VARCHAR(24),
+    comment_text             VARCHAR(240),
     created_at               TIMESTAMP WITH TIME ZONE NOT NULL,
     created_by               VARCHAR(40)              NOT NULL,
 
@@ -31,8 +31,8 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON identifying_marks TO prison_person;
 
 CREATE TABLE identifying_marks_images
 (
-    identifying_mark_image_id BIGSERIAL                NOT NULL,
-    identifying_mark_id       BIGINT                   NOT NULL,
+    identifying_mark_image_id UUID                   NOT NULL,
+    identifying_mark_id       UUID                   NOT NULL,
 
     CONSTRAINT identifying_mark_image_pk PRIMARY KEY (identifying_mark_image_id),
     CONSTRAINT identifying_mark_image_identifying_mark_fk FOREIGN KEY (identifying_mark_id) REFERENCES identifying_marks (identifying_mark_id)

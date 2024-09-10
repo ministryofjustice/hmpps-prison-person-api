@@ -280,18 +280,18 @@ class FieldHistoryRepositoryTest : RepositoryTest() {
 
     const val INT_VALUE = 123
     const val STRING_VALUE = "VALUE"
-    val REF_DATA_DOMAIN = ReferenceDataDomain("TEST", "Test domain", 1, ZonedDateTime.now(), "testUser")
+    val REF_DATA_DOMAIN = ReferenceDataDomain("FACE", "Face shape", 0, ZonedDateTime.now(), "OMS_OWNER")
     val REF_DATA_CODE = ReferenceDataCode(
-      id = "TEST_ORANGE",
+      id = "FACE_OVAL",
       domain = REF_DATA_DOMAIN,
-      code = "ORANGE",
-      description = "Orange",
-      listSequence = 1,
+      code = "OVAL",
+      description = "Oval",
+      listSequence = 0,
       createdAt = ZonedDateTime.now(),
-      createdBy = "testUser",
+      createdBy = "OMS_OWNER",
     )
     val INVALID_REF_DATA_CODE = ReferenceDataCode(
-      id = "TEST_INVALID",
+      id = "FACE_INVALID",
       domain = REF_DATA_DOMAIN,
       code = "INVALID",
       description = "INVALID",

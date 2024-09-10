@@ -16,14 +16,14 @@ class ReferenceDataCodeControllerIntTest : IntegrationTestBase() {
 
       @Test
       fun `access forbidden when no authority`() {
-        webTestClient.get().uri("/reference-data/domains/TEST/codes")
+        webTestClient.get().uri("/reference-data/domains/FACE/codes")
           .exchange()
           .expectStatus().isUnauthorized
       }
 
       @Test
       fun `access forbidden with wrong role`() {
-        webTestClient.get().uri("/reference-data/domains/TEST/codes")
+        webTestClient.get().uri("/reference-data/domains/FACE/codes")
           .headers(setAuthorisation(roles = listOf("ROLE_IS_WRONG")))
           .exchange()
           .expectStatus().isForbidden
@@ -35,7 +35,7 @@ class ReferenceDataCodeControllerIntTest : IntegrationTestBase() {
 
       @Test
       fun `can retrieve reference data codes`() {
-        webTestClient.get().uri("/reference-data/domains/TEST/codes")
+        webTestClient.get().uri("/reference-data/domains/FACE/codes")
           .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__REFERENCE_DATA__RO")))
           .exchange()
           .expectStatus().isOk
@@ -43,36 +43,54 @@ class ReferenceDataCodeControllerIntTest : IntegrationTestBase() {
             """
               [
                 {
-                  "domain": "TEST",
-                  "code": "ORANGE",
-                  "description": "Orange",
-                  "listSequence": 1,
-                  "isActive": true,
-                  "createdAt": "2024-07-11T17:00:00+0100",
-                  "createdBy": "OMS_OWNER"
-                },
-                {
-                  "domain": "TEST",
-                  "code": "BROWN",
-                  "description": "Brown",
+                  "domain": "FACE",
+                  "code": "ANGULAR",
+                  "description": "Angular",
                   "listSequence": 0,
                   "isActive": true,
                   "createdAt": "2024-07-11T17:00:00+0100",
                   "createdBy": "OMS_OWNER"
                 },
                 {
-                  "domain": "TEST",
-                  "code": "RED",
-                  "description": "Red",
+                  "domain": "FACE",
+                  "code": "BULLET",
+                  "description": "Long",
                   "listSequence": 0,
                   "isActive": true,
                   "createdAt": "2024-07-11T17:00:00+0100",
                   "createdBy": "OMS_OWNER"
                 },
                 {
-                  "domain": "TEST",
-                  "code": "WHITE",
-                  "description": "White",
+                  "domain": "FACE",
+                  "code": "OVAL",
+                  "description": "Oval",
+                  "listSequence": 0,
+                  "isActive": true,
+                  "createdAt": "2024-07-11T17:00:00+0100",
+                  "createdBy": "OMS_OWNER"
+                },
+                {
+                  "domain": "FACE",
+                  "code": "ROUND",
+                  "description": "Round",
+                  "listSequence": 0,
+                  "isActive": true,
+                  "createdAt": "2024-07-11T17:00:00+0100",
+                  "createdBy": "OMS_OWNER"
+                },
+                {
+                  "domain": "FACE",
+                  "code": "SQUARE",
+                  "description": "Square",
+                  "listSequence": 0,
+                  "isActive": true,
+                  "createdAt": "2024-07-11T17:00:00+0100",
+                  "createdBy": "OMS_OWNER"
+                },
+                {
+                  "domain": "FACE",
+                  "code": "TRIANGULAR",
+                  "description": "Triangle",
                   "listSequence": 0,
                   "isActive": true,
                   "createdAt": "2024-07-11T17:00:00+0100",
@@ -94,14 +112,14 @@ class ReferenceDataCodeControllerIntTest : IntegrationTestBase() {
 
       @Test
       fun `access forbidden when no authority`() {
-        webTestClient.get().uri("/reference-data/domains/TEST/codes/ORANGE")
+        webTestClient.get().uri("/reference-data/domains/FACE/codes/OVAL")
           .exchange()
           .expectStatus().isUnauthorized
       }
 
       @Test
       fun `access forbidden with wrong role`() {
-        webTestClient.get().uri("/reference-data/domains/TEST/codes/ORANGE")
+        webTestClient.get().uri("/reference-data/domains/FACE/codes/OVAL")
           .headers(setAuthorisation(roles = listOf("ROLE_IS_WRONG")))
           .exchange()
           .expectStatus().isForbidden
@@ -113,17 +131,17 @@ class ReferenceDataCodeControllerIntTest : IntegrationTestBase() {
 
       @Test
       fun `can retrieve reference data code`() {
-        webTestClient.get().uri("/reference-data/domains/TEST/codes/ORANGE")
+        webTestClient.get().uri("/reference-data/domains/FACE/codes/OVAL")
           .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__REFERENCE_DATA__RO")))
           .exchange()
           .expectStatus().isOk
           .expectBody().json(
             """
                 {
-                  "domain": "TEST",
-                  "code": "ORANGE",
-                  "description": "Orange",
-                  "listSequence": 1,
+                  "domain": "FACE",
+                  "code": "OVAL",
+                  "description": "Oval",
+                  "listSequence": 0,
                   "isActive": true,
                   "createdAt": "2024-07-11T17:00:00+0100",
                   "createdBy": "OMS_OWNER"
@@ -138,7 +156,7 @@ class ReferenceDataCodeControllerIntTest : IntegrationTestBase() {
 
       @Test
       fun `receive a 404 when no reference data code found`() {
-        webTestClient.get().uri("/reference-data/domains/TEST/codes/UNKNOWN")
+        webTestClient.get().uri("/reference-data/domains/FACE/codes/UNKNOWN")
           .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__REFERENCE_DATA__RO")))
           .exchange()
           .expectStatus().isNotFound

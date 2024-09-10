@@ -110,11 +110,25 @@ class PhysicalAttributesMigrationControllerIntTest : IntegrationTestBase() {
 
         expectFieldHistory(
           HEIGHT,
-          HistoryComparison(value = 190, appliesFrom = NOW, appliesTo = null, createdAt = NOW, createdBy = USER1, source = NOMIS),
+          HistoryComparison(
+            value = 190,
+            appliesFrom = NOW,
+            appliesTo = null,
+            createdAt = NOW,
+            createdBy = USER1,
+            source = NOMIS,
+          ),
         )
         expectFieldHistory(
           WEIGHT,
-          HistoryComparison(value = 80, appliesFrom = NOW, appliesTo = null, createdAt = NOW, createdBy = USER1, source = NOMIS),
+          HistoryComparison(
+            value = 80,
+            appliesFrom = NOW,
+            appliesTo = null,
+            createdAt = NOW,
+            createdBy = USER1,
+            source = NOMIS,
+          ),
         )
         expectNoFieldHistoryFor(HAIR, FACIAL_HAIR, FACE, BUILD, LEFT_EYE_COLOUR, RIGHT_EYE_COLOUR, SHOE_SIZE)
 
@@ -137,15 +151,57 @@ class PhysicalAttributesMigrationControllerIntTest : IntegrationTestBase() {
 
         expectFieldHistory(
           HEIGHT,
-          HistoryComparison(value = 189, appliesFrom = NOW.minusDays(5), appliesTo = NOW.minusDays(3), createdAt = NOW.minusDays(5), createdBy = USER2, source = NOMIS),
-          HistoryComparison(value = 188, appliesFrom = NOW.minusDays(3), appliesTo = NOW, createdAt = NOW.minusDays(3), createdBy = USER_CHANGING_HEIGHT_ONLY, source = NOMIS),
-          HistoryComparison(value = 190, appliesFrom = NOW, appliesTo = null, createdAt = NOW, createdBy = USER1, source = NOMIS),
+          HistoryComparison(
+            value = 189,
+            appliesFrom = NOW.minusDays(5),
+            appliesTo = NOW.minusDays(3),
+            createdAt = NOW.minusDays(5),
+            createdBy = USER2,
+            source = NOMIS,
+          ),
+          HistoryComparison(
+            value = 188,
+            appliesFrom = NOW.minusDays(3),
+            appliesTo = NOW,
+            createdAt = NOW.minusDays(3),
+            createdBy = USER_CHANGING_HEIGHT_ONLY,
+            source = NOMIS,
+          ),
+          HistoryComparison(
+            value = 190,
+            appliesFrom = NOW,
+            appliesTo = null,
+            createdAt = NOW,
+            createdBy = USER1,
+            source = NOMIS,
+          ),
         )
         expectFieldHistory(
           WEIGHT,
-          HistoryComparison(value = 79, appliesFrom = NOW.minusDays(5), appliesTo = NOW.minusDays(2), createdAt = NOW.minusDays(5), createdBy = USER2, source = NOMIS),
-          HistoryComparison(value = 78, appliesFrom = NOW.minusDays(2), appliesTo = NOW, createdAt = NOW.minusDays(2), createdBy = USER_CHANGING_WEIGHT_ONLY, source = NOMIS),
-          HistoryComparison(value = 80, appliesFrom = NOW, appliesTo = null, createdAt = NOW, createdBy = USER1, source = NOMIS),
+          HistoryComparison(
+            value = 79,
+            appliesFrom = NOW.minusDays(5),
+            appliesTo = NOW.minusDays(2),
+            createdAt = NOW.minusDays(5),
+            createdBy = USER2,
+            source = NOMIS,
+          ),
+          HistoryComparison(
+            value = 78,
+            appliesFrom = NOW.minusDays(2),
+            appliesTo = NOW,
+            createdAt = NOW.minusDays(2),
+            createdBy = USER_CHANGING_WEIGHT_ONLY,
+            source = NOMIS,
+          ),
+          HistoryComparison(
+            value = 80,
+            appliesFrom = NOW,
+            appliesTo = null,
+            createdAt = NOW,
+            createdBy = USER1,
+            source = NOMIS,
+          ),
         )
         expectNoFieldHistoryFor(HAIR, FACIAL_HAIR, FACE, BUILD, LEFT_EYE_COLOUR, RIGHT_EYE_COLOUR, SHOE_SIZE)
 
@@ -373,13 +429,26 @@ class PhysicalAttributesMigrationControllerIntTest : IntegrationTestBase() {
 
         expectFieldHistory(
           HEIGHT,
-          HistoryComparison(value = 190, appliesFrom = NOW, appliesTo = null, createdAt = NOW, createdBy = USER1, source = NOMIS),
+          HistoryComparison(
+            value = 190,
+            appliesFrom = NOW,
+            appliesTo = null,
+            createdAt = NOW,
+            createdBy = USER1,
+            source = NOMIS,
+          ),
         )
         expectFieldHistory(
           WEIGHT,
-          HistoryComparison(value = 80, appliesFrom = NOW, appliesTo = null, createdAt = NOW, createdBy = USER1, source = NOMIS),
+          HistoryComparison(
+            value = 80,
+            appliesFrom = NOW,
+            appliesTo = null,
+            createdAt = NOW,
+            createdBy = USER1,
+            source = NOMIS,
+          ),
         )
-        expectNoFieldHistoryFor(HAIR, FACIAL_HAIR, FACE, BUILD, LEFT_EYE_COLOUR, RIGHT_EYE_COLOUR, SHOE_SIZE)
 
         expectFieldMetadata(
           FieldMetadata(PRISONER_NUMBER, HEIGHT, lastModifiedAt = NOW, lastModifiedBy = USER1),

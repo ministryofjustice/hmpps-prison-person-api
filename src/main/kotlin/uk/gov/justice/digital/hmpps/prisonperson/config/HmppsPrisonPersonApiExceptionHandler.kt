@@ -181,6 +181,18 @@ class HmppsPrisonPersonApiExceptionHandler {
         ),
       ).also { log.error("Illegal field history exception: {}", e.message) }
 
+  @ExceptionHandler(GenericNotFoundException::class)
+  fun handleGenericNotFoundException(e: GenericNotFoundException): ResponseEntity<ErrorResponse> =
+    ResponseEntity
+      .status(NOT_FOUND)
+      .body(
+        ErrorResponse(
+          status = NOT_FOUND,
+          userMessage = e.message,
+          developerMessage = e.message,
+        ),
+      )
+
   @ExceptionHandler(NoResourceFoundException::class)
   fun handleNoResourceFoundException(e: NoResourceFoundException): ResponseEntity<ErrorResponse> = ResponseEntity
     .status(NOT_FOUND)
@@ -253,6 +265,7 @@ class HmppsPrisonPersonApiExceptionHandler {
 class PrisonPersonDataNotFoundException(prisonerNumber: String) : Exception("No data for '$prisonerNumber'")
 class ReferenceDataDomainNotFoundException(code: String) : Exception("No data for domain '$code'")
 class ReferenceDataCodeNotFoundException(code: String, domain: String) : Exception("No data for code '$code' in domain '$domain'")
+class GenericNotFoundException(message: String) : Exception(message)
 class IllegalFieldHistoryException(prisonerNumber: String) : Exception("Cannot update field history for prisoner: '$prisonerNumber'")
 
 class DownstreamServiceException(message: String, cause: Throwable) : Exception(message, cause)

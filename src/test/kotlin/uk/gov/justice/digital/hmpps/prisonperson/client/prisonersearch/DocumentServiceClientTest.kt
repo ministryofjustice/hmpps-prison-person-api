@@ -4,8 +4,8 @@ import com.github.tomakehurst.wiremock.client.WireMock.equalTo
 import com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor
 import com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo
 import io.mockk.every
-import io.mockk.mockkStatic
-import io.mockk.unmockkStatic
+import io.mockk.mockkObject
+import io.mockk.unmockkObject
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.AfterAll
@@ -28,6 +28,7 @@ import uk.gov.justice.digital.hmpps.prisonperson.client.documentservice.dto.Orde
 import uk.gov.justice.digital.hmpps.prisonperson.config.DownstreamServiceException
 import uk.gov.justice.digital.hmpps.prisonperson.integration.wiremock.DocumentServiceServer
 import uk.gov.justice.digital.hmpps.prisonperson.integration.wiremock.PRISONER_NUMBER
+import uk.gov.justice.digital.hmpps.prisonperson.utils.UuidV7Generator.Companion.uuidGenerator
 import java.util.UUID
 
 class DocumentServiceClientTest {
@@ -104,22 +105,23 @@ class DocumentServiceClientTest {
 
   @Nested
   inner class PutDocument {
+    var mockUuid: UUID? = null
+
     @BeforeEach
     fun setup() {
-      mockkStatic(UUID::class)
-      val mockUuid = UUID.randomUUID().toString()
-      every { UUID.randomUUID().toString() } returns mockUuid
+      mockkObject(uuidGenerator)
+      this.mockUuid = UUID.randomUUID()
+      every { uuidGenerator.generate() } returns mockUuid
     }
 
     @AfterEach
     fun teardown() {
-      unmockkStatic(UUID::class)
+      unmockkObject(uuidGenerator)
     }
 
     @Test
     fun `putDocument - success`() {
-      val mockUuid = UUID.randomUUID().toString()
-      server.stubPostNewDocument(uuid = mockUuid, result = DOCUMENT_DTO)
+      server.stubPostNewDocument(uuid = mockUuid.toString(), result = DOCUMENT_DTO)
 
       val result = client.putDocument(
         "mock content".toByteArray(),
@@ -137,8 +139,7 @@ class DocumentServiceClientTest {
 
     @Test
     fun `putDocument - downstream service exception`() {
-      val uuid = UUID.randomUUID().toString()
-      server.stubPostNewDocumentException(documentType = DocumentType.PRISONER_PROFILE_PICTURE, uuid = uuid)
+      server.stubPostNewDocumentException(documentType = DocumentType.PRISONER_PROFILE_PICTURE, uuid = mockUuid.toString())
 
       assertThatThrownBy {
         client.putDocument(
@@ -153,7 +154,7 @@ class DocumentServiceClientTest {
         .isInstanceOf(DownstreamServiceException::class.java)
         .hasMessage("Put document request failed")
         .hasCauseInstanceOf(WebClientResponseException::class.java)
-        .hasRootCauseMessage("500 Internal Server Error from POST http://localhost:8113/documents/PRISONER_PROFILE_PICTURE/$uuid")
+        .hasRootCauseMessage("500 Internal Server Error from POST http://localhost:8113/documents/PRISONER_PROFILE_PICTURE/$mockUuid")
     }
   }
 

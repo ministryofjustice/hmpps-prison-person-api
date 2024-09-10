@@ -17,6 +17,7 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import org.springframework.data.jpa.domain.AbstractAuditable_.createdBy
 import org.springframework.http.MediaType
 import org.springframework.mock.web.MockMultipartFile
 import uk.gov.justice.digital.hmpps.prisonperson.client.documentservice.DocumentServiceClient
@@ -111,10 +112,10 @@ class IdentifyingMarksServiceTest {
     @Test
     fun `can create identifying mark with no file`() {
       whenever(authenticationFacade.getUserOrSystemInContext()).thenReturn(USER1)
-      whenever(referenceDataCodeRepository.getReferenceById("BODY_PART_LEG")).thenReturn(LEG_REFERENCE)
-      whenever(referenceDataCodeRepository.getReferenceById("MARK_TYPE_SCAR")).thenReturn(SCAR_REFERENCE)
-      whenever(referenceDataCodeRepository.getReferenceById("SIDE_L")).thenReturn(LEFT_SIDE_REFERENCE)
-      whenever(referenceDataCodeRepository.getReferenceById("PART_ORIENT_CENTR")).thenReturn(CENTRE_REFERENCE)
+      whenever(referenceDataCodeRepository.findById("BODY_PART_LEG")).thenReturn(Optional.of(LEG_REFERENCE))
+      whenever(referenceDataCodeRepository.findById("MARK_TYPE_SCAR")).thenReturn(Optional.of(SCAR_REFERENCE))
+      whenever(referenceDataCodeRepository.findById("SIDE_L")).thenReturn(Optional.of(LEFT_SIDE_REFERENCE))
+      whenever(referenceDataCodeRepository.findById("PART_ORIENT_CENTR")).thenReturn(Optional.of(CENTRE_REFERENCE))
 
       val identifyingMarkRequest = IdentifyingMarkRequest(
         prisonerNumber = PRISONER_NUMBER,
@@ -180,10 +181,10 @@ class IdentifyingMarksServiceTest {
       )
 
       whenever(authenticationFacade.getUserOrSystemInContext()).thenReturn(USER1)
-      whenever(referenceDataCodeRepository.getReferenceById("BODY_PART_LEG")).thenReturn(LEG_REFERENCE)
-      whenever(referenceDataCodeRepository.getReferenceById("MARK_TYPE_SCAR")).thenReturn(SCAR_REFERENCE)
-      whenever(referenceDataCodeRepository.getReferenceById("SIDE_L")).thenReturn(LEFT_SIDE_REFERENCE)
-      whenever(referenceDataCodeRepository.getReferenceById("PART_ORIENT_CENTR")).thenReturn(CENTRE_REFERENCE)
+      whenever(referenceDataCodeRepository.findById("BODY_PART_LEG")).thenReturn(Optional.of(LEG_REFERENCE))
+      whenever(referenceDataCodeRepository.findById("MARK_TYPE_SCAR")).thenReturn(Optional.of(SCAR_REFERENCE))
+      whenever(referenceDataCodeRepository.findById("SIDE_L")).thenReturn(Optional.of(LEFT_SIDE_REFERENCE))
+      whenever(referenceDataCodeRepository.findById("PART_ORIENT_CENTR")).thenReturn(Optional.of(CENTRE_REFERENCE))
       whenever(documentServiceClient.putDocument(file.bytes, "fileName.jpg", DocumentType.PHYSICAL_IDENTIFIER_PICTURE, mapOf("prisonerNumber" to "A1234AA"), fileType, DOCUMENT_REQ_CONTEXT)).thenReturn(documentDto)
 
       val identifyingMarkRequest = IdentifyingMarkRequest(
@@ -245,10 +246,10 @@ class IdentifyingMarksServiceTest {
       )
 
       whenever(authenticationFacade.getUserOrSystemInContext()).thenReturn(USER1)
-      whenever(referenceDataCodeRepository.getReferenceById("BODY_PART_LEG")).thenReturn(LEG_REFERENCE)
-      whenever(referenceDataCodeRepository.getReferenceById("MARK_TYPE_SCAR")).thenReturn(SCAR_REFERENCE)
-      whenever(referenceDataCodeRepository.getReferenceById("SIDE_L")).thenReturn(LEFT_SIDE_REFERENCE)
-      whenever(referenceDataCodeRepository.getReferenceById("PART_ORIENT_CENTR")).thenReturn(CENTRE_REFERENCE)
+      whenever(referenceDataCodeRepository.findById("BODY_PART_LEG")).thenReturn(Optional.of(LEG_REFERENCE))
+      whenever(referenceDataCodeRepository.findById("MARK_TYPE_SCAR")).thenReturn(Optional.of(SCAR_REFERENCE))
+      whenever(referenceDataCodeRepository.findById("SIDE_L")).thenReturn(Optional.of(LEFT_SIDE_REFERENCE))
+      whenever(referenceDataCodeRepository.findById("PART_ORIENT_CENTR")).thenReturn(Optional.of(CENTRE_REFERENCE))
       whenever(documentServiceClient.putDocument(file.bytes, "fileName.jpg", DocumentType.PHYSICAL_IDENTIFIER_PICTURE, mapOf("prisonerNumber" to "A1234AA"), fileType, DOCUMENT_REQ_CONTEXT)).thenThrow(RuntimeException("Put document request failed"))
 
       val identifyingMarkRequest = IdentifyingMarkRequest(

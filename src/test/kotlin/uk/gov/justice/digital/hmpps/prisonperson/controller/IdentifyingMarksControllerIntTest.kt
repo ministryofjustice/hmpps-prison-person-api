@@ -66,7 +66,7 @@ class IdentifyingMarksControllerIntTest : IntegrationTestBase() {
       @Test
       fun `can return empty list when none are found`() {
         webTestClient.get().uri("/identifying-marks/prisoner/A1234AA")
-          .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RO")))
+          .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RW")))
           .exchange()
           .expectStatus().isOk
           .expectBody().json(
@@ -83,7 +83,7 @@ class IdentifyingMarksControllerIntTest : IntegrationTestBase() {
       @Sql("classpath:controller/identifyingMarks/identifying_marks.sql")
       fun `can return list of identifying mark data for prisoner when found`() {
         val response = webTestClient.get().uri("/identifying-marks/prisoner/12345")
-          .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RO")))
+          .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RW")))
           .exchange()
           .expectStatus().isOk
           .expectBodyList(IdentifyingMarkDto::class.java)
@@ -102,8 +102,8 @@ class IdentifyingMarksControllerIntTest : IntegrationTestBase() {
       @Test
       @Sql("classpath:jpa/repository/reset.sql")
       fun `can return 404 when not found`() {
-        webTestClient.get().uri("/identifying-marks/id/c46d0ce9-e586-4fa6-ae76-52ea8c242258")
-          .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RO")))
+        webTestClient.get().uri("/identifying-marks/mark/c46d0ce9-e586-4fa6-ae76-52ea8c242258")
+          .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RW")))
           .exchange()
           .expectStatus().isNotFound
       }
@@ -112,8 +112,8 @@ class IdentifyingMarksControllerIntTest : IntegrationTestBase() {
       @Sql("classpath:jpa/repository/reset.sql")
       @Sql("classpath:controller/identifyingMarks/identifying_marks.sql")
       fun `can return identifying mark data when found`() {
-        val response = webTestClient.get().uri("/identifying-marks/id/c46d0ce9-e586-4fa6-ae76-52ea8c242258")
-          .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RO")))
+        val response = webTestClient.get().uri("/identifying-marks/mark/c46d0ce9-e586-4fa6-ae76-52ea8c242258")
+          .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RW")))
           .exchange()
           .expectStatus().isOk
           .expectBody(IdentifyingMarkDto::class.java)
@@ -137,7 +137,7 @@ class IdentifyingMarksControllerIntTest : IntegrationTestBase() {
     }
 
     @Nested
-    inner class PutIdentifyingMarkHappyPath {
+    inner class PostIdentifyingMarkHappyPath {
 
       @Test
       @Sql("classpath:jpa/repository/reset.sql")
@@ -163,10 +163,10 @@ class IdentifyingMarksControllerIntTest : IntegrationTestBase() {
         bodyBuilder.part("partOrientation", "PART_ORIENT_CENTR")
         bodyBuilder.part("comment", "Comment")
 
-        val response = webTestClient.put().uri("/identifying-marks/new")
+        val response = webTestClient.post().uri("/identifying-marks/mark")
           .contentType(MediaType.MULTIPART_FORM_DATA)
           .bodyValue(bodyBuilder.build())
-          .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RO")))
+          .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RW")))
           .exchange()
           .expectStatus().isOk
           .expectBody(IdentifyingMarkDto::class.java)
@@ -202,10 +202,10 @@ class IdentifyingMarksControllerIntTest : IntegrationTestBase() {
         bodyBuilder.part("partOrientation", "PART_ORIENT_CENTR")
         bodyBuilder.part("comment", "Comment")
 
-        val response = webTestClient.put().uri("/identifying-marks/new")
+        val response = webTestClient.post().uri("/identifying-marks/mark")
           .contentType(MediaType.MULTIPART_FORM_DATA)
           .bodyValue(bodyBuilder.build())
-          .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RO")))
+          .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RW")))
           .exchange()
           .expectStatus().isOk
           .expectBody(IdentifyingMarkDto::class.java)
@@ -235,9 +235,6 @@ class IdentifyingMarksControllerIntTest : IntegrationTestBase() {
         "'', 'BODY_PART_LEG', 'MARK_TYPE_TAT', 'SIDE_R', 'PART_ORIENT_CENTR', 'Comment'",
         "'A1234AA', '', 'MARK_TYPE_TAT', 'SIDE_R', 'PART_ORIENT_CENTR', 'Comment'",
         "'A1234AA', 'BODY_PART_LEG', '', 'SIDE_R', 'PART_ORIENT_CENTR', 'Comment'",
-        "'A1234AA', 'BODY_PART_LEG', 'MARK_TYPE_TAT', '', 'PART_ORIENT_CENTR', 'Comment'",
-        "'A1234AA', 'BODY_PART_LEG', 'MARK_TYPE_TAT', 'SIDE_R', '', 'Comment'",
-        "'A1234AA', 'BODY_PART_LEG', 'MARK_TYPE_TAT', 'SIDE_R', 'PART_ORIENT_CENTR', ''",
       )
       fun `bad request when missing required fields`(
         prisonerNumber: String,
@@ -255,10 +252,10 @@ class IdentifyingMarksControllerIntTest : IntegrationTestBase() {
         if (partOrientation.isNotEmpty()) bodyBuilder.part("partOrientation", partOrientation)
         if (comment.isNotEmpty()) bodyBuilder.part("comment", comment)
 
-        webTestClient.put().uri("/identifying-marks/new")
+        webTestClient.post().uri("/identifying-marks/mark")
           .contentType(MediaType.MULTIPART_FORM_DATA)
           .bodyValue(bodyBuilder.build())
-          .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RO")))
+          .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RW")))
           .exchange()
           .expectStatus().isBadRequest
       }

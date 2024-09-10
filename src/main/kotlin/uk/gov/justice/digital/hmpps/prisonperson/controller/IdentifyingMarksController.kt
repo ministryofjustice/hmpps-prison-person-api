@@ -11,7 +11,7 @@ import org.springframework.http.MediaType
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PutMapping
+import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestPart
 import org.springframework.web.bind.annotation.ResponseStatus
@@ -28,12 +28,12 @@ import uk.gov.justice.hmpps.kotlin.common.ErrorResponse
 class IdentifyingMarksController(private val identifyingMarksService: IdentifyingMarksService) {
   @GetMapping("/prisoner/{prisonerNumber}", produces = [MediaType.APPLICATION_JSON_VALUE])
   @ResponseStatus(HttpStatus.OK)
-  @PreAuthorize("hasRole('ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RO')")
+  @PreAuthorize("hasRole('ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RW')")
   @Operation(
     summary = "Get all identifying marks for a prisoner",
     description = "description = \"Returns a list of identifying marks for a prisoner." +
       "Images associated with the identifying marks must be downloaded separately" +
-      "Requires role `ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RO`",
+      "Requires role `ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RW`",
     responses = [
       ApiResponse(
         responseCode = "200",
@@ -46,7 +46,7 @@ class IdentifyingMarksController(private val identifyingMarksService: Identifyin
       ),
       ApiResponse(
         responseCode = "403",
-        description = "Missing required role. Requires ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RO",
+        description = "Missing required role. Requires ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RW",
         content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
       ),
       ApiResponse(
@@ -66,14 +66,14 @@ class IdentifyingMarksController(private val identifyingMarksService: Identifyin
     prisonerNumber: String,
   ): List<IdentifyingMarkDto> = identifyingMarksService.getIdentifyingMarksForPrisoner(prisonerNumber)
 
-  @GetMapping("/id/{uuid}", produces = [MediaType.APPLICATION_JSON_VALUE])
+  @GetMapping("/mark/{uuid}", produces = [MediaType.APPLICATION_JSON_VALUE])
   @ResponseStatus(HttpStatus.OK)
-  @PreAuthorize("hasRole('ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RO')")
+  @PreAuthorize("hasRole('ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RW')")
   @Operation(
-    summary = "Get all identifying marks for a prisoner",
-    description = "description = \"Returns a list of identifying marks for a prisoner." +
-      "Images associated with the identifying marks must be downloaded separately" +
-      "Requires role `ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RO`",
+    summary = "Get identifying mark by id",
+    description = "description = \"Returns the identifying mark requested." +
+      "Images associated with the identifying mark must be downloaded separately" +
+      "Requires role `ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RW`",
     responses = [
       ApiResponse(
         responseCode = "200",
@@ -86,7 +86,7 @@ class IdentifyingMarksController(private val identifyingMarksService: Identifyin
       ),
       ApiResponse(
         responseCode = "403",
-        description = "Missing required role. Requires ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RO",
+        description = "Missing required role. Requires ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RW",
         content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
       ),
       ApiResponse(
@@ -105,14 +105,15 @@ class IdentifyingMarksController(private val identifyingMarksService: Identifyin
     uuid: String,
   ): IdentifyingMarkDto? = identifyingMarksService.getIdentifyingMarkById(uuid)
 
-  @PutMapping("/new", produces = [MediaType.APPLICATION_JSON_VALUE])
+  @PostMapping("/mark", produces = [MediaType.APPLICATION_JSON_VALUE])
   @ResponseStatus(HttpStatus.OK)
-  @PreAuthorize("hasRole('ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RO')")
+  @PreAuthorize("hasRole('ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RW')")
   @Operation(
-    summary = "Post a profile picture for a prisoner",
-    description = "description = \"Stores a profile picture supplied on the file attribute of a multipart/form-date submission  \n" +
-      "returns the meta data for the stored document\"\n" +
-      "Requires role `ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RO`",
+    summary = "Post an identifying mark",
+    description = "description = \"Stores a new identifying mark entry in the database. " +
+      "Optionally stores an image file supplied on the file attribute of a multipart/form-date submission  \n" +
+      "returns the identifying mark detail\"\n" +
+      "Requires role `ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RW`",
     responses = [
       ApiResponse(
         responseCode = "200",
@@ -125,7 +126,7 @@ class IdentifyingMarksController(private val identifyingMarksService: Identifyin
       ),
       ApiResponse(
         responseCode = "403",
-        description = "Missing required role. Requires ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RO",
+        description = "Missing required role. Requires ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RW",
         content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
       ),
       ApiResponse(

@@ -37,11 +37,11 @@ class IdentifyingMark(
 
   @ManyToOne
   @JoinColumn(name = "side_code", referencedColumnName = "id")
-  val side: ReferenceDataCode,
+  val side: ReferenceDataCode? = null,
 
   @ManyToOne
   @JoinColumn(name = "part_orientation", referencedColumnName = "id")
-  val partOrientation: ReferenceDataCode,
+  val partOrientation: ReferenceDataCode? = null,
 
   @Column(name = "comment_text")
   val comment: String? = null,
@@ -57,8 +57,8 @@ class IdentifyingMark(
     prisonerNumber,
     bodyPart.toSimpleDto(),
     markType.toSimpleDto(),
-    side.toSimpleDto(),
-    partOrientation.toSimpleDto(),
+    side?.toSimpleDto(),
+    partOrientation?.toSimpleDto(),
     comment,
     photographUuids.map { it.identifyingMarkImageId.toString() },
     createdAt,

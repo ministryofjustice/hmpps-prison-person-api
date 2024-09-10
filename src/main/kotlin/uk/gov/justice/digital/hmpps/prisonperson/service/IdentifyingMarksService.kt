@@ -15,6 +15,7 @@ import uk.gov.justice.digital.hmpps.prisonperson.jpa.IdentifyingMarkImage
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.IdentifyingMarksRepository
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.ReferenceDataCodeRepository
 import uk.gov.justice.digital.hmpps.prisonperson.utils.AuthenticationFacade
+import uk.gov.justice.digital.hmpps.prisonperson.utils.toReferenceDataCode
 import java.util.UUID
 
 @Service
@@ -40,22 +41,26 @@ class IdentifyingMarksService(
   @Transactional
   fun create(
     file: MultipartFile?,
-    fileType: MediaType,
+    fileType: MediaType?,
     identifyingMarkRequest: IdentifyingMarkRequest,
   ): IdentifyingMarkDto {
     val username = authenticationFacade.getUserOrSystemInContext()
 
     val identifyingMark = IdentifyingMark(
       prisonerNumber = identifyingMarkRequest.prisonerNumber,
-      markType = referenceDataCodeRepository.getReferenceById(identifyingMarkRequest.markType),
-      bodyPart = referenceDataCodeRepository.getReferenceById(identifyingMarkRequest.bodyPart),
-      side = referenceDataCodeRepository.getReferenceById(identifyingMarkRequest.side),
-      partOrientation = referenceDataCodeRepository.getReferenceById(identifyingMarkRequest.partOrientation),
+      markType = toReferenceDataCode(referenceDataCodeRepository, identifyingMarkRequest.markType)!!,
+      bodyPart = toReferenceDataCode(referenceDataCodeRepository, identifyingMarkRequest.bodyPart)!!,
+      side = toReferenceDataCode(referenceDataCodeRepository, identifyingMarkRequest.side),
+      partOrientation = toReferenceDataCode(referenceDataCodeRepository, identifyingMarkRequest.partOrientation),
       comment = identifyingMarkRequest.comment,
       createdBy = username,
     )
 
     if (file?.isEmpty == false) {
+      if (fileType == null) {
+        throw IllegalArgumentException("File type must not be null")
+      }
+
       val uploadedDocument = documentServiceClient.putDocument(
         document = file.bytes,
         filename = file.originalFilename,

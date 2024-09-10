@@ -16,7 +16,7 @@ data class IdentifyingMarkDto(
   val bodyPart: ReferenceDataSimpleDto,
 
   @Schema(description = "The type of identifying mark (e.g. tattoo, scar)")
-  val markType: ReferenceDataSimpleDto? = null,
+  val markType: ReferenceDataSimpleDto,
 
   @Schema(description = "The side of the body part the mark is on")
   val side: ReferenceDataSimpleDto? = null,

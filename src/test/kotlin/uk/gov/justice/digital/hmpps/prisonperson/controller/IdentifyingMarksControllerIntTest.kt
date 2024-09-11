@@ -66,7 +66,7 @@ class IdentifyingMarksControllerIntTest : IntegrationTestBase() {
       @Test
       fun `can return empty list when none are found`() {
         webTestClient.get().uri("/identifying-marks/prisoner/A1234AA")
-          .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RW")))
+          .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RO")))
           .exchange()
           .expectStatus().isOk
           .expectBody().json(
@@ -83,7 +83,7 @@ class IdentifyingMarksControllerIntTest : IntegrationTestBase() {
       @Sql("classpath:controller/identifyingMarks/identifying_marks.sql")
       fun `can return list of identifying mark data for prisoner when found`() {
         val response = webTestClient.get().uri("/identifying-marks/prisoner/12345")
-          .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RW")))
+          .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RO")))
           .exchange()
           .expectStatus().isOk
           .expectBodyList(IdentifyingMarkDto::class.java)
@@ -103,7 +103,7 @@ class IdentifyingMarksControllerIntTest : IntegrationTestBase() {
       @Sql("classpath:jpa/repository/reset.sql")
       fun `can return 404 when not found`() {
         webTestClient.get().uri("/identifying-marks/mark/c46d0ce9-e586-4fa6-ae76-52ea8c242258")
-          .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RW")))
+          .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RO")))
           .exchange()
           .expectStatus().isNotFound
       }
@@ -113,7 +113,7 @@ class IdentifyingMarksControllerIntTest : IntegrationTestBase() {
       @Sql("classpath:controller/identifyingMarks/identifying_marks.sql")
       fun `can return identifying mark data when found`() {
         val response = webTestClient.get().uri("/identifying-marks/mark/c46d0ce9-e586-4fa6-ae76-52ea8c242258")
-          .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RW")))
+          .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RO")))
           .exchange()
           .expectStatus().isOk
           .expectBody(IdentifyingMarkDto::class.java)

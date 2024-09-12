@@ -28,7 +28,7 @@ import uk.gov.justice.hmpps.kotlin.common.ErrorResponse
 class IdentifyingMarksController(private val identifyingMarksService: IdentifyingMarksService) {
   @GetMapping("/prisoner/{prisonerNumber}", produces = [MediaType.APPLICATION_JSON_VALUE])
   @ResponseStatus(HttpStatus.OK)
-  @PreAuthorize("hasRole('ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RW')")
+  @PreAuthorize("hasRole('ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RO')")
   @Operation(
     summary = "Get all identifying marks for a prisoner",
     description = "description = \"Returns a list of identifying marks for a prisoner." +
@@ -68,7 +68,7 @@ class IdentifyingMarksController(private val identifyingMarksService: Identifyin
 
   @GetMapping("/mark/{uuid}", produces = [MediaType.APPLICATION_JSON_VALUE])
   @ResponseStatus(HttpStatus.OK)
-  @PreAuthorize("hasRole('ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RW')")
+  @PreAuthorize("hasRole('ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RO')")
   @Operation(
     summary = "Get identifying mark by id",
     description = "description = \"Returns the identifying mark requested." +

@@ -512,7 +512,6 @@ class ProfileDetailsPhysicalAttributesMigrationControllerIntTest : IntegrationTe
   private companion object {
     const val PRISONER_NUMBER = "A1234AA"
     const val USER1 = "USER1"
-    const val USER2 = "USER2"
 
     data class RefData(
       val domain: String,
@@ -520,10 +519,7 @@ class ProfileDetailsPhysicalAttributesMigrationControllerIntTest : IntegrationTe
       val domainDescription: String,
       val codeDescription: String,
       val listSeq: Int = 0,
-    ) {
-      val id: String
-        get() = "${domain}_$code"
-    }
+    )
 
     val prisonerHair = RefData(
       domain = "HAIR",
@@ -614,32 +610,32 @@ class ProfileDetailsPhysicalAttributesMigrationControllerIntTest : IntegrationTe
         [
           {
             "hair": {
-                "value": "${prisonerHair.id}",
+                "value": "${prisonerHair.code}",
                 "lastModifiedAt": "$NOW",
                 "lastModifiedBy": "$USER1"
             },
             "facialHair": {
-                "value": "${prisonerFacialHair.id}",
+                "value": "${prisonerFacialHair.code}",
                 "lastModifiedAt": "$NOW",
                 "lastModifiedBy": "$USER1"
             },
             "face": {
-                "value": "${prisonerFace.id}",
+                "value": "${prisonerFace.code}",
                 "lastModifiedAt": "$NOW",
                 "lastModifiedBy": "$USER1"
             },
             "build": {
-                "value": "${prisonerBuild.id}",
+                "value": "${prisonerBuild.code}",
                 "lastModifiedAt": "$NOW",
                 "lastModifiedBy": "$USER1"
             },
             "leftEyeColour": {
-                "value": "${prisonerLeftEyeColour.id}",
+                "value": "${prisonerLeftEyeColour.code}",
                 "lastModifiedAt": "$NOW",
                 "lastModifiedBy": "$USER1"
             },
             "rightEyeColour": {
-                "value": "${prisonerRightEyeColour.id}",
+                "value": "${prisonerRightEyeColour.code}",
                 "lastModifiedAt": "$NOW",
                 "lastModifiedBy": "$USER1"
             },
@@ -658,32 +654,32 @@ class ProfileDetailsPhysicalAttributesMigrationControllerIntTest : IntegrationTe
         [
           {
             "hair": {
-                "value": "${prisonerHairPrevious.id}",
+                "value": "${prisonerHairPrevious.code}",
                 "lastModifiedAt": "$THEN",
                 "lastModifiedBy": "$USER1"
             },
             "facialHair": {
-                "value": "${prisonerFacialHairPrevious.id}",
+                "value": "${prisonerFacialHairPrevious.code}",
                 "lastModifiedAt": "$THEN",
                 "lastModifiedBy": "$USER1"
             },
             "face": {
-                "value": "${prisonerFacePrevious.id}",
+                "value": "${prisonerFacePrevious.code}",
                 "lastModifiedAt": "$THEN",
                 "lastModifiedBy": "$USER1"
             },
             "build": {
-                "value": "${prisonerBuildPrevious.id}",
+                "value": "${prisonerBuildPrevious.code}",
                 "lastModifiedAt": "$THEN",
                 "lastModifiedBy": "$USER1"
             },
             "leftEyeColour": {
-                "value": "${prisonerLeftEyeColourPrevious.id}",
+                "value": "${prisonerLeftEyeColourPrevious.code}",
                 "lastModifiedAt": "$THEN",
                 "lastModifiedBy": "$USER1"
             },
             "rightEyeColour": {
-                "value": "${prisonerRightEyeColourPrevious.id}",
+                "value": "${prisonerRightEyeColourPrevious.code}",
                 "lastModifiedAt": "$THEN",
                 "lastModifiedBy": "$USER1"
             },
@@ -697,32 +693,32 @@ class ProfileDetailsPhysicalAttributesMigrationControllerIntTest : IntegrationTe
           },
           {
             "hair": {
-                "value": "${prisonerHair.id}",
+                "value": "${prisonerHair.code}",
                 "lastModifiedAt": "$NOW",
                 "lastModifiedBy": "$USER1"
             },
             "facialHair": {
-                "value": "${prisonerFacialHair.id}",
+                "value": "${prisonerFacialHair.code}",
                 "lastModifiedAt": "$NOW",
                 "lastModifiedBy": "$USER1"
             },
             "face": {
-                "value": "${prisonerFace.id}",
+                "value": "${prisonerFace.code}",
                 "lastModifiedAt": "$NOW",
                 "lastModifiedBy": "$USER1"
             },
             "build": {
-                "value": "${prisonerBuild.id}",
+                "value": "${prisonerBuild.code}",
                 "lastModifiedAt": "$NOW",
                 "lastModifiedBy": "$USER1"
             },
             "leftEyeColour": {
-                "value": "${prisonerLeftEyeColour.id}",
+                "value": "${prisonerLeftEyeColour.code}",
                 "lastModifiedAt": "$NOW",
                 "lastModifiedBy": "$USER1"
             },
             "rightEyeColour": {
-                "value": "${prisonerRightEyeColour.id}",
+                "value": "${prisonerRightEyeColour.code}",
                 "lastModifiedAt": "$NOW",
                 "lastModifiedBy": "$USER1"
             },
@@ -738,22 +734,10 @@ class ProfileDetailsPhysicalAttributesMigrationControllerIntTest : IntegrationTe
 
     val VALID_REQUEST_BODY = SINGLE_CURRENT_RECORD_MIGRATION
 
-    val DOMAIN = ReferenceDataDomain("DOMAIN", "Domain", 0, ZonedDateTime.now(), "testUser")
-    val REF_DATA_CODE =
-      ReferenceDataCode(
-        "${DOMAIN.code}_ACTIVE",
-        "ACTIVE",
-        DOMAIN,
-        "Active domain",
-        0,
-        ZonedDateTime.now(),
-        "testUser",
-      )
-
     fun generateRefDataCode(
       refData: RefData?,
-    ): ReferenceDataCode {
-      if (refData == null) return null as ReferenceDataCode
+    ): ReferenceDataCode? {
+      if (refData == null) return null
 
       val refDataDomain =
         ReferenceDataDomain(refData.domain, refData.domainDescription, 0, ZonedDateTime.now(), "testUser")

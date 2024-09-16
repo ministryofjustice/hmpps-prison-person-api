@@ -55,12 +55,17 @@ class ProfileDetailsPhysicalAttributesMigrationService(
       val appliesTo = record.appliesTo?.takeIf { record.isNestedBooking(migration) }
 
       physicalAttributes.apply {
-        hair = toReferenceDataCode(referenceDataCodeRepository, record.hair?.value)
-        facialHair = toReferenceDataCode(referenceDataCodeRepository, record.facialHair?.value)
-        face = toReferenceDataCode(referenceDataCodeRepository, record.face?.value)
-        build = toReferenceDataCode(referenceDataCodeRepository, record.build?.value)
-        leftEyeColour = toReferenceDataCode(referenceDataCodeRepository, record.leftEyeColour?.value)
-        rightEyeColour = toReferenceDataCode(referenceDataCodeRepository, record.rightEyeColour?.value)
+        hair = toReferenceDataCode(referenceDataCodeRepository, toReferenceDataCodeId(record.hair?.value, "HAIR"))
+        facialHair = toReferenceDataCode(
+          referenceDataCodeRepository,
+          toReferenceDataCodeId(record.facialHair?.value, "FACIAL_HAIR"),
+        )
+        face = toReferenceDataCode(referenceDataCodeRepository, toReferenceDataCodeId(record.face?.value, "FACE"))
+        build = toReferenceDataCode(referenceDataCodeRepository, toReferenceDataCodeId(record.build?.value, "BUILD"))
+        leftEyeColour =
+          toReferenceDataCode(referenceDataCodeRepository, toReferenceDataCodeId(record.leftEyeColour?.value, "EYE"))
+        rightEyeColour =
+          toReferenceDataCode(referenceDataCodeRepository, toReferenceDataCodeId(record.rightEyeColour?.value, "EYE"))
         shoeSize = record.shoeSize?.value
       }.also {
         updateFieldHistory(record.hair, record, HAIR, it, now, appliesTo)
@@ -79,6 +84,9 @@ class ProfileDetailsPhysicalAttributesMigrationService(
       .also { trackMigrationEvent(prisonerNumber, it) }
       .let { ProfileDetailsPhysicalAttributesMigrationResponse(it) }
   }
+
+  private fun toReferenceDataCodeId(code: String?, domain: String) =
+    code?.let { "${domain}_$code" }
 
   private fun updateFieldHistory(
     attribute: MigrationValueWithMetadata<String>?,
@@ -101,11 +109,11 @@ class ProfileDetailsPhysicalAttributesMigrationService(
     }
   }
 
-    /*
-    This handles the case where there is an overlap in booking dates, and
-    we can't define a logical boundary between one attribute being applicable with the next,
-    so we explicitly set the appliesTo date.
-     */
+  /*
+  This handles the case where there is an overlap in booking dates, and
+  we can't define a logical boundary between one attribute being applicable with the next,
+  so we explicitly set the appliesTo date.
+   */
   private fun ProfileDetailsPhysicalAttributesMigrationRequest.isNestedBooking(others: SortedSet<ProfileDetailsPhysicalAttributesMigrationRequest>): Boolean =
     others
       .filterNot { it == this }

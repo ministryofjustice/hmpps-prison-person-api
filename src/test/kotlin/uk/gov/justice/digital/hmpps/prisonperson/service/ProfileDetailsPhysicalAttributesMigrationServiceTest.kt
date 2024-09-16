@@ -69,31 +69,37 @@ class ProfileDetailsPhysicalAttributesMigrationServiceTest {
     fun beforeEach() {
       lenient().whenever(referenceDataCodeRepository.findById(any())).thenAnswer { invocation ->
         val id = invocation.arguments[0] as String
-        val refDataCode = generateRefDataCode(id)
-        Optional.of(refDataCode)
+        splitId(id)?.let { (domain, code) ->
+          Optional.ofNullable(generateRefDataCode(code, domain))
+        }
       }
       whenever(physicalAttributesRepository.save(savedPhysicalAttributes.capture())).thenAnswer { savedPhysicalAttributes.firstValue }
     }
 
     @Test
     fun `migrates a single version of physical attributes`() {
-      assertThat(underTest.migrate(PRISONER_NUMBER, sortedSetOf(PROFILE_DETAILS_PHYSICAL_ATTRIBUTES_MIGRATION_REQUEST)))
+      assertThat(
+        underTest.migrate(
+          PRISONER_NUMBER,
+          sortedSetOf(PROFILE_DETAILS_PHYSICAL_ATTRIBUTES_MIGRATION_REQUEST),
+        ),
+      )
         .isInstanceOf(ProfileDetailsPhysicalAttributesMigrationResponse::class.java)
 
       with(savedPhysicalAttributes.firstValue) {
         assertThat(prisonerNumber).isEqualTo(PRISONER_NUMBER)
-        assertThat(hair?.id).isEqualTo(PRISONER_HAIR.value)
-        assertThat(facialHair?.id).isEqualTo(PRISONER_FACIAL_HAIR.value)
-        assertThat(face?.id).isEqualTo(PRISONER_FACE.value)
-        assertThat(build?.id).isEqualTo(PRISONER_BUILD.value)
-        assertThat(leftEyeColour?.id).isEqualTo(PRISONER_LEFT_EYE_COLOUR.value)
-        assertThat(rightEyeColour?.id).isEqualTo(PRISONER_RIGHT_EYE_COLOUR.value)
+        assertThat(hair?.code).isEqualTo(PRISONER_HAIR.value)
+        assertThat(facialHair?.code).isEqualTo(PRISONER_FACIAL_HAIR.value)
+        assertThat(face?.code).isEqualTo(PRISONER_FACE.value)
+        assertThat(build?.code).isEqualTo(PRISONER_BUILD.value)
+        assertThat(leftEyeColour?.code).isEqualTo(PRISONER_LEFT_EYE_COLOUR.value)
+        assertThat(rightEyeColour?.code).isEqualTo(PRISONER_RIGHT_EYE_COLOUR.value)
         assertThat(shoeSize).isEqualTo(PRISONER_SHOE_SIZE.value)
 
         expectFieldHistory(
           HAIR,
           HistoryComparison(
-            value = generateRefDataCode(PRISONER_HAIR.value),
+            value = generateRefDataCode(PRISONER_HAIR.value, "HAIR"),
             createdAt = NOW,
             createdBy = USER1,
             appliesFrom = THEN,
@@ -106,7 +112,7 @@ class ProfileDetailsPhysicalAttributesMigrationServiceTest {
         expectFieldHistory(
           FACIAL_HAIR,
           HistoryComparison(
-            value = generateRefDataCode(PRISONER_FACIAL_HAIR.value),
+            value = generateRefDataCode(PRISONER_FACIAL_HAIR.value, "FACIAL_HAIR"),
             createdAt = NOW,
             createdBy = USER1,
             appliesFrom = THEN,
@@ -119,7 +125,7 @@ class ProfileDetailsPhysicalAttributesMigrationServiceTest {
         expectFieldHistory(
           FACE,
           HistoryComparison(
-            value = generateRefDataCode(PRISONER_FACE.value),
+            value = generateRefDataCode(PRISONER_FACE.value, "FACE"),
             createdAt = NOW,
             createdBy = USER1,
             appliesFrom = THEN,
@@ -132,7 +138,7 @@ class ProfileDetailsPhysicalAttributesMigrationServiceTest {
         expectFieldHistory(
           BUILD,
           HistoryComparison(
-            value = generateRefDataCode(PRISONER_BUILD.value),
+            value = generateRefDataCode(PRISONER_BUILD.value, "BUILD"),
             createdAt = NOW,
             createdBy = USER1,
             appliesFrom = THEN,
@@ -145,7 +151,7 @@ class ProfileDetailsPhysicalAttributesMigrationServiceTest {
         expectFieldHistory(
           LEFT_EYE_COLOUR,
           HistoryComparison(
-            value = generateRefDataCode(PRISONER_LEFT_EYE_COLOUR.value),
+            value = generateRefDataCode(PRISONER_LEFT_EYE_COLOUR.value, "EYE"),
             createdAt = NOW,
             createdBy = USER1,
             appliesFrom = THEN,
@@ -158,7 +164,7 @@ class ProfileDetailsPhysicalAttributesMigrationServiceTest {
         expectFieldHistory(
           RIGHT_EYE_COLOUR,
           HistoryComparison(
-            value = generateRefDataCode(PRISONER_RIGHT_EYE_COLOUR.value),
+            value = generateRefDataCode(PRISONER_RIGHT_EYE_COLOUR.value, "EYE"),
             createdAt = NOW,
             createdBy = USER1,
             appliesFrom = THEN,
@@ -200,18 +206,18 @@ class ProfileDetailsPhysicalAttributesMigrationServiceTest {
 
       with(savedPhysicalAttributes.firstValue) {
         assertThat(prisonerNumber).isEqualTo(PRISONER_NUMBER)
-        assertThat(hair?.id).isEqualTo(PRISONER_HAIR.value)
-        assertThat(facialHair?.id).isEqualTo(PRISONER_FACIAL_HAIR.value)
-        assertThat(face?.id).isEqualTo(PRISONER_FACE.value)
-        assertThat(build?.id).isEqualTo(PRISONER_BUILD.value)
-        assertThat(leftEyeColour?.id).isEqualTo(PRISONER_LEFT_EYE_COLOUR.value)
-        assertThat(rightEyeColour?.id).isEqualTo(PRISONER_RIGHT_EYE_COLOUR.value)
+        assertThat(hair?.code).isEqualTo(PRISONER_HAIR.value)
+        assertThat(facialHair?.code).isEqualTo(PRISONER_FACIAL_HAIR.value)
+        assertThat(face?.code).isEqualTo(PRISONER_FACE.value)
+        assertThat(build?.code).isEqualTo(PRISONER_BUILD.value)
+        assertThat(leftEyeColour?.code).isEqualTo(PRISONER_LEFT_EYE_COLOUR.value)
+        assertThat(rightEyeColour?.code).isEqualTo(PRISONER_RIGHT_EYE_COLOUR.value)
         assertThat(shoeSize).isEqualTo(PRISONER_SHOE_SIZE.value)
 
         expectFieldHistory(
           HAIR,
           HistoryComparison(
-            value = generateRefDataCode(RECORDS["HAIR"]!![1]),
+            value = generateRefDataCode(RECORDS["HAIR"]!![1], "HAIR"),
             createdAt = NOW.minusDays(2),
             createdBy = USER3,
             appliesFrom = THEN.minusDays(2),
@@ -220,7 +226,7 @@ class ProfileDetailsPhysicalAttributesMigrationServiceTest {
             source = NOMIS,
           ),
           HistoryComparison(
-            value = generateRefDataCode(RECORDS["HAIR"]!![0]),
+            value = generateRefDataCode(RECORDS["HAIR"]!![0], "HAIR"),
             createdAt = NOW.minusDays(1),
             createdBy = USER2,
             appliesFrom = THEN.minusDays(1),
@@ -229,7 +235,7 @@ class ProfileDetailsPhysicalAttributesMigrationServiceTest {
             source = NOMIS,
           ),
           HistoryComparison(
-            value = generateRefDataCode(PRISONER_HAIR.value),
+            value = generateRefDataCode(PRISONER_HAIR.value, "HAIR"),
             createdAt = NOW,
             createdBy = USER1,
             appliesFrom = THEN,
@@ -242,7 +248,7 @@ class ProfileDetailsPhysicalAttributesMigrationServiceTest {
         expectFieldHistory(
           FACIAL_HAIR,
           HistoryComparison(
-            value = generateRefDataCode(RECORDS["FACIAL_HAIR"]!![1]),
+            value = generateRefDataCode(RECORDS["FACIAL_HAIR"]!![1], "FACIAL_HAIR"),
             createdAt = NOW.minusDays(2),
             createdBy = USER3,
             appliesFrom = THEN.minusDays(2),
@@ -251,7 +257,7 @@ class ProfileDetailsPhysicalAttributesMigrationServiceTest {
             source = NOMIS,
           ),
           HistoryComparison(
-            value = generateRefDataCode(RECORDS["FACIAL_HAIR"]!![0]),
+            value = generateRefDataCode(RECORDS["FACIAL_HAIR"]!![0], "FACIAL_HAIR"),
             createdAt = NOW.minusDays(1),
             createdBy = USER2,
             appliesFrom = THEN.minusDays(1),
@@ -260,7 +266,7 @@ class ProfileDetailsPhysicalAttributesMigrationServiceTest {
             source = NOMIS,
           ),
           HistoryComparison(
-            value = generateRefDataCode(PRISONER_FACIAL_HAIR.value),
+            value = generateRefDataCode(PRISONER_FACIAL_HAIR.value, "FACIAL_HAIR"),
             createdAt = NOW,
             createdBy = USER1,
             appliesFrom = THEN,
@@ -273,7 +279,7 @@ class ProfileDetailsPhysicalAttributesMigrationServiceTest {
         expectFieldHistory(
           FACE,
           HistoryComparison(
-            value = generateRefDataCode(RECORDS["FACE"]!![1]),
+            value = generateRefDataCode(RECORDS["FACE"]!![1], "FACE"),
             createdAt = NOW.minusDays(2),
             createdBy = USER3,
             appliesFrom = THEN.minusDays(2),
@@ -282,7 +288,7 @@ class ProfileDetailsPhysicalAttributesMigrationServiceTest {
             source = NOMIS,
           ),
           HistoryComparison(
-            value = generateRefDataCode(RECORDS["FACE"]!![0]),
+            value = generateRefDataCode(RECORDS["FACE"]!![0], "FACE"),
             createdAt = NOW.minusDays(1),
             createdBy = USER2,
             appliesFrom = THEN.minusDays(1),
@@ -291,7 +297,7 @@ class ProfileDetailsPhysicalAttributesMigrationServiceTest {
             source = NOMIS,
           ),
           HistoryComparison(
-            value = generateRefDataCode(PRISONER_FACE.value),
+            value = generateRefDataCode(PRISONER_FACE.value, "FACE"),
             createdAt = NOW,
             createdBy = USER1,
             appliesFrom = THEN,
@@ -304,7 +310,7 @@ class ProfileDetailsPhysicalAttributesMigrationServiceTest {
         expectFieldHistory(
           BUILD,
           HistoryComparison(
-            value = generateRefDataCode(RECORDS["BUILD"]!![1]),
+            value = generateRefDataCode(RECORDS["BUILD"]!![1], "BUILD"),
             createdAt = NOW.minusDays(2),
             createdBy = USER3,
             appliesFrom = THEN.minusDays(2),
@@ -313,7 +319,7 @@ class ProfileDetailsPhysicalAttributesMigrationServiceTest {
             source = NOMIS,
           ),
           HistoryComparison(
-            value = generateRefDataCode(RECORDS["BUILD"]!![0]),
+            value = generateRefDataCode(RECORDS["BUILD"]!![0], "BUILD"),
             createdAt = NOW.minusDays(1),
             createdBy = USER2,
             appliesFrom = THEN.minusDays(1),
@@ -322,7 +328,7 @@ class ProfileDetailsPhysicalAttributesMigrationServiceTest {
             source = NOMIS,
           ),
           HistoryComparison(
-            value = generateRefDataCode(PRISONER_BUILD.value),
+            value = generateRefDataCode(PRISONER_BUILD.value, "BUILD"),
             createdAt = NOW,
             createdBy = USER1,
             appliesFrom = THEN,
@@ -335,7 +341,7 @@ class ProfileDetailsPhysicalAttributesMigrationServiceTest {
         expectFieldHistory(
           LEFT_EYE_COLOUR,
           HistoryComparison(
-            value = generateRefDataCode(RECORDS["LEFT_EYE_COLOUR"]!![1]),
+            value = generateRefDataCode(RECORDS["LEFT_EYE_COLOUR"]!![1], "EYE"),
             createdAt = NOW.minusDays(2),
             createdBy = USER3,
             appliesFrom = THEN.minusDays(2),
@@ -344,7 +350,7 @@ class ProfileDetailsPhysicalAttributesMigrationServiceTest {
             source = NOMIS,
           ),
           HistoryComparison(
-            value = generateRefDataCode(RECORDS["LEFT_EYE_COLOUR"]!![0]),
+            value = generateRefDataCode(RECORDS["LEFT_EYE_COLOUR"]!![0], "EYE"),
             createdAt = NOW.minusDays(1),
             createdBy = USER2,
             appliesFrom = THEN.minusDays(1),
@@ -353,7 +359,7 @@ class ProfileDetailsPhysicalAttributesMigrationServiceTest {
             source = NOMIS,
           ),
           HistoryComparison(
-            value = generateRefDataCode(PRISONER_LEFT_EYE_COLOUR.value),
+            value = generateRefDataCode(PRISONER_LEFT_EYE_COLOUR.value, "EYE"),
             createdAt = NOW,
             createdBy = USER1,
             appliesFrom = THEN,
@@ -366,7 +372,7 @@ class ProfileDetailsPhysicalAttributesMigrationServiceTest {
         expectFieldHistory(
           RIGHT_EYE_COLOUR,
           HistoryComparison(
-            value = generateRefDataCode(RECORDS["RIGHT_EYE_COLOUR"]!![1]),
+            value = generateRefDataCode(RECORDS["RIGHT_EYE_COLOUR"]!![1], "EYE"),
             createdAt = NOW.minusDays(2),
             createdBy = USER3,
             appliesFrom = THEN.minusDays(2),
@@ -375,7 +381,7 @@ class ProfileDetailsPhysicalAttributesMigrationServiceTest {
             source = NOMIS,
           ),
           HistoryComparison(
-            value = generateRefDataCode(RECORDS["RIGHT_EYE_COLOUR"]!![0]),
+            value = generateRefDataCode(RECORDS["RIGHT_EYE_COLOUR"]!![0], "EYE"),
             createdAt = NOW.minusDays(1),
             createdBy = USER2,
             appliesFrom = THEN.minusDays(1),
@@ -384,7 +390,7 @@ class ProfileDetailsPhysicalAttributesMigrationServiceTest {
             source = NOMIS,
           ),
           HistoryComparison(
-            value = generateRefDataCode(PRISONER_RIGHT_EYE_COLOUR.value),
+            value = generateRefDataCode(PRISONER_RIGHT_EYE_COLOUR.value, "EYE"),
             createdAt = NOW,
             createdBy = USER1,
             appliesFrom = THEN,
@@ -443,18 +449,18 @@ class ProfileDetailsPhysicalAttributesMigrationServiceTest {
 
       with(savedPhysicalAttributes.firstValue) {
         assertThat(prisonerNumber).isEqualTo(PRISONER_NUMBER)
-        assertThat(hair?.id).isEqualTo(PRISONER_HAIR.value)
-        assertThat(facialHair?.id).isEqualTo(PRISONER_FACIAL_HAIR.value)
-        assertThat(face?.id).isEqualTo(PRISONER_FACE.value)
-        assertThat(build?.id).isEqualTo(PRISONER_BUILD.value)
-        assertThat(leftEyeColour?.id).isEqualTo(PRISONER_LEFT_EYE_COLOUR.value)
-        assertThat(rightEyeColour?.id).isEqualTo(PRISONER_RIGHT_EYE_COLOUR.value)
+        assertThat(hair?.code).isEqualTo(PRISONER_HAIR.value)
+        assertThat(facialHair?.code).isEqualTo(PRISONER_FACIAL_HAIR.value)
+        assertThat(face?.code).isEqualTo(PRISONER_FACE.value)
+        assertThat(build?.code).isEqualTo(PRISONER_BUILD.value)
+        assertThat(leftEyeColour?.code).isEqualTo(PRISONER_LEFT_EYE_COLOUR.value)
+        assertThat(rightEyeColour?.code).isEqualTo(PRISONER_RIGHT_EYE_COLOUR.value)
         assertThat(shoeSize).isEqualTo(PRISONER_SHOE_SIZE.value)
 
         expectFieldHistory(
           HAIR,
           HistoryComparison(
-            value = generateRefDataCode(PRISONER_HAIR.value),
+            value = generateRefDataCode(PRISONER_HAIR.value, "HAIR"),
             createdAt = NOW,
             createdBy = USER1,
             appliesFrom = THEN,
@@ -467,7 +473,7 @@ class ProfileDetailsPhysicalAttributesMigrationServiceTest {
         expectFieldHistory(
           FACIAL_HAIR,
           HistoryComparison(
-            value = generateRefDataCode(PRISONER_FACIAL_HAIR.value),
+            value = generateRefDataCode(PRISONER_FACIAL_HAIR.value, "FACIAL_HAIR"),
             createdAt = NOW,
             createdBy = USER1,
             appliesFrom = THEN,
@@ -480,7 +486,7 @@ class ProfileDetailsPhysicalAttributesMigrationServiceTest {
         expectFieldHistory(
           FACE,
           HistoryComparison(
-            value = generateRefDataCode(PRISONER_FACE.value),
+            value = generateRefDataCode(PRISONER_FACE.value, "FACE"),
             createdAt = NOW,
             createdBy = USER1,
             appliesFrom = THEN,
@@ -493,7 +499,7 @@ class ProfileDetailsPhysicalAttributesMigrationServiceTest {
         expectFieldHistory(
           BUILD,
           HistoryComparison(
-            value = generateRefDataCode(PRISONER_BUILD.value),
+            value = generateRefDataCode(PRISONER_BUILD.value, "BUILD"),
             createdAt = NOW,
             createdBy = USER1,
             appliesFrom = THEN,
@@ -506,7 +512,7 @@ class ProfileDetailsPhysicalAttributesMigrationServiceTest {
         expectFieldHistory(
           LEFT_EYE_COLOUR,
           HistoryComparison(
-            value = generateRefDataCode(PRISONER_LEFT_EYE_COLOUR.value),
+            value = generateRefDataCode(PRISONER_LEFT_EYE_COLOUR.value, "EYE"),
             createdAt = NOW,
             createdBy = USER1,
             appliesFrom = THEN,
@@ -519,7 +525,7 @@ class ProfileDetailsPhysicalAttributesMigrationServiceTest {
         expectFieldHistory(
           RIGHT_EYE_COLOUR,
           HistoryComparison(
-            value = generateRefDataCode(PRISONER_RIGHT_EYE_COLOUR.value),
+            value = generateRefDataCode(PRISONER_RIGHT_EYE_COLOUR.value, "EYE"),
             createdAt = NOW,
             createdBy = USER1,
             appliesFrom = THEN,
@@ -747,44 +753,55 @@ class ProfileDetailsPhysicalAttributesMigrationServiceTest {
     val NOW: ZonedDateTime = ZonedDateTime.ofInstant(Instant.now(), ZoneId.of("Europe/London"))
     val THEN: ZonedDateTime = NOW.minusDays(1)
 
-    val PRISONER_HAIR = MigrationValueWithMetadata("HAIR_GREY", NOW, USER1)
-    val PRISONER_FACIAL_HAIR = MigrationValueWithMetadata("FACIAL_HAIR_BEARDED", NOW, USER1)
-    val PRISONER_FACE = MigrationValueWithMetadata("FACE_OVAL", NOW, USER1)
-    val PRISONER_BUILD = MigrationValueWithMetadata("BUILD_MEDIUM", NOW, USER1)
-    val PRISONER_LEFT_EYE_COLOUR = MigrationValueWithMetadata("EYE_GREEN", NOW, USER1)
-    val PRISONER_RIGHT_EYE_COLOUR = MigrationValueWithMetadata("EYE_BLUE", NOW, USER1)
+    val PRISONER_HAIR = MigrationValueWithMetadata("GREY", NOW, USER1)
+    val PRISONER_FACIAL_HAIR = MigrationValueWithMetadata("BEARDED", NOW, USER1)
+    val PRISONER_FACE = MigrationValueWithMetadata("OVAL", NOW, USER1)
+    val PRISONER_BUILD = MigrationValueWithMetadata("MEDIUM", NOW, USER1)
+    val PRISONER_LEFT_EYE_COLOUR = MigrationValueWithMetadata("GREEN", NOW, USER1)
+    val PRISONER_RIGHT_EYE_COLOUR = MigrationValueWithMetadata("BLUE", NOW, USER1)
     val PRISONER_SHOE_SIZE = MigrationValueWithMetadata("11.5", NOW, USER1)
 
     val RECORDS = mapOf(
-      "HAIR" to listOf("HAIR_BLACK", "HAIR_BLONDE"),
-      "FACIAL_HAIR" to listOf("FACIAL_HAIR_MOUSTACHE", "FACIAL_HAIR_SIDEBURNS"),
-      "FACE" to listOf("FACE_ANGULAR", "FACE_SQUARE"),
-      "BUILD" to listOf("BUILD_HEAVY", "BUILD_SMALL"),
-      "LEFT_EYE_COLOUR" to listOf("EYE_BROWN", "EYE_HAZEL"),
-      "RIGHT_EYE_COLOUR" to listOf("EYE_GREY", "EYE_CLOUDED"),
+      "HAIR" to listOf("BLACK", "BLONDE"),
+      "FACIAL_HAIR" to listOf("MOUSTACHE", "SIDEBURNS"),
+      "FACE" to listOf("ANGULAR", "SQUARE"),
+      "BUILD" to listOf("HEAVY", "SMALL"),
+      "LEFT_EYE_COLOUR" to listOf("BROWN", "HAZEL"),
+      "RIGHT_EYE_COLOUR" to listOf("GREY", "CLOUDED"),
       "SHOE_SIZE" to listOf("10", "9"),
     )
 
     val PROFILE_DETAILS_PHYSICAL_ATTRIBUTES_MIGRATION_REQUEST = ProfileDetailsPhysicalAttributesMigrationRequest(
-      PRISONER_HAIR,
-      PRISONER_FACIAL_HAIR,
-      PRISONER_FACE,
-      PRISONER_BUILD,
-      PRISONER_LEFT_EYE_COLOUR,
-      PRISONER_RIGHT_EYE_COLOUR,
-      PRISONER_SHOE_SIZE,
+      hair = PRISONER_HAIR,
+      facialHair = PRISONER_FACIAL_HAIR,
+      face = PRISONER_FACE,
+      build = PRISONER_BUILD,
+      leftEyeColour = PRISONER_LEFT_EYE_COLOUR,
+      rightEyeColour = PRISONER_RIGHT_EYE_COLOUR,
+      shoeSize = PRISONER_SHOE_SIZE,
       appliesFrom = THEN,
     )
 
-    val DOMAIN = ReferenceDataDomain("DOMAIN", "Domain", 0, ZonedDateTime.now(), "testUser")
-    val REF_DATA_CODE =
-      ReferenceDataCode("${DOMAIN.code}_ACTIVE", "ACTIVE", DOMAIN, "Active domain", 0, ZonedDateTime.now(), "testUser")
+    val domains = setOf("HAIR", "FACIAL_HAIR", "FACE", "BUILD", "EYE")
 
-    fun generateRefDataCode(id: String?): ReferenceDataCode {
-      if (id == null) return null as ReferenceDataCode
+    fun splitId(id: String?): Pair<String, String>? {
+      if (id.isNullOrEmpty()) return null
 
-      val rdc = ReferenceDataDomain(DOMAIN.code, "Domain", 0, ZonedDateTime.now(), "testUser")
-      return ReferenceDataCode(id, REF_DATA_CODE.code, rdc, "Ref data code", 0, ZonedDateTime.now(), "testUser")
+      for (domain in domains) {
+        if (id.startsWith("${domain}_")) {
+          val code = id.removePrefix("${domain}_")
+          return domain to code
+        }
+      }
+
+      return null
+    }
+
+    fun generateRefDataCode(code: String?, domain: String): ReferenceDataCode? {
+      if (code == null) return null
+
+      val rdd = ReferenceDataDomain(domain, "Domain", 0, ZonedDateTime.now(), "testUser")
+      return ReferenceDataCode("${domain}_$code", code, rdd, "Ref data code", 0, ZonedDateTime.now(), "testUser")
     }
   }
 }

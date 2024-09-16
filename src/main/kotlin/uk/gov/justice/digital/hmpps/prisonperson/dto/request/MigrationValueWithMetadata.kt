@@ -3,7 +3,7 @@ package uk.gov.justice.digital.hmpps.prisonperson.dto.request
 import io.swagger.v3.oas.annotations.media.Schema
 import java.time.ZonedDateTime
 
-@Schema(description = "The migration value with metadata")
+@Schema(description = "The migration value (`ReferenceDataCode.code`) with metadata")
 data class MigrationValueWithMetadata<T>(
   @Schema(description = "Value")
   val value: T?,

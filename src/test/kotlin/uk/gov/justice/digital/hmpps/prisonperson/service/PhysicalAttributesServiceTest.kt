@@ -32,7 +32,6 @@ import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.utils.HistoryCom
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.utils.expectFieldHistory
 import uk.gov.justice.digital.hmpps.prisonperson.utils.AuthenticationFacade
 import java.time.Clock
-import java.time.LocalDate
 import java.time.ZonedDateTime
 import java.util.Optional
 
@@ -167,6 +166,18 @@ class PhysicalAttributesServiceTest {
     }
 
     @Test
+    fun `does not create new physical attributes if prisoner found in prisoner search matched on a different id`() {
+      whenever(prisonerSearchClient.getPrisoner(PRISONER_NUMBER)).thenReturn(PrisonerDto(prisonerNumber = "somethingelse"))
+      whenever(physicalAttributesRepository.findById(PRISONER_NUMBER)).thenReturn(Optional.empty())
+
+      assertThatThrownBy { underTest.createOrUpdate(PRISONER_NUMBER, PHYSICAL_ATTRIBUTES_UPDATE_REQUEST) }
+        .isInstanceOf(IllegalArgumentException::class.java)
+        .hasMessage("Prisoner number '${PRISONER_NUMBER}' not found")
+
+      verify(physicalAttributesRepository, never()).save(any())
+    }
+
+    @Test
     fun `updates physical attributes`() {
       whenever(physicalAttributesRepository.findById(PRISONER_NUMBER)).thenReturn(
         Optional.of(
@@ -259,14 +270,6 @@ class PhysicalAttributesServiceTest {
     )
 
     val PHYSICAL_ATTRIBUTES_UPDATE_REQUEST = PhysicalAttributesUpdateRequest(attributes)
-    val PRISONER_SEARCH_RESPONSE =
-      PrisonerDto(
-        PRISONER_NUMBER,
-        123,
-        "prisoner",
-        "middle",
-        "lastName",
-        LocalDate.of(1988, 3, 4),
-      )
+    val PRISONER_SEARCH_RESPONSE = PrisonerDto(PRISONER_NUMBER)
   }
 }

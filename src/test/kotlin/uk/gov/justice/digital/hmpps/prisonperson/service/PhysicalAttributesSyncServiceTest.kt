@@ -22,7 +22,6 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import org.mockito.quality.Strictness.LENIENT
-import uk.gov.justice.digital.hmpps.prisonperson.client.prisonersearch.dto.PrisonerDto
 import uk.gov.justice.digital.hmpps.prisonperson.config.IllegalFieldHistoryException
 import uk.gov.justice.digital.hmpps.prisonperson.dto.request.PhysicalAttributesSyncRequest
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.PhysicalAttributesSyncResponse
@@ -36,7 +35,6 @@ import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.PhysicalAttribut
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.utils.HistoryComparison
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.utils.expectFieldHistory
 import java.time.Clock
-import java.time.LocalDate
 import java.time.ZonedDateTime
 import java.util.Optional
 
@@ -352,16 +350,6 @@ class PhysicalAttributesSyncServiceTest {
     const val USER2 = "USER2"
 
     val NOW: ZonedDateTime = ZonedDateTime.now()
-
-    val PRISONER_SEARCH_RESPONSE =
-      PrisonerDto(
-        PRISONER_NUMBER,
-        123,
-        "prisoner",
-        "middle",
-        "lastName",
-        LocalDate.of(1988, 3, 4),
-      )
 
     val PHYSICAL_ATTRIBUTES_SYNC_REQUEST = PhysicalAttributesSyncRequest(
       PRISONER_HEIGHT,

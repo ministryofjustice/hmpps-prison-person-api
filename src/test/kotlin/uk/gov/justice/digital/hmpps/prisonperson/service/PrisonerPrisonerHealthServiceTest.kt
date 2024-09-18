@@ -31,7 +31,6 @@ import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.utils.expectFiel
 import uk.gov.justice.digital.hmpps.prisonperson.mapper.toSimpleDto
 import uk.gov.justice.digital.hmpps.prisonperson.utils.AuthenticationFacade
 import java.time.Clock
-import java.time.LocalDate
 import java.time.ZonedDateTime
 import java.util.*
 
@@ -241,13 +240,6 @@ class PrisonerPrisonerHealthServiceTest {
       ),
     )
 
-    val PRISONER_SEARCH_RESPONSE = PrisonerDto(
-      PRISONER_NUMBER,
-      123,
-      "prisoner",
-      "middle",
-      "lastName",
-      LocalDate.of(1988, 3, 4),
-    )
+    val PRISONER_SEARCH_RESPONSE = PrisonerDto(PRISONER_NUMBER)
   }
 }

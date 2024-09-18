@@ -8,7 +8,6 @@ import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.whenever
 import uk.gov.justice.digital.hmpps.prisonperson.client.prisonersearch.PrisonerSearchClient
 import uk.gov.justice.digital.hmpps.prisonperson.client.prisonersearch.dto.PrisonerDto
-import java.time.LocalDate
 
 @ExtendWith(MockitoExtension::class)
 class PrisonerNumberUtilsTest {
@@ -39,13 +38,6 @@ class PrisonerNumberUtilsTest {
 
   private companion object {
     const val PRISONER_NUMBER = "A1234BC"
-    val PRISONER_DTO = PrisonerDto(
-      PRISONER_NUMBER,
-      123456,
-      "John",
-      "Xavier",
-      "Smith",
-      LocalDate.of(1993, 7, 30),
-    )
+    val PRISONER_DTO = PrisonerDto(PRISONER_NUMBER)
   }
 }

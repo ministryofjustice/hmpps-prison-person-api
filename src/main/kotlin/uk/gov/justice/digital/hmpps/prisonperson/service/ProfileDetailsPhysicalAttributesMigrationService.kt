@@ -22,6 +22,7 @@ import uk.gov.justice.digital.hmpps.prisonperson.jpa.PhysicalAttributes
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.PhysicalAttributesRepository
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.ReferenceDataCodeRepository
 import uk.gov.justice.digital.hmpps.prisonperson.utils.toReferenceDataCode
+import uk.gov.justice.digital.hmpps.prisonperson.utils.toReferenceDataCodeId
 import java.time.Clock
 import java.time.ZonedDateTime
 import java.util.SortedSet
@@ -31,6 +32,7 @@ import java.util.SortedSet
 class ProfileDetailsPhysicalAttributesMigrationService(
   private val physicalAttributesRepository: PhysicalAttributesRepository,
   private val referenceDataCodeRepository: ReferenceDataCodeRepository,
+  private val physicalAttributesService: PhysicalAttributesService,
   private val telemetryClient: TelemetryClient,
   private val clock: Clock,
 ) {
@@ -48,7 +50,7 @@ class ProfileDetailsPhysicalAttributesMigrationService(
     val now = ZonedDateTime.now(clock)
 
     val physicalAttributes = physicalAttributesRepository.findById(prisonerNumber)
-      .orElseGet { newPhysicalAttributesFor(prisonerNumber) }
+      .orElseGet { physicalAttributesService.newPhysicalAttributesFor(prisonerNumber) }
       .also { it.resetHistoryForMigratedFields() }
 
     migration.forEach { record ->
@@ -85,9 +87,6 @@ class ProfileDetailsPhysicalAttributesMigrationService(
       .let { ProfileDetailsPhysicalAttributesMigrationResponse(it) }
   }
 
-  private fun toReferenceDataCodeId(code: String?, domain: String) =
-    code?.let { "${domain}_$code" }
-
   private fun updateFieldHistory(
     attribute: MigrationValueWithMetadata<String>?,
     record: ProfileDetailsPhysicalAttributesMigrationRequest,
@@ -122,9 +121,6 @@ class ProfileDetailsPhysicalAttributesMigrationService(
           other.appliesFrom <= this.appliesFrom &&
           (other.appliesTo == null || other.appliesTo >= this.appliesTo)
       } != null
-
-  private fun newPhysicalAttributesFor(prisonerNumber: String): PhysicalAttributes =
-    PhysicalAttributes(prisonerNumber)
 
   private fun PhysicalAttributes.resetHistoryForMigratedFields() {
     fieldsToMigrate.forEach { field -> fieldHistory.removeIf { it.field == field } }

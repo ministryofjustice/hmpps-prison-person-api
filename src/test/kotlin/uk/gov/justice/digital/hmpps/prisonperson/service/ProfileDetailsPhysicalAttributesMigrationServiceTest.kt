@@ -52,6 +52,9 @@ class ProfileDetailsPhysicalAttributesMigrationServiceTest {
   lateinit var referenceDataCodeRepository: ReferenceDataCodeRepository
 
   @Mock
+  lateinit var physicalAttributesService: PhysicalAttributesService
+
+  @Mock
   lateinit var telemetryClient: TelemetryClient
 
   @Spy
@@ -74,6 +77,11 @@ class ProfileDetailsPhysicalAttributesMigrationServiceTest {
         }
       }
       whenever(physicalAttributesRepository.save(savedPhysicalAttributes.capture())).thenAnswer { savedPhysicalAttributes.firstValue }
+      whenever(physicalAttributesService.newPhysicalAttributesFor(PRISONER_NUMBER)).thenReturn(
+        PhysicalAttributes(
+          PRISONER_NUMBER,
+        ),
+      )
     }
 
     @Test

@@ -54,7 +54,7 @@ class PhysicalAttributesService(
     return physicalAttributesRepository.save(physicalAttributes).toDto()
   }
 
-  private fun newPhysicalAttributesFor(prisonerNumber: String): PhysicalAttributes {
+  fun newPhysicalAttributesFor(prisonerNumber: String): PhysicalAttributes {
     validatePrisonerNumber(prisonerSearchClient, prisonerNumber)
     return PhysicalAttributes(prisonerNumber)
   }

@@ -37,6 +37,9 @@ class PhysicalAttributesMigrationServiceTest {
   lateinit var physicalAttributesRepository: PhysicalAttributesRepository
 
   @Mock
+  lateinit var physicalAttributesService: PhysicalAttributesService
+
+  @Mock
   lateinit var telemetryClient: TelemetryClient
 
   @Spy
@@ -53,6 +56,11 @@ class PhysicalAttributesMigrationServiceTest {
     @BeforeEach
     fun beforeEach() {
       whenever(physicalAttributesRepository.save(savedPhysicalAttributes.capture())).thenAnswer { savedPhysicalAttributes.firstValue }
+      whenever(physicalAttributesService.newPhysicalAttributesFor(PRISONER_NUMBER)).thenReturn(
+        PhysicalAttributes(
+          PRISONER_NUMBER,
+        ),
+      )
     }
 
     @Test
@@ -67,12 +75,28 @@ class PhysicalAttributesMigrationServiceTest {
 
         expectFieldHistory(
           HEIGHT,
-          HistoryComparison(value = PRISONER_HEIGHT, createdAt = THEN, createdBy = USER1, appliesFrom = THEN, appliesTo = null, migratedAt = NOW, source = NOMIS),
+          HistoryComparison(
+            value = PRISONER_HEIGHT,
+            createdAt = THEN,
+            createdBy = USER1,
+            appliesFrom = THEN,
+            appliesTo = null,
+            migratedAt = NOW,
+            source = NOMIS,
+          ),
         )
 
         expectFieldHistory(
           WEIGHT,
-          HistoryComparison(value = PRISONER_WEIGHT, createdAt = THEN, createdBy = USER1, appliesFrom = THEN, appliesTo = null, migratedAt = NOW, source = NOMIS),
+          HistoryComparison(
+            value = PRISONER_WEIGHT,
+            createdAt = THEN,
+            createdBy = USER1,
+            appliesFrom = THEN,
+            appliesTo = null,
+            migratedAt = NOW,
+            source = NOMIS,
+          ),
         )
       }
 
@@ -99,16 +123,64 @@ class PhysicalAttributesMigrationServiceTest {
 
         expectFieldHistory(
           HEIGHT,
-          HistoryComparison(value = PRISONER_HEIGHT - 2, createdAt = THEN.minusDays(2), createdBy = USER3, appliesFrom = THEN.minusDays(2), appliesTo = THEN.minusDays(1), migratedAt = NOW, source = NOMIS),
-          HistoryComparison(value = PRISONER_HEIGHT - 1, createdAt = THEN.minusDays(1), createdBy = USER2, appliesFrom = THEN.minusDays(1), appliesTo = THEN, migratedAt = NOW, source = NOMIS),
-          HistoryComparison(value = PRISONER_HEIGHT, createdAt = THEN, createdBy = USER1, appliesFrom = THEN, appliesTo = null, migratedAt = NOW, source = NOMIS),
+          HistoryComparison(
+            value = PRISONER_HEIGHT - 2,
+            createdAt = THEN.minusDays(2),
+            createdBy = USER3,
+            appliesFrom = THEN.minusDays(2),
+            appliesTo = THEN.minusDays(1),
+            migratedAt = NOW,
+            source = NOMIS,
+          ),
+          HistoryComparison(
+            value = PRISONER_HEIGHT - 1,
+            createdAt = THEN.minusDays(1),
+            createdBy = USER2,
+            appliesFrom = THEN.minusDays(1),
+            appliesTo = THEN,
+            migratedAt = NOW,
+            source = NOMIS,
+          ),
+          HistoryComparison(
+            value = PRISONER_HEIGHT,
+            createdAt = THEN,
+            createdBy = USER1,
+            appliesFrom = THEN,
+            appliesTo = null,
+            migratedAt = NOW,
+            source = NOMIS,
+          ),
         )
 
         expectFieldHistory(
           WEIGHT,
-          HistoryComparison(value = PRISONER_WEIGHT - 2, createdAt = THEN.minusDays(2), createdBy = USER3, appliesFrom = THEN.minusDays(2), appliesTo = THEN.minusDays(1), migratedAt = NOW, source = NOMIS),
-          HistoryComparison(value = PRISONER_WEIGHT - 1, createdAt = THEN.minusDays(1), createdBy = USER2, appliesFrom = THEN.minusDays(1), appliesTo = THEN, migratedAt = NOW, source = NOMIS),
-          HistoryComparison(value = PRISONER_WEIGHT, createdAt = THEN, createdBy = USER1, appliesFrom = THEN, appliesTo = null, migratedAt = NOW, source = NOMIS),
+          HistoryComparison(
+            value = PRISONER_WEIGHT - 2,
+            createdAt = THEN.minusDays(2),
+            createdBy = USER3,
+            appliesFrom = THEN.minusDays(2),
+            appliesTo = THEN.minusDays(1),
+            migratedAt = NOW,
+            source = NOMIS,
+          ),
+          HistoryComparison(
+            value = PRISONER_WEIGHT - 1,
+            createdAt = THEN.minusDays(1),
+            createdBy = USER2,
+            appliesFrom = THEN.minusDays(1),
+            appliesTo = THEN,
+            migratedAt = NOW,
+            source = NOMIS,
+          ),
+          HistoryComparison(
+            value = PRISONER_WEIGHT,
+            createdAt = THEN,
+            createdBy = USER1,
+            appliesFrom = THEN,
+            appliesTo = null,
+            migratedAt = NOW,
+            source = NOMIS,
+          ),
         )
       }
 
@@ -134,12 +206,28 @@ class PhysicalAttributesMigrationServiceTest {
 
         expectFieldHistory(
           HEIGHT,
-          HistoryComparison(value = PRISONER_HEIGHT, createdAt = THEN, createdBy = USER1, appliesFrom = THEN, appliesTo = null, migratedAt = NOW, source = NOMIS),
+          HistoryComparison(
+            value = PRISONER_HEIGHT,
+            createdAt = THEN,
+            createdBy = USER1,
+            appliesFrom = THEN,
+            appliesTo = null,
+            migratedAt = NOW,
+            source = NOMIS,
+          ),
         )
 
         expectFieldHistory(
           WEIGHT,
-          HistoryComparison(value = PRISONER_WEIGHT, createdAt = THEN, createdBy = USER1, appliesFrom = THEN, appliesTo = null, migratedAt = NOW, source = NOMIS),
+          HistoryComparison(
+            value = PRISONER_WEIGHT,
+            createdAt = THEN,
+            createdBy = USER1,
+            appliesFrom = THEN,
+            appliesTo = null,
+            migratedAt = NOW,
+            source = NOMIS,
+          ),
         )
       }
 
@@ -152,7 +240,12 @@ class PhysicalAttributesMigrationServiceTest {
 
     @Test
     fun `migrates physical attributes with null height and weight`() {
-      assertThat(underTest.migrate(PRISONER_NUMBER, sortedSetOf(PHYSICAL_ATTRIBUTES_MIGRATION_REQUEST.copy(height = null, weight = null))))
+      assertThat(
+        underTest.migrate(
+          PRISONER_NUMBER,
+          sortedSetOf(PHYSICAL_ATTRIBUTES_MIGRATION_REQUEST.copy(height = null, weight = null)),
+        ),
+      )
         .isInstanceOf(PhysicalAttributesMigrationResponse::class.java)
 
       with(savedPhysicalAttributes.firstValue) {
@@ -162,12 +255,28 @@ class PhysicalAttributesMigrationServiceTest {
 
         expectFieldHistory(
           HEIGHT,
-          HistoryComparison(value = null, createdAt = THEN, createdBy = USER1, appliesFrom = THEN, appliesTo = null, migratedAt = NOW, source = NOMIS),
+          HistoryComparison(
+            value = null,
+            createdAt = THEN,
+            createdBy = USER1,
+            appliesFrom = THEN,
+            appliesTo = null,
+            migratedAt = NOW,
+            source = NOMIS,
+          ),
         )
 
         expectFieldHistory(
           WEIGHT,
-          HistoryComparison(value = null, createdAt = THEN, createdBy = USER1, appliesFrom = THEN, appliesTo = null, migratedAt = NOW, source = NOMIS),
+          HistoryComparison(
+            value = null,
+            createdAt = THEN,
+            createdBy = USER1,
+            appliesFrom = THEN,
+            appliesTo = null,
+            migratedAt = NOW,
+            source = NOMIS,
+          ),
         )
       }
 
@@ -191,7 +300,10 @@ class PhysicalAttributesMigrationServiceTest {
     )
   }
 
-  private fun generatePrevious(migration: PhysicalAttributesMigrationRequest, username: String): PhysicalAttributesMigrationRequest = migration.copy(
+  private fun generatePrevious(
+    migration: PhysicalAttributesMigrationRequest,
+    username: String,
+  ): PhysicalAttributesMigrationRequest = migration.copy(
     height = migration.height?.minus(1),
     weight = migration.weight?.minus(1),
     appliesFrom = migration.appliesFrom.minusDays(1),
@@ -211,6 +323,12 @@ class PhysicalAttributesMigrationServiceTest {
     val NOW: ZonedDateTime = ZonedDateTime.ofInstant(Instant.now(), ZoneId.of("Europe/London"))
     val THEN: ZonedDateTime = NOW.minusDays(1)
 
-    val PHYSICAL_ATTRIBUTES_MIGRATION_REQUEST = PhysicalAttributesMigrationRequest(PRISONER_HEIGHT, PRISONER_WEIGHT, appliesFrom = THEN, createdAt = THEN, createdBy = USER1)
+    val PHYSICAL_ATTRIBUTES_MIGRATION_REQUEST = PhysicalAttributesMigrationRequest(
+      PRISONER_HEIGHT,
+      PRISONER_WEIGHT,
+      appliesFrom = THEN,
+      createdAt = THEN,
+      createdBy = USER1,
+    )
   }
 }

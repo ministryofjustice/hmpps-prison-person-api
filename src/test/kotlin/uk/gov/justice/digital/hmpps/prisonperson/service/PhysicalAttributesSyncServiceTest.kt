@@ -22,7 +22,6 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import org.mockito.quality.Strictness.LENIENT
-import uk.gov.justice.digital.hmpps.prisonperson.client.prisonersearch.PrisonerSearchClient
 import uk.gov.justice.digital.hmpps.prisonperson.client.prisonersearch.dto.PrisonerDto
 import uk.gov.justice.digital.hmpps.prisonperson.config.IllegalFieldHistoryException
 import uk.gov.justice.digital.hmpps.prisonperson.dto.request.PhysicalAttributesSyncRequest
@@ -51,7 +50,7 @@ class PhysicalAttributesSyncServiceTest {
   lateinit var fieldHistoryRepository: FieldHistoryRepository
 
   @Mock
-  lateinit var prisonerSearchClient: PrisonerSearchClient
+  lateinit var physicalAttributesService: PhysicalAttributesService
 
   @Mock
   lateinit var telemetryClient: TelemetryClient
@@ -76,7 +75,11 @@ class PhysicalAttributesSyncServiceTest {
 
     @Test
     fun `creates new physical attributes`() {
-      whenever(prisonerSearchClient.getPrisoner(PRISONER_NUMBER)).thenReturn(PRISONER_SEARCH_RESPONSE)
+      whenever(physicalAttributesService.newPhysicalAttributesFor(PRISONER_NUMBER)).thenReturn(
+        PhysicalAttributes(
+          PRISONER_NUMBER,
+        ),
+      )
       whenever(physicalAttributesRepository.findById(PRISONER_NUMBER)).thenReturn(Optional.empty())
 
       assertThat(underTest.sync(PRISONER_NUMBER, PHYSICAL_ATTRIBUTES_SYNC_REQUEST))
@@ -89,12 +92,26 @@ class PhysicalAttributesSyncServiceTest {
 
         expectFieldHistory(
           HEIGHT,
-          HistoryComparison(value = PRISONER_HEIGHT, createdAt = NOW, createdBy = USER1, appliesFrom = NOW, appliesTo = null, source = NOMIS),
+          HistoryComparison(
+            value = PRISONER_HEIGHT,
+            createdAt = NOW,
+            createdBy = USER1,
+            appliesFrom = NOW,
+            appliesTo = null,
+            source = NOMIS,
+          ),
         )
 
         expectFieldHistory(
           WEIGHT,
-          HistoryComparison(value = PRISONER_WEIGHT, createdAt = NOW, createdBy = USER1, appliesFrom = NOW, appliesTo = null, source = NOMIS),
+          HistoryComparison(
+            value = PRISONER_WEIGHT,
+            createdAt = NOW,
+            createdBy = USER1,
+            appliesFrom = NOW,
+            appliesTo = null,
+            source = NOMIS,
+          ),
         )
       }
 
@@ -107,7 +124,7 @@ class PhysicalAttributesSyncServiceTest {
 
     @Test
     fun `does not create new physical attributes if prisoner doesn't exist in prisoner search`() {
-      whenever(prisonerSearchClient.getPrisoner(PRISONER_NUMBER)).thenReturn(null)
+      whenever(physicalAttributesService.newPhysicalAttributesFor(PRISONER_NUMBER)).thenThrow(IllegalArgumentException("Prisoner number '$PRISONER_NUMBER' not found"))
       whenever(physicalAttributesRepository.findById(PRISONER_NUMBER)).thenReturn(Optional.empty())
 
       assertThatThrownBy { underTest.sync(PRISONER_NUMBER, PHYSICAL_ATTRIBUTES_SYNC_REQUEST) }
@@ -141,17 +158,43 @@ class PhysicalAttributesSyncServiceTest {
         expectFieldHistory(
           HEIGHT,
           // Initial history entry:
-          HistoryComparison(value = PREVIOUS_PRISONER_HEIGHT, createdAt = NOW.minusDays(1), createdBy = USER1, appliesFrom = NOW.minusDays(1), appliesTo = NOW),
+          HistoryComparison(
+            value = PREVIOUS_PRISONER_HEIGHT,
+            createdAt = NOW.minusDays(1),
+            createdBy = USER1,
+            appliesFrom = NOW.minusDays(1),
+            appliesTo = NOW,
+          ),
           // New history entry:
-          HistoryComparison(value = PRISONER_HEIGHT, createdAt = NOW, createdBy = USER2, appliesFrom = NOW, appliesTo = null, source = NOMIS),
+          HistoryComparison(
+            value = PRISONER_HEIGHT,
+            createdAt = NOW,
+            createdBy = USER2,
+            appliesFrom = NOW,
+            appliesTo = null,
+            source = NOMIS,
+          ),
         )
 
         expectFieldHistory(
           WEIGHT,
           // Initial history entry:
-          HistoryComparison(value = PREVIOUS_PRISONER_WEIGHT, createdAt = NOW.minusDays(1), createdBy = USER1, appliesFrom = NOW.minusDays(1), appliesTo = NOW),
+          HistoryComparison(
+            value = PREVIOUS_PRISONER_WEIGHT,
+            createdAt = NOW.minusDays(1),
+            createdBy = USER1,
+            appliesFrom = NOW.minusDays(1),
+            appliesTo = NOW,
+          ),
           // New history entry:
-          HistoryComparison(value = PRISONER_WEIGHT, createdAt = NOW, createdBy = USER2, appliesFrom = NOW, appliesTo = null, source = NOMIS),
+          HistoryComparison(
+            value = PRISONER_WEIGHT,
+            createdAt = NOW,
+            createdBy = USER2,
+            appliesFrom = NOW,
+            appliesTo = null,
+            source = NOMIS,
+          ),
         )
       }
 
@@ -225,7 +268,11 @@ class PhysicalAttributesSyncServiceTest {
 
     @Test
     fun `accepts physical attributes with null height and weight`() {
-      whenever(prisonerSearchClient.getPrisoner(PRISONER_NUMBER)).thenReturn(PRISONER_SEARCH_RESPONSE)
+      whenever(physicalAttributesService.newPhysicalAttributesFor(PRISONER_NUMBER)).thenReturn(
+        PhysicalAttributes(
+          PRISONER_NUMBER,
+        ),
+      )
       whenever(physicalAttributesRepository.findById(PRISONER_NUMBER)).thenReturn(Optional.empty())
 
       assertThat(underTest.sync(PRISONER_NUMBER, PHYSICAL_ATTRIBUTES_SYNC_REQUEST.copy(height = null, weight = null)))
@@ -238,12 +285,26 @@ class PhysicalAttributesSyncServiceTest {
 
         expectFieldHistory(
           HEIGHT,
-          HistoryComparison(value = null, createdAt = NOW, createdBy = USER1, appliesFrom = NOW, appliesTo = null, source = NOMIS),
+          HistoryComparison(
+            value = null,
+            createdAt = NOW,
+            createdBy = USER1,
+            appliesFrom = NOW,
+            appliesTo = null,
+            source = NOMIS,
+          ),
         )
 
         expectFieldHistory(
           WEIGHT,
-          HistoryComparison(value = null, createdAt = NOW, createdBy = USER1, appliesFrom = NOW, appliesTo = null, source = NOMIS),
+          HistoryComparison(
+            value = null,
+            createdAt = NOW,
+            createdBy = USER1,
+            appliesFrom = NOW,
+            appliesTo = null,
+            source = NOMIS,
+          ),
         )
       }
 

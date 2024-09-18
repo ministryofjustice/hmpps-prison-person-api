@@ -12,7 +12,6 @@ import org.junit.jupiter.api.extension.BeforeAllCallback
 import org.junit.jupiter.api.extension.BeforeEachCallback
 import org.junit.jupiter.api.extension.ExtensionContext
 import uk.gov.justice.digital.hmpps.prisonperson.client.prisonersearch.dto.PrisonerDto
-import java.time.LocalDate
 
 internal const val PRISONER_NUMBER = "A1234AA"
 internal const val PRISONER_NUMBER_NOT_FOUND = "NOT_FOUND"
@@ -43,16 +42,7 @@ class PrisonerSearchServer : WireMockServer(WIREMOCK_PORT) {
           aResponse()
             .withHeader("Content-Type", "application/json")
             .withBody(
-              mapper.writeValueAsString(
-                PrisonerDto(
-                  prisonerNumber = prisonNumber,
-                  bookingId = 1234,
-                  "First",
-                  "Middle",
-                  "Last",
-                  LocalDate.of(1988, 4, 3),
-                ),
-              ),
+              mapper.writeValueAsString(PrisonerDto(prisonerNumber = prisonNumber)),
             )
             .withStatus(200),
         ),
@@ -62,7 +52,10 @@ class PrisonerSearchServer : WireMockServer(WIREMOCK_PORT) {
     stubFor(get("/prisoner/$prisonNumber").willReturn(aResponse().withStatus(500)))
 }
 
-class PrisonerSearchExtension : BeforeAllCallback, AfterAllCallback, BeforeEachCallback {
+class PrisonerSearchExtension :
+  BeforeAllCallback,
+  AfterAllCallback,
+  BeforeEachCallback {
   companion object {
     @JvmField
     val prisonerSearch = PrisonerSearchServer()

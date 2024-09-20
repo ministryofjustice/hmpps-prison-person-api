@@ -29,6 +29,8 @@ import uk.gov.justice.digital.hmpps.prisonperson.config.DownstreamServiceExcepti
 import uk.gov.justice.digital.hmpps.prisonperson.integration.wiremock.DocumentServiceServer
 import uk.gov.justice.digital.hmpps.prisonperson.integration.wiremock.PRISONER_NUMBER
 import uk.gov.justice.digital.hmpps.prisonperson.utils.UuidV7Generator.Companion.uuidGenerator
+import java.nio.file.Files
+import java.nio.file.Paths
 import java.util.UUID
 
 class DocumentServiceClientTest {
@@ -155,6 +157,36 @@ class DocumentServiceClientTest {
         .hasMessage("Put document request failed")
         .hasCauseInstanceOf(WebClientResponseException::class.java)
         .hasRootCauseMessage("500 Internal Server Error from POST http://localhost:8113/documents/PRISONER_PROFILE_PICTURE/$mockUuid")
+    }
+  }
+
+  @Nested
+  inner class GetDocumentByUuid {
+    @Test
+    fun `getDocumentByUuid - success`() {
+      val uuid = UUID.randomUUID().toString()
+      server.stubGetDocumentByUuid(uuid)
+
+      val (body, contentType) = client.getDocumentByUuid(uuid, DOCUMENT_REQ_CONTEXT)
+
+      assertThat(body).isInstanceOf(ByteArray::class.java)
+      assertThat(body).isEqualTo(Files.readAllBytes(Paths.get("src/test/kotlin/uk/gov/justice/digital/hmpps/prisonperson/integration/assets/profile.jpeg")))
+
+      assertThat(contentType).isEqualTo("image/jpeg")
+    }
+
+    @Test
+    fun `getDocumentByUuid - downstream service exception`() {
+      val uuid = UUID.randomUUID().toString()
+      server.stubGetDocumentByUuidException(uuid)
+
+      assertThatThrownBy {
+        client.getDocumentByUuid(uuid, DOCUMENT_REQ_CONTEXT)
+      }
+        .isInstanceOf(DownstreamServiceException::class.java)
+        .hasMessage("Get file request failed")
+        .hasCauseInstanceOf(WebClientResponseException::class.java)
+        .hasRootCauseMessage("500 Internal Server Error from GET http://localhost:8113/documents/$uuid/file")
     }
   }
 

@@ -74,7 +74,26 @@ class DocumentServiceClient(@Qualifier("documentServiceWebClient") private val w
     throw DownstreamServiceException("Put document request failed", e)
   }
 
-  private fun addHeaders(request: WebClient.RequestBodySpec, documentRequestContext: DocumentRequestContext): WebClient.RequestBodySpec {
+  fun getDocumentByUuid(documentUuid: String, documentRequestContext: DocumentRequestContext): Pair<ByteArray?, String?> = try {
+    log.info("Retrieving file from document service: $documentUuid")
+    val request = webClient
+      .get()
+      .uri("/documents/$documentUuid/file")
+
+    val response = addHeaders(request, documentRequestContext)
+      .retrieve()
+      .toEntity(ByteArray::class.java)
+      .block()
+
+    val contentType = response?.headers?.contentType?.toString()
+    val body = response?.body
+
+    Pair(body, contentType)
+  } catch (e: Exception) {
+    throw DownstreamServiceException("Get file request failed", e)
+  }
+
+  private fun <T : WebClient.RequestHeadersSpec<*>> addHeaders(request: T, documentRequestContext: DocumentRequestContext): T {
     request.header("Service-Name", documentRequestContext.serviceName)
 
     if (!documentRequestContext.activeCaseLoadId.isNullOrEmpty()) {

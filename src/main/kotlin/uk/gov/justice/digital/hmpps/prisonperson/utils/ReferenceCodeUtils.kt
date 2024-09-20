@@ -10,3 +10,9 @@ fun toReferenceDataCode(
   referenceDataCodeRepository.findById(it)
     .orElseThrow { IllegalArgumentException("Invalid reference data code: $it") }
 }
+
+fun toReferenceDataCodeId(code: String?, domain: String?): String? = code?.let { c ->
+  domain?.let { d ->
+    "${d}_$c"
+  }
+}

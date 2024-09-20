@@ -14,7 +14,6 @@ import uk.gov.justice.digital.hmpps.prisonperson.integration.wiremock.PRISONER_N
 import uk.gov.justice.digital.hmpps.prisonperson.integration.wiremock.PRISONER_NUMBER_NOT_FOUND
 import uk.gov.justice.digital.hmpps.prisonperson.integration.wiremock.PRISONER_NUMBER_THROW_EXCEPTION
 import uk.gov.justice.digital.hmpps.prisonperson.integration.wiremock.PrisonerSearchServer
-import java.time.LocalDate
 
 class PrisonerSearchClientTest {
   private lateinit var client: PrisonerSearchClient
@@ -32,16 +31,7 @@ class PrisonerSearchClientTest {
 
     val result = client.getPrisoner(PRISONER_NUMBER)
 
-    assertThat(result!!).isEqualTo(
-      PrisonerDto(
-        prisonerNumber = PRISONER_NUMBER,
-        bookingId = 1234,
-        "First",
-        "Middle",
-        "Last",
-        LocalDate.of(1988, 4, 3),
-      ),
-    )
+    assertThat(result!!).isEqualTo(PrisonerDto(prisonerNumber = PRISONER_NUMBER))
   }
 
   @Test

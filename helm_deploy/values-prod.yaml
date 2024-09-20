@@ -15,6 +15,8 @@ generic-service:
 
   postgresDatabaseRestore:
     enabled: true
+    env:
+      SCHEMA_TO_RESTORE: "prison_person"
     namespace_secrets:
       rds-postgresql-instance-output:
         DB_NAME: "database_name"

@@ -3,7 +3,6 @@ package uk.gov.justice.digital.hmpps.prisonperson.service.merge
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import uk.gov.justice.digital.hmpps.prisonperson.client.prisonersearch.PrisonerSearchClient
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.HEIGHT
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.WEIGHT
@@ -12,6 +11,7 @@ import uk.gov.justice.digital.hmpps.prisonperson.jpa.PhysicalAttributes
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.FieldHistoryRepository
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.FieldMetadataRepository
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.PhysicalAttributesRepository
+import uk.gov.justice.digital.hmpps.prisonperson.service.PhysicalAttributesService
 import java.time.Clock
 import java.time.ZonedDateTime
 import java.util.SortedSet
@@ -21,7 +21,7 @@ class PhysicalAttributesMergeService(
   private val physicalAttributesRepository: PhysicalAttributesRepository,
   private val fieldMetadataRepository: FieldMetadataRepository,
   private val fieldHistoryRepository: FieldHistoryRepository,
-  private val prisonerSearchClient: PrisonerSearchClient,
+  private val physicalAttributesService: PhysicalAttributesService,
   private val clock: Clock,
 ) : PrisonPersonMerge {
 
@@ -51,7 +51,7 @@ class PhysicalAttributesMergeService(
   ) {
     val physicalAttributes = physicalAttributesRepository.findById(prisonerNumberTo).orElseGet {
       log.debug("No physical attributes exist yet for prisoner: '$prisonerNumberTo', merging into an empty record")
-      newPhysicalAttributesFor(prisonerNumberTo)
+      physicalAttributesService.newPhysicalAttributesFor(prisonerNumberTo)
     }
 
     fieldsToMerge.forEach { field ->
@@ -122,15 +122,8 @@ class PhysicalAttributesMergeService(
     physicalAttributesRepository.deleteByPrisonerNumber(prisonerNumber)
   }
 
-  private fun newPhysicalAttributesFor(prisonerNumber: String): PhysicalAttributes {
-    validatePrisonerNumber(prisonerNumber)
-    return PhysicalAttributes(prisonerNumber)
-  }
-
-  private fun validatePrisonerNumber(prisonerNumber: String) =
-    require(prisonerSearchClient.getPrisoner(prisonerNumber) != null) { "Prisoner number '$prisonerNumber' not found" }
-
-  private fun SortedSet<FieldHistory>.filterOn(field: PrisonPersonField, excludingId: Long) = filter { it.field == field && it.fieldHistoryId != excludingId }
+  private fun SortedSet<FieldHistory>.filterOn(field: PrisonPersonField, excludingId: Long) =
+    filter { it.field == field && it.fieldHistoryId != excludingId }
 
   private companion object {
     private val log = LoggerFactory.getLogger(this::class.java)

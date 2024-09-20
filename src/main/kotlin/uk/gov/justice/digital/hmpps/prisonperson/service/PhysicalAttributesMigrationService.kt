@@ -21,6 +21,7 @@ import java.util.SortedSet
 @Transactional
 class PhysicalAttributesMigrationService(
   private val physicalAttributesRepository: PhysicalAttributesRepository,
+  private val physicalAttributesService: PhysicalAttributesService,
   private val telemetryClient: TelemetryClient,
   private val clock: Clock,
 ) {
@@ -38,7 +39,7 @@ class PhysicalAttributesMigrationService(
     val now = ZonedDateTime.now(clock)
 
     val physicalAttributes = physicalAttributesRepository.findById(prisonerNumber)
-      .orElseGet { newPhysicalAttributesFor(prisonerNumber) }
+      .orElseGet { physicalAttributesService.newPhysicalAttributesFor(prisonerNumber) }
       .also { it.resetHistoryForMigratedFields() }
 
     migration.forEach { record ->
@@ -82,8 +83,6 @@ class PhysicalAttributesMigrationService(
           other.appliesFrom <= this.appliesFrom &&
           (other.appliesTo == null || other.appliesTo >= this.appliesTo)
       } != null
-
-  private fun newPhysicalAttributesFor(prisonerNumber: String): PhysicalAttributes = PhysicalAttributes(prisonerNumber)
 
   private fun PhysicalAttributes.resetHistoryForMigratedFields() {
     fieldsToMigrate.forEach { field -> fieldHistory.removeIf { it.field == field } }

@@ -5,7 +5,6 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import uk.gov.justice.digital.hmpps.prisonperson.client.prisonersearch.PrisonerSearchClient
 import uk.gov.justice.digital.hmpps.prisonperson.config.trackEvent
 import uk.gov.justice.digital.hmpps.prisonperson.dto.request.PhysicalAttributesSyncRequest
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.PhysicalAttributesSyncResponse
@@ -24,7 +23,7 @@ import java.time.ZonedDateTime
 class PhysicalAttributesSyncService(
   private val physicalAttributesRepository: PhysicalAttributesRepository,
   private val fieldHistoryRepository: FieldHistoryRepository,
-  private val prisonerSearchClient: PrisonerSearchClient,
+  private val physicalAttributesService: PhysicalAttributesService,
   private val telemetryClient: TelemetryClient,
   private val clock: Clock,
 ) {
@@ -37,13 +36,16 @@ class PhysicalAttributesSyncService(
     syncHistoricalPhysicalAttributes(prisonerNumber, request)
   }
 
-  private fun syncLatestPhysicalAttributes(prisonerNumber: String, request: PhysicalAttributesSyncRequest): PhysicalAttributesSyncResponse {
+  private fun syncLatestPhysicalAttributes(
+    prisonerNumber: String,
+    request: PhysicalAttributesSyncRequest,
+  ): PhysicalAttributesSyncResponse {
     log.debug("Syncing latest physical attributes update from NOMIS for prisoner: $prisonerNumber")
 
     val now = ZonedDateTime.now(clock)
 
     val physicalAttributes = physicalAttributesRepository.findById(prisonerNumber)
-      .orElseGet { newPhysicalAttributesFor(prisonerNumber) }
+      .orElseGet { physicalAttributesService.newPhysicalAttributesFor(prisonerNumber) }
       .apply {
         height = request.height
         weight = request.weight
@@ -56,13 +58,16 @@ class PhysicalAttributesSyncService(
       .let { PhysicalAttributesSyncResponse(it) }
   }
 
-  private fun syncHistoricalPhysicalAttributes(prisonerNumber: String, request: PhysicalAttributesSyncRequest): PhysicalAttributesSyncResponse {
+  private fun syncHistoricalPhysicalAttributes(
+    prisonerNumber: String,
+    request: PhysicalAttributesSyncRequest,
+  ): PhysicalAttributesSyncResponse {
     log.debug("Syncing historical physical attributes update from NOMIS for prisoner: $prisonerNumber")
 
     physicalAttributesRepository.findById(prisonerNumber)
       .orElseGet {
         physicalAttributesRepository.save(
-          newPhysicalAttributesFor(prisonerNumber).apply {
+          physicalAttributesService.newPhysicalAttributesFor(prisonerNumber).apply {
             height = request.height
             weight = request.weight
           },
@@ -94,14 +99,6 @@ class PhysicalAttributesSyncService(
       )
     }
   }
-
-  private fun newPhysicalAttributesFor(prisonerNumber: String): PhysicalAttributes {
-    validatePrisonerNumber(prisonerNumber)
-    return PhysicalAttributes(prisonerNumber)
-  }
-
-  private fun validatePrisonerNumber(prisonerNumber: String) =
-    require(prisonerSearchClient.getPrisoner(prisonerNumber) != null) { "Prisoner number '$prisonerNumber' not found" }
 
   private fun PhysicalAttributes.getLatestFieldHistoryIds() = listOf(
     fieldHistory.last { it.field == HEIGHT },

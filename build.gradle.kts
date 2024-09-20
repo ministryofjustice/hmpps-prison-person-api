@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "6.0.4"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "6.0.5"
   kotlin("plugin.spring") version "2.0.20"
   kotlin("plugin.jpa") version "2.0.20"
   jacoco
@@ -14,13 +14,13 @@ configurations {
 
 dependencies {
   // Spring Boot
-  implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:1.0.5")
+  implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:1.0.6")
   implementation("org.springframework.boot:spring-boot-starter-webflux")
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
   implementation("org.springframework.boot:spring-boot-starter-validation")
 
   // AWS
-  implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:4.3.2")
+  implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:4.4.3")
 
   // OpenAPI
   implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0")
@@ -35,7 +35,7 @@ dependencies {
   runtimeOnly("org.postgresql:postgresql")
 
   // Logging and Telemetry
-  implementation("io.opentelemetry.instrumentation:opentelemetry-instrumentation-annotations:2.7.0")
+  implementation("io.opentelemetry.instrumentation:opentelemetry-instrumentation-annotations:2.8.0")
 
   // Test
   testImplementation("io.jsonwebtoken:jjwt-impl:0.12.6")
@@ -47,7 +47,7 @@ dependencies {
   testImplementation("org.testcontainers:localstack:1.20.1")
   testImplementation("org.awaitility:awaitility-kotlin:4.2.2")
   testImplementation("org.springframework.security:spring-security-test")
-  testImplementation("io.opentelemetry:opentelemetry-sdk-testing:1.41.0")
+  testImplementation("io.opentelemetry:opentelemetry-sdk-testing:1.42.1")
 
   // Developer experience
   developmentOnly("org.springframework.boot:spring-boot-devtools")

@@ -58,13 +58,13 @@ class ProfileDetailsPhysicalAttributesSyncService(
     val now = ZonedDateTime.now(clock)
     val updatedFields = mutableSetOf<PrisonPersonField>()
 
-    val physicalAttributes = physicalAttributesRepository.findById(prisonerNumber)
+    val physicalAttributes = physicalAttributesRepository.findByIdForUpdate(prisonerNumber)
       .orElseGet {
         try {
           physicalAttributesService.newPhysicalAttributesFor(prisonerNumber)
         } catch (e: DataIntegrityViolationException) {
           log.debug("Race condition detected: Duplicate Physical Attributes primary key for $prisonerNumber")
-          physicalAttributesRepository.getReferenceById(prisonerNumber)
+          physicalAttributesRepository.getReferenceByIdForUpdate(prisonerNumber)
         }
       }
       .apply {

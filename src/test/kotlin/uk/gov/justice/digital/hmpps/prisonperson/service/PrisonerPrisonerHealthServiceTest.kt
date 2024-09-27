@@ -20,7 +20,12 @@ import uk.gov.justice.digital.hmpps.prisonperson.dto.request.PrisonerHealthUpdat
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.HealthDto
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.ValueWithMetadata
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField
-import uk.gov.justice.digital.hmpps.prisonperson.jpa.*
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.FieldMetadata
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.FoodAllergy
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.FoodAllergyId
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.PrisonerHealth
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.ReferenceDataCode
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.ReferenceDataDomain
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.PrisonerHealthRepository
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.ReferenceDataCodeRepository
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.utils.HistoryComparison
@@ -271,6 +276,5 @@ class PrisonerPrisonerHealthServiceTest {
       Pair("foodAllergies", null),
     )
     val HEALTH_UPDATE_REQUEST_WITH_NULL = PrisonerHealthUpdateRequest(attributes_undefined)
-
   }
 }

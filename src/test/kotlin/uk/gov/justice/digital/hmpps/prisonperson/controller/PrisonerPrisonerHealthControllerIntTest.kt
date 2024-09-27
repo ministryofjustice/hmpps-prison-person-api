@@ -346,6 +346,5 @@ class PrisonerPrisonerHealthControllerIntTest : IntegrationTestBase() {
         ]
       }
       """.trimIndent()
-
   }
 }

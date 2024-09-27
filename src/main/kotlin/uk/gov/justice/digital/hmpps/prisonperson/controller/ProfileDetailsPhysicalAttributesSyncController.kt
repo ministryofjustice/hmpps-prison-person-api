@@ -42,11 +42,10 @@ class ProfileDetailsPhysicalAttributesSyncController(private val profileDetailsP
       "<br/><br/>Requires role `ROLE_PRISON_PERSON_API__PROFILE_DETAILS_PHYSICAL_ATTRIBUTES_SYNC__RW`" +
       "<br/><br/>Edits can be made to profile details physical attributes in NOMIS to both the current booking " +
       "and to old bookings. This sync API can handle both by accepting the `appliesFrom` and " +
-      "`appliesTo` timestamps.  For edits to the current booking, `appliesFrom` should be equal to the " +
-      "point in time that the edit happened, and `appliesTo` should be null.  For edits to historical " +
-      "bookings `appliesFrom` should be equal to the booking start date and and `appliesTo` should be " +
-      "equal to the booking end date. The `lastModifiedAt` date should always be the point in time that the " +
-      "user made the edit.",
+      "`appliesTo` timestamps - `appliesFrom` should be equal to the point in time that the edit happened, and " +
+      "`appliesTo` should be null.  For edits to historical bookings `appliesFrom` should be equal to the booking " +
+      "start date and and `appliesTo` should be equal to the booking end date. The `lastModifiedAt` date should " +
+      "always be the point in time that the user made the edit.",
     responses = [
       ApiResponse(
         responseCode = "201",

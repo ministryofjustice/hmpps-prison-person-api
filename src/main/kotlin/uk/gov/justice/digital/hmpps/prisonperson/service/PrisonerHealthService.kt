@@ -51,9 +51,13 @@ class PrisonerHealthService(
             it.stream().map { allergyCode ->
               val allergy = toReferenceDataCode(referenceDataCodeRepository, allergyCode)
 
-              if (allergy != null) FoodAllergy(
-                FoodAllergyId(prisonerNumber, allergy),
-              ) else null
+              if (allergy != null) {
+                FoodAllergy(
+                  FoodAllergyId(prisonerNumber, allergy),
+                )
+              } else {
+                null
+              }
             }.toList().filterNotNull().forEach { allergy -> this::foodAllergies.get()?.add(allergy) }
           }
         }

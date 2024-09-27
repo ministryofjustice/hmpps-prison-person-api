@@ -26,6 +26,7 @@ class PhotographService(private val documentServiceClient: DocumentServiceClient
     fileType,
     documentRequestContext = buildDocumentRequestContext(),
   )
+  fun getPicByUuid(uuid: String): Pair<ByteArray?, String?> = documentServiceClient.getDocumentByUuid(uuid, buildDocumentRequestContext())
 
   private fun buildDocumentRequestContext() = DocumentRequestContext(
     serviceName = "hmpps-prison-person-api",

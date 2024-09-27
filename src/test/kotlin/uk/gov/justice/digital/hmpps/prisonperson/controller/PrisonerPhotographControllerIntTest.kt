@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.prisonperson.controller
 import io.mockk.every
 import io.mockk.mockkObject
 import io.mockk.unmockkObject
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -16,6 +17,8 @@ import uk.gov.justice.digital.hmpps.prisonperson.client.documentservice.dto.Docu
 import uk.gov.justice.digital.hmpps.prisonperson.integration.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.prisonperson.integration.wiremock.DocumentServiceExtension.Companion.documentService
 import uk.gov.justice.digital.hmpps.prisonperson.utils.UuidV7Generator.Companion.uuidGenerator
+import java.nio.file.Files
+import java.nio.file.Paths
 import java.util.UUID
 
 class PrisonerPhotographControllerIntTest : IntegrationTestBase() {
@@ -140,6 +143,28 @@ class PrisonerPhotographControllerIntTest : IntegrationTestBase() {
           .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RO")))
           .exchange()
           .expectStatus().isBadRequest
+      }
+    }
+
+    @Nested
+    inner class GetDocumentFileByUUI {
+      @Test
+      fun `can return document ByteArray with correct Content-Type header`() {
+        val uuid = UUID.randomUUID().toString()
+        documentService.stubGetDocumentByUuid(uuid)
+
+        val expectedBytes = Files.readAllBytes(Paths.get("src/test/kotlin/uk/gov/justice/digital/hmpps/prisonperson/integration/assets/profile.jpeg"))
+
+        webTestClient.get().uri("/photographs/$uuid/file")
+          .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RO")))
+          .exchange()
+          .expectStatus().isOk
+          .expectHeader().contentType(MediaType.IMAGE_JPEG)
+          .expectBody()
+          .returnResult()
+          .responseBody?.let { actualBytes ->
+            assertThat(actualBytes).isEqualTo(expectedBytes)
+          }
       }
     }
   }

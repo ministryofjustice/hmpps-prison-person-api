@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.prisonperson.service
 
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.prisonperson.client.prisonersearch.PrisonerSearchClient
 import uk.gov.justice.digital.hmpps.prisonperson.dto.request.PhysicalAttributesUpdateRequest
@@ -54,8 +55,9 @@ class PhysicalAttributesService(
     return physicalAttributesRepository.save(physicalAttributes).toDto()
   }
 
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
   fun newPhysicalAttributesFor(prisonerNumber: String): PhysicalAttributes {
     validatePrisonerNumber(prisonerSearchClient, prisonerNumber)
-    return PhysicalAttributes(prisonerNumber)
+    return physicalAttributesRepository.save(PhysicalAttributes(prisonerNumber))
   }
 }

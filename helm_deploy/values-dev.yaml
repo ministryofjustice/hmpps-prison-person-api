@@ -24,7 +24,7 @@ generic-service:
 # CloudPlatform AlertManager receiver to route prometheus alerts to slack
 # See https://user-guide.cloud-platform.service.justice.gov.uk/documentation/monitoring-an-app/how-to-create-alarms.html#creating-your-own-custom-alerts
 generic-prometheus-alerts:
-  alertSeverity: hmpps-prisoner-profile-non-prod
+  alertSeverity: hmpps-prison-person-api-dev
   businessHoursOnly: true
   rdsAlertsDatabases:
     cloud-platform-a40b7024a320758f: prison-person-api

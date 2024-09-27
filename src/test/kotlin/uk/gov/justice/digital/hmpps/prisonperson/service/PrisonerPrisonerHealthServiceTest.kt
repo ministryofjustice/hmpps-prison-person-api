@@ -172,14 +172,14 @@ class PrisonerPrisonerHealthServiceTest {
       assertThat(underTest.createOrUpdate(PRISONER_NUMBER, HEALTH_UPDATE_REQUEST_WITH_NULL)).isEqualTo(
         HealthDto(
           ValueWithMetadata(null, NOW, USER1),
-          null
+          emptyList(),
         ),
       )
 
       with(savedPrisonerHealth.firstValue) {
         assertThat(prisonerNumber).isEqualTo(PRISONER_NUMBER)
         assertThat(smokerOrVaper).isEqualTo(null)
-        assertThat(foodAllergies).isEqualTo(null)
+        assertThat(foodAllergies).isEqualTo(mutableSetOf<FoodAllergy>())
 
         expectFieldHistory(
           PrisonPersonField.SMOKER_OR_VAPER,

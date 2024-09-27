@@ -31,7 +31,7 @@ data class PrisonerHealthUpdateRequest(
     type = "string[]",
     example = "[FOOD_ALLERGY_EGG, FOOD_ALLERGY_MILK]",
     requiredMode = NOT_REQUIRED,
-    nullable = true
+    nullable = true,
   )
   val foodAllergies: Nullish<List<String>> = getAttributeAsNullish<List<String>>(attributes, "foodAllergies")
 }

@@ -61,7 +61,6 @@ class PrisonerHealthService(
             }.toList().filterNotNull().forEach { allergy -> this::foodAllergies.get()?.add(allergy) }
           }
         }
-
       }.also { it.updateFieldHistory(now, authenticationFacade.getUserOrSystemInContext()) }
 
     return prisonerHealthRepository.save(health).toDto()

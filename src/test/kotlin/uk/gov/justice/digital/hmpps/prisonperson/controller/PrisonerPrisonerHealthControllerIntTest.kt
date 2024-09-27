@@ -91,7 +91,7 @@ class PrisonerPrisonerHealthControllerIntTest : IntegrationTestBase() {
       @Sql("classpath:jpa/repository/reset.sql")
       fun `can create new health information`() {
         expectSuccessfulUpdateFrom(VALID_REQUEST_BODY).expectBody().json(
-          SMOKER_NO_RESPONSE,
+          SMOKER_NO_MILK_ALLERGY_RESPONSE,
           true,
         )
 
@@ -110,6 +110,7 @@ class PrisonerPrisonerHealthControllerIntTest : IntegrationTestBase() {
       @Test
       @Sql("classpath:jpa/repository/reset.sql")
       @Sql("classpath:controller/prisoner_health/health.sql")
+      @Sql("classpath:controller/prisoner_health/food_allergies.sql")
       @Sql("classpath:controller/prisoner_health/field_history.sql")
       fun `can update existing health information`() {
         expectFieldHistory(
@@ -124,7 +125,7 @@ class PrisonerPrisonerHealthControllerIntTest : IntegrationTestBase() {
         )
 
         expectSuccessfulUpdateFrom(VALID_REQUEST_BODY).expectBody().json(
-          SMOKER_NO_RESPONSE,
+          SMOKER_NO_MILK_ALLERGY_RESPONSE,
           true,
         )
 
@@ -150,6 +151,7 @@ class PrisonerPrisonerHealthControllerIntTest : IntegrationTestBase() {
       @Test
       @Sql("classpath:jpa/repository/reset.sql")
       @Sql("classpath:controller/prisoner_health/health.sql")
+      @Sql("classpath:controller/prisoner_health/food_allergies.sql")
       @Sql("classpath:controller/prisoner_health/field_history.sql")
       fun `can update existing health information to null`() {
         expectFieldHistory(
@@ -166,7 +168,7 @@ class PrisonerPrisonerHealthControllerIntTest : IntegrationTestBase() {
         expectSuccessfulUpdateFrom(
           // language=json
           """
-            { "smokerOrVaper": null }
+            { "smokerOrVaper": null, "foodAllergies": [] }
           """.trimIndent(),
         ).expectBody().json(
           // language=json
@@ -175,11 +177,55 @@ class PrisonerPrisonerHealthControllerIntTest : IntegrationTestBase() {
                 "value":  null,
                 "lastModifiedAt":"2024-06-14T09:10:11+0100",
                 "lastModifiedBy":"USER1"
-              } 
+              },
+              "foodAllergies": []
             }
           """.trimIndent(),
           true,
         )
+
+        expectFieldHistory(
+          SMOKER_OR_VAPER,
+          HistoryComparison(
+            value = SMOKE_SMOKER,
+            appliesFrom = THEN,
+            appliesTo = NOW,
+            createdAt = THEN,
+            createdBy = USER1,
+          ),
+          HistoryComparison(
+            value = null,
+            appliesFrom = NOW,
+            appliesTo = null,
+            createdAt = NOW,
+            createdBy = USER1,
+          ),
+        )
+      }
+
+      @Test
+      @Sql("classpath:jpa/repository/reset.sql")
+      @Sql("classpath:controller/prisoner_health/health.sql")
+      @Sql("classpath:controller/prisoner_health/food_allergies.sql")
+      @Sql("classpath:controller/prisoner_health/field_history.sql")
+      fun `can update only smoker or vaper`() {
+        expectFieldHistory(
+          SMOKER_OR_VAPER,
+          HistoryComparison(
+            value = SMOKE_SMOKER,
+            appliesFrom = THEN,
+            appliesTo = null,
+            createdAt = THEN,
+            createdBy = USER1,
+          ),
+        )
+
+        expectSuccessfulUpdateFrom(
+          // language=json
+          """
+            { "smokerOrVaper": null }
+          """.trimIndent(),
+        ).expectBody().json(SMOKER_NULL_EGG_ALLERGY_RESPONSE, true)
 
         expectFieldHistory(
           SMOKER_OR_VAPER,
@@ -223,7 +269,8 @@ class PrisonerPrisonerHealthControllerIntTest : IntegrationTestBase() {
       // language=json
       """
         { 
-          "smokerOrVaper": "SMOKE_NO"
+          "smokerOrVaper": "SMOKE_NO",
+          "foodAllergies": ["FOOD_ALLERGY_MILK"]
         }
       """.trimIndent()
 
@@ -255,7 +302,27 @@ class PrisonerPrisonerHealthControllerIntTest : IntegrationTestBase() {
       createdBy = "OMS_OWNER",
     )
 
-    val SMOKER_NO_RESPONSE =
+    val SMOKER_NULL_EGG_ALLERGY_RESPONSE =
+      // language=json
+      """
+      {
+        "smokerOrVaper": {
+          "value": null,
+          "lastModifiedAt": "2024-06-14T09:10:11+0100",
+          "lastModifiedBy": "USER1"
+        },
+        "foodAllergies": [
+          {
+            "id": "FOOD_ALLERGY_EGG",
+            "description": "Egg",
+            "listSequence": 0,
+            "isActive": true
+          }
+        ]
+      }
+      """.trimIndent()
+
+    val SMOKER_NO_MILK_ALLERGY_RESPONSE =
       // language=json
       """
       {
@@ -268,8 +335,17 @@ class PrisonerPrisonerHealthControllerIntTest : IntegrationTestBase() {
           },
           "lastModifiedAt": "2024-06-14T09:10:11+0100",
           "lastModifiedBy": "USER1"
-        } 
+        },
+        "foodAllergies": [
+          {
+            "id": "FOOD_ALLERGY_MILK",
+            "description": "Milk",
+            "listSequence": 0,
+            "isActive": true
+          }
+        ]
       }
       """.trimIndent()
+
   }
 }

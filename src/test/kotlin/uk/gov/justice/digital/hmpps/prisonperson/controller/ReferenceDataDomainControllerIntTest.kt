@@ -40,7 +40,7 @@ class ReferenceDataDomainControllerIntTest : IntegrationTestBase() {
           .exchange()
           .expectStatus().isOk
           .expectBody()
-          .jsonPath("$.length()").isEqualTo(10)
+          .jsonPath("$.length()").isEqualTo(11)
           .jsonPath("$[?(@.code == 'FACE')].description").isEqualTo("Face shape")
           .jsonPath("$[?(@.code == 'FACE')].listSequence").isEqualTo(0)
           .jsonPath("$[?(@.code == 'FACE')].isActive").isEqualTo(true)

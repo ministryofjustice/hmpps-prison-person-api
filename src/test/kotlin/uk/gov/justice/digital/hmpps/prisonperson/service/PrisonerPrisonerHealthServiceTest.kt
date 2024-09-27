@@ -20,10 +20,7 @@ import uk.gov.justice.digital.hmpps.prisonperson.dto.request.PrisonerHealthUpdat
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.HealthDto
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.ValueWithMetadata
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField
-import uk.gov.justice.digital.hmpps.prisonperson.jpa.FieldMetadata
-import uk.gov.justice.digital.hmpps.prisonperson.jpa.PrisonerHealth
-import uk.gov.justice.digital.hmpps.prisonperson.jpa.ReferenceDataCode
-import uk.gov.justice.digital.hmpps.prisonperson.jpa.ReferenceDataDomain
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.*
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.PrisonerHealthRepository
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.ReferenceDataCodeRepository
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.utils.HistoryComparison
@@ -60,6 +57,7 @@ class PrisonerPrisonerHealthServiceTest {
   @BeforeEach
   fun beforeEach() {
     whenever(referenceDataCodeRepository.findById(REFERENCE_DATA_CODE_ID)).thenReturn(Optional.of(SMOKER_OR_VAPER))
+    whenever(referenceDataCodeRepository.findById(FOOD_REFERENCE_DATA_CODE_ID)).thenReturn(Optional.of(EGG_ALLERGY))
     whenever(authenticationFacade.getUserOrSystemInContext()).thenReturn(USER1)
   }
 
@@ -131,13 +129,15 @@ class PrisonerPrisonerHealthServiceTest {
         ),
       ).isEqualTo(
         HealthDto(
-          ValueWithMetadata(SMOKER_OR_VAPER.toSimpleDto(), NOW, USER1),
+          smokerOrVaper = ValueWithMetadata(SMOKER_OR_VAPER.toSimpleDto(), NOW, USER1),
+          foodAllergies = listOf(EGG_ALLERGY.toSimpleDto()),
         ),
       )
 
       with(savedPrisonerHealth.firstValue) {
         assertThat(prisonerNumber).isEqualTo(PRISONER_NUMBER)
         assertThat(smokerOrVaper).isEqualTo(SMOKER_OR_VAPER)
+        assertThat(foodAllergies).containsAll(listOf(EGG_FOOD_ALLERGY))
 
         expectFieldHistory(
           PrisonPersonField.SMOKER_OR_VAPER,
@@ -164,6 +164,7 @@ class PrisonerPrisonerHealthServiceTest {
           PrisonerHealth(
             prisonerNumber = PRISONER_NUMBER,
             smokerOrVaper = SMOKER_OR_VAPER,
+            foodAllergies = mutableSetOf(EGG_FOOD_ALLERGY),
           ).also { it.updateFieldHistory(lastModifiedAt = NOW.minusDays(1), lastModifiedBy = USER2) },
         ),
       )
@@ -171,12 +172,14 @@ class PrisonerPrisonerHealthServiceTest {
       assertThat(underTest.createOrUpdate(PRISONER_NUMBER, HEALTH_UPDATE_REQUEST_WITH_NULL)).isEqualTo(
         HealthDto(
           ValueWithMetadata(null, NOW, USER1),
+          null
         ),
       )
 
       with(savedPrisonerHealth.firstValue) {
         assertThat(prisonerNumber).isEqualTo(PRISONER_NUMBER)
         assertThat(smokerOrVaper).isEqualTo(null)
+        assertThat(foodAllergies).isEqualTo(null)
 
         expectFieldHistory(
           PrisonPersonField.SMOKER_OR_VAPER,
@@ -214,16 +217,6 @@ class PrisonerPrisonerHealthServiceTest {
     val REFERENCE_DATA_DOMAIN_CODE = "EXAMPLE"
     val REFERENCE_DATA_DOMAIN_DESCRIPTION = "Example"
 
-    val attributes = mutableMapOf<String, Any?>(
-      Pair("smokerOrVaper", REFERENCE_DATA_CODE_ID),
-    )
-    val HEALTH_UPDATE_REQUEST = PrisonerHealthUpdateRequest(attributes)
-
-    val attributes_undefined = mutableMapOf<String, Any?>(
-      Pair("smokerOrVaper", null),
-    )
-    val HEALTH_UPDATE_REQUEST_WITH_NULL = PrisonerHealthUpdateRequest(attributes_undefined)
-
     val SMOKER_OR_VAPER = ReferenceDataCode(
       id = REFERENCE_DATA_CODE_ID,
       code = REFERENCE_DATA_CODE,
@@ -240,6 +233,44 @@ class PrisonerPrisonerHealthServiceTest {
       ),
     )
 
+    val FOOD_REFERENCE_DATA_CODE_ID = "FOOD_EXAMPLE_CODE"
+    val FOOD_REFERENCE_DATA_CODE = "FOOD_CODE"
+    val FOOD_REFERENCE_DATA_CODE_DESCRPTION = "Example food code"
+    val FOOD_REFERENCE_DATA_LIST_SEQUENCE = 0
+    val FOOD_REFERENCE_DATA_DOMAIN_CODE = "FOOD_EXAMPLE"
+    val FOOD_REFERENCE_DATA_DOMAIN_DESCRIPTION = "Food Example"
+
+    val EGG_ALLERGY = ReferenceDataCode(
+      id = FOOD_REFERENCE_DATA_CODE_ID,
+      code = FOOD_REFERENCE_DATA_CODE,
+      createdBy = USER1,
+      createdAt = NOW,
+      description = FOOD_REFERENCE_DATA_CODE_DESCRPTION,
+      listSequence = FOOD_REFERENCE_DATA_LIST_SEQUENCE,
+      domain = ReferenceDataDomain(
+        code = FOOD_REFERENCE_DATA_DOMAIN_CODE,
+        createdBy = USER1,
+        createdAt = NOW,
+        listSequence = FOOD_REFERENCE_DATA_LIST_SEQUENCE,
+        description = FOOD_REFERENCE_DATA_DOMAIN_DESCRIPTION,
+      ),
+    )
+
+    val EGG_FOOD_ALLERGY = FoodAllergy(FoodAllergyId(PRISONER_NUMBER, EGG_ALLERGY))
+
     val PRISONER_SEARCH_RESPONSE = PrisonerDto(PRISONER_NUMBER)
+
+    val attributes = mutableMapOf<String, Any?>(
+      Pair("smokerOrVaper", REFERENCE_DATA_CODE_ID),
+      Pair("foodAllergies", listOf(FOOD_REFERENCE_DATA_CODE_ID)),
+    )
+    val HEALTH_UPDATE_REQUEST = PrisonerHealthUpdateRequest(attributes)
+
+    val attributes_undefined = mutableMapOf<String, Any?>(
+      Pair("smokerOrVaper", null),
+      Pair("foodAllergies", null),
+    )
+    val HEALTH_UPDATE_REQUEST_WITH_NULL = PrisonerHealthUpdateRequest(attributes_undefined)
+
   }
 }

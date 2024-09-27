@@ -25,4 +25,10 @@ data class PrisonerHealthUpdateRequest(
     nullable = true,
   )
   val smokerOrVaper: Nullish<String> = getAttributeAsNullish<String>(attributes, "smokerOrVaper")
+
+  @Schema(
+    description = "TODO",
+    type = "string[]",
+  )
+  val foodAllergies: Nullish<List<String>> = getAttributeAsNullish<List<String>>(attributes, "foodAllergies")
 }

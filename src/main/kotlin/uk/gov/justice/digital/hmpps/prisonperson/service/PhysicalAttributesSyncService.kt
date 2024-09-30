@@ -50,8 +50,10 @@ class PhysicalAttributesSyncService(
         height = request.height
         weight = request.weight
       }
-      .also { it.updateFieldHistory(request.createdAt, request.createdBy, NOMIS, fieldsToSync) }
-      .also { it.publishUpdateEvent(NOMIS, now) }
+      .also {
+        val changedFields = it.updateFieldHistory(request.createdAt, request.createdBy, NOMIS, fieldsToSync)
+        it.publishUpdateEvent(NOMIS, now, changedFields)
+      }
 
     return physicalAttributesRepository.save(physicalAttributes).getLatestFieldHistoryIds()
       .also { trackSyncEvent(prisonerNumber, it) }

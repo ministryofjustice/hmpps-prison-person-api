@@ -1,7 +1,6 @@
 package uk.gov.justice.digital.hmpps.prisonperson.jpa
 
 import org.springframework.data.domain.AbstractAggregateRoot
-import org.springframework.data.jpa.domain.AbstractAuditable_.lastModifiedBy
 import uk.gov.justice.digital.hmpps.prisonperson.config.IllegalFieldHistoryException
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField
 import uk.gov.justice.digital.hmpps.prisonperson.enums.Source
@@ -19,18 +18,17 @@ abstract class WithFieldHistory<T : AbstractAggregateRoot<T>?> : AbstractAggrega
   abstract fun updateFieldHistory(
     lastModifiedAt: ZonedDateTime,
     lastModifiedBy: String,
-  )
+  ): Collection<PrisonPersonField>
 
-  abstract fun publishUpdateEvent(source: Source, now: ZonedDateTime)
+  abstract fun publishUpdateEvent(source: Source, now: ZonedDateTime, fields: Collection<PrisonPersonField>)
 
   fun updateFieldHistory(
     lastModifiedAt: ZonedDateTime,
     lastModifiedBy: String,
     source: Source,
     fields: Collection<PrisonPersonField>,
-  ) {
+  ): Collection<PrisonPersonField> =
     updateFieldHistory(lastModifiedAt, null, lastModifiedAt, lastModifiedBy, source, fields)
-  }
 
   fun updateFieldHistory(
     appliesFrom: ZonedDateTime,
@@ -40,7 +38,9 @@ abstract class WithFieldHistory<T : AbstractAggregateRoot<T>?> : AbstractAggrega
     source: Source = DPS,
     fields: Collection<PrisonPersonField>,
     migratedAt: ZonedDateTime? = null,
-  ) {
+  ): Collection<PrisonPersonField> {
+    val changedFields = mutableSetOf<PrisonPersonField>()
+
     fieldAccessors()
       .filter { fields.contains(it.key) }
       .forEach { (field, currentValue) ->
@@ -76,7 +76,9 @@ abstract class WithFieldHistory<T : AbstractAggregateRoot<T>?> : AbstractAggrega
               migratedAt = migratedAt,
             ).also { field.set(it, currentValue()) },
           )
+          changedFields.add(field)
         }
       }
+    return changedFields
   }
 }

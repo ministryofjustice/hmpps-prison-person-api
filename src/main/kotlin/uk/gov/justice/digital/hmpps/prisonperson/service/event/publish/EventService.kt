@@ -27,6 +27,7 @@ class EventService(
           mapOf(
             "prisonerNumber" to event.prisonerNumber,
             "source" to event.source.name,
+            "fields" to event.fields.toString(),
           ),
           null,
         )

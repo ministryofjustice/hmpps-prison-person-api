@@ -12,6 +12,8 @@ import software.amazon.awssdk.services.sns.SnsAsyncClient
 import software.amazon.awssdk.services.sns.model.MessageAttributeValue
 import software.amazon.awssdk.services.sns.model.PublishRequest
 import uk.gov.justice.digital.hmpps.prisonperson.enums.EventType.PHYSICAL_ATTRIBUTES_UPDATED
+import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.HEIGHT
+import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.WEIGHT
 import uk.gov.justice.digital.hmpps.prisonperson.enums.Source.NOMIS
 import uk.gov.justice.digital.hmpps.prisonperson.service.event.publish.DomainEventPublisher
 import uk.gov.justice.hmpps.sqs.HmppsQueueService
@@ -51,6 +53,7 @@ class DomainEventPublisherTest {
         url = "$baseUrl/prisoners/$prisonerNumber",
         prisonerNumber = prisonerNumber,
         source = NOMIS,
+        fields = listOf(HEIGHT, WEIGHT),
       ),
       description = PHYSICAL_ATTRIBUTES_UPDATED.description,
       occurredAt = occurredAt,
@@ -62,7 +65,12 @@ class DomainEventPublisherTest {
       PublishRequest.builder()
         .topicArn(domainEventsTopic.arn)
         .message(objectMapper.writeValueAsString(domainEvent))
-        .messageAttributes(mapOf("eventType" to MessageAttributeValue.builder().dataType("String").stringValue(domainEvent.eventType).build()))
+        .messageAttributes(
+          mapOf(
+            "eventType" to MessageAttributeValue.builder().dataType("String").stringValue(domainEvent.eventType)
+              .build(),
+          ),
+        )
         .build(),
     )
   }

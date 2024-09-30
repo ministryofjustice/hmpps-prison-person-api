@@ -24,12 +24,15 @@ import org.mockito.kotlin.whenever
 import org.mockito.quality.Strictness.LENIENT
 import uk.gov.justice.digital.hmpps.prisonperson.config.IllegalFieldHistoryException
 import uk.gov.justice.digital.hmpps.prisonperson.dto.request.PhysicalAttributesSyncRequest
+import uk.gov.justice.digital.hmpps.prisonperson.dto.response.PhysicalAttributesSyncDto
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.PhysicalAttributesSyncResponse
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.HEIGHT
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.WEIGHT
 import uk.gov.justice.digital.hmpps.prisonperson.enums.Source.NOMIS
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.FieldHistory
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.PhysicalAttributes
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.ReferenceDataCode
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.ReferenceDataDomain
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.FieldHistoryRepository
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.PhysicalAttributesRepository
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.utils.HistoryComparison
@@ -340,16 +343,70 @@ class PhysicalAttributesSyncServiceTest {
     }
   }
 
+  @Nested
+  inner class GetPhysicalAttributes {
+    @Test
+    fun `physical attributes not found`() {
+      whenever(physicalAttributesRepository.findById(PRISONER_NUMBER)).thenReturn(Optional.empty())
+
+      assertThat(underTest.getPhysicalAttributes(PRISONER_NUMBER)).isNull()
+    }
+
+    @Test
+    fun `physical attributes retrieved`() {
+      whenever(physicalAttributesRepository.findById(PRISONER_NUMBER)).thenReturn(
+        Optional.of(
+          PhysicalAttributes(
+            prisonerNumber = PRISONER_NUMBER,
+            height = PRISONER_HEIGHT,
+            weight = PRISONER_WEIGHT,
+            hair = PRISONER_HAIR,
+            facialHair = PRISONER_FACIAL_HAIR,
+            face = PRISONER_FACE,
+            build = PRISONER_BUILD,
+            leftEyeColour = PRISONER_LEFT_EYE_COLOUR,
+            rightEyeColour = PRISONER_RIGHT_EYE_COLOUR,
+            shoeSize = PRISONER_SHOE_SIZE,
+          ),
+        ),
+      )
+
+      assertThat(underTest.getPhysicalAttributes(PRISONER_NUMBER))
+        .isEqualTo(
+          PhysicalAttributesSyncDto(
+            height = PRISONER_HEIGHT,
+            weight = PRISONER_WEIGHT,
+            hair = PRISONER_HAIR!!.code,
+            facialHair = PRISONER_FACIAL_HAIR!!.code,
+            face = PRISONER_FACE!!.code,
+            build = PRISONER_BUILD!!.code,
+            leftEyeColour = PRISONER_LEFT_EYE_COLOUR!!.code,
+            rightEyeColour = PRISONER_RIGHT_EYE_COLOUR!!.code,
+            shoeSize = PRISONER_SHOE_SIZE,
+          ),
+        )
+    }
+  }
+
   private companion object {
     const val PRISONER_NUMBER = "A1234AA"
     const val PRISONER_HEIGHT = 180
     const val PRISONER_WEIGHT = 70
+
     const val PREVIOUS_PRISONER_HEIGHT = 179
     const val PREVIOUS_PRISONER_WEIGHT = 69
     const val USER1 = "USER1"
     const val USER2 = "USER2"
 
     val NOW: ZonedDateTime = ZonedDateTime.now()
+
+    val PRISONER_HAIR = generateRefDataCode("GREY", "HAIR")
+    val PRISONER_FACIAL_HAIR = generateRefDataCode("BEARDED", "FACIAL_HAIR")
+    val PRISONER_FACE = generateRefDataCode("OVAL", "FACE")
+    val PRISONER_BUILD = generateRefDataCode("MEDIUM", "BUILD")
+    val PRISONER_LEFT_EYE_COLOUR = generateRefDataCode("GREEN", "EYE")
+    val PRISONER_RIGHT_EYE_COLOUR = generateRefDataCode("BLUE", "EYE")
+    val PRISONER_SHOE_SIZE = "11.5"
 
     val PHYSICAL_ATTRIBUTES_SYNC_REQUEST = PhysicalAttributesSyncRequest(
       PRISONER_HEIGHT,
@@ -359,5 +416,12 @@ class PhysicalAttributesSyncServiceTest {
       createdAt = NOW,
       createdBy = USER1,
     )
+
+    fun generateRefDataCode(code: String?, domain: String): ReferenceDataCode? {
+      if (code == null) return null
+
+      val rdd = ReferenceDataDomain(domain, "Domain", 0, ZonedDateTime.now(), "testUser")
+      return ReferenceDataCode("${domain}_$code", code, rdd, "Ref data code", 0, ZonedDateTime.now(), "testUser")
+    }
   }
 }

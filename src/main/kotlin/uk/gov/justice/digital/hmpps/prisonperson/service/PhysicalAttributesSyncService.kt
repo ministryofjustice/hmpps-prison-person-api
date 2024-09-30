@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.prisonperson.config.trackEvent
 import uk.gov.justice.digital.hmpps.prisonperson.dto.request.PhysicalAttributesSyncRequest
+import uk.gov.justice.digital.hmpps.prisonperson.dto.response.PhysicalAttributesSyncDto
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.PhysicalAttributesSyncResponse
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.HEIGHT
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.WEIGHT
@@ -17,6 +18,7 @@ import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.FieldHistoryRepo
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.PhysicalAttributesRepository
 import java.time.Clock
 import java.time.ZonedDateTime
+import kotlin.jvm.optionals.getOrNull
 
 @Service
 @Transactional
@@ -27,6 +29,9 @@ class PhysicalAttributesSyncService(
   private val telemetryClient: TelemetryClient,
   private val clock: Clock,
 ) {
+  fun getPhysicalAttributes(prisonNumber: String): PhysicalAttributesSyncDto? =
+    physicalAttributesRepository.findById(prisonNumber).getOrNull()?.toSyncDto()
+
   fun sync(
     prisonerNumber: String,
     request: PhysicalAttributesSyncRequest,
@@ -99,6 +104,19 @@ class PhysicalAttributesSyncService(
       )
     }
   }
+
+  private fun PhysicalAttributes.toSyncDto(): PhysicalAttributesSyncDto =
+    PhysicalAttributesSyncDto(
+      height = height,
+      weight = weight,
+      hair = hair?.code,
+      facialHair = facialHair?.code,
+      face = face?.code,
+      build = build?.code,
+      leftEyeColour = leftEyeColour?.code,
+      rightEyeColour = rightEyeColour?.code,
+      shoeSize = shoeSize,
+    )
 
   private fun PhysicalAttributes.getLatestFieldHistoryIds() = listOf(
     fieldHistory.last { it.field == HEIGHT },

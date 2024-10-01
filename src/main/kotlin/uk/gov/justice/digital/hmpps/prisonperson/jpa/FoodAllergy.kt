@@ -1,30 +1,27 @@
 package uk.gov.justice.digital.hmpps.prisonperson.jpa
 
 import jakarta.persistence.Column
-import jakarta.persistence.Embeddable
-import jakarta.persistence.EmbeddedId
 import jakarta.persistence.Entity
+import jakarta.persistence.GeneratedValue
+import jakarta.persistence.GenerationType.IDENTITY
+import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
 import org.hibernate.Hibernate
-import java.io.Serializable
 
-@Embeddable
-class FoodAllergyId(
+@Entity
+@Table(name = "food_allergies")
+class FoodAllergy(
+  @Id @GeneratedValue(strategy = IDENTITY)
+  val id: Long = 0,
+
   @Column(name = "prisoner_number", updatable = false, nullable = false)
   val prisonerNumber: String,
 
   @ManyToOne
   @JoinColumn(name = "allergy", referencedColumnName = "id")
   var allergy: ReferenceDataCode,
-) : Serializable
-
-@Entity
-@Table(name = "food_allergies")
-class FoodAllergy(
-  @EmbeddedId
-  val id: FoodAllergyId,
 ) {
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
@@ -32,8 +29,8 @@ class FoodAllergy(
 
     other as FoodAllergy
 
-    if (id.prisonerNumber != other.id.prisonerNumber) return false
-    if (id.allergy != other.id.allergy) return false
+    if (prisonerNumber != other.prisonerNumber) return false
+    if (allergy != other.allergy) return false
 
     return true
   }

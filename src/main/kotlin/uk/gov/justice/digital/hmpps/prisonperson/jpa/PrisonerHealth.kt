@@ -35,7 +35,7 @@ class PrisonerHealth(
   @JoinColumn(name = "smoker_or_vaper", referencedColumnName = "id")
   var smokerOrVaper: ReferenceDataCode? = null,
 
-  @OneToMany(mappedBy = "id.prisonerNumber", cascade = [ALL], orphanRemoval = true)
+  @OneToMany(mappedBy = "prisonerNumber", cascade = [ALL], orphanRemoval = true)
   var foodAllergies: MutableSet<FoodAllergy>? = mutableSetOf(),
 
   // Stores snapshots of each update to a prisoner's health information
@@ -55,7 +55,7 @@ class PrisonerHealth(
 
   fun toDto(): HealthDto = HealthDto(
     smokerOrVaper = getRefDataValueWithMetadata(::smokerOrVaper, SMOKER_OR_VAPER),
-    foodAllergies = ::foodAllergies.get()?.stream()?.map { allergy -> allergy.id.allergy.toSimpleDto() }?.toList(),
+    foodAllergies = ::foodAllergies.get()?.stream()?.map { allergy -> allergy.allergy.toSimpleDto() }?.toList(),
   )
 
   override fun updateFieldHistory(

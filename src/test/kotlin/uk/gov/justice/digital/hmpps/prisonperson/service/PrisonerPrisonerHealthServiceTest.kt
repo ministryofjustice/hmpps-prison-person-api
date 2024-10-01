@@ -22,7 +22,6 @@ import uk.gov.justice.digital.hmpps.prisonperson.dto.response.ValueWithMetadata
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.FieldMetadata
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.FoodAllergy
-import uk.gov.justice.digital.hmpps.prisonperson.jpa.FoodAllergyId
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.PrisonerHealth
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.ReferenceDataCode
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.ReferenceDataDomain
@@ -261,7 +260,7 @@ class PrisonerPrisonerHealthServiceTest {
       ),
     )
 
-    val EGG_FOOD_ALLERGY = FoodAllergy(FoodAllergyId(PRISONER_NUMBER, EGG_ALLERGY))
+    val EGG_FOOD_ALLERGY = FoodAllergy(prisonerNumber = PRISONER_NUMBER, allergy = EGG_ALLERGY)
 
     val PRISONER_SEARCH_RESPONSE = PrisonerDto(PRISONER_NUMBER)
 

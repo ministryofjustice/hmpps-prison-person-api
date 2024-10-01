@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.transaction.TestTransaction
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.FoodAllergy
-import uk.gov.justice.digital.hmpps.prisonperson.jpa.FoodAllergyId
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.PrisonerHealth
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.ReferenceDataCode
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.ReferenceDataDomain
@@ -129,33 +128,29 @@ class PrisonerPrisonerHealthRepositoryTest : RepositoryTest() {
 
     val FOOD_ALLERGY_DOMAIN = ReferenceDataDomain("FOOD_ALLERGY", "Food allergy", 0, ZonedDateTime.now(), "OMS_OWNER")
     val EGG_ALLERGY = FoodAllergy(
-      FoodAllergyId(
-        PRISONER_NUMBER,
-        ReferenceDataCode(
-          id = "FOOD_ALLERGY_EGG",
-          domain = FOOD_ALLERGY_DOMAIN,
-          code = "EGG",
-          description = "Egg",
-          listSequence = 0,
-          createdAt = ZonedDateTime.now(),
-          createdBy = "OMS_OWNER",
-        ),
+      prisonerNumber = PRISONER_NUMBER,
+      allergy = ReferenceDataCode(
+        id = "FOOD_ALLERGY_EGG",
+        domain = FOOD_ALLERGY_DOMAIN,
+        code = "EGG",
+        description = "Egg",
+        listSequence = 0,
+        createdAt = ZonedDateTime.now(),
+        createdBy = "OMS_OWNER",
       ),
     )
 
     val MILK_ALLERGY =
       FoodAllergy(
-        FoodAllergyId(
-          PRISONER_NUMBER,
-          ReferenceDataCode(
-            id = "FOOD_ALLERGY_MILK",
-            domain = FOOD_ALLERGY_DOMAIN,
-            code = "MILK",
-            description = "Milk",
-            listSequence = 0,
-            createdAt = ZonedDateTime.now(),
-            createdBy = "OMS_OWNER",
-          ),
+        prisonerNumber = PRISONER_NUMBER,
+        allergy = ReferenceDataCode(
+          id = "FOOD_ALLERGY_MILK",
+          domain = FOOD_ALLERGY_DOMAIN,
+          code = "MILK",
+          description = "Milk",
+          listSequence = 0,
+          createdAt = ZonedDateTime.now(),
+          createdBy = "OMS_OWNER",
         ),
       )
 

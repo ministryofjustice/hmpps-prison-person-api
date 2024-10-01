@@ -6,7 +6,6 @@ import uk.gov.justice.digital.hmpps.prisonperson.client.prisonersearch.PrisonerS
 import uk.gov.justice.digital.hmpps.prisonperson.dto.request.PrisonerHealthUpdateRequest
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.HealthDto
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.FoodAllergy
-import uk.gov.justice.digital.hmpps.prisonperson.jpa.FoodAllergyId
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.PrisonerHealth
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.PrisonerHealthRepository
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.ReferenceDataCodeRepository
@@ -53,7 +52,8 @@ class PrisonerHealthService(
 
               if (allergy != null) {
                 FoodAllergy(
-                  FoodAllergyId(prisonerNumber, allergy),
+                  prisonerNumber = prisonerNumber,
+                  allergy = allergy,
                 )
               } else {
                 null

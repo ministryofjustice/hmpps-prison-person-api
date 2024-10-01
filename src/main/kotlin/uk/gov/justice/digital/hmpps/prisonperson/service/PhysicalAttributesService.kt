@@ -49,8 +49,10 @@ class PhysicalAttributesService(
         request.rightEyeColour.apply(::rightEyeColour, { toReferenceDataCode(referenceDataCodeRepository, it) })
         request.shoeSize.apply(::shoeSize)
       }
-      .also { it.updateFieldHistory(now, authenticationFacade.getUserOrSystemInContext()) }
-      .also { it.publishUpdateEvent(DPS, now) }
+      .also {
+        val changedFields = it.updateFieldHistory(now, authenticationFacade.getUserOrSystemInContext())
+        it.publishUpdateEvent(DPS, now, changedFields)
+      }
 
     return physicalAttributesRepository.save(physicalAttributes).toDto()
   }

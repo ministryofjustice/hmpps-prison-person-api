@@ -85,6 +85,7 @@ class ProfileDetailsPhysicalAttributesSyncService(
           shoeSize = it.value
         }
       }.also { attributes ->
+        val changedFields = mutableSetOf<PrisonPersonField>()
         listOf(
           request.hair to HAIR,
           request.facialHair to FACIAL_HAIR,
@@ -94,10 +95,10 @@ class ProfileDetailsPhysicalAttributesSyncService(
           request.rightEyeColour to RIGHT_EYE_COLOUR,
           request.shoeSize to SHOE_SIZE,
         ).forEach { (attr, field) ->
-          updateFieldHistory(attr, request, field, attributes)
+          changedFields += updateFieldHistory(attr, request, field, attributes)
         }
+        attributes.publishUpdateEvent(NOMIS, now, changedFields)
       }
-      .also { it.publishUpdateEvent(NOMIS, now) }
 
     return physicalAttributesRepository.save(physicalAttributes).getLatestFieldHistoryIds(updatedFields)
       .also { trackSyncEvent(prisonerNumber, it) }
@@ -154,18 +155,17 @@ class ProfileDetailsPhysicalAttributesSyncService(
     record: ProfileDetailsPhysicalAttributesSyncRequest,
     field: PrisonPersonField,
     physicalAttributes: PhysicalAttributes,
-  ) {
-    attribute?.let {
-      physicalAttributes.updateFieldHistory(
-        appliesFrom = record.appliesFrom,
-        appliesTo = record.appliesTo,
-        lastModifiedAt = it.lastModifiedAt,
-        lastModifiedBy = it.lastModifiedBy,
-        source = NOMIS,
-        fields = listOf(field),
-      )
-    }
-  }
+  ): Collection<PrisonPersonField> = attribute?.let {
+    physicalAttributes.updateFieldHistory(
+      appliesFrom = record.appliesFrom,
+      appliesTo = record.appliesTo,
+      lastModifiedAt = it.lastModifiedAt,
+      lastModifiedBy = it.lastModifiedBy,
+      source = NOMIS,
+      fields = listOf(field),
+    )
+    setOf(field)
+  } ?: emptySet()
 
   private fun updateField(
     requestField: SyncValueWithMetadata<String>,

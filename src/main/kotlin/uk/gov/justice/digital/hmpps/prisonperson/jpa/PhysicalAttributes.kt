@@ -137,14 +137,15 @@ class PhysicalAttributes(
   override fun updateFieldHistory(
     lastModifiedAt: ZonedDateTime,
     lastModifiedBy: String,
-  ) = updateFieldHistory(lastModifiedAt, null, lastModifiedAt, lastModifiedBy, DPS, allFields)
+  ): Collection<PrisonPersonField> = updateFieldHistory(lastModifiedAt, null, lastModifiedAt, lastModifiedBy, DPS, allFields)
 
-  override fun publishUpdateEvent(source: Source, now: ZonedDateTime) {
+  override fun publishUpdateEvent(source: Source, now: ZonedDateTime, fields: Collection<PrisonPersonField>) {
     registerEvent(
       PhysicalAttributesUpdatedEvent(
         prisonerNumber = prisonerNumber,
         occurredAt = now,
         source = source,
+        fields = fields,
       ),
     )
   }

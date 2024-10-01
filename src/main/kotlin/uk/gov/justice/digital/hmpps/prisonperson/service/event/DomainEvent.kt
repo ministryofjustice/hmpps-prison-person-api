@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.prisonperson.service.event
 
+import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField
 import uk.gov.justice.digital.hmpps.prisonperson.enums.Source
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME
@@ -29,6 +30,7 @@ data class PrisonPersonAdditionalInformation(
   val url: String,
   val source: Source,
   val prisonerNumber: String,
+  val fields: Collection<PrisonPersonField>,
 )
 
 data class PrisonerMergedAdditionalInformation(

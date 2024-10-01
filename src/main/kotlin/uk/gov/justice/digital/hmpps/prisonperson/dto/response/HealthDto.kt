@@ -9,5 +9,5 @@ data class HealthDto(
   val smokerOrVaper: ValueWithMetadata<ReferenceDataSimpleDto?>? = null,
 
   @Schema(description = "Food allergies")
-  val foodAllergies: List<ReferenceDataSimpleDto?>? = emptyList(),
+  val foodAllergies: List<ReferenceDataSimpleDto?> = emptyList(),
 )

@@ -44,10 +44,10 @@ class PrisonerHealthService(
 
         request.foodAllergies.let<List<String>> {
           if (it == null) {
-            this::foodAllergies.get()?.clear()
+            this::foodAllergies.get().clear()
           } else {
-            this::foodAllergies.get()?.clear()
-            it.stream().map { allergyCode ->
+            this::foodAllergies.get().clear()
+            it.map { allergyCode ->
               val allergy = toReferenceDataCode(referenceDataCodeRepository, allergyCode)
 
               if (allergy != null) {
@@ -58,7 +58,7 @@ class PrisonerHealthService(
               } else {
                 null
               }
-            }.toList().filterNotNull().forEach { allergy -> this::foodAllergies.get()?.add(allergy) }
+            }.toList().filterNotNull().forEach { allergy -> this::foodAllergies.get().add(allergy) }
           }
         }
       }.also { it.updateFieldHistory(now, authenticationFacade.getUserOrSystemInContext()) }

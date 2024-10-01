@@ -10,6 +10,8 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import uk.gov.justice.digital.hmpps.prisonperson.config.EventProperties
 import uk.gov.justice.digital.hmpps.prisonperson.enums.EventType.PHYSICAL_ATTRIBUTES_UPDATED
+import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.HEIGHT
+import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.WEIGHT
 import uk.gov.justice.digital.hmpps.prisonperson.enums.Source.DPS
 import uk.gov.justice.digital.hmpps.prisonperson.service.event.publish.DomainEventPublisher
 import uk.gov.justice.digital.hmpps.prisonperson.service.event.publish.EventService
@@ -29,7 +31,7 @@ class EventServiceTest {
   fun `handle event - publish enabled`() {
     val eventProperties = EventProperties(publish = true, baseUrl = baseUrl)
     val eventService = EventService(eventProperties, telemetryClient, domainEventPublisher)
-    val event = PhysicalAttributesUpdatedEvent(PRISONER_NUMBER, NOW, DPS)
+    val event = PhysicalAttributesUpdatedEvent(PRISONER_NUMBER, NOW, DPS, listOf(HEIGHT, WEIGHT))
 
     eventService.handleEvent(event)
 
@@ -42,6 +44,7 @@ class EventServiceTest {
           url = "$baseUrl/prisoners/$PRISONER_NUMBER",
           source = event.source,
           prisonerNumber = PRISONER_NUMBER,
+          fields = listOf(HEIGHT, WEIGHT),
         ),
         description = PHYSICAL_ATTRIBUTES_UPDATED.description,
         occurredAt = NOW,
@@ -53,7 +56,7 @@ class EventServiceTest {
   fun `handle event - publish disabled`() {
     val eventProperties = EventProperties(publish = false, baseUrl = baseUrl)
     val eventService = EventService(eventProperties, telemetryClient, domainEventPublisher)
-    val event = PhysicalAttributesUpdatedEvent(PRISONER_NUMBER, NOW, DPS)
+    val event = PhysicalAttributesUpdatedEvent(PRISONER_NUMBER, NOW, DPS, listOf(HEIGHT, WEIGHT))
 
     eventService.handleEvent(event)
 

@@ -114,11 +114,25 @@ class PhysicalAttributesSyncControllerIntTest : IntegrationTestBase() {
 
         expectFieldHistory(
           HEIGHT,
-          HistoryComparison(value = 190, appliesFrom = NOW, appliesTo = null, createdAt = NOW, createdBy = USER1, source = NOMIS),
+          HistoryComparison(
+            value = 190,
+            appliesFrom = NOW,
+            appliesTo = null,
+            createdAt = NOW,
+            createdBy = USER1,
+            source = NOMIS,
+          ),
         )
         expectFieldHistory(
           WEIGHT,
-          HistoryComparison(value = 80, appliesFrom = NOW, appliesTo = null, createdAt = NOW, createdBy = USER1, source = NOMIS),
+          HistoryComparison(
+            value = 80,
+            appliesFrom = NOW,
+            appliesTo = null,
+            createdAt = NOW,
+            createdBy = USER1,
+            source = NOMIS,
+          ),
         )
         expectNoFieldHistoryFor(HAIR, FACIAL_HAIR, FACE, BUILD, LEFT_EYE_COLOUR, RIGHT_EYE_COLOUR, SHOE_SIZE)
 
@@ -148,14 +162,42 @@ class PhysicalAttributesSyncControllerIntTest : IntegrationTestBase() {
 
         expectFieldHistory(
           HEIGHT,
-          HistoryComparison(value = 180, appliesFrom = THEN, appliesTo = NOW, createdAt = THEN, createdBy = USER1, source = DPS),
-          HistoryComparison(value = 190, appliesFrom = NOW, appliesTo = null, createdAt = NOW, createdBy = USER1, source = NOMIS),
+          HistoryComparison(
+            value = 180,
+            appliesFrom = THEN,
+            appliesTo = NOW,
+            createdAt = THEN,
+            createdBy = USER1,
+            source = DPS,
+          ),
+          HistoryComparison(
+            value = 190,
+            appliesFrom = NOW,
+            appliesTo = null,
+            createdAt = NOW,
+            createdBy = USER1,
+            source = NOMIS,
+          ),
         )
 
         expectFieldHistory(
           WEIGHT,
-          HistoryComparison(value = 70, appliesFrom = THEN, appliesTo = NOW, createdAt = THEN, createdBy = USER1, source = DPS),
-          HistoryComparison(value = 80, appliesFrom = NOW, appliesTo = null, createdAt = NOW, createdBy = USER1, source = NOMIS),
+          HistoryComparison(
+            value = 70,
+            appliesFrom = THEN,
+            appliesTo = NOW,
+            createdAt = THEN,
+            createdBy = USER1,
+            source = DPS,
+          ),
+          HistoryComparison(
+            value = 80,
+            appliesFrom = NOW,
+            appliesTo = null,
+            createdAt = NOW,
+            createdBy = USER1,
+            source = NOMIS,
+          ),
         )
 
         expectFieldMetadata(
@@ -184,14 +226,42 @@ class PhysicalAttributesSyncControllerIntTest : IntegrationTestBase() {
 
         expectFieldHistory(
           HEIGHT,
-          HistoryComparison(value = 180, appliesFrom = THEN, appliesTo = NOW, createdAt = THEN, createdBy = USER1, source = DPS),
-          HistoryComparison(value = 190, appliesFrom = NOW, appliesTo = null, createdAt = NOW, createdBy = USER1, source = NOMIS),
+          HistoryComparison(
+            value = 180,
+            appliesFrom = THEN,
+            appliesTo = NOW,
+            createdAt = THEN,
+            createdBy = USER1,
+            source = DPS,
+          ),
+          HistoryComparison(
+            value = 190,
+            appliesFrom = NOW,
+            appliesTo = null,
+            createdAt = NOW,
+            createdBy = USER1,
+            source = NOMIS,
+          ),
         )
 
         expectFieldHistory(
           WEIGHT,
-          HistoryComparison(value = 70, appliesFrom = THEN, appliesTo = NOW, createdAt = THEN, createdBy = USER1, source = DPS),
-          HistoryComparison(value = 80, appliesFrom = NOW, appliesTo = null, createdAt = NOW, createdBy = USER1, source = NOMIS),
+          HistoryComparison(
+            value = 70,
+            appliesFrom = THEN,
+            appliesTo = NOW,
+            createdAt = THEN,
+            createdBy = USER1,
+            source = DPS,
+          ),
+          HistoryComparison(
+            value = 80,
+            appliesFrom = NOW,
+            appliesTo = null,
+            createdAt = NOW,
+            createdBy = USER1,
+            source = NOMIS,
+          ),
         )
 
         expectFieldMetadata(
@@ -219,13 +289,41 @@ class PhysicalAttributesSyncControllerIntTest : IntegrationTestBase() {
 
         expectFieldHistory(
           HEIGHT,
-          HistoryComparison(value = 190, appliesFrom = THEN.minusYears(1), appliesTo = NOW.minusYears(1), createdAt = NOW, createdBy = USER1, source = NOMIS),
-          HistoryComparison(value = 180, appliesFrom = THEN, appliesTo = null, createdAt = THEN, createdBy = USER1, source = DPS),
+          HistoryComparison(
+            value = 190,
+            appliesFrom = THEN.minusYears(1),
+            appliesTo = NOW.minusYears(1),
+            createdAt = NOW,
+            createdBy = USER1,
+            source = NOMIS,
+          ),
+          HistoryComparison(
+            value = 180,
+            appliesFrom = THEN,
+            appliesTo = null,
+            createdAt = THEN,
+            createdBy = USER1,
+            source = DPS,
+          ),
         )
         expectFieldHistory(
           WEIGHT,
-          HistoryComparison(value = 80, appliesFrom = THEN.minusYears(1), appliesTo = NOW.minusYears(1), createdAt = NOW, createdBy = USER1, source = NOMIS),
-          HistoryComparison(value = 70, appliesFrom = THEN, appliesTo = null, createdAt = THEN, createdBy = USER1, source = DPS),
+          HistoryComparison(
+            value = 80,
+            appliesFrom = THEN.minusYears(1),
+            appliesTo = NOW.minusYears(1),
+            createdAt = NOW,
+            createdBy = USER1,
+            source = NOMIS,
+          ),
+          HistoryComparison(
+            value = 70,
+            appliesFrom = THEN,
+            appliesTo = null,
+            createdAt = THEN,
+            createdBy = USER1,
+            source = DPS,
+          ),
         )
         expectNoFieldHistoryFor(HAIR, FACIAL_HAIR, FACE, BUILD, LEFT_EYE_COLOUR, RIGHT_EYE_COLOUR, SHOE_SIZE)
       }
@@ -238,11 +336,25 @@ class PhysicalAttributesSyncControllerIntTest : IntegrationTestBase() {
 
         expectFieldHistory(
           HEIGHT,
-          HistoryComparison(value = 190, appliesFrom = THEN.minusYears(1), appliesTo = NOW.minusYears(1), createdAt = NOW, createdBy = USER1, source = NOMIS),
+          HistoryComparison(
+            value = 190,
+            appliesFrom = THEN.minusYears(1),
+            appliesTo = NOW.minusYears(1),
+            createdAt = NOW,
+            createdBy = USER1,
+            source = NOMIS,
+          ),
         )
         expectFieldHistory(
           WEIGHT,
-          HistoryComparison(value = 80, appliesFrom = THEN.minusYears(1), appliesTo = NOW.minusYears(1), createdAt = NOW, createdBy = USER1, source = NOMIS),
+          HistoryComparison(
+            value = 80,
+            appliesFrom = THEN.minusYears(1),
+            appliesTo = NOW.minusYears(1),
+            createdAt = NOW,
+            createdBy = USER1,
+            source = NOMIS,
+          ),
         )
         expectNoFieldHistoryFor(HAIR, FACIAL_HAIR, FACE, BUILD, LEFT_EYE_COLOUR, RIGHT_EYE_COLOUR, SHOE_SIZE)
       }
@@ -255,18 +367,21 @@ class PhysicalAttributesSyncControllerIntTest : IntegrationTestBase() {
         await untilCallTo { publishTestQueue.countAllMessagesOnQueue() } matches { it == 1 }
         val event = publishTestQueue.receiveDomainEventOnQueue<PrisonPersonAdditionalInformation>()
 
-        assertThat(event).isEqualTo(
-          DomainEvent(
-            eventType = PHYSICAL_ATTRIBUTES_UPDATED.domainEventType,
-            additionalInformation = PrisonPersonAdditionalInformation(
-              url = "http://localhost:8080/prisoners/${PRISONER_NUMBER}",
-              prisonerNumber = PRISONER_NUMBER,
-              source = NOMIS,
-            ),
-            description = PHYSICAL_ATTRIBUTES_UPDATED.description,
-            occurredAt = NOW,
+        val expected = DomainEvent(
+          eventType = PHYSICAL_ATTRIBUTES_UPDATED.domainEventType,
+          additionalInformation = PrisonPersonAdditionalInformation(
+            url = "http://localhost:8080/prisoners/${PRISONER_NUMBER}",
+            prisonerNumber = PRISONER_NUMBER,
+            source = NOMIS,
+            fields = listOf(HEIGHT, WEIGHT),
           ),
+          description = PHYSICAL_ATTRIBUTES_UPDATED.description,
+          occurredAt = NOW,
         )
+        println(event.additionalInformation?.javaClass)
+        println(expected.additionalInformation?.javaClass)
+
+        assertThat(event).isEqualTo(expected)
       }
 
       private fun expectSuccessfulSyncFrom(requestBody: String) =
@@ -305,6 +420,89 @@ class PhysicalAttributesSyncControllerIntTest : IntegrationTestBase() {
         .exchange()
         .expectStatus().is5xxServerError
     }
+  }
+
+  @DisplayName("GET /sync/prisoners/{prisonerNumber}/physical-attributes")
+  @Nested
+  inner class GetPhysicalAttributesTest {
+
+    @Nested
+    inner class Security {
+
+      @Test
+      fun `access forbidden when no authority`() {
+        webTestClient.get().uri("/sync/prisoners/${PRISONER_NUMBER}/physical-attributes")
+          .header("Content-Type", "application/json")
+          .exchange()
+          .expectStatus().isUnauthorized
+      }
+
+      @Test
+      fun `access forbidden when no role`() {
+        webTestClient.get().uri("/sync/prisoners/${PRISONER_NUMBER}/physical-attributes")
+          .headers(setAuthorisation(roles = listOf()))
+          .header("Content-Type", "application/json")
+          .exchange()
+          .expectStatus().isForbidden
+      }
+
+      @Test
+      fun `access forbidden with wrong role`() {
+        webTestClient.get().uri("/sync/prisoners/${PRISONER_NUMBER}/physical-attributes")
+          .headers(setAuthorisation(roles = listOf("ROLE_IS_WRONG")))
+          .header("Content-Type", "application/json")
+          .exchange()
+          .expectStatus().isForbidden
+      }
+    }
+
+    @Nested
+    inner class HappyPath {
+
+      @Test
+      @Sql("classpath:jpa/repository/reset.sql")
+      fun `not found response returned when there are no physical attributes recorded yet for the prisoner`() {
+        webTestClient.get().uri("/sync/prisoners/${PRISONER_NUMBER}/physical-attributes")
+          .headers(setAuthorisation(USER1, roles = listOf("ROLE_PRISON_PERSON_API__PHYSICAL_ATTRIBUTES_SYNC__RW")))
+          .header("Content-Type", "application/json")
+          .exchange()
+          .expectStatus().isNotFound
+      }
+
+      @Test
+      @Sql(
+        "classpath:jpa/repository/reset.sql",
+        "classpath:controller/physicalattributes/migration/physical_attributes.sql",
+        "classpath:controller/physicalattributes/migration/field_history.sql",
+        "classpath:controller/physicalattributes/migration/field_metadata.sql",
+      )
+      fun `can return physical attributes`() {
+        expectSuccessfulGetRequest().expectBody()
+          .json(
+            // language=json
+            """
+            { 
+              "height": 180,
+              "weight": 70,
+              "hair": "BLACK",
+              "facialHair": "SIDEBURNS",
+              "face": "ROUND",
+              "build": "HEAVY",
+              "leftEyeColour": "BROWN",
+              "rightEyeColour": "BROWN",
+              "shoeSize": "9"
+            }
+            """,
+          )
+      }
+    }
+
+    private fun expectSuccessfulGetRequest() =
+      webTestClient.get().uri("/sync/prisoners/${PRISONER_NUMBER}/physical-attributes")
+        .headers(setAuthorisation(USER1, roles = listOf("ROLE_PRISON_PERSON_API__PHYSICAL_ATTRIBUTES_SYNC__RW")))
+        .header("Content-Type", "application/json")
+        .exchange()
+        .expectStatus().isOk
   }
 
   private companion object {

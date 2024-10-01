@@ -63,7 +63,7 @@ class PrisonerHealth(
     lastModifiedBy: String,
   ) = updateFieldHistory(lastModifiedAt, null, lastModifiedAt, lastModifiedBy, DPS, allFields)
 
-  override fun publishUpdateEvent(source: Source, now: ZonedDateTime) {
+  override fun publishUpdateEvent(source: Source, now: ZonedDateTime, fields: Collection<PrisonPersonField>) {
     // No-op for now
   }
 

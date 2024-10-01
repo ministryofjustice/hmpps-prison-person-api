@@ -649,8 +649,10 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
 
       @Test
       @Sql("classpath:jpa/repository/reset.sql")
+      @Sql("classpath:controller/physicalattributes/migration/physical_attributes.sql")
+      @Sql("classpath:controller/physicalattributes/migration/field_history.sql")
       fun `should publish domain event`() {
-        expectSuccessfulUpdateFrom("""{ "height": 180, "weight": 70 }""")
+        expectSuccessfulUpdateFrom("""{ "height": 190, "weight": 90 }""")
 
         await untilCallTo { publishTestQueue.countAllMessagesOnQueue() } matches { it == 1 }
         val event = publishTestQueue.receiveDomainEventOnQueue<PrisonPersonAdditionalInformation>()
@@ -662,6 +664,7 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
               url = "http://localhost:8080/prisoners/${PRISONER_NUMBER}",
               prisonerNumber = PRISONER_NUMBER,
               source = DPS,
+              fields = listOf(HEIGHT, WEIGHT),
             ),
             description = PHYSICAL_ATTRIBUTES_UPDATED.description,
             occurredAt = ZonedDateTime.now(clock),

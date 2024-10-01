@@ -422,6 +422,89 @@ class PhysicalAttributesSyncControllerIntTest : IntegrationTestBase() {
     }
   }
 
+  @DisplayName("GET /sync/prisoners/{prisonerNumber}/physical-attributes")
+  @Nested
+  inner class GetPhysicalAttributesTest {
+
+    @Nested
+    inner class Security {
+
+      @Test
+      fun `access forbidden when no authority`() {
+        webTestClient.get().uri("/sync/prisoners/${PRISONER_NUMBER}/physical-attributes")
+          .header("Content-Type", "application/json")
+          .exchange()
+          .expectStatus().isUnauthorized
+      }
+
+      @Test
+      fun `access forbidden when no role`() {
+        webTestClient.get().uri("/sync/prisoners/${PRISONER_NUMBER}/physical-attributes")
+          .headers(setAuthorisation(roles = listOf()))
+          .header("Content-Type", "application/json")
+          .exchange()
+          .expectStatus().isForbidden
+      }
+
+      @Test
+      fun `access forbidden with wrong role`() {
+        webTestClient.get().uri("/sync/prisoners/${PRISONER_NUMBER}/physical-attributes")
+          .headers(setAuthorisation(roles = listOf("ROLE_IS_WRONG")))
+          .header("Content-Type", "application/json")
+          .exchange()
+          .expectStatus().isForbidden
+      }
+    }
+
+    @Nested
+    inner class HappyPath {
+
+      @Test
+      @Sql("classpath:jpa/repository/reset.sql")
+      fun `not found response returned when there are no physical attributes recorded yet for the prisoner`() {
+        webTestClient.get().uri("/sync/prisoners/${PRISONER_NUMBER}/physical-attributes")
+          .headers(setAuthorisation(USER1, roles = listOf("ROLE_PRISON_PERSON_API__PHYSICAL_ATTRIBUTES_SYNC__RW")))
+          .header("Content-Type", "application/json")
+          .exchange()
+          .expectStatus().isNotFound
+      }
+
+      @Test
+      @Sql(
+        "classpath:jpa/repository/reset.sql",
+        "classpath:controller/physicalattributes/migration/physical_attributes.sql",
+        "classpath:controller/physicalattributes/migration/field_history.sql",
+        "classpath:controller/physicalattributes/migration/field_metadata.sql",
+      )
+      fun `can return physical attributes`() {
+        expectSuccessfulGetRequest().expectBody()
+          .json(
+            // language=json
+            """
+            { 
+              "height": 180,
+              "weight": 70,
+              "hair": "BLACK",
+              "facialHair": "SIDEBURNS",
+              "face": "ROUND",
+              "build": "HEAVY",
+              "leftEyeColour": "BROWN",
+              "rightEyeColour": "BROWN",
+              "shoeSize": "9"
+            }
+            """,
+          )
+      }
+    }
+
+    private fun expectSuccessfulGetRequest() =
+      webTestClient.get().uri("/sync/prisoners/${PRISONER_NUMBER}/physical-attributes")
+        .headers(setAuthorisation(USER1, roles = listOf("ROLE_PRISON_PERSON_API__PHYSICAL_ATTRIBUTES_SYNC__RW")))
+        .header("Content-Type", "application/json")
+        .exchange()
+        .expectStatus().isOk
+  }
+
   private companion object {
     const val PRISONER_NUMBER = "A1234AA"
     const val USER1 = "USER1"

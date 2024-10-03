@@ -9,6 +9,8 @@ CREATE TABLE food_allergies
     CONSTRAINT allergy_fk FOREIGN KEY (allergy) REFERENCES reference_data_code (id)
 );
 
+CREATE INDEX food_allergies_prisoner_number_idx ON food_allergies (prisoner_number);
+
 COMMENT ON TABLE food_allergies IS 'The list of food allergies the prisoner has';
 COMMENT ON COLUMN food_allergies.id IS 'The primary key, in case prisoners require multiple "other" values';
 COMMENT ON COLUMN food_allergies.prisoner_number IS 'The identifier of a prisoner (also often called prison number, NOMS number, offender number...)';

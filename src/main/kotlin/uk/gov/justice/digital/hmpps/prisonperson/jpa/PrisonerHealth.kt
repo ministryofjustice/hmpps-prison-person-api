@@ -55,7 +55,7 @@ class PrisonerHealth(
 
   fun toDto(): HealthDto = HealthDto(
     smokerOrVaper = getRefDataValueWithMetadata(::smokerOrVaper, SMOKER_OR_VAPER),
-    foodAllergies = ::foodAllergies.get().map { allergy -> allergy.allergy.toSimpleDto() }.toList(),
+    foodAllergies = foodAllergies.map { allergy -> allergy.allergy.toSimpleDto() }.toList(),
   )
 
   override fun updateFieldHistory(

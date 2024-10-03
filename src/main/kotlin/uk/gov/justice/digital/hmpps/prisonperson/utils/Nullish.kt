@@ -48,7 +48,7 @@ sealed interface Nullish<T> {
   }
 
   /**
-   * If the Nullish object is not defined, run the provided function
+   * If the Nullish object is defined, run the provided function
    * @param fn The function to run on the `value` if defined
    */
   fun <U> let(fn: (T?) -> Unit) {

@@ -44,9 +44,9 @@ class PrisonerHealthService(
 
         request.foodAllergies.let<List<String>> {
           if (it == null) {
-            this::foodAllergies.get().clear()
+            foodAllergies.clear()
           } else {
-            this::foodAllergies.get().clear()
+            foodAllergies.clear()
             it.map { allergyCode ->
               val allergy = toReferenceDataCode(referenceDataCodeRepository, allergyCode)
 

@@ -37,6 +37,8 @@ class FoodAllergy(
   }
 
   override fun hashCode(): Int {
-    return 31 * id.hashCode()
+    var result = prisonerNumber.hashCode()
+    result = 31 * result + allergy.hashCode()
+    return result
   }
 }

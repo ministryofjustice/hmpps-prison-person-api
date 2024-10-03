@@ -3,7 +3,6 @@ package uk.gov.justice.digital.hmpps.prisonperson.service
 import com.microsoft.applicationinsights.TelemetryClient
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.prisonperson.config.trackEvent
@@ -60,12 +59,8 @@ class ProfileDetailsPhysicalAttributesSyncService(
 
     val physicalAttributes = physicalAttributesRepository.findByIdForUpdate(prisonerNumber)
       .orElseGet {
-        try {
-          physicalAttributesService.newPhysicalAttributesFor(prisonerNumber)
-        } catch (e: DataIntegrityViolationException) {
-          log.debug("Race condition detected: Duplicate Physical Attributes primary key for $prisonerNumber")
-          physicalAttributesRepository.getReferenceByIdForUpdate(prisonerNumber)
-        }
+        physicalAttributesService.ensurePhysicalAttributesPersistedFor(prisonerNumber)
+        physicalAttributesRepository.findByIdForUpdate(prisonerNumber).orElseThrow()
       }
       .apply {
         request.hair?.let { hair = updateField(it, referenceDataCodeRepository, HAIR, updatedFields) }

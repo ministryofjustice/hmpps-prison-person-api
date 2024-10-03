@@ -66,4 +66,9 @@ data class ReferenceDataDomainDto(
     description = "The reference data codes associated with this reference data domain",
   )
   val referenceDataCodes: Collection<ReferenceDataCodeDto>,
+
+  @Schema(
+    description = "Reference data domains that are considered sub-domains of this domain",
+  )
+  val subDomains: Collection<ReferenceDataDomainDto>,
 )

@@ -23,9 +23,13 @@ class ReferenceDataDomain(
   var deactivatedAt: ZonedDateTime? = null
   var deactivatedBy: String? = null
   var migratedAt: ZonedDateTime? = null
+  var parentDomainCode: String? = null
 
   @OneToMany(mappedBy = "domain")
   var referenceDataCodes: MutableList<ReferenceDataCode> = mutableListOf()
+
+  @OneToMany(mappedBy = "parentDomainCode")
+  var subDomains: MutableList<ReferenceDataDomain> = mutableListOf()
 
   override fun equals(other: Any?): Boolean {
     if (this === other) return true

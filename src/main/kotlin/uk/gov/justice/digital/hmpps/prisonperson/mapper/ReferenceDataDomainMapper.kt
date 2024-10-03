@@ -16,6 +16,7 @@ fun ReferenceDataDomain.toDto(): ReferenceDataDomainDto = ReferenceDataDomainDto
   deactivatedAt,
   deactivatedBy,
   referenceDataCodes.map { it.toDto() },
+  subDomains.map { it.toDto() },
 )
 
 fun ReferenceDataDomain.isActive() = deactivatedAt?.isBefore(ZonedDateTime.now()) != true

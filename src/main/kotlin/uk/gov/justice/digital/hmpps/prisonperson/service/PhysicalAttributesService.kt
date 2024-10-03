@@ -57,9 +57,14 @@ class PhysicalAttributesService(
     return physicalAttributesRepository.save(physicalAttributes).toDto()
   }
 
-  @Transactional(propagation = Propagation.REQUIRES_NEW)
   fun newPhysicalAttributesFor(prisonerNumber: String): PhysicalAttributes {
     validatePrisonerNumber(prisonerSearchClient, prisonerNumber)
-    return physicalAttributesRepository.save(PhysicalAttributes(prisonerNumber))
+    return PhysicalAttributes(prisonerNumber)
+  }
+
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
+  fun ensurePhysicalAttributesPersistedFor(prisonerNumber: String) {
+    validatePrisonerNumber(prisonerSearchClient, prisonerNumber)
+    physicalAttributesRepository.newPhysicalAttributesFor(prisonerNumber)
   }
 }

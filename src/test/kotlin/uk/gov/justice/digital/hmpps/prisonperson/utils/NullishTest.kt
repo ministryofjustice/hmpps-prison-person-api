@@ -33,4 +33,22 @@ class NullishTest {
       .isInstanceOf(IllegalArgumentException::class.java)
       .hasMessage("key1 is not an instance of String")
   }
+
+  @Test
+  fun `should not run function provided when attribute is not present in the map`() {
+    val attributes = mapOf("key1" to 123)
+    var check = "unchanged"
+    getAttributeAsNullish<String>(attributes, "key2").let<String> { check = "changed" }
+
+    assertThat(check).isEqualTo("unchanged")
+  }
+
+  @Test
+  fun `should run function provided when attribute is present in the map`() {
+    val attributes = mapOf("key1" to "changed")
+    var check: String? = "unchanged"
+    getAttributeAsNullish<String>(attributes, "key1").let<String> { check = it }
+
+    assertThat(check).isEqualTo("changed")
+  }
 }

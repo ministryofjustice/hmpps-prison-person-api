@@ -79,7 +79,8 @@ class PrisonPersonControllerIntTest : IntegrationTestBase() {
                   "shoeSize": null
                 },
                 "health": {
-                  "smokerOrVaper": null
+                  "smokerOrVaper": null,
+                  "foodAllergies": []
                 }
               }
             """.trimIndent(),

@@ -35,6 +35,9 @@ class PrisonerHealth(
   @JoinColumn(name = "smoker_or_vaper", referencedColumnName = "id")
   var smokerOrVaper: ReferenceDataCode? = null,
 
+  @OneToMany(mappedBy = "prisonerNumber", cascade = [ALL], orphanRemoval = true)
+  var foodAllergies: MutableSet<FoodAllergy> = mutableSetOf(),
+
   // Stores snapshots of each update to a prisoner's health information
   @OneToMany(mappedBy = "prisonerNumber", fetch = LAZY, cascade = [ALL], orphanRemoval = true)
   @SortNatural
@@ -52,6 +55,7 @@ class PrisonerHealth(
 
   fun toDto(): HealthDto = HealthDto(
     smokerOrVaper = getRefDataValueWithMetadata(::smokerOrVaper, SMOKER_OR_VAPER),
+    foodAllergies = foodAllergies.map { allergy -> allergy.allergy.toSimpleDto() }.toList(),
   )
 
   override fun updateFieldHistory(
@@ -83,6 +87,7 @@ class PrisonerHealth(
 
     if (prisonerNumber != other.prisonerNumber) return false
     if (smokerOrVaper != other.smokerOrVaper) return false
+    if (foodAllergies != other.foodAllergies) return false
 
     return true
   }
@@ -90,6 +95,7 @@ class PrisonerHealth(
   override fun hashCode(): Int {
     var result = prisonerNumber.hashCode()
     result = 31 * result + smokerOrVaper.hashCode()
+    result = 31 * result + foodAllergies.hashCode()
     return result
   }
 

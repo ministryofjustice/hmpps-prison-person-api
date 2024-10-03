@@ -5,6 +5,7 @@ import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.prisonperson.client.prisonersearch.PrisonerSearchClient
 import uk.gov.justice.digital.hmpps.prisonperson.dto.request.PrisonerHealthUpdateRequest
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.HealthDto
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.FoodAllergy
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.PrisonerHealth
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.PrisonerHealthRepository
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.ReferenceDataCodeRepository
@@ -24,7 +25,8 @@ class PrisonerHealthService(
   private val authenticationFacade: AuthenticationFacade,
   private val clock: Clock,
 ) {
-  fun getHealth(prisonerNumber: String): HealthDto? = prisonerHealthRepository.findById(prisonerNumber).getOrNull()?.toDto()
+  fun getHealth(prisonerNumber: String): HealthDto? =
+    prisonerHealthRepository.findById(prisonerNumber).getOrNull()?.toDto()
 
   @Transactional
   fun createOrUpdate(
@@ -39,6 +41,26 @@ class PrisonerHealthService(
           this::smokerOrVaper,
           { toReferenceDataCode(referenceDataCodeRepository, it) },
         )
+
+        request.foodAllergies.let<List<String>> {
+          if (it == null) {
+            foodAllergies.clear()
+          } else {
+            foodAllergies.clear()
+            it.map { allergyCode ->
+              val allergy = toReferenceDataCode(referenceDataCodeRepository, allergyCode)
+
+              if (allergy != null) {
+                FoodAllergy(
+                  prisonerNumber = prisonerNumber,
+                  allergy = allergy,
+                )
+              } else {
+                null
+              }
+            }.toList().filterNotNull().forEach { allergy -> this::foodAllergies.get().add(allergy) }
+          }
+        }
       }.also { it.updateFieldHistory(now, authenticationFacade.getUserOrSystemInContext()) }
 
     return prisonerHealthRepository.save(health).toDto()

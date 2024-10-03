@@ -7,4 +7,7 @@ import uk.gov.justice.digital.hmpps.prisonperson.dto.ReferenceDataSimpleDto
 data class HealthDto(
   @Schema(description = "Smoker or vaper")
   val smokerOrVaper: ValueWithMetadata<ReferenceDataSimpleDto?>? = null,
+
+  @Schema(description = "Food allergies")
+  val foodAllergies: List<ReferenceDataSimpleDto?> = emptyList(),
 )

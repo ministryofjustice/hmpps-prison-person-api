@@ -9,7 +9,8 @@ VALUES ('HAIR', 'Hair type or colour', 0, '2024-07-11 17:00:00+0100', 'OMS_OWNER
        ('MARK_TYPE', 'Type of identifying mark', 0, '2024-07-21 14:00:00+0100', 'OMS_OWNER'),
        ('SIDE', 'Side identifying mark is on', 0, '2024-07-21 14:00:00+0100', 'OMS_OWNER'),
        ('PART_ORIENT', 'Position of identifying mark', 0, '2024-07-21 14:00:00+0100', 'OMS_OWNER'),
-       ('BODY_PART', 'Body part identifying mark is on', 0, '2024-07-21 14:00:00+0100', 'OMS_OWNER');
+       ('BODY_PART', 'Body part identifying mark is on', 0, '2024-07-21 14:00:00+0100', 'OMS_OWNER'),
+       ('FOOD_ALLERGY', 'Food allergy', 0, '2024-07-21 14:00:00+0100', 'OMS_OWNER');
 
 INSERT INTO reference_data_code (id, domain, code, description, list_sequence, created_at, created_by)
 VALUES
@@ -99,7 +100,23 @@ VALUES
 ('BODY_PART_SHOULDER', 'BODY_PART', 'SHOULDER', 'Shoulder', 0, '2024-07-21 14:00:00+0100', 'OMS_OWNER'),
 ('BODY_PART_THIGH', 'BODY_PART', 'THIGH', 'Thigh', 0, '2024-07-21 14:00:00+0100', 'OMS_OWNER'),
 ('BODY_PART_TOE', 'BODY_PART', 'TOE', 'Toe', 0, '2024-07-21 14:00:00+0100', 'OMS_OWNER'),
-('BODY_PART_TORSO', 'BODY_PART', 'TORSO', 'Torso', 0, '2024-07-21 14:00:00+0100', 'OMS_OWNER');
+('BODY_PART_TORSO', 'BODY_PART', 'TORSO', 'Torso', 0, '2024-07-21 14:00:00+0100', 'OMS_OWNER'),
+-- Food allergies
+('FOOD_ALLERGY_CELERY', 'FOOD_ALLERGY', 'CELERY', 'Celery', 0, '2024-07-21 14:00:00+0100', 'OMS_OWNER'),
+('FOOD_ALLERGY_GLUTEN', 'FOOD_ALLERGY', 'GLUTEN', 'Cereals containing gluten', 0, '2024-07-21 14:00:00+0100', 'OMS_OWNER'),
+('FOOD_ALLERGY_CRUSTACEANS', 'FOOD_ALLERGY', 'CRUSTACEANS', 'Crustaceans', 0, '2024-07-21 14:00:00+0100', 'OMS_OWNER'),
+('FOOD_ALLERGY_EGG', 'FOOD_ALLERGY', 'EGG', 'Egg', 0, '2024-07-21 14:00:00+0100', 'OMS_OWNER'),
+('FOOD_ALLERGY_FISH', 'FOOD_ALLERGY', 'FISH', 'Fish', 0, '2024-07-21 14:00:00+0100', 'OMS_OWNER'),
+('FOOD_ALLERGY_LUPIN', 'FOOD_ALLERGY', 'LUPIN', 'Lupin', 0, '2024-07-21 14:00:00+0100', 'OMS_OWNER'),
+('FOOD_ALLERGY_MILK', 'FOOD_ALLERGY', 'MILK', 'Milk', 0, '2024-07-21 14:00:00+0100', 'OMS_OWNER'),
+('FOOD_ALLERGY_MOLLUSCS', 'FOOD_ALLERGY', 'MOLLUSCS', 'Molluscs', 0, '2024-07-21 14:00:00+0100', 'OMS_OWNER'),
+('FOOD_ALLERGY_MUSTARD', 'FOOD_ALLERGY', 'MUSTARD', 'Mustard', 0, '2024-07-21 14:00:00+0100', 'OMS_OWNER'),
+('FOOD_ALLERGY_PEANUTS', 'FOOD_ALLERGY', 'PEANUTS', 'Peanuts', 0, '2024-07-21 14:00:00+0100', 'OMS_OWNER'),
+('FOOD_ALLERGY_SESAME', 'FOOD_ALLERGY', 'SESAME', 'Sesame', 0, '2024-07-21 14:00:00+0100', 'OMS_OWNER'),
+('FOOD_ALLERGY_SOYA', 'FOOD_ALLERGY', 'SOYA', 'Soya', 0, '2024-07-21 14:00:00+0100', 'OMS_OWNER'),
+('FOOD_ALLERGY_SULPHUR_DIOXIDE', 'FOOD_ALLERGY', 'SULPHUR_DIOXIDE', 'Sulphur Dioxide', 0, '2024-07-21 14:00:00+0100', 'OMS_OWNER'),
+('FOOD_ALLERGY_TREE_NUTS', 'FOOD_ALLERGY', 'TREE_NUTS', 'Tree nuts', 0, '2024-07-21 14:00:00+0100', 'OMS_OWNER'),
+('FOOD_ALLERGY_OTHER', 'FOOD_ALLERGY', 'OTHER', 'Other', 0, '2024-07-21 14:00:00+0100', 'OMS_OWNER');
 
 INSERT INTO reference_data_domain (code, description, list_sequence, created_at, created_by, last_modified_at,
                                    last_modified_by, deactivated_at, deactivated_by)

@@ -12,8 +12,8 @@ import uk.gov.justice.digital.hmpps.prisonperson.mapper.toDto
 class ReferenceDataDomainService(
   private val referenceDataDomainRepository: ReferenceDataDomainRepository,
 ) {
-  fun getReferenceDataDomains(includeInactive: Boolean): Collection<ReferenceDataDomainDto> =
-    referenceDataDomainRepository.findAllByIncludeInactive(includeInactive).map { it.toDto() }
+  fun getReferenceDataDomains(includeInactive: Boolean, includeSubDomains: Boolean = false): Collection<ReferenceDataDomainDto> =
+    referenceDataDomainRepository.findAllByIncludeInactive(includeInactive, includeSubDomains).map { it.toDto() }
 
   fun getReferenceDataDomain(code: String): ReferenceDataDomainDto =
     referenceDataDomainRepository.findByCode(code)?.toDto()

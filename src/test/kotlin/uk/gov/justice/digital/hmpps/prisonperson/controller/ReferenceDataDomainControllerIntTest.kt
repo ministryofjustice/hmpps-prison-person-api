@@ -40,7 +40,7 @@ class ReferenceDataDomainControllerIntTest : IntegrationTestBase() {
           .exchange()
           .expectStatus().isOk
           .expectBody()
-          .jsonPath("$.length()").isEqualTo(11)
+          .jsonPath("$.length()").isEqualTo(12)
           .jsonPath("$[?(@.code == 'FACE')].description").isEqualTo("Face shape")
           .jsonPath("$[?(@.code == 'FACE')].listSequence").isEqualTo(0)
           .jsonPath("$[?(@.code == 'FACE')].isActive").isEqualTo(true)
@@ -55,7 +55,23 @@ class ReferenceDataDomainControllerIntTest : IntegrationTestBase() {
           .jsonPath("$[?(@.code == 'FACE')].referenceDataCodes[5].id").isEqualTo("FACE_TRIANGULAR")
           .jsonPath("$[?(@.code == 'FACE')].referenceDataCodes[6].id").isEqualTo("FACE_INACTIVE")
           .jsonPath("$[?(@.code == 'FACE')].referenceDataCodes[6].isActive").isEqualTo(false)
+          .jsonPath("$[?(@.code == 'MEDICAL_DIET')].subDomains.length()").isEqualTo(1)
+          .jsonPath("$[?(@.code == 'MEDICAL_DIET')].subDomains[0].code").isEqualTo("FREE_FROM")
+          .jsonPath("$[?(@.code == 'MEDICAL_DIET')].subDomains[0].referenceDataCodes.length()").isEqualTo(2)
+          .jsonPath("$[?(@.code == 'MEDICAL_DIET')].subDomains[0].referenceDataCodes[0].id").isEqualTo("FREE_FROM_MONOAMINE_OXIDASE_INHIBITORS")
+          .jsonPath("$[?(@.code == 'MEDICAL_DIET')].subDomains[0].referenceDataCodes[1].id").isEqualTo("FREE_FROM_CHEESE")
       }
+    }
+
+    @Test
+    fun `can retrieve reference data domains including sub-domains at the top level`() {
+      webTestClient.get().uri("/reference-data/domains?includeSubDomains=true")
+        .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__REFERENCE_DATA__RO")))
+        .exchange()
+        .expectStatus().isOk
+        .expectBody()
+        .jsonPath("$.length()").isEqualTo(13)
+        .jsonPath("$[?(@.code == 'FREE_FROM')].isActive").isEqualTo(true)
     }
   }
 

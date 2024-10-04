@@ -49,8 +49,11 @@ class PhysicalAttributesSyncService(
 
     val now = ZonedDateTime.now(clock)
 
-    val physicalAttributes = physicalAttributesRepository.findById(prisonerNumber)
-      .orElseGet { physicalAttributesService.newPhysicalAttributesFor(prisonerNumber) }
+    val physicalAttributes = physicalAttributesRepository.findByIdForUpdate(prisonerNumber)
+      .orElseGet {
+        physicalAttributesService.ensurePhysicalAttributesPersistedFor(prisonerNumber)
+        physicalAttributesRepository.findByIdForUpdate(prisonerNumber).orElseThrow()
+      }
       .apply {
         height = request.height
         weight = request.weight
@@ -71,15 +74,17 @@ class PhysicalAttributesSyncService(
   ): PhysicalAttributesSyncResponse {
     log.debug("Syncing historical physical attributes update from NOMIS for prisoner: $prisonerNumber")
 
-    physicalAttributesRepository.findById(prisonerNumber)
+    val physicalAttributes = physicalAttributesRepository.findByIdForUpdate(prisonerNumber)
       .orElseGet {
-        physicalAttributesRepository.save(
-          physicalAttributesService.newPhysicalAttributesFor(prisonerNumber).apply {
-            height = request.height
-            weight = request.weight
-          },
-        )
+        physicalAttributesService.ensurePhysicalAttributesPersistedFor(prisonerNumber)
+        physicalAttributesRepository.findByIdForUpdate(prisonerNumber).orElseThrow()
       }
+      .apply {
+        height = request.height
+        weight = request.weight
+      }
+    physicalAttributesRepository.save(physicalAttributes)
+
     return request.addToHistory(prisonerNumber)
       .map { it.fieldHistoryId }
       .also { trackSyncEvent(prisonerNumber, it) }

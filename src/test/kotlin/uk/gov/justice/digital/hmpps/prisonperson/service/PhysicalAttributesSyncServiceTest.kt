@@ -81,7 +81,14 @@ class PhysicalAttributesSyncServiceTest {
           PRISONER_NUMBER,
         ),
       )
-      whenever(physicalAttributesRepository.findById(PRISONER_NUMBER)).thenReturn(Optional.empty())
+      whenever(physicalAttributesRepository.findByIdForUpdate(PRISONER_NUMBER)).thenReturn(Optional.empty())
+      whenever(physicalAttributesRepository.findByIdForUpdate(PRISONER_NUMBER)).thenReturn(
+        Optional.of(
+          PhysicalAttributes(
+            PRISONER_NUMBER,
+          ),
+        ),
+      )
 
       assertThat(underTest.sync(PRISONER_NUMBER, PHYSICAL_ATTRIBUTES_SYNC_REQUEST))
         .isInstanceOf(PhysicalAttributesSyncResponse::class.java)
@@ -125,8 +132,10 @@ class PhysicalAttributesSyncServiceTest {
 
     @Test
     fun `does not create new physical attributes if prisoner doesn't exist in prisoner search`() {
-      whenever(physicalAttributesService.newPhysicalAttributesFor(PRISONER_NUMBER)).thenThrow(IllegalArgumentException("Prisoner number '$PRISONER_NUMBER' not found"))
-      whenever(physicalAttributesRepository.findById(PRISONER_NUMBER)).thenReturn(Optional.empty())
+      whenever(physicalAttributesService.ensurePhysicalAttributesPersistedFor(PRISONER_NUMBER)).thenThrow(
+        IllegalArgumentException("Prisoner number '$PRISONER_NUMBER' not found"),
+      )
+      whenever(physicalAttributesRepository.findByIdForUpdate(PRISONER_NUMBER)).thenReturn(Optional.empty())
 
       assertThatThrownBy { underTest.sync(PRISONER_NUMBER, PHYSICAL_ATTRIBUTES_SYNC_REQUEST) }
         .isInstanceOf(IllegalArgumentException::class.java)
@@ -138,7 +147,7 @@ class PhysicalAttributesSyncServiceTest {
 
     @Test
     fun `updates physical attributes`() {
-      whenever(physicalAttributesRepository.findById(PRISONER_NUMBER)).thenReturn(
+      whenever(physicalAttributesRepository.findByIdForUpdate(PRISONER_NUMBER)).thenReturn(
         Optional.of(
           PhysicalAttributes(
             prisonerNumber = PRISONER_NUMBER,
@@ -208,7 +217,7 @@ class PhysicalAttributesSyncServiceTest {
 
     @Test
     fun `inserts physical attributes history (for updates to old NOMIS bookings)`() {
-      whenever(physicalAttributesRepository.findById(PRISONER_NUMBER)).thenReturn(
+      whenever(physicalAttributesRepository.findByIdForUpdate(PRISONER_NUMBER)).thenReturn(
         Optional.of(
           PhysicalAttributes(
             prisonerNumber = PRISONER_NUMBER,
@@ -274,7 +283,14 @@ class PhysicalAttributesSyncServiceTest {
           PRISONER_NUMBER,
         ),
       )
-      whenever(physicalAttributesRepository.findById(PRISONER_NUMBER)).thenReturn(Optional.empty())
+      whenever(physicalAttributesRepository.findByIdForUpdate(PRISONER_NUMBER)).thenReturn(Optional.empty())
+      whenever(physicalAttributesRepository.findByIdForUpdate(PRISONER_NUMBER)).thenReturn(
+        Optional.of(
+          PhysicalAttributes(
+            PRISONER_NUMBER,
+          ),
+        ),
+      )
 
       assertThat(underTest.sync(PRISONER_NUMBER, PHYSICAL_ATTRIBUTES_SYNC_REQUEST.copy(height = null, weight = null)))
         .isInstanceOf(PhysicalAttributesSyncResponse::class.java)
@@ -318,7 +334,7 @@ class PhysicalAttributesSyncServiceTest {
 
     @Test
     fun `throws exception if history would have illogical applies_to and applies_from timestamps`() {
-      whenever(physicalAttributesRepository.findById(PRISONER_NUMBER)).thenReturn(
+      whenever(physicalAttributesRepository.findByIdForUpdate(PRISONER_NUMBER)).thenReturn(
         Optional.of(
           PhysicalAttributes(
             prisonerNumber = PRISONER_NUMBER,
@@ -347,7 +363,7 @@ class PhysicalAttributesSyncServiceTest {
   inner class GetPhysicalAttributes {
     @Test
     fun `physical attributes not found`() {
-      whenever(physicalAttributesRepository.findById(PRISONER_NUMBER)).thenReturn(Optional.empty())
+      whenever(physicalAttributesRepository.findByIdForUpdate(PRISONER_NUMBER)).thenReturn(Optional.empty())
 
       assertThat(underTest.getPhysicalAttributes(PRISONER_NUMBER)).isNull()
     }

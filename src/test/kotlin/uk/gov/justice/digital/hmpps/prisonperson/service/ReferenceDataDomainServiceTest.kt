@@ -53,6 +53,21 @@ class ReferenceDataDomainServiceTest {
   }
 
   @Test
+  fun `test getReferenceDataDomains with includeSubDomains`() {
+    val activeDomain = ACTIVE_DOMAIN
+    whenever(referenceDataDomainRepository.findAllByIncludeInactive(false, true)).thenReturn(
+      listOf(
+        activeDomain,
+      ),
+    )
+
+    val result = referenceDataDomainService.getReferenceDataDomains(false, true)
+
+    assertThat(result.size).isEqualTo(1)
+    verify(referenceDataDomainRepository).findAllByIncludeInactive(false, true)
+  }
+
+  @Test
   fun `test getReferenceDataDomain found`() {
     val code = "ACTIVE"
     val referenceDataDomain = ACTIVE_DOMAIN

@@ -53,7 +53,12 @@ class ReferenceDataDomainController(
       description = "Include inactive reference data domains. Defaults to false.",
     )
     includeInactive: Boolean = false,
-  ): Collection<ReferenceDataDomainDto> = referenceDataDomainService.getReferenceDataDomains(includeInactive)
+    @Parameter(
+      description = "Include sub-domains at the top level. Defaults to false",
+    )
+    includeSubDomains: Boolean = false,
+  ): Collection<ReferenceDataDomainDto> =
+    referenceDataDomainService.getReferenceDataDomains(includeInactive, includeSubDomains)
 
   @GetMapping("/{domain}")
   @ResponseStatus(HttpStatus.OK)

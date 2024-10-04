@@ -1,21 +1,24 @@
-package uk.gov.justice.digital.hmpps.prisonperson.service.event.publish
+package uk.gov.justice.digital.hmpps.prisonperson.service.event.handlers
 
 import com.microsoft.applicationinsights.TelemetryClient
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.stereotype.Service
-import org.springframework.transaction.event.TransactionPhase.AFTER_COMMIT
-import org.springframework.transaction.event.TransactionalEventListener
+import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.prisonperson.config.EventProperties
+import uk.gov.justice.digital.hmpps.prisonperson.enums.EventType
+import uk.gov.justice.digital.hmpps.prisonperson.service.event.PrisonPersonEvent
+import uk.gov.justice.digital.hmpps.prisonperson.service.event.publish.DomainEventPublisher
 
-@Service
-class EventService(
+@Component
+class PhysicalAttributesUpdatedHandler(
   private val eventProperties: EventProperties,
   private val telemetryClient: TelemetryClient,
   private val domainEventPublisher: DomainEventPublisher,
-) {
-  @TransactionalEventListener(phase = AFTER_COMMIT)
-  fun handleEvent(event: PrisonPersonEvent) {
+) : EventHandler {
+
+  override fun getType() = EventType.PHYSICAL_ATTRIBUTES_UPDATED
+
+  override fun handleEvent(event: PrisonPersonEvent) {
     log.info(event.toString())
 
     event.toDomainEvent(eventProperties.baseUrl).run {

@@ -1,11 +1,9 @@
-package uk.gov.justice.digital.hmpps.prisonperson.service.event.publish
+package uk.gov.justice.digital.hmpps.prisonperson.service.event
 
 import uk.gov.justice.digital.hmpps.prisonperson.enums.EventType
 import uk.gov.justice.digital.hmpps.prisonperson.enums.EventType.PHYSICAL_ATTRIBUTES_UPDATED
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField
 import uk.gov.justice.digital.hmpps.prisonperson.enums.Source
-import uk.gov.justice.digital.hmpps.prisonperson.service.event.DomainEvent
-import uk.gov.justice.digital.hmpps.prisonperson.service.event.PrisonPersonAdditionalInformation
 import java.time.ZonedDateTime
 
 abstract class PrisonPersonEvent(val type: EventType) {

@@ -27,7 +27,7 @@ import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.WEIGHT
 import uk.gov.justice.digital.hmpps.prisonperson.enums.Source
 import uk.gov.justice.digital.hmpps.prisonperson.enums.Source.DPS
 import uk.gov.justice.digital.hmpps.prisonperson.mapper.toSimpleDto
-import uk.gov.justice.digital.hmpps.prisonperson.service.event.publish.PhysicalAttributesUpdatedEvent
+import uk.gov.justice.digital.hmpps.prisonperson.service.event.PhysicalAttributesUpdatedEvent
 import java.time.ZonedDateTime
 import java.util.SortedSet
 import kotlin.reflect.KMutableProperty0

@@ -1,71 +1,45 @@
 package uk.gov.justice.digital.hmpps.prisonperson.service.event
 
-import com.microsoft.applicationinsights.TelemetryClient
-import org.assertj.core.api.Assertions.assertThat
+import io.mockk.clearAllMocks
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.mockito.kotlin.any
-import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
-import uk.gov.justice.digital.hmpps.prisonperson.config.EventProperties
-import uk.gov.justice.digital.hmpps.prisonperson.enums.EventType.PHYSICAL_ATTRIBUTES_UPDATED
-import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.HEIGHT
-import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.WEIGHT
-import uk.gov.justice.digital.hmpps.prisonperson.enums.Source.DPS
-import uk.gov.justice.digital.hmpps.prisonperson.service.event.publish.DomainEventPublisher
-import uk.gov.justice.digital.hmpps.prisonperson.service.event.publish.EventService
-import uk.gov.justice.digital.hmpps.prisonperson.service.event.publish.PhysicalAttributesUpdatedEvent
-import java.time.Instant
-import java.time.ZoneId
-import java.time.ZonedDateTime
+import org.mockito.kotlin.whenever
+import uk.gov.justice.digital.hmpps.prisonperson.enums.EventType
+import uk.gov.justice.digital.hmpps.prisonperson.service.event.handlers.EventHandler
+import uk.gov.justice.digital.hmpps.prisonperson.service.event.handlers.EventHandlerFactory
 
 class EventServiceTest {
 
-  private val telemetryClient = mock<TelemetryClient>()
-  private val domainEventPublisher = mock<DomainEventPublisher>()
+  private val eventHandlerFactory = mock<EventHandlerFactory>()
+  private val eventHandler = mock<EventHandler>()
+  private val event = mock<PrisonPersonEvent>()
 
-  private val baseUrl = "http://localhost:8080"
+  private lateinit var eventService: EventService
 
-  @Test
-  fun `handle event - publish enabled`() {
-    val eventProperties = EventProperties(publish = true, baseUrl = baseUrl)
-    val eventService = EventService(eventProperties, telemetryClient, domainEventPublisher)
-    val event = PhysicalAttributesUpdatedEvent(PRISONER_NUMBER, NOW, DPS, listOf(HEIGHT, WEIGHT))
+  @BeforeEach
+  fun setUp() {
+    eventService = EventService(eventHandlerFactory)
+  }
 
-    eventService.handleEvent(event)
-
-    val domainEventCaptor = argumentCaptor<DomainEvent<*>>()
-    verify(domainEventPublisher).publish(domainEventCaptor.capture())
-    assertThat(domainEventCaptor.firstValue).isEqualTo(
-      DomainEvent(
-        eventType = PHYSICAL_ATTRIBUTES_UPDATED.domainEventType,
-        additionalInformation = PrisonPersonAdditionalInformation(
-          url = "$baseUrl/prisoners/$PRISONER_NUMBER",
-          source = event.source,
-          prisonerNumber = PRISONER_NUMBER,
-          fields = listOf(HEIGHT, WEIGHT),
-        ),
-        description = PHYSICAL_ATTRIBUTES_UPDATED.description,
-        occurredAt = NOW,
-      ),
-    )
+  @AfterEach
+  fun tearDown() {
+    clearAllMocks()
   }
 
   @Test
-  fun `handle event - publish disabled`() {
-    val eventProperties = EventProperties(publish = false, baseUrl = baseUrl)
-    val eventService = EventService(eventProperties, telemetryClient, domainEventPublisher)
-    val event = PhysicalAttributesUpdatedEvent(PRISONER_NUMBER, NOW, DPS, listOf(HEIGHT, WEIGHT))
+  fun `event service delegates to event handler`() {
+    whenever(eventHandlerFactory.getHandler(EVENT_TYPE)).thenReturn(eventHandler)
+    whenever(event.type).thenReturn(EVENT_TYPE)
 
     eventService.handleEvent(event)
 
-    verify(domainEventPublisher, never()).publish(any<DomainEvent<*>>())
+    verify(eventHandler).handleEvent(event)
   }
 
   private companion object {
-    const val PRISONER_NUMBER = "A1234AA"
-
-    val NOW: ZonedDateTime = ZonedDateTime.ofInstant(Instant.now(), ZoneId.of("Europe/London"))
+    val EVENT_TYPE = EventType.PHYSICAL_ATTRIBUTES_UPDATED
   }
 }

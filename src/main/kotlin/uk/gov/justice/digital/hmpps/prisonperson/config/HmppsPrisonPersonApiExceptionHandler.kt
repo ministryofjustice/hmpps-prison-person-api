@@ -22,6 +22,7 @@ import org.springframework.web.method.annotation.HandlerMethodValidationExceptio
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException
 import org.springframework.web.multipart.support.MissingServletRequestPartException
 import org.springframework.web.servlet.resource.NoResourceFoundException
+import uk.gov.justice.digital.hmpps.prisonperson.enums.EventType
 import uk.gov.justice.hmpps.kotlin.common.ErrorResponse
 
 @RestControllerAdvice
@@ -267,5 +268,5 @@ class ReferenceDataDomainNotFoundException(code: String) : Exception("No data fo
 class ReferenceDataCodeNotFoundException(code: String, domain: String) : Exception("No data for code '$code' in domain '$domain'")
 class GenericNotFoundException(message: String) : Exception(message)
 class IllegalFieldHistoryException(prisonerNumber: String) : Exception("Cannot update field history for prisoner: '$prisonerNumber'")
-
+class EventHandlerException(eventType: EventType) : Exception("Cannot handle event of type: '${eventType.name}'")
 class DownstreamServiceException(message: String, cause: Throwable) : Exception(message, cause)

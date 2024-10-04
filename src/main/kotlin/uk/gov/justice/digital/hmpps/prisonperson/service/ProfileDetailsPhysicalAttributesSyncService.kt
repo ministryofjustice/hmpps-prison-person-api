@@ -106,39 +106,33 @@ class ProfileDetailsPhysicalAttributesSyncService(
   ): ProfileDetailsPhysicalAttributesSyncResponse {
     log.debug("Syncing historical profile details physical attributes update from NOMIS for prisoner: $prisonerNumber")
 
-    physicalAttributesRepository.findById(prisonerNumber)
+    val updatedFields = mutableSetOf<PrisonPersonField>()
+
+    val physicalAttributes = physicalAttributesRepository.findByIdForUpdate(prisonerNumber)
       .orElseGet {
-        physicalAttributesRepository.save(
-          physicalAttributesService.newPhysicalAttributesFor(prisonerNumber).apply {
-            hair = toReferenceDataCode(
-              referenceDataCodeRepository,
-              toReferenceDataCodeId(request.hair?.value, "HAIR"),
-            )
-            facialHair = toReferenceDataCode(
-              referenceDataCodeRepository,
-              toReferenceDataCodeId(request.facialHair?.value, "FACIAL_HAIR"),
-            )
-            face = toReferenceDataCode(
-              referenceDataCodeRepository,
-              toReferenceDataCodeId(request.face?.value, "FACE"),
-            )
-            build =
-              toReferenceDataCode(
-                referenceDataCodeRepository,
-                toReferenceDataCodeId(request.build?.value, "BUILD"),
-              )
-            leftEyeColour = toReferenceDataCode(
-              referenceDataCodeRepository,
-              toReferenceDataCodeId(request.leftEyeColour?.value, "EYE"),
-            )
-            rightEyeColour = toReferenceDataCode(
-              referenceDataCodeRepository,
-              toReferenceDataCodeId(request.rightEyeColour?.value, "EYE"),
-            )
-            shoeSize = request.shoeSize?.value
-          },
-        )
+        physicalAttributesService.ensurePhysicalAttributesPersistedFor(prisonerNumber)
+        physicalAttributesRepository.findByIdForUpdate(prisonerNumber).orElseThrow()
       }
+      .apply {
+        request.hair?.let { hair = updateField(it, referenceDataCodeRepository, HAIR, updatedFields) }
+        request.facialHair?.let {
+          facialHair = updateField(it, referenceDataCodeRepository, FACIAL_HAIR, updatedFields)
+        }
+        request.face?.let { face = updateField(it, referenceDataCodeRepository, FACE, updatedFields) }
+        request.build?.let { build = updateField(it, referenceDataCodeRepository, BUILD, updatedFields) }
+        request.leftEyeColour?.let {
+          leftEyeColour = updateField(it, referenceDataCodeRepository, LEFT_EYE_COLOUR, updatedFields)
+        }
+        request.rightEyeColour?.let {
+          rightEyeColour = updateField(it, referenceDataCodeRepository, RIGHT_EYE_COLOUR, updatedFields)
+        }
+        request.shoeSize?.let {
+          updatedFields.add(SHOE_SIZE)
+          shoeSize = it.value
+        }
+      }
+    physicalAttributesRepository.save(physicalAttributes)
+
     return request.addToHistory(prisonerNumber)
       .map { it.fieldHistoryId }
       .also { trackSyncEvent(prisonerNumber, it) }
@@ -150,7 +144,7 @@ class ProfileDetailsPhysicalAttributesSyncService(
     record: ProfileDetailsPhysicalAttributesSyncRequest,
     field: PrisonPersonField,
     physicalAttributes: PhysicalAttributes,
-  ): Collection<PrisonPersonField> = attribute?.let {
+  ): Collection<PrisonPersonField> = attribute?.also {
     physicalAttributes.updateFieldHistory(
       appliesFrom = record.appliesFrom,
       appliesTo = record.appliesTo,
@@ -159,6 +153,7 @@ class ProfileDetailsPhysicalAttributesSyncService(
       source = NOMIS,
       fields = listOf(field),
     )
+  }?.let {
     setOf(field)
   } ?: emptySet()
 
@@ -198,10 +193,9 @@ class ProfileDetailsPhysicalAttributesSyncService(
           ).also {
             field.set(
               it,
-              toReferenceDataCode(
-                referenceDataCodeRepository,
-                toReferenceDataCodeId(getter()!!.value, field.domain),
-              ),
+              field.domain?.let { domain ->
+                toReferenceDataCode(referenceDataCodeRepository, toReferenceDataCodeId(getter()!!.value, domain))
+              } ?: getter()!!.value,
             )
           },
         )

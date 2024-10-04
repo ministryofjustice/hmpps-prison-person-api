@@ -144,7 +144,7 @@ class ProfileDetailsPhysicalAttributesSyncService(
     record: ProfileDetailsPhysicalAttributesSyncRequest,
     field: PrisonPersonField,
     physicalAttributes: PhysicalAttributes,
-  ): Collection<PrisonPersonField> = attribute?.let {
+  ): Collection<PrisonPersonField> = attribute?.also {
     physicalAttributes.updateFieldHistory(
       appliesFrom = record.appliesFrom,
       appliesTo = record.appliesTo,
@@ -153,6 +153,7 @@ class ProfileDetailsPhysicalAttributesSyncService(
       source = NOMIS,
       fields = listOf(field),
     )
+  }?.let {
     setOf(field)
   } ?: emptySet()
 

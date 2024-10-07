@@ -34,4 +34,14 @@ data class PrisonerHealthUpdateRequest(
     nullable = true,
   )
   val foodAllergies: Nullish<List<String>> = getAttributeAsNullish<List<String>>(attributes, "foodAllergies")
+
+  @Schema(
+    description = "The medical dietary requirements the prisoner has. A list of `ReferenceDataCode`.`id`",
+    type = "string[]",
+    example = "[MEDICAL_DIET_LOW_FAT, FREE_FROM_EGG]",
+    requiredMode = NOT_REQUIRED,
+    nullable = true,
+  )
+  val medicalDietaryRequirements: Nullish<List<String>> =
+    getAttributeAsNullish<List<String>>(attributes, "medicalDietaryRequirements")
 }

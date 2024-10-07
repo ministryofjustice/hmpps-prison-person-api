@@ -80,7 +80,8 @@ class PrisonPersonControllerIntTest : IntegrationTestBase() {
                 },
                 "health": {
                   "smokerOrVaper": null,
-                  "foodAllergies": []
+                  "foodAllergies": [],
+                  "medicalDietaryRequirements": []
                 }
               }
             """.trimIndent(),

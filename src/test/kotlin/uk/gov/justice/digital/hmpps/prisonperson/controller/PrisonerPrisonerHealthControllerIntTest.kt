@@ -178,7 +178,8 @@ class PrisonerPrisonerHealthControllerIntTest : IntegrationTestBase() {
                 "lastModifiedAt":"2024-06-14T09:10:11+0100",
                 "lastModifiedBy":"USER1"
               },
-              "foodAllergies": []
+              "foodAllergies": [],
+              "medicalDietaryRequirements": []
             }
           """.trimIndent(),
           true,
@@ -318,7 +319,8 @@ class PrisonerPrisonerHealthControllerIntTest : IntegrationTestBase() {
             "listSequence": 0,
             "isActive": true
           }
-        ]
+        ],
+        "medicalDietaryRequirements": []
       }
       """.trimIndent()
 
@@ -343,7 +345,8 @@ class PrisonerPrisonerHealthControllerIntTest : IntegrationTestBase() {
             "listSequence": 0,
             "isActive": true
           }
-        ]
+        ],
+        "medicalDietaryRequirements": []
       }
       """.trimIndent()
   }

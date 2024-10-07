@@ -57,7 +57,7 @@ class ReferenceDataDomainControllerIntTest : IntegrationTestBase() {
           .jsonPath("$[?(@.code == 'FACE')].referenceDataCodes[6].isActive").isEqualTo(false)
           .jsonPath("$[?(@.code == 'MEDICAL_DIET')].subDomains.length()").isEqualTo(1)
           .jsonPath("$[?(@.code == 'MEDICAL_DIET')].subDomains[0].code").isEqualTo("FREE_FROM")
-          .jsonPath("$[?(@.code == 'MEDICAL_DIET')].subDomains[0].referenceDataCodes.length()").isEqualTo(2)
+          .jsonPath("$[?(@.code == 'MEDICAL_DIET')].subDomains[0].referenceDataCodes.length()").isEqualTo(12)
           .jsonPath("$[?(@.code == 'MEDICAL_DIET')].subDomains[0].referenceDataCodes[0].id").isEqualTo("FREE_FROM_MONOAMINE_OXIDASE_INHIBITORS")
           .jsonPath("$[?(@.code == 'MEDICAL_DIET')].subDomains[0].referenceDataCodes[1].id").isEqualTo("FREE_FROM_CHEESE")
       }

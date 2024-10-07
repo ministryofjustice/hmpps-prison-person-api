@@ -5,6 +5,10 @@ import org.hamcrest.Matchers.not
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.mockito.kotlin.argThat
+import org.mockito.kotlin.eq
+import org.mockito.kotlin.isNull
+import org.mockito.kotlin.verify
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Primary
@@ -504,6 +508,36 @@ class ProfileDetailsPhysicalAttributesMigrationControllerIntTest : IntegrationTe
           FieldMetadata(PRISONER_NUMBER, LEFT_EYE_COLOUR, lastModifiedAt = NOW, lastModifiedBy = USER1),
           FieldMetadata(PRISONER_NUMBER, RIGHT_EYE_COLOUR, lastModifiedAt = NOW, lastModifiedBy = USER1),
           FieldMetadata(PRISONER_NUMBER, SHOE_SIZE, lastModifiedAt = NOW, lastModifiedBy = USER1),
+        )
+      }
+
+      @Test
+      @Sql("classpath:jpa/repository/reset.sql")
+      fun `should publish telemetry event`() {
+        webTestClient.put().uri("/migration/prisoners/A1234AA/profile-details-physical-attributes")
+          .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__PROFILE_DETAILS_PHYSICAL_ATTRIBUTES_MIGRATION__RW")))
+          .header("Content-Type", "application/json")
+          .bodyValue(SINGLE_CURRENT_RECORD_MIGRATION)
+          .exchange()
+          .expectStatus().is2xxSuccessful
+          .expectBody().jsonPath("$.fieldHistoryInserted[*]").value(not(hasItem(-1)))
+
+        verify(telemetryClient).trackEvent(
+          eq("prison-person-api-profile-details-physical-attributes-migrated"),
+          argThat { it ->
+            it["prisonerNumber"] == PRISONER_NUMBER &&
+              it["source"] == NOMIS.name &&
+              it["fields"] == listOf(
+                HAIR.name,
+                FACIAL_HAIR.name,
+                FACE.name,
+                BUILD.name,
+                LEFT_EYE_COLOUR.name,
+                RIGHT_EYE_COLOUR.name,
+                SHOE_SIZE.name,
+              ).toString()
+          },
+          isNull(),
         )
       }
     }

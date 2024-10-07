@@ -12,16 +12,13 @@ import org.mockito.Mockito.lenient
 import org.mockito.Spy
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
-import org.mockito.kotlin.argThat
 import org.mockito.kotlin.argumentCaptor
-import org.mockito.kotlin.eq
-import org.mockito.kotlin.isNull
-import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import uk.gov.justice.digital.hmpps.prisonperson.dto.request.MigrationValueWithMetadata
 import uk.gov.justice.digital.hmpps.prisonperson.dto.request.ProfileDetailsPhysicalAttributesMigrationRequest
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.ProfileDetailsPhysicalAttributesMigrationResponse
+import uk.gov.justice.digital.hmpps.prisonperson.enums.EventType.PROFILE_DETAILS_PHYSICAL_ATTRIBUTES_MIGRATED
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.BUILD
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.FACE
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.FACIAL_HAIR
@@ -36,7 +33,9 @@ import uk.gov.justice.digital.hmpps.prisonperson.jpa.ReferenceDataDomain
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.PhysicalAttributesRepository
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.ReferenceDataCodeRepository
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.utils.HistoryComparison
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.utils.expectDomainEventRaised
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.utils.expectFieldHistory
+import uk.gov.justice.digital.hmpps.prisonperson.service.event.publish.PrisonPersonUpdatedEvent
 import java.time.Clock
 import java.time.Instant
 import java.time.ZoneId
@@ -194,13 +193,11 @@ class ProfileDetailsPhysicalAttributesMigrationServiceTest {
             source = NOMIS,
           ),
         )
-      }
 
-      verify(telemetryClient).trackEvent(
-        eq("prison-person-api-profile-details-physical-attributes-migrated"),
-        argThat { it -> it.containsValue(PRISONER_NUMBER) },
-        isNull(),
-      )
+        expectDomainEventRaised(PRISONER_NUMBER, PROFILE_DETAILS_PHYSICAL_ATTRIBUTES_MIGRATED) {
+          assertThat((it as PrisonPersonUpdatedEvent).fieldHistoryIds).isNotEmpty()
+        }
+      }
     }
 
     @Test
@@ -438,13 +435,11 @@ class ProfileDetailsPhysicalAttributesMigrationServiceTest {
             source = NOMIS,
           ),
         )
-      }
 
-      verify(telemetryClient).trackEvent(
-        eq("prison-person-api-profile-details-physical-attributes-migrated"),
-        argThat { it -> it.containsValue(PRISONER_NUMBER) },
-        isNull(),
-      )
+        expectDomainEventRaised(PRISONER_NUMBER, PROFILE_DETAILS_PHYSICAL_ATTRIBUTES_MIGRATED) {
+          assertThat((it as PrisonPersonUpdatedEvent).fieldHistoryIds).isNotEmpty()
+        }
+      }
     }
 
     @Test
@@ -555,13 +550,11 @@ class ProfileDetailsPhysicalAttributesMigrationServiceTest {
             source = NOMIS,
           ),
         )
-      }
 
-      verify(telemetryClient).trackEvent(
-        eq("prison-person-api-profile-details-physical-attributes-migrated"),
-        argThat { it -> it.containsValue(PRISONER_NUMBER) },
-        isNull(),
-      )
+        expectDomainEventRaised(PRISONER_NUMBER, PROFILE_DETAILS_PHYSICAL_ATTRIBUTES_MIGRATED) {
+          assertThat((it as PrisonPersonUpdatedEvent).fieldHistoryIds).isNotEmpty()
+        }
+      }
     }
 
     @Test
@@ -684,13 +677,10 @@ class ProfileDetailsPhysicalAttributesMigrationServiceTest {
             source = NOMIS,
           ),
         )
+        expectDomainEventRaised(PRISONER_NUMBER, PROFILE_DETAILS_PHYSICAL_ATTRIBUTES_MIGRATED) {
+          assertThat((it as PrisonPersonUpdatedEvent).fieldHistoryIds).isNotEmpty()
+        }
       }
-
-      verify(telemetryClient).trackEvent(
-        eq("prison-person-api-profile-details-physical-attributes-migrated"),
-        argThat { it -> it.containsValue(PRISONER_NUMBER) },
-        isNull(),
-      )
     }
   }
 
@@ -701,11 +691,6 @@ class ProfileDetailsPhysicalAttributesMigrationServiceTest {
     )
 
     verifyNoInteractions(physicalAttributesRepository)
-    verify(telemetryClient).trackEvent(
-      eq("prison-person-api-profile-details-physical-attributes-migrated"),
-      argThat { it -> it.containsValue(PRISONER_NUMBER) && it.containsValue("[]") },
-      isNull(),
-    )
   }
 
   private fun generatePrevious(

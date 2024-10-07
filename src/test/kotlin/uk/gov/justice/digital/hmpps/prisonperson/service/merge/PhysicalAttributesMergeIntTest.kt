@@ -16,13 +16,16 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.test.context.jdbc.Sql
 import software.amazon.awssdk.services.sns.model.MessageAttributeValue
 import software.amazon.awssdk.services.sns.model.PublishRequest
+import uk.gov.justice.digital.hmpps.prisonperson.enums.EventType.PHYSICAL_ATTRIBUTES_UPDATED
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.HEIGHT
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.WEIGHT
+import uk.gov.justice.digital.hmpps.prisonperson.enums.Source.DPS
 import uk.gov.justice.digital.hmpps.prisonperson.integration.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.prisonperson.integration.wiremock.PrisonerSearchExtension.Companion.prisonerSearch
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.FieldMetadata
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.PhysicalAttributesRepository
 import uk.gov.justice.digital.hmpps.prisonperson.service.event.DomainEvent
+import uk.gov.justice.digital.hmpps.prisonperson.service.event.PrisonPersonFieldInformation
 import uk.gov.justice.digital.hmpps.prisonperson.service.event.PrisonerMergedAdditionalInformation
 import java.time.Clock
 import java.time.Duration
@@ -195,6 +198,32 @@ class PhysicalAttributesMergeIntTest : IntegrationTestBase() {
     assertThat(fieldHistoryIds(NO_PRISON_PERSON_DATA)).isEmpty()
     assertThat(physicalAttributesRepository.findByIdOrNull(NO_PRISON_PERSON_DATA)).isNull()
     assertThat(fieldMetadataRepository.findAllByPrisonerNumber(NO_PRISON_PERSON_DATA)).isEmpty()
+  }
+
+  @Test
+  @Sql("classpath:jpa/repository/reset.sql")
+  @Sql("classpath:service/event/physical_attributes.sql")
+  @Sql("classpath:service/event/physical_attributes_metadata.sql")
+  @Sql("classpath:service/event/physical_attributes_history.sql")
+  fun `domain event raised when merge completes`() {
+    publishPrisonerMergedMessage(PRISONER_MERGE_TO, PRISONER_MERGE_FROM)
+
+    await untilCallTo { publishTestQueue.countAllMessagesOnQueue() } matches { it == 1 }
+    val event = publishTestQueue.receiveDomainEventOnQueue<PrisonPersonFieldInformation>()
+
+    assertThat(event).isEqualTo(
+      DomainEvent(
+        eventType = PHYSICAL_ATTRIBUTES_UPDATED.domainEventDetails!!.type,
+        additionalInformation = PrisonPersonFieldInformation(
+          url = "http://localhost:8080/prisoners/${PRISONER_MERGE_TO}",
+          prisonerNumber = PRISONER_MERGE_TO,
+          source = DPS,
+          fields = listOf(HEIGHT, WEIGHT),
+        ),
+        description = PHYSICAL_ATTRIBUTES_UPDATED.domainEventDetails!!.description,
+        occurredAt = ZonedDateTime.now(clock),
+      ),
+    )
   }
 
   @Test

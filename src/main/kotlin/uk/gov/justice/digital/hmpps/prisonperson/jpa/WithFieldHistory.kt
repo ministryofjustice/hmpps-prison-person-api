@@ -20,8 +20,6 @@ abstract class WithFieldHistory<T : AbstractAggregateRoot<T>?> : AbstractAggrega
     lastModifiedBy: String,
   ): Collection<PrisonPersonField>
 
-  abstract fun publishUpdateEvent(source: Source, now: ZonedDateTime, fields: Collection<PrisonPersonField>)
-
   fun updateFieldHistory(
     lastModifiedAt: ZonedDateTime,
     lastModifiedBy: String,
@@ -79,4 +77,6 @@ abstract class WithFieldHistory<T : AbstractAggregateRoot<T>?> : AbstractAggrega
       }
     return changedFields
   }
+
+  public override fun domainEvents(): Collection<Any> = super.domainEvents()
 }

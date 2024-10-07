@@ -13,10 +13,7 @@ import org.mockito.Spy
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.junit.jupiter.MockitoSettings
 import org.mockito.kotlin.any
-import org.mockito.kotlin.argThat
 import org.mockito.kotlin.argumentCaptor
-import org.mockito.kotlin.eq
-import org.mockito.kotlin.isNull
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
@@ -26,6 +23,8 @@ import uk.gov.justice.digital.hmpps.prisonperson.config.IllegalFieldHistoryExcep
 import uk.gov.justice.digital.hmpps.prisonperson.dto.request.ProfileDetailsPhysicalAttributesSyncRequest
 import uk.gov.justice.digital.hmpps.prisonperson.dto.request.SyncValueWithMetadata
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.ProfileDetailsPhysicalAttributesSyncResponse
+import uk.gov.justice.digital.hmpps.prisonperson.enums.EventType.PROFILE_DETAILS_PHYSICAL_ATTRIBUTES_SYNCED
+import uk.gov.justice.digital.hmpps.prisonperson.enums.EventType.PROFILE_DETAILS_PHYSICAL_ATTRIBUTES_SYNCED_HISTORICAL
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.BUILD
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.FACE
@@ -43,7 +42,9 @@ import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.FieldHistoryRepo
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.PhysicalAttributesRepository
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.ReferenceDataCodeRepository
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.utils.HistoryComparison
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.utils.expectDomainEventRaised
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.utils.expectFieldHistory
+import uk.gov.justice.digital.hmpps.prisonperson.service.event.publish.PrisonPersonUpdatedEvent
 import java.time.Clock
 import java.time.ZonedDateTime
 import java.util.Optional
@@ -120,13 +121,11 @@ class ProfileDetailsPhysicalAttributesSyncServiceTest {
             source = NOMIS,
           ),
         )
-      }
 
-      verify(telemetryClient).trackEvent(
-        eq("prison-person-api-profile-details-physical-attributes-synced"),
-        argThat { it -> it.containsValue(PRISONER_NUMBER) },
-        isNull(),
-      )
+        expectDomainEventRaised(PRISONER_NUMBER, PROFILE_DETAILS_PHYSICAL_ATTRIBUTES_SYNCED) {
+          assertThat((it as PrisonPersonUpdatedEvent).fieldHistoryIds).isNotEmpty()
+        }
+      }
     }
 
     @Test
@@ -198,13 +197,11 @@ class ProfileDetailsPhysicalAttributesSyncServiceTest {
             source = NOMIS,
           ),
         )
-      }
 
-      verify(telemetryClient).trackEvent(
-        eq("prison-person-api-profile-details-physical-attributes-synced"),
-        argThat { it -> it.containsValue(PRISONER_NUMBER) },
-        isNull(),
-      )
+        expectDomainEventRaised(PRISONER_NUMBER, PROFILE_DETAILS_PHYSICAL_ATTRIBUTES_SYNCED) {
+          assertThat((it as PrisonPersonUpdatedEvent).fieldHistoryIds).isNotEmpty()
+        }
+      }
     }
 
     @Test
@@ -231,8 +228,9 @@ class ProfileDetailsPhysicalAttributesSyncServiceTest {
       )
         .isInstanceOf(ProfileDetailsPhysicalAttributesSyncResponse::class.java)
 
-      // Profile Details Physical Attributes were not saved - only history fields from old booking
-      assertThat(savedPhysicalAttributes.allValues).isEmpty()
+      // Main physical attributes record remains unchanged:
+      assertThat(savedPhysicalAttributes.firstValue.hair).isEqualTo(PRISONER_HAIR)
+
       expectFieldHistory(
         HAIR,
         savedFieldHistory.allValues,
@@ -246,11 +244,9 @@ class ProfileDetailsPhysicalAttributesSyncServiceTest {
         ),
       )
 
-      verify(telemetryClient).trackEvent(
-        eq("prison-person-api-profile-details-physical-attributes-synced"),
-        argThat { it -> it.containsValue(PRISONER_NUMBER) },
-        isNull(),
-      )
+      savedPhysicalAttributes.firstValue.expectDomainEventRaised(PRISONER_NUMBER, PROFILE_DETAILS_PHYSICAL_ATTRIBUTES_SYNCED_HISTORICAL) {
+        assertThat((it as PrisonPersonUpdatedEvent).fieldHistoryIds).isNotEmpty()
+      }
     }
 
     @Test
@@ -298,13 +294,11 @@ class ProfileDetailsPhysicalAttributesSyncServiceTest {
             source = NOMIS,
           ),
         )
-      }
 
-      verify(telemetryClient).trackEvent(
-        eq("prison-person-api-profile-details-physical-attributes-synced"),
-        argThat { it -> it.containsValue(PRISONER_NUMBER) },
-        isNull(),
-      )
+        expectDomainEventRaised(PRISONER_NUMBER, PROFILE_DETAILS_PHYSICAL_ATTRIBUTES_SYNCED) {
+          assertThat((it as PrisonPersonUpdatedEvent).fieldHistoryIds).isNotEmpty()
+        }
+      }
     }
 
     @Test

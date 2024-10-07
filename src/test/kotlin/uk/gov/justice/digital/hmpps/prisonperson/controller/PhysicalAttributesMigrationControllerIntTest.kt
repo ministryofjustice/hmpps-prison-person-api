@@ -5,6 +5,10 @@ import org.hamcrest.Matchers.not
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.mockito.kotlin.argThat
+import org.mockito.kotlin.eq
+import org.mockito.kotlin.isNull
+import org.mockito.kotlin.verify
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Primary
@@ -453,6 +457,28 @@ class PhysicalAttributesMigrationControllerIntTest : IntegrationTestBase() {
         expectFieldMetadata(
           FieldMetadata(PRISONER_NUMBER, HEIGHT, lastModifiedAt = NOW, lastModifiedBy = USER1),
           FieldMetadata(PRISONER_NUMBER, WEIGHT, lastModifiedAt = NOW, lastModifiedBy = USER1),
+        )
+      }
+
+      @Test
+      @Sql("classpath:jpa/repository/reset.sql")
+      fun `should publish telemetry event`() {
+        webTestClient.put().uri("/migration/prisoners/A1234AA/physical-attributes")
+          .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__PHYSICAL_ATTRIBUTES_MIGRATION__RW")))
+          .header("Content-Type", "application/json")
+          .bodyValue(SINGLE_CURRENT_RECORD_MIGRATION)
+          .exchange()
+          .expectStatus().is2xxSuccessful
+          .expectBody().jsonPath("$.fieldHistoryInserted[*]").value(not(hasItem(-1)))
+
+        verify(telemetryClient).trackEvent(
+          eq("prison-person-api-physical-attributes-migrated"),
+          argThat { it ->
+            it["prisonerNumber"] == PRISONER_NUMBER &&
+              it["source"] == NOMIS.name &&
+              it["fields"] == listOf(HEIGHT.name, WEIGHT.name).toString()
+          },
+          isNull(),
         )
       }
     }

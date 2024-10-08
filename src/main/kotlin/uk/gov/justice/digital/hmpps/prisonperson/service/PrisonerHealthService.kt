@@ -42,44 +42,25 @@ class PrisonerHealthService(
       )
 
       request.foodAllergies.let<List<String>> {
-        if (it == null) {
-          foodAllergies.clear()
-        } else {
-          foodAllergies.clear()
-          it.map { allergyCode ->
-            val allergy = toReferenceDataCode(referenceDataCodeRepository, allergyCode)
-
-            if (allergy != null) {
-              FoodAllergy(
-                prisonerNumber = prisonerNumber,
-                allergy = allergy,
-              )
-            } else {
-              null
-            }
-          }.toList().filterNotNull().forEach { allergy -> this::foodAllergies.get().add(allergy) }
-        }
+        foodAllergies.apply { clear() }.addAll(
+          it!!.map { allergyCode ->
+            FoodAllergy(
+              prisonerNumber = prisonerNumber,
+              allergy = toReferenceDataCode(referenceDataCodeRepository, allergyCode)!!,
+            )
+          },
+        )
       }
 
       request.medicalDietaryRequirements.let<List<String>> {
-        if (it == null) {
-          medicalDietaryRequirements.clear()
-        } else {
-          medicalDietaryRequirements.clear()
-          it.map { dietaryCode ->
-            val dietaryRequirement = toReferenceDataCode(referenceDataCodeRepository, dietaryCode)
-
-            if (dietaryRequirement != null) {
-              MedicalDietaryRequirement(
-                prisonerNumber = prisonerNumber,
-                dietaryRequirement = dietaryRequirement,
-              )
-            } else {
-              null
-            }
-          }.toList().filterNotNull()
-            .forEach { dietaryRequirement -> this::medicalDietaryRequirements.get().add(dietaryRequirement) }
-        }
+        medicalDietaryRequirements.apply { clear() }.addAll(
+          it!!.map { dietaryCode ->
+            MedicalDietaryRequirement(
+              prisonerNumber = prisonerNumber,
+              dietaryRequirement = toReferenceDataCode(referenceDataCodeRepository, dietaryCode)!!,
+            )
+          },
+        )
       }
     }.also { it.updateFieldHistory(now, authenticationFacade.getUserOrSystemInContext()) }
 

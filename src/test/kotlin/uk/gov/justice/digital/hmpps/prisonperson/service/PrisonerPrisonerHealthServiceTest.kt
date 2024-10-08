@@ -272,7 +272,7 @@ class PrisonerPrisonerHealthServiceTest {
 
     val attributes_undefined = mutableMapOf<String, Any?>(
       Pair("smokerOrVaper", null),
-      Pair("foodAllergies", null),
+      Pair("foodAllergies", emptyList<String>()),
     )
     val HEALTH_UPDATE_REQUEST_WITH_NULL = PrisonerHealthUpdateRequest(attributes_undefined)
   }

@@ -45,6 +45,11 @@ class PrisonPersonControllerIntTest : IntegrationTestBase() {
       "classpath:controller/physicalattributes/physical_attributes.sql",
       "classpath:controller/physicalattributes/field_history.sql",
       "classpath:controller/physicalattributes/field_metadata.sql",
+      "classpath:controller/prisoner_health/health.sql",
+      "classpath:controller/prisoner_health/food_allergies.sql",
+      "classpath:controller/prisoner_health/medical_dietary_requirements.sql",
+      "classpath:controller/prisoner_health/field_history.sql",
+      "classpath:controller/prisoner_health/field_metadata.sql",
     )
     inner class HappyPath {
 
@@ -79,9 +84,9 @@ class PrisonPersonControllerIntTest : IntegrationTestBase() {
                   "shoeSize": null
                 },
                 "health": {
-                  "smokerOrVaper": null,
-                  "foodAllergies": [],
-                  "medicalDietaryRequirements": []
+                  "smokerOrVaper": {"value":{"id":"SMOKE_SMOKER","description":"Yes, they smoke","listSequence":0,"isActive":true},"lastModifiedAt":"2024-01-02T09:10:11+0000","lastModifiedBy":"USER1"},
+                  "foodAllergies": [{"id":"FOOD_ALLERGY_EGG","description":"Egg","listSequence":0,"isActive":true}],
+                  "medicalDietaryRequirements":[{"id":"MEDICAL_DIET_LOW_FAT","description":"Low fat","listSequence":0,"isActive":true}]
                 }
               }
             """.trimIndent(),

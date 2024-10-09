@@ -90,7 +90,7 @@ class ProfileDetailsPhysicalAttributesSyncService(
           request.rightEyeColour to RIGHT_EYE_COLOUR,
           request.shoeSize to SHOE_SIZE,
         ).forEach { (attr, field) ->
-          changedFields += updateFieldHistory(attr, request, field, attributes)
+          changedFields += updateFieldHistory(attr, field, attributes)
         }
         attributes.publishUpdateEvent(NOMIS, now, changedFields)
       }
@@ -108,30 +108,30 @@ class ProfileDetailsPhysicalAttributesSyncService(
 
     val updatedFields = mutableSetOf<PrisonPersonField>()
 
-    val physicalAttributes = physicalAttributesRepository.findByIdForUpdate(prisonerNumber)
+    physicalAttributesRepository.findByIdForUpdate(prisonerNumber)
       .orElseGet {
         physicalAttributesService.ensurePhysicalAttributesPersistedFor(prisonerNumber)
-        physicalAttributesRepository.findByIdForUpdate(prisonerNumber).orElseThrow()
+        val physicalAttributes = physicalAttributesRepository.findByIdForUpdate(prisonerNumber).orElseThrow()
+          .apply {
+            request.hair?.let { hair = updateField(it, referenceDataCodeRepository, HAIR, updatedFields) }
+            request.facialHair?.let {
+              facialHair = updateField(it, referenceDataCodeRepository, FACIAL_HAIR, updatedFields)
+            }
+            request.face?.let { face = updateField(it, referenceDataCodeRepository, FACE, updatedFields) }
+            request.build?.let { build = updateField(it, referenceDataCodeRepository, BUILD, updatedFields) }
+            request.leftEyeColour?.let {
+              leftEyeColour = updateField(it, referenceDataCodeRepository, LEFT_EYE_COLOUR, updatedFields)
+            }
+            request.rightEyeColour?.let {
+              rightEyeColour = updateField(it, referenceDataCodeRepository, RIGHT_EYE_COLOUR, updatedFields)
+            }
+            request.shoeSize?.let {
+              updatedFields.add(SHOE_SIZE)
+              shoeSize = it.value
+            }
+          }
+        physicalAttributesRepository.save(physicalAttributes)
       }
-      .apply {
-        request.hair?.let { hair = updateField(it, referenceDataCodeRepository, HAIR, updatedFields) }
-        request.facialHair?.let {
-          facialHair = updateField(it, referenceDataCodeRepository, FACIAL_HAIR, updatedFields)
-        }
-        request.face?.let { face = updateField(it, referenceDataCodeRepository, FACE, updatedFields) }
-        request.build?.let { build = updateField(it, referenceDataCodeRepository, BUILD, updatedFields) }
-        request.leftEyeColour?.let {
-          leftEyeColour = updateField(it, referenceDataCodeRepository, LEFT_EYE_COLOUR, updatedFields)
-        }
-        request.rightEyeColour?.let {
-          rightEyeColour = updateField(it, referenceDataCodeRepository, RIGHT_EYE_COLOUR, updatedFields)
-        }
-        request.shoeSize?.let {
-          updatedFields.add(SHOE_SIZE)
-          shoeSize = it.value
-        }
-      }
-    physicalAttributesRepository.save(physicalAttributes)
 
     return request.addToHistory(prisonerNumber)
       .map { it.fieldHistoryId }
@@ -141,13 +141,12 @@ class ProfileDetailsPhysicalAttributesSyncService(
 
   private fun updateFieldHistory(
     attribute: SyncValueWithMetadata<String>?,
-    record: ProfileDetailsPhysicalAttributesSyncRequest,
     field: PrisonPersonField,
     physicalAttributes: PhysicalAttributes,
   ): Collection<PrisonPersonField> = attribute?.also {
     physicalAttributes.updateFieldHistory(
-      appliesFrom = record.appliesFrom,
-      appliesTo = record.appliesTo,
+      appliesFrom = it.lastModifiedAt,
+      appliesTo = null,
       lastModifiedAt = it.lastModifiedAt,
       lastModifiedBy = it.lastModifiedBy,
       source = NOMIS,
@@ -177,7 +176,6 @@ class ProfileDetailsPhysicalAttributesSyncService(
       RIGHT_EYE_COLOUR to ::rightEyeColour,
       SHOE_SIZE to ::shoeSize,
     )
-
     return fieldsToSync
       .filter { (_, getter) -> getter() != null }
       .map { (field, getter) ->

@@ -45,7 +45,6 @@ abstract class WithFieldHistory<T : AbstractAggregateRoot<T>?> : AbstractAggrega
       .filter { fields.contains(it.key) }
       .forEach { (field, currentValue) ->
         val previousVersion = fieldHistory.lastOrNull { it.field == field }
-
         if (previousVersion == null || field.hasChangedFrom(previousVersion, currentValue())) {
           fieldMetadata[field] = FieldMetadata(
             field = field,
@@ -59,7 +58,6 @@ abstract class WithFieldHistory<T : AbstractAggregateRoot<T>?> : AbstractAggrega
             ?.takeIf { it.appliesTo == null }
             ?.let {
               it.appliesTo = if (appliesFrom > it.appliesFrom) appliesFrom else lastModifiedAt
-
               // If the resulting update to appliesTo causes it to be less than appliesFrom, throw exception:
               if (it.appliesFrom > it.appliesTo) throw IllegalFieldHistoryException(prisonerNumber)
             }

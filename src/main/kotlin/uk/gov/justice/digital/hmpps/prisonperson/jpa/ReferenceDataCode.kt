@@ -55,4 +55,7 @@ class ReferenceDataCode(
     result = 31 * result + (listSequence)
     return result
   }
+
+  override fun toString(): String =
+    "ReferenceDataCode(id=$id, code=$code, domain=$domain, description='$description', listSequence=$listSequence)"
 }

@@ -23,10 +23,13 @@ fun expectNoFieldHistoryFor(field: PrisonPersonField, history: Collection<FieldH
   assertThat(fieldHistory).isEmpty()
 }
 
-fun <T> expectFieldHistory(field: PrisonPersonField, history: Collection<FieldHistory>, vararg comparison: HistoryComparison<T>) {
+fun <T> expectFieldHistory(
+  field: PrisonPersonField,
+  history: Collection<FieldHistory>,
+  vararg comparison: HistoryComparison<T>,
+) {
   val fieldHistory = history.filter { it.field == field }.toList()
   assertThat(fieldHistory).hasSize(comparison.size)
-
   fieldHistory.forEachIndexed { index, actual ->
     val expected = comparison[index]
     assertThat(actual.field).isEqualTo(field)
@@ -39,4 +42,5 @@ fun <T> expectFieldHistory(field: PrisonPersonField, history: Collection<FieldHi
   }
 }
 
-fun <T> PhysicalAttributes.expectFieldHistory(field: PrisonPersonField, vararg comparison: HistoryComparison<T>) = expectFieldHistory(field, fieldHistory, *comparison)
+fun <T> PhysicalAttributes.expectFieldHistory(field: PrisonPersonField, vararg comparison: HistoryComparison<T>) =
+  expectFieldHistory(field, fieldHistory, *comparison)

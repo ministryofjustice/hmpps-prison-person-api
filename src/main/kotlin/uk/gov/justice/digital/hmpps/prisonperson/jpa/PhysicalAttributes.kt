@@ -137,7 +137,8 @@ class PhysicalAttributes(
   override fun updateFieldHistory(
     lastModifiedAt: ZonedDateTime,
     lastModifiedBy: String,
-  ): Collection<PrisonPersonField> = updateFieldHistory(lastModifiedAt, null, lastModifiedAt, lastModifiedBy, DPS, allFields)
+  ): Collection<PrisonPersonField> =
+    updateFieldHistory(lastModifiedAt, null, lastModifiedAt, lastModifiedBy, DPS, allFields)
 
   override fun publishUpdateEvent(source: Source, now: ZonedDateTime, fields: Collection<PrisonPersonField>) {
     registerEvent(
@@ -183,6 +184,8 @@ class PhysicalAttributes(
     result = 31 * result + (shoeSize.hashCode())
     return result
   }
+
+  override fun toString(): String = "PhysicalAttributes(prisonerNumber=$prisonerNumber, height=$height, weight=$weight, hair=$hair, facialHair=$facialHair, face=$face, build=$build, leftEyeColour=$leftEyeColour, rightEyeColour=$rightEyeColour, shoeSize=$shoeSize)"
 
   companion object {
     val allFields = listOf(

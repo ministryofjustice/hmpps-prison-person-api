@@ -378,8 +378,6 @@ class PhysicalAttributesSyncControllerIntTest : IntegrationTestBase() {
           description = PHYSICAL_ATTRIBUTES_UPDATED.description,
           occurredAt = NOW,
         )
-        println(event.additionalInformation?.javaClass)
-        println(expected.additionalInformation?.javaClass)
 
         assertThat(event).isEqualTo(expected)
       }

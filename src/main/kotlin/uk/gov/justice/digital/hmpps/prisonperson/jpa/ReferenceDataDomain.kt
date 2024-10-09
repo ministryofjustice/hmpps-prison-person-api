@@ -50,4 +50,7 @@ class ReferenceDataDomain(
     result = 31 * result + (listSequence)
     return result
   }
+
+  override fun toString(): String =
+    "ReferenceDataDomain(code=$code, description='$description', listSequence=$listSequence)"
 }

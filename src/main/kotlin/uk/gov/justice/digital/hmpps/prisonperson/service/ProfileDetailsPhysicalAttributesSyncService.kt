@@ -145,8 +145,6 @@ class ProfileDetailsPhysicalAttributesSyncService(
     physicalAttributes: PhysicalAttributes,
   ): Collection<PrisonPersonField> = attribute?.also {
     physicalAttributes.updateFieldHistory(
-      appliesFrom = it.lastModifiedAt,
-      appliesTo = null,
       lastModifiedAt = it.lastModifiedAt,
       lastModifiedBy = it.lastModifiedBy,
       source = NOMIS,

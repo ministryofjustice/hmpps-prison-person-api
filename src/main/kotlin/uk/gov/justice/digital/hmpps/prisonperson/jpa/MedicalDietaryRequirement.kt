@@ -11,7 +11,7 @@ import jakarta.persistence.Table
 import org.hibernate.Hibernate
 
 @Entity
-@Table(name = "medical_dietary_requirements")
+@Table(name = "medical_dietary_requirement")
 class MedicalDietaryRequirement(
   @Column(name = "prisoner_number", updatable = false, nullable = false)
   val prisonerNumber: String,

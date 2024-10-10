@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.transaction.TestTransaction
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.FoodAllergy
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.MedicalDietaryRequirement
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.PrisonerHealth
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.ReferenceDataCode
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.ReferenceDataDomain
@@ -28,6 +29,7 @@ class PrisonerPrisonerHealthRepositoryTest : RepositoryTest() {
       PRISONER_NUMBER,
       SMOKER_OR_VAPER,
       mutableSetOf(EGG_ALLERGY, MILK_ALLERGY),
+      mutableSetOf(MEDICAL_DIET_LOW_SALT, MEDICAL_DIET_LOW_FAT),
     )
     save(prisonerHealth)
 
@@ -37,6 +39,9 @@ class PrisonerPrisonerHealthRepositoryTest : RepositoryTest() {
       assertThat(foodAllergies).hasSize(2)
       assertThat(foodAllergies).contains(EGG_ALLERGY)
       assertThat(foodAllergies).contains(MILK_ALLERGY)
+      assertThat(medicalDietaryRequirements).hasSize(2)
+      assertThat(medicalDietaryRequirements).contains(MEDICAL_DIET_LOW_SALT)
+      assertThat(medicalDietaryRequirements).contains(MEDICAL_DIET_LOW_FAT)
     }
   }
 
@@ -49,6 +54,7 @@ class PrisonerPrisonerHealthRepositoryTest : RepositoryTest() {
       assertThat(prisonerNumber).isEqualTo(PRISONER_NUMBER)
       assertThat(smokerOrVaper).isNull()
       assertThat(foodAllergies).isEmpty()
+      assertThat(medicalDietaryRequirements).isEmpty()
     }
   }
 
@@ -61,7 +67,8 @@ class PrisonerPrisonerHealthRepositoryTest : RepositoryTest() {
 
     val health = repository.getReferenceById(PRISONER_NUMBER)
     health.smokerOrVaper = SMOKER_OR_VAPER
-    health.foodAllergies?.add(EGG_ALLERGY)
+    health.foodAllergies.add(EGG_ALLERGY)
+    health.medicalDietaryRequirements.add(MEDICAL_DIET_LOW_SALT)
 
     repository.save(health)
     TestTransaction.flagForCommit()
@@ -72,17 +79,29 @@ class PrisonerPrisonerHealthRepositoryTest : RepositoryTest() {
       assertThat(prisonerNumber).isEqualTo(PRISONER_NUMBER)
       assertThat(smokerOrVaper).isEqualTo(SMOKER_OR_VAPER)
       assertThat(foodAllergies).hasSize(1)
-      assertThat(foodAllergies?.first()).isEqualTo(EGG_ALLERGY)
+      assertThat(foodAllergies.first()).isEqualTo(EGG_ALLERGY)
+      assertThat(medicalDietaryRequirements).hasSize(1)
+      assertThat(medicalDietaryRequirements.first()).isEqualTo(MEDICAL_DIET_LOW_SALT)
     }
   }
 
   @Test
   fun `can test for equality`() {
-    assertThat(PrisonerHealth(PRISONER_NUMBER, SMOKER_OR_VAPER, mutableSetOf(EGG_ALLERGY))).isEqualTo(
+    assertThat(
       PrisonerHealth(
         PRISONER_NUMBER,
         SMOKER_OR_VAPER,
         mutableSetOf(EGG_ALLERGY),
+        mutableSetOf(
+          MEDICAL_DIET_LOW_FAT,
+        ),
+      ),
+    ).isEqualTo(
+      PrisonerHealth(
+        PRISONER_NUMBER,
+        SMOKER_OR_VAPER,
+        mutableSetOf(EGG_ALLERGY),
+        mutableSetOf(MEDICAL_DIET_LOW_FAT),
       ),
     )
 
@@ -103,6 +122,25 @@ class PrisonerPrisonerHealthRepositoryTest : RepositoryTest() {
         PRISONER_NUMBER,
         SMOKER_NO,
         mutableSetOf(MILK_ALLERGY),
+      ),
+    )
+
+    // Medical diet
+    assertThat(
+      PrisonerHealth(
+        PRISONER_NUMBER,
+        SMOKER_OR_VAPER,
+        mutableSetOf(EGG_ALLERGY),
+        mutableSetOf(
+          MEDICAL_DIET_LOW_SALT,
+        ),
+      ),
+    ).isNotEqualTo(
+      PrisonerHealth(
+        PRISONER_NUMBER,
+        SMOKER_NO,
+        mutableSetOf(EGG_ALLERGY),
+        mutableSetOf(MEDICAL_DIET_LOW_FAT),
       ),
     )
   }
@@ -151,6 +189,42 @@ class PrisonerPrisonerHealthRepositoryTest : RepositoryTest() {
           listSequence = 0,
           createdAt = ZonedDateTime.now(),
           createdBy = "OMS_OWNER",
+        ),
+      )
+
+    val MEDICAL_DIET_DOMAIN = ReferenceDataDomain(
+      "MEDICAL_DIET",
+      "Medical dietary requirements",
+      0,
+      ZonedDateTime.now(),
+      "CONNECT_DPS",
+    )
+
+    val MEDICAL_DIET_LOW_FAT =
+      MedicalDietaryRequirement(
+        prisonerNumber = PRISONER_NUMBER,
+        dietaryRequirement = ReferenceDataCode(
+          id = "MEDICAL_DIET_LOW_FAT",
+          domain = MEDICAL_DIET_DOMAIN,
+          code = "LOW_FAT",
+          description = "Low fat",
+          listSequence = 0,
+          createdAt = ZonedDateTime.now(),
+          createdBy = "CONNECT_DPS",
+        ),
+      )
+
+    val MEDICAL_DIET_LOW_SALT =
+      MedicalDietaryRequirement(
+        prisonerNumber = PRISONER_NUMBER,
+        dietaryRequirement = ReferenceDataCode(
+          id = "MEDICAL_DIET_LOW_SALT",
+          domain = MEDICAL_DIET_DOMAIN,
+          code = "LOW_SALT",
+          description = "Low salt",
+          listSequence = 0,
+          createdAt = ZonedDateTime.now(),
+          createdBy = "CONNECT_DPS",
         ),
       )
 

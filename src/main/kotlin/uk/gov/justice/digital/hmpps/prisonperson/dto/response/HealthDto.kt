@@ -10,4 +10,7 @@ data class HealthDto(
 
   @Schema(description = "Food allergies")
   val foodAllergies: List<ReferenceDataSimpleDto?> = emptyList(),
+
+  @Schema(description = "Medical dietary requirements")
+  val medicalDietaryRequirements: List<ReferenceDataSimpleDto?> = emptyList(),
 )

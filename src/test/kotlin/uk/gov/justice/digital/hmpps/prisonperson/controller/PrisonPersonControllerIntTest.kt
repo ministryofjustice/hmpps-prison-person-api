@@ -45,6 +45,11 @@ class PrisonPersonControllerIntTest : IntegrationTestBase() {
       "classpath:controller/physicalattributes/physical_attributes.sql",
       "classpath:controller/physicalattributes/field_history.sql",
       "classpath:controller/physicalattributes/field_metadata.sql",
+      "classpath:controller/prisoner_health/health.sql",
+      "classpath:controller/prisoner_health/food_allergies.sql",
+      "classpath:controller/prisoner_health/medical_dietary_requirements.sql",
+      "classpath:controller/prisoner_health/field_history.sql",
+      "classpath:controller/prisoner_health/field_metadata.sql",
     )
     inner class HappyPath {
 
@@ -61,26 +66,99 @@ class PrisonPersonControllerIntTest : IntegrationTestBase() {
                 "prisonerNumber": "A1234AA",
                 "physicalAttributes": {
                   "height": {
-                    "value":180,
-                    "lastModifiedAt":"2024-01-02T09:10:11+0000",
-                    "lastModifiedBy":"USER1"
+                    "value": 180,
+                    "lastModifiedAt": "2024-01-02T09:10:11+0000",
+                    "lastModifiedBy": "USER1"
                   },
                   "weight": {
-                    "value":70,
-                    "lastModifiedAt":"2024-01-02T09:10:11+0000",
-                    "lastModifiedBy":"USER1"
+                    "value": 70,
+                    "lastModifiedAt": "2024-01-02T09:10:11+0000",
+                    "lastModifiedBy": "USER1"
                   },
                   "hair": null,
-                  "facialHair": null,
-                  "face": null,
-                  "build": null,
-                  "leftEyeColour": null,
-                  "rightEyeColour": null,
-                  "shoeSize": null
+                  "facialHair": {
+                    "value": {
+                      "id": "FACIAL_HAIR_SIDEBURNS",
+                      "description": "Sideburns",
+                      "listSequence": 0,
+                      "isActive": true
+                    },
+                    "lastModifiedAt": "2024-01-02T09:10:11+0000",
+                    "lastModifiedBy": "USER1"
+                  },
+                  "face": {
+                    "value": {
+                      "id": "FACE_ROUND",
+                      "description": "Round",
+                      "listSequence": 0,
+                      "isActive": true
+                    },
+                    "lastModifiedAt": "2024-01-02T09:10:11+0000",
+                    "lastModifiedBy": "USER1"
+                  },
+                  "build": {
+                    "value": {
+                      "id": "BUILD_FRAIL",
+                      "description": "Frail",
+                      "listSequence": 0,
+                      "isActive": true
+                    },
+                    "lastModifiedAt": "2024-01-02T09:10:11+0000",
+                    "lastModifiedBy": "USER1"
+                  },
+                  "leftEyeColour": {
+                    "value": {
+                      "id": "EYE_BLUE",
+                      "description": "Blue",
+                      "listSequence": 1,
+                      "isActive": true
+                    },
+                    "lastModifiedAt": "2024-01-02T09:10:11+0000",
+                    "lastModifiedBy": "USER1"
+                  },
+                  "rightEyeColour": {
+                    "value": {
+                      "id": "EYE_BLUE",
+                      "description": "Blue",
+                      "listSequence": 1,
+                      "isActive": true
+                    },
+                    "lastModifiedAt": "2024-01-02T09:10:11+0000",
+                    "lastModifiedBy": "USER1"
+                  },
+                  "shoeSize": {
+                    "value": "10",
+                    "lastModifiedAt": "2024-01-02T09:10:11+0000",
+                    "lastModifiedBy": "USER1"
+                  }
                 },
                 "health": {
-                  "smokerOrVaper": null,
-                  "foodAllergies": []
+                  "smokerOrVaper": {
+                    "value": {
+                      "id": "SMOKE_SMOKER",
+                      "description": "Yes, they smoke",
+                      "listSequence": 0,
+                      "isActive": true
+                    },
+                    "lastModifiedAt": "2024-01-02T09:10:11+0000",
+                    "lastModifiedBy": "USER1"
+                  },
+                  "foodAllergies": [
+                    {
+                      "id": "FOOD_ALLERGY_EGG",
+                      "description": "Egg",
+                      "listSequence": 0,
+                      "isActive": true
+                    }
+                  ],
+                  "medicalDietaryRequirements": [
+                    {
+                      "id": "MEDICAL_DIET_LOW_FAT",
+                      "description": "Low fat",
+                      "listSequence": 0,
+                      "isActive": true
+                    }
+                  ]
                 }
               }
             """.trimIndent(),

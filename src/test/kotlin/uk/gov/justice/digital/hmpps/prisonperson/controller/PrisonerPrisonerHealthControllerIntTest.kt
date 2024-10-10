@@ -76,6 +76,48 @@ class PrisonerPrisonerHealthControllerIntTest : IntegrationTestBase() {
         )
       }
 
+      @Nested
+      inner class MedicalDietaryRequirements {
+        @Test
+        fun `bad request when null for medical dietary requirements`() {
+          expectBadRequestFrom(
+            PRISONER_NUMBER,
+            requestBody = """{ "medicalDietaryRequirements": null }""",
+            message = "Validation failure(s): The value must be a a list of domain codes of the correct domain, an empty list, or Undefined.",
+          )
+        }
+
+        @Test
+        fun `bad request when incorrect domain for medical dietary requirements`() {
+          expectBadRequestFrom(
+            PRISONER_NUMBER,
+            requestBody = """{ "medicalDietaryRequirements": ["MEDICAL_DIET_FREE_FROM","FOOD_ALLERGY_EGG"] }""".trimMargin(),
+            message = "Validation failure(s): The value must be a a list of domain codes of the correct domain, an empty list, or Undefined.",
+          )
+        }
+      }
+
+      @Nested
+      inner class FoodAllergies {
+        @Test
+        fun `bad request when null for medical dietary requirements`() {
+          expectBadRequestFrom(
+            PRISONER_NUMBER,
+            requestBody = """{ "foodAllergies": null }""",
+            message = "Validation failure(s): The value must be a a list of domain codes of the correct domain, an empty list, or Undefined.",
+          )
+        }
+
+        @Test
+        fun `bad request when incorrect domain for medical dietary requirements`() {
+          expectBadRequestFrom(
+            PRISONER_NUMBER,
+            requestBody = """{ "foodAllergies": ["MEDICAL_DIET_FREE_FROM","FOOD_ALLERGY_EGG"] }""".trimMargin(),
+            message = "Validation failure(s): The value must be a a list of domain codes of the correct domain, an empty list, or Undefined.",
+          )
+        }
+      }
+
       private fun expectBadRequestFrom(prisonerNumber: String, requestBody: String, message: String) {
         webTestClient.patch().uri("/prisoners/$prisonerNumber/health")
           .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__HEALTH__RW")))
@@ -178,7 +220,8 @@ class PrisonerPrisonerHealthControllerIntTest : IntegrationTestBase() {
                 "lastModifiedAt":"2024-06-14T09:10:11+0100",
                 "lastModifiedBy":"USER1"
               },
-              "foodAllergies": []
+              "foodAllergies": [],
+              "medicalDietaryRequirements": []
             }
           """.trimIndent(),
           true,
@@ -318,7 +361,8 @@ class PrisonerPrisonerHealthControllerIntTest : IntegrationTestBase() {
             "listSequence": 0,
             "isActive": true
           }
-        ]
+        ],
+        "medicalDietaryRequirements": []
       }
       """.trimIndent()
 
@@ -343,7 +387,8 @@ class PrisonerPrisonerHealthControllerIntTest : IntegrationTestBase() {
             "listSequence": 0,
             "isActive": true
           }
-        ]
+        ],
+        "medicalDietaryRequirements": []
       }
       """.trimIndent()
   }

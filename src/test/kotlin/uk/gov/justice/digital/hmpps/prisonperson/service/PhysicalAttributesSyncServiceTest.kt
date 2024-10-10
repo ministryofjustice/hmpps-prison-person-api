@@ -13,9 +13,7 @@ import org.mockito.Spy
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.junit.jupiter.MockitoSettings
 import org.mockito.kotlin.any
-import org.mockito.kotlin.argThat
 import org.mockito.kotlin.argumentCaptor
-import org.mockito.kotlin.eq
 import org.mockito.kotlin.isNull
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -26,6 +24,8 @@ import uk.gov.justice.digital.hmpps.prisonperson.config.IllegalFieldHistoryExcep
 import uk.gov.justice.digital.hmpps.prisonperson.dto.request.PhysicalAttributesSyncRequest
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.PhysicalAttributesSyncDto
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.PhysicalAttributesSyncResponse
+import uk.gov.justice.digital.hmpps.prisonperson.enums.EventType.PHYSICAL_ATTRIBUTES_SYNCED
+import uk.gov.justice.digital.hmpps.prisonperson.enums.EventType.PHYSICAL_ATTRIBUTES_SYNCED_HISTORICAL
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.HEIGHT
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.WEIGHT
 import uk.gov.justice.digital.hmpps.prisonperson.enums.Source.NOMIS
@@ -36,7 +36,9 @@ import uk.gov.justice.digital.hmpps.prisonperson.jpa.ReferenceDataDomain
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.FieldHistoryRepository
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.PhysicalAttributesRepository
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.utils.HistoryComparison
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.utils.expectDomainEventRaised
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.utils.expectFieldHistory
+import uk.gov.justice.digital.hmpps.prisonperson.service.event.publish.PrisonPersonUpdatedEvent
 import java.time.Clock
 import java.time.ZonedDateTime
 import java.util.Optional
@@ -121,13 +123,11 @@ class PhysicalAttributesSyncServiceTest {
             source = NOMIS,
           ),
         )
-      }
 
-      verify(telemetryClient).trackEvent(
-        eq("prison-person-api-physical-attributes-synced"),
-        argThat { it -> it.containsValue(PRISONER_NUMBER) },
-        isNull(),
-      )
+        expectDomainEventRaised(PRISONER_NUMBER, PHYSICAL_ATTRIBUTES_SYNCED) {
+          assertThat((it as PrisonPersonUpdatedEvent).fieldHistoryIds).isNotEmpty()
+        }
+      }
     }
 
     @Test
@@ -206,13 +206,11 @@ class PhysicalAttributesSyncServiceTest {
             source = NOMIS,
           ),
         )
-      }
 
-      verify(telemetryClient).trackEvent(
-        eq("prison-person-api-physical-attributes-synced"),
-        argThat { it -> it.containsValue(PRISONER_NUMBER) },
-        isNull(),
-      )
+        expectDomainEventRaised(PRISONER_NUMBER, PHYSICAL_ATTRIBUTES_SYNCED) {
+          assertThat((it as PrisonPersonUpdatedEvent).fieldHistoryIds).isNotEmpty()
+        }
+      }
     }
 
     @Test
@@ -243,6 +241,10 @@ class PhysicalAttributesSyncServiceTest {
       )
         .isInstanceOf(PhysicalAttributesSyncResponse::class.java)
 
+      // Main physical attributes record remains unchanged:
+      assertThat(savedPhysicalAttributes.firstValue.height).isEqualTo(PRISONER_HEIGHT)
+      assertThat(savedPhysicalAttributes.firstValue.weight).isEqualTo(PRISONER_WEIGHT)
+
       expectFieldHistory(
         HEIGHT,
         savedFieldHistory.allValues,
@@ -269,11 +271,9 @@ class PhysicalAttributesSyncServiceTest {
         ),
       )
 
-      verify(telemetryClient).trackEvent(
-        eq("prison-person-api-physical-attributes-synced"),
-        argThat { it -> it.containsValue(PRISONER_NUMBER) },
-        isNull(),
-      )
+      savedPhysicalAttributes.firstValue.expectDomainEventRaised(PRISONER_NUMBER, PHYSICAL_ATTRIBUTES_SYNCED_HISTORICAL) {
+        assertThat((it as PrisonPersonUpdatedEvent).fieldHistoryIds).isNotEmpty()
+      }
     }
 
     @Test
@@ -323,13 +323,11 @@ class PhysicalAttributesSyncServiceTest {
             source = NOMIS,
           ),
         )
-      }
 
-      verify(telemetryClient).trackEvent(
-        eq("prison-person-api-physical-attributes-synced"),
-        argThat { it -> it.containsValue(PRISONER_NUMBER) },
-        isNull(),
-      )
+        expectDomainEventRaised(PRISONER_NUMBER, PHYSICAL_ATTRIBUTES_SYNCED) {
+          assertThat((it as PrisonPersonUpdatedEvent).fieldHistoryIds).isNotEmpty()
+        }
+      }
     }
 
     @Test

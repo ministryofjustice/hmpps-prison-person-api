@@ -9,6 +9,10 @@ import org.hamcrest.Matchers.not
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.mockito.kotlin.argThat
+import org.mockito.kotlin.eq
+import org.mockito.kotlin.isNull
+import org.mockito.kotlin.verify
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Primary
@@ -31,7 +35,7 @@ import uk.gov.justice.digital.hmpps.prisonperson.jpa.ReferenceDataCode
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.ReferenceDataDomain
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.utils.HistoryComparison
 import uk.gov.justice.digital.hmpps.prisonperson.service.event.DomainEvent
-import uk.gov.justice.digital.hmpps.prisonperson.service.event.PrisonPersonAdditionalInformation
+import uk.gov.justice.digital.hmpps.prisonperson.service.event.PrisonPersonFieldInformation
 import java.time.Clock
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -336,21 +340,37 @@ class ProfileDetailsPhysicalAttributesSyncControllerIntTest : IntegrationTestBas
         expectSuccessfulSyncFrom(REQUEST_TO_SYNC_LATEST_PROFILE_DETAILS_PHYSICAL_ATTRIBUTES)
 
         await untilCallTo { publishTestQueue.countAllMessagesOnQueue() } matches { it == 1 }
-        val event = publishTestQueue.receiveDomainEventOnQueue<PrisonPersonAdditionalInformation>()
+        val event = publishTestQueue.receiveDomainEventOnQueue<PrisonPersonFieldInformation>()
 
         val expected = DomainEvent(
-          eventType = PHYSICAL_ATTRIBUTES_UPDATED.domainEventType,
-          additionalInformation = PrisonPersonAdditionalInformation(
+          eventType = PHYSICAL_ATTRIBUTES_UPDATED.domainEventDetails!!.type,
+          additionalInformation = PrisonPersonFieldInformation(
             url = "http://localhost:8080/prisoners/${PRISONER_NUMBER}",
             prisonerNumber = PRISONER_NUMBER,
             source = NOMIS,
             fields = listOf(HAIR),
           ),
-          description = PHYSICAL_ATTRIBUTES_UPDATED.description,
+          description = PHYSICAL_ATTRIBUTES_UPDATED.domainEventDetails!!.description,
           occurredAt = NOW,
         )
 
         assertThat(event).isEqualTo(expected)
+      }
+
+      @Test
+      @Sql("classpath:jpa/repository/reset.sql")
+      fun `should publish telemetry event`() {
+        expectSuccessfulSyncFrom(REQUEST_TO_SYNC_LATEST_PROFILE_DETAILS_PHYSICAL_ATTRIBUTES)
+
+        verify(telemetryClient).trackEvent(
+          eq("prison-person-api-profile-details-physical-attributes-synced"),
+          argThat { it ->
+            it["prisonerNumber"] == PRISONER_NUMBER &&
+              it["source"] == NOMIS.name &&
+              it["fields"] == listOf(HAIR.name).toString()
+          },
+          isNull(),
+        )
       }
 
       private fun expectSuccessfulSyncFrom(requestBody: String) =

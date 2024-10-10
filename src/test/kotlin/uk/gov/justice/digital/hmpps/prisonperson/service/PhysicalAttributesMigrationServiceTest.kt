@@ -10,22 +10,21 @@ import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.Spy
 import org.mockito.junit.jupiter.MockitoExtension
-import org.mockito.kotlin.argThat
 import org.mockito.kotlin.argumentCaptor
-import org.mockito.kotlin.eq
-import org.mockito.kotlin.isNull
-import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import uk.gov.justice.digital.hmpps.prisonperson.dto.request.PhysicalAttributesMigrationRequest
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.PhysicalAttributesMigrationResponse
+import uk.gov.justice.digital.hmpps.prisonperson.enums.EventType.PHYSICAL_ATTRIBUTES_MIGRATED
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.HEIGHT
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.WEIGHT
 import uk.gov.justice.digital.hmpps.prisonperson.enums.Source.NOMIS
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.PhysicalAttributes
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.PhysicalAttributesRepository
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.utils.HistoryComparison
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.utils.expectDomainEventRaised
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.utils.expectFieldHistory
+import uk.gov.justice.digital.hmpps.prisonperson.service.event.publish.PrisonPersonUpdatedEvent
 import java.time.Clock
 import java.time.Instant
 import java.time.ZoneId
@@ -98,13 +97,14 @@ class PhysicalAttributesMigrationServiceTest {
             source = NOMIS,
           ),
         )
-      }
 
-      verify(telemetryClient).trackEvent(
-        eq("prison-person-api-physical-attributes-migrated"),
-        argThat { it -> it.containsValue(PRISONER_NUMBER) },
-        isNull(),
-      )
+        assertThat(domainEvents()).hasSize(1)
+        with(domainEvents().first() as PrisonPersonUpdatedEvent) {
+          assertThat(prisonerNumber).isEqualTo(PRISONER_NUMBER)
+          assertThat(eventType).isEqualTo(PHYSICAL_ATTRIBUTES_MIGRATED)
+          assertThat(fieldHistoryIds).isNotEmpty()
+        }
+      }
     }
 
     @Test
@@ -182,13 +182,14 @@ class PhysicalAttributesMigrationServiceTest {
             source = NOMIS,
           ),
         )
-      }
 
-      verify(telemetryClient).trackEvent(
-        eq("prison-person-api-physical-attributes-migrated"),
-        argThat { it -> it.containsValue(PRISONER_NUMBER) },
-        isNull(),
-      )
+        assertThat(domainEvents()).hasSize(1)
+        with(domainEvents().first() as PrisonPersonUpdatedEvent) {
+          assertThat(prisonerNumber).isEqualTo(PRISONER_NUMBER)
+          assertThat(eventType).isEqualTo(PHYSICAL_ATTRIBUTES_MIGRATED)
+          assertThat(fieldHistoryIds).isNotEmpty()
+        }
+      }
     }
 
     @Test
@@ -229,13 +230,11 @@ class PhysicalAttributesMigrationServiceTest {
             source = NOMIS,
           ),
         )
-      }
 
-      verify(telemetryClient).trackEvent(
-        eq("prison-person-api-physical-attributes-migrated"),
-        argThat { it -> it.containsValue(PRISONER_NUMBER) },
-        isNull(),
-      )
+        expectDomainEventRaised(PRISONER_NUMBER, PHYSICAL_ATTRIBUTES_MIGRATED) {
+          assertThat((it as PrisonPersonUpdatedEvent).fieldHistoryIds).isNotEmpty()
+        }
+      }
     }
 
     @Test
@@ -278,13 +277,14 @@ class PhysicalAttributesMigrationServiceTest {
             source = NOMIS,
           ),
         )
-      }
 
-      verify(telemetryClient).trackEvent(
-        eq("prison-person-api-physical-attributes-migrated"),
-        argThat { it -> it.containsValue(PRISONER_NUMBER) },
-        isNull(),
-      )
+        assertThat(domainEvents()).hasSize(1)
+        with(domainEvents().first() as PrisonPersonUpdatedEvent) {
+          assertThat(prisonerNumber).isEqualTo(PRISONER_NUMBER)
+          assertThat(eventType).isEqualTo(PHYSICAL_ATTRIBUTES_MIGRATED)
+          assertThat(fieldHistoryIds).isNotEmpty()
+        }
+      }
     }
   }
 
@@ -293,11 +293,6 @@ class PhysicalAttributesMigrationServiceTest {
     assertThat(underTest.migrate(PRISONER_NUMBER, sortedSetOf())).isEqualTo(PhysicalAttributesMigrationResponse())
 
     verifyNoInteractions(physicalAttributesRepository)
-    verify(telemetryClient).trackEvent(
-      eq("prison-person-api-physical-attributes-migrated"),
-      argThat { it -> it.containsValue(PRISONER_NUMBER) && it.containsValue("[]") },
-      isNull(),
-    )
   }
 
   private fun generatePrevious(

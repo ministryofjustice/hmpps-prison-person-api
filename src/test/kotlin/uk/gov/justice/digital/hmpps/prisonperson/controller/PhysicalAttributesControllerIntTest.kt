@@ -4,9 +4,14 @@ import org.assertj.core.api.Assertions.assertThat
 import org.awaitility.kotlin.await
 import org.awaitility.kotlin.matches
 import org.awaitility.kotlin.untilCallTo
+import org.hamcrest.Matchers.not
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.mockito.kotlin.argThat
+import org.mockito.kotlin.eq
+import org.mockito.kotlin.isNull
+import org.mockito.kotlin.verify
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Primary
@@ -28,7 +33,7 @@ import uk.gov.justice.digital.hmpps.prisonperson.jpa.ReferenceDataCode
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.ReferenceDataDomain
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.utils.HistoryComparison
 import uk.gov.justice.digital.hmpps.prisonperson.service.event.DomainEvent
-import uk.gov.justice.digital.hmpps.prisonperson.service.event.PrisonPersonAdditionalInformation
+import uk.gov.justice.digital.hmpps.prisonperson.service.event.PrisonPersonFieldInformation
 import java.time.Clock
 import java.time.Duration
 import java.time.ZoneId
@@ -655,22 +660,40 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
         expectSuccessfulUpdateFrom("""{ "height": 190, "weight": 90 }""")
 
         await untilCallTo { publishTestQueue.countAllMessagesOnQueue() } matches { it == 1 }
-        val event = publishTestQueue.receiveDomainEventOnQueue<PrisonPersonAdditionalInformation>()
+        val event = publishTestQueue.receiveDomainEventOnQueue<PrisonPersonFieldInformation>()
 
         assertThat(event).isEqualTo(
           DomainEvent(
-            eventType = PHYSICAL_ATTRIBUTES_UPDATED.domainEventType,
-            additionalInformation = PrisonPersonAdditionalInformation(
+            eventType = PHYSICAL_ATTRIBUTES_UPDATED.domainEventDetails!!.type,
+            additionalInformation = PrisonPersonFieldInformation(
               url = "http://localhost:8080/prisoners/${PRISONER_NUMBER}",
               prisonerNumber = PRISONER_NUMBER,
               source = DPS,
               fields = listOf(HEIGHT, WEIGHT),
             ),
-            description = PHYSICAL_ATTRIBUTES_UPDATED.description,
+            description = PHYSICAL_ATTRIBUTES_UPDATED.domainEventDetails!!.description,
             occurredAt = ZonedDateTime.now(clock),
           ),
         )
       }
+    }
+
+    @Test
+    @Sql("classpath:jpa/repository/reset.sql")
+    @Sql("classpath:controller/physicalattributes/migration/physical_attributes.sql")
+    @Sql("classpath:controller/physicalattributes/migration/field_history.sql")
+    fun `should publish telemetry event`() {
+      expectSuccessfulUpdateFrom("""{ "height": 190, "weight": 90 }""")
+
+      verify(telemetryClient).trackEvent(
+        eq("prison-person-api-physical-attributes-updated"),
+        argThat { it ->
+          it["prisonerNumber"] == PRISONER_NUMBER &&
+            it["source"] == DPS.name &&
+            it["fields"] == listOf(HEIGHT.name, WEIGHT.name).toString()
+        },
+        isNull(),
+      )
     }
 
     private fun expectSuccessfulUpdateFrom(requestBody: String, user: String? = USER1) =

@@ -1,36 +1,90 @@
 package uk.gov.justice.digital.hmpps.prisonperson.service.event.publish
 
 import uk.gov.justice.digital.hmpps.prisonperson.enums.EventType
-import uk.gov.justice.digital.hmpps.prisonperson.enums.EventType.PHYSICAL_ATTRIBUTES_UPDATED
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField
 import uk.gov.justice.digital.hmpps.prisonperson.enums.Source
 import uk.gov.justice.digital.hmpps.prisonperson.service.event.DomainEvent
-import uk.gov.justice.digital.hmpps.prisonperson.service.event.PrisonPersonAdditionalInformation
+import uk.gov.justice.digital.hmpps.prisonperson.service.event.PrisonPersonFieldInformation
+import uk.gov.justice.digital.hmpps.prisonperson.service.event.TelemetryEvent
 import java.time.ZonedDateTime
 
-abstract class PrisonPersonEvent(val type: EventType) {
-  abstract val prisonerNumber: String
-  abstract val occurredAt: ZonedDateTime
-  abstract val source: Source
-  abstract val fields: Collection<PrisonPersonField>
+interface PrisonPersonEvent<T> {
+  val eventType: EventType
+  val prisonerNumber: String
 
-  fun toDomainEvent(baseUrl: String): DomainEvent<PrisonPersonAdditionalInformation> =
-    DomainEvent(
-      eventType = type.domainEventType,
-      additionalInformation = PrisonPersonAdditionalInformation(
-        url = "$baseUrl/prisoners/$prisonerNumber",
-        prisonerNumber = prisonerNumber,
-        source = source,
-        fields = fields,
+  fun getDomainEvent(baseUrl: String): DomainEvent<T>? = null
+  fun getTelemetryEvent(): TelemetryEvent? = null
+}
+
+data class PrisonPersonUpdatedEvent(
+  override val eventType: EventType,
+  override val prisonerNumber: String,
+  val occurredAt: ZonedDateTime,
+  val source: Source,
+  val fields: Collection<PrisonPersonField>,
+  val fieldHistoryIds: Collection<Long>? = null,
+) : PrisonPersonEvent<PrisonPersonFieldInformation> {
+  override fun getDomainEvent(baseUrl: String): DomainEvent<PrisonPersonFieldInformation>? =
+    eventType.domainEventDetails?.let {
+      DomainEvent(
+        eventType = it.type,
+        additionalInformation = PrisonPersonFieldInformation(
+          url = "$baseUrl/prisoners/$prisonerNumber",
+          prisonerNumber = prisonerNumber,
+          source = source,
+          fields = fields,
+        ),
+        description = it.description,
+        occurredAt = occurredAt,
+      )
+    }
+
+  override fun getTelemetryEvent(): TelemetryEvent =
+    TelemetryEvent(
+      eventType.telemetryEventName!!,
+      mapOf(
+        "prisonerNumber" to prisonerNumber,
+        "source" to source.name,
+        "fields" to fields.toString(),
+        "fieldHistoryIds" to fieldHistoryIds.toString(),
       ),
-      description = type.description,
-      occurredAt = occurredAt,
     )
 }
 
-data class PhysicalAttributesUpdatedEvent(
-  override val prisonerNumber: String,
-  override val occurredAt: ZonedDateTime,
-  override val source: Source,
-  override val fields: Collection<PrisonPersonField>,
-) : PrisonPersonEvent(PHYSICAL_ATTRIBUTES_UPDATED)
+data class PrisonPersonMergedEvent(
+  override val eventType: EventType,
+  val prisonerNumberFrom: String,
+  val prisonerNumberTo: String,
+  val occurredAt: ZonedDateTime,
+  val source: Source,
+  val fields: Collection<PrisonPersonField>,
+) : PrisonPersonEvent<PrisonPersonFieldInformation> {
+  override val prisonerNumber: String
+    get() = prisonerNumberTo
+
+  override fun getDomainEvent(baseUrl: String): DomainEvent<PrisonPersonFieldInformation>? =
+    eventType.domainEventDetails?.let {
+      DomainEvent(
+        eventType = it.type,
+        additionalInformation = PrisonPersonFieldInformation(
+          url = "$baseUrl/prisoners/$prisonerNumber",
+          prisonerNumber = prisonerNumber,
+          source = source,
+          fields = fields,
+        ),
+        description = it.description,
+        occurredAt = occurredAt,
+      )
+    }
+
+  override fun getTelemetryEvent(): TelemetryEvent =
+    TelemetryEvent(
+      eventType.telemetryEventName!!,
+      mapOf(
+        "prisonerNumberFrom" to prisonerNumberFrom,
+        "prisonerNumberTo" to prisonerNumberTo,
+        "source" to source.name,
+        "fields" to fields.toString(),
+      ),
+    )
+}

@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.prisonperson.service.event.publish
 
-import com.microsoft.applicationinsights.TelemetryClient
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -9,28 +8,16 @@ import org.springframework.transaction.event.TransactionalEventListener
 import uk.gov.justice.digital.hmpps.prisonperson.config.EventProperties
 
 @Service
-class EventService(
+class DomainEventService(
   private val eventProperties: EventProperties,
-  private val telemetryClient: TelemetryClient,
   private val domainEventPublisher: DomainEventPublisher,
 ) {
   @TransactionalEventListener(phase = AFTER_COMMIT)
-  fun handleEvent(event: PrisonPersonEvent) {
-    log.info(event.toString())
-
-    event.toDomainEvent(eventProperties.baseUrl).run {
+  fun <T> publishDomainEvent(event: PrisonPersonEvent<T>) {
+    event.getDomainEvent(eventProperties.baseUrl)?.run {
       if (eventProperties.publish) {
+        log.info("Publishing domain event for $event")
         domainEventPublisher.publish(this)
-
-        telemetryClient.trackEvent(
-          event.type.telemetryEventName,
-          mapOf(
-            "prisonerNumber" to event.prisonerNumber,
-            "source" to event.source.name,
-            "fields" to event.fields.toString(),
-          ),
-          null,
-        )
       } else {
         log.info("$eventType event publishing is disabled")
       }

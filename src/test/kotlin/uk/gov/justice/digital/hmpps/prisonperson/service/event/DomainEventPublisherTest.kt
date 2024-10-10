@@ -8,6 +8,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import org.testcontainers.shaded.org.bouncycastle.asn1.x500.style.RFC4519Style.description
 import software.amazon.awssdk.services.sns.SnsAsyncClient
 import software.amazon.awssdk.services.sns.model.MessageAttributeValue
 import software.amazon.awssdk.services.sns.model.PublishRequest
@@ -48,14 +49,14 @@ class DomainEventPublisherTest {
     val prisonerNumber = "A1234AA"
 
     val domainEvent = DomainEvent(
-      eventType = PHYSICAL_ATTRIBUTES_UPDATED.domainEventType,
-      additionalInformation = PrisonPersonAdditionalInformation(
+      eventType = EVENT_TYPE.domainEventDetails!!.type,
+      additionalInformation = PrisonPersonFieldInformation(
         url = "$baseUrl/prisoners/$prisonerNumber",
         prisonerNumber = prisonerNumber,
         source = NOMIS,
         fields = listOf(HEIGHT, WEIGHT),
       ),
-      description = PHYSICAL_ATTRIBUTES_UPDATED.description,
+      description = EVENT_TYPE.domainEventDetails!!.description,
       occurredAt = occurredAt,
     )
 
@@ -85,5 +86,9 @@ class DomainEventPublisherTest {
     whenever(domainEventsSnsClient.publish(any<PublishRequest>())).thenThrow(RuntimeException("Failed to publish"))
 
     domainEventPublisher.publish(domainEvent)
+  }
+
+  private companion object {
+    val EVENT_TYPE = PHYSICAL_ATTRIBUTES_UPDATED
   }
 }

@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.prisonperson.client.prisonersearch.PrisonerSearchClient
 import uk.gov.justice.digital.hmpps.prisonperson.dto.request.PhysicalAttributesUpdateRequest
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.PhysicalAttributesDto
+import uk.gov.justice.digital.hmpps.prisonperson.enums.EventType.PHYSICAL_ATTRIBUTES_UPDATED
 import uk.gov.justice.digital.hmpps.prisonperson.enums.Source.DPS
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.PhysicalAttributes
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.PhysicalAttributesRepository
@@ -51,7 +52,7 @@ class PhysicalAttributesService(
       }
       .also {
         val changedFields = it.updateFieldHistory(now, authenticationFacade.getUserOrSystemInContext())
-        it.publishUpdateEvent(DPS, now, changedFields)
+        it.publishUpdateEvent(PHYSICAL_ATTRIBUTES_UPDATED, DPS, now, changedFields)
       }
 
     return physicalAttributesRepository.save(physicalAttributes).toDto()

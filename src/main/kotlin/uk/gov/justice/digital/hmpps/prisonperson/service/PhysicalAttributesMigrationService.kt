@@ -1,13 +1,12 @@
 package uk.gov.justice.digital.hmpps.prisonperson.service
 
-import com.microsoft.applicationinsights.TelemetryClient
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import uk.gov.justice.digital.hmpps.prisonperson.config.trackEvent
 import uk.gov.justice.digital.hmpps.prisonperson.dto.request.PhysicalAttributesMigrationRequest
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.PhysicalAttributesMigrationResponse
+import uk.gov.justice.digital.hmpps.prisonperson.enums.EventType.PHYSICAL_ATTRIBUTES_MIGRATED
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.HEIGHT
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.WEIGHT
 import uk.gov.justice.digital.hmpps.prisonperson.enums.Source.NOMIS
@@ -22,7 +21,6 @@ import java.util.SortedSet
 class PhysicalAttributesMigrationService(
   private val physicalAttributesRepository: PhysicalAttributesRepository,
   private val physicalAttributesService: PhysicalAttributesService,
-  private val telemetryClient: TelemetryClient,
   private val clock: Clock,
 ) {
   fun migrate(
@@ -32,7 +30,7 @@ class PhysicalAttributesMigrationService(
     log.info("Attempting to migrate physical attributes for $prisonerNumber")
 
     if (migration.isEmpty()) {
-      trackMigrationEvent(prisonerNumber, listOf())
+      log.info("No physical attributes provided for $prisonerNumber")
       return PhysicalAttributesMigrationResponse()
     }
 
@@ -64,7 +62,8 @@ class PhysicalAttributesMigrationService(
     return physicalAttributesRepository.save(physicalAttributes).fieldHistory
       .filter { it.migratedAt == now }
       .map { it.fieldHistoryId }
-      .also { trackMigrationEvent(prisonerNumber, it) }
+      .also { physicalAttributes.publishUpdateEvent(PHYSICAL_ATTRIBUTES_MIGRATED, NOMIS, now, fieldsToMigrate, it) }
+      .also { physicalAttributesRepository.save(physicalAttributes) } // save() required after publishEvent
       .let { PhysicalAttributesMigrationResponse(it) }
   }
 
@@ -86,16 +85,6 @@ class PhysicalAttributesMigrationService(
 
   private fun PhysicalAttributes.resetHistoryForMigratedFields() {
     fieldsToMigrate.forEach { field -> fieldHistory.removeIf { it.field == field } }
-  }
-
-  private fun trackMigrationEvent(prisonerNumber: String, fieldHistoryIds: List<Long>) {
-    telemetryClient.trackEvent(
-      "prison-person-api-physical-attributes-migrated",
-      mapOf(
-        "prisonerNumber" to prisonerNumber,
-        "fieldHistoryIds" to fieldHistoryIds.toString(),
-      ),
-    )
   }
 
   private companion object {

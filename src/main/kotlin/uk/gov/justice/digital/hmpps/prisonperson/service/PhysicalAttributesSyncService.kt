@@ -1,14 +1,14 @@
 package uk.gov.justice.digital.hmpps.prisonperson.service
 
-import com.microsoft.applicationinsights.TelemetryClient
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import uk.gov.justice.digital.hmpps.prisonperson.config.trackEvent
 import uk.gov.justice.digital.hmpps.prisonperson.dto.request.PhysicalAttributesSyncRequest
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.PhysicalAttributesSyncDto
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.PhysicalAttributesSyncResponse
+import uk.gov.justice.digital.hmpps.prisonperson.enums.EventType.PHYSICAL_ATTRIBUTES_SYNCED
+import uk.gov.justice.digital.hmpps.prisonperson.enums.EventType.PHYSICAL_ATTRIBUTES_SYNCED_HISTORICAL
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.HEIGHT
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.WEIGHT
 import uk.gov.justice.digital.hmpps.prisonperson.enums.Source.NOMIS
@@ -26,7 +26,6 @@ class PhysicalAttributesSyncService(
   private val physicalAttributesRepository: PhysicalAttributesRepository,
   private val fieldHistoryRepository: FieldHistoryRepository,
   private val physicalAttributesService: PhysicalAttributesService,
-  private val telemetryClient: TelemetryClient,
   private val clock: Clock,
 ) {
   fun getPhysicalAttributes(prisonNumber: String): PhysicalAttributesSyncDto? =
@@ -58,13 +57,12 @@ class PhysicalAttributesSyncService(
         height = request.height
         weight = request.weight
       }
-      .also {
-        val changedFields = it.updateFieldHistory(request.createdAt, request.createdBy, NOMIS, fieldsToSync)
-        it.publishUpdateEvent(NOMIS, now, changedFields)
-      }
+
+    val changedFields = physicalAttributes.updateFieldHistory(request.createdAt, request.createdBy, NOMIS, fieldsToSync)
 
     return physicalAttributesRepository.save(physicalAttributes).getLatestFieldHistoryIds()
-      .also { trackSyncEvent(prisonerNumber, it) }
+      .also { physicalAttributes.publishUpdateEvent(PHYSICAL_ATTRIBUTES_SYNCED, NOMIS, now, changedFields, it) }
+      .also { physicalAttributesRepository.save(physicalAttributes) } // save() required after publishEvent
       .let { PhysicalAttributesSyncResponse(it) }
   }
 
@@ -74,19 +72,22 @@ class PhysicalAttributesSyncService(
   ): PhysicalAttributesSyncResponse {
     log.debug("Syncing historical physical attributes update from NOMIS for prisoner: $prisonerNumber")
 
-    physicalAttributesRepository.findByIdForUpdate(prisonerNumber)
+    val now = ZonedDateTime.now(clock)
+
+    val physicalAttributes = physicalAttributesRepository.findByIdForUpdate(prisonerNumber)
       .orElseGet {
         physicalAttributesService.ensurePhysicalAttributesPersistedFor(prisonerNumber)
-        val physicalAttributes = physicalAttributesRepository.findByIdForUpdate(prisonerNumber).orElseThrow().apply {
-          height = request.height
-          weight = request.weight
-        }
-        physicalAttributesRepository.save(physicalAttributes)
+        physicalAttributesRepository.findByIdForUpdate(prisonerNumber).orElseThrow()
+          .apply {
+            height = request.height
+            weight = request.weight
+          }
       }
 
     return request.addToHistory(prisonerNumber)
       .map { it.fieldHistoryId }
-      .also { trackSyncEvent(prisonerNumber, it) }
+      .also { physicalAttributes.publishUpdateEvent(PHYSICAL_ATTRIBUTES_SYNCED_HISTORICAL, NOMIS, now, emptyList(), it) }
+      .also { physicalAttributesRepository.save(physicalAttributes) } // save() required after publishEvent
       .let { PhysicalAttributesSyncResponse(it) }
   }
 
@@ -128,16 +129,6 @@ class PhysicalAttributesSyncService(
     fieldHistory.last { it.field == HEIGHT },
     fieldHistory.last { it.field == WEIGHT },
   ).map { it.fieldHistoryId }
-
-  private fun trackSyncEvent(prisonerNumber: String, fieldHistoryIds: List<Long>) {
-    telemetryClient.trackEvent(
-      "prison-person-api-physical-attributes-synced",
-      mapOf(
-        "prisonerNumber" to prisonerNumber,
-        "fieldHistoryIds" to fieldHistoryIds.toString(),
-      ),
-    )
-  }
 
   private companion object {
     val log: Logger = LoggerFactory.getLogger(this::class.java)

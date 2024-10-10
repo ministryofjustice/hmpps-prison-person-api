@@ -14,6 +14,7 @@ import org.hibernate.annotations.SortNatural
 import uk.gov.justice.digital.hmpps.prisonperson.dto.ReferenceDataSimpleDto
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.PhysicalAttributesDto
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.ValueWithMetadata
+import uk.gov.justice.digital.hmpps.prisonperson.enums.EventType
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.BUILD
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.FACE
@@ -27,7 +28,8 @@ import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.WEIGHT
 import uk.gov.justice.digital.hmpps.prisonperson.enums.Source
 import uk.gov.justice.digital.hmpps.prisonperson.enums.Source.DPS
 import uk.gov.justice.digital.hmpps.prisonperson.mapper.toSimpleDto
-import uk.gov.justice.digital.hmpps.prisonperson.service.event.publish.PhysicalAttributesUpdatedEvent
+import uk.gov.justice.digital.hmpps.prisonperson.service.event.publish.PrisonPersonMergedEvent
+import uk.gov.justice.digital.hmpps.prisonperson.service.event.publish.PrisonPersonUpdatedEvent
 import java.time.ZonedDateTime
 import java.util.SortedSet
 import kotlin.reflect.KMutableProperty0
@@ -140,13 +142,41 @@ class PhysicalAttributes(
   ): Collection<PrisonPersonField> =
     updateFieldHistory(lastModifiedAt, null, lastModifiedAt, lastModifiedBy, DPS, allFields)
 
-  override fun publishUpdateEvent(source: Source, now: ZonedDateTime, fields: Collection<PrisonPersonField>) {
+  fun publishUpdateEvent(
+    eventType: EventType,
+    source: Source,
+    now: ZonedDateTime,
+    fields: Collection<PrisonPersonField>,
+    fieldHistoryIds: Collection<Long>? = null,
+  ) {
     registerEvent(
-      PhysicalAttributesUpdatedEvent(
-        prisonerNumber = prisonerNumber,
+      PrisonPersonUpdatedEvent(
+        eventType,
+        prisonerNumber,
         occurredAt = now,
-        source = source,
-        fields = fields,
+        source,
+        fields,
+        fieldHistoryIds,
+      ),
+    )
+  }
+
+  fun publishMergeEvent(
+    eventType: EventType,
+    prisonerNumberFrom: String,
+    prisonerNumberTo: String,
+    source: Source,
+    now: ZonedDateTime,
+    fields: Collection<PrisonPersonField>,
+  ) {
+    registerEvent(
+      PrisonPersonMergedEvent(
+        eventType,
+        prisonerNumberFrom,
+        prisonerNumberTo,
+        occurredAt = now,
+        source,
+        fields,
       ),
     )
   }

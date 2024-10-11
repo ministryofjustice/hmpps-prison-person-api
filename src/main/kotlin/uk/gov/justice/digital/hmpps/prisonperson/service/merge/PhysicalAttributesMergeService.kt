@@ -3,9 +3,11 @@ package uk.gov.justice.digital.hmpps.prisonperson.service.merge
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import uk.gov.justice.digital.hmpps.prisonperson.enums.EventType.PHYSICAL_ATTRIBUTES_MERGED
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.HEIGHT
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.WEIGHT
+import uk.gov.justice.digital.hmpps.prisonperson.enums.Source.DPS
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.FieldHistory
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.PhysicalAttributes
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.FieldHistoryRepository
@@ -40,21 +42,24 @@ class PhysicalAttributesMergeService(
       return
     }
 
-    mergePhysicalAttributesFieldHistory(fieldHistoryFrom, fieldHistoryTo, prisonerNumberTo)
+    mergePhysicalAttributesFieldHistory(fieldHistoryFrom, fieldHistoryTo, prisonerNumberFrom, prisonerNumberTo)
     deletePhysicalAttributesAndMetadata(prisonerNumberFrom)
   }
 
   private fun mergePhysicalAttributesFieldHistory(
     historyFrom: SortedSet<FieldHistory>,
     historyTo: SortedSet<FieldHistory>,
+    prisonerNumberFrom: String,
     prisonerNumberTo: String,
   ) {
+    val now = ZonedDateTime.now(clock)
+
     val physicalAttributes = physicalAttributesRepository.findById(prisonerNumberTo).orElseGet {
       log.debug("No physical attributes exist yet for prisoner: '$prisonerNumberTo', merging into an empty record")
       physicalAttributesService.newPhysicalAttributesFor(prisonerNumberTo)
     }
 
-    fieldsToMerge.forEach { field ->
+    fieldsToMerge.map { field ->
       val latestFrom = historyFrom.last { it.field == field }
       val latestTo = historyTo.lastOrNull { it.field == field }
 
@@ -70,7 +75,16 @@ class PhysicalAttributesMergeService(
         .forEach { merge(it, prisonerNumberTo) }
     }
 
-    physicalAttributesRepository.save(physicalAttributes)
+    physicalAttributes.publishMergeEvent(
+      PHYSICAL_ATTRIBUTES_MERGED,
+      prisonerNumberFrom,
+      prisonerNumberTo,
+      DPS,
+      now,
+      fieldsToMerge,
+    )
+
+    physicalAttributesRepository.save(physicalAttributes) // save() required after publishEvent
   }
 
   private fun mergeLatest(

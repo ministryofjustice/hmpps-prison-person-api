@@ -26,7 +26,7 @@ data class DomainEvent<T>(
   )
 }
 
-data class PrisonPersonAdditionalInformation(
+data class PrisonPersonFieldInformation(
   val url: String,
   val source: Source,
   val prisonerNumber: String,

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.media.Schema.RequiredMode.NOT_REQUIRED
+import uk.gov.justice.digital.hmpps.prisonperson.annotation.NullishReferenceDataCodeList
 import uk.gov.justice.digital.hmpps.prisonperson.utils.Nullish
 import uk.gov.justice.digital.hmpps.prisonperson.utils.getAttributeAsNullish
 
@@ -31,7 +32,21 @@ data class PrisonerHealthUpdateRequest(
     type = "string[]",
     example = "[FOOD_ALLERGY_EGG, FOOD_ALLERGY_MILK]",
     requiredMode = NOT_REQUIRED,
-    nullable = true,
+  )
+  @field:NullishReferenceDataCodeList(
+    domains = ["FOOD_ALLERGY"],
   )
   val foodAllergies: Nullish<List<String>> = getAttributeAsNullish<List<String>>(attributes, "foodAllergies")
+
+  @Schema(
+    description = "The medical dietary requirements the prisoner has. A list of `ReferenceDataCode`.`id`",
+    type = "string[]",
+    example = "[MEDICAL_DIET_LOW_FAT, FREE_FROM_EGG]",
+    requiredMode = NOT_REQUIRED,
+  )
+  @field:NullishReferenceDataCodeList(
+    domains = ["MEDICAL_DIET", "FREE_FROM"],
+  )
+  val medicalDietaryRequirements: Nullish<List<String>> =
+    getAttributeAsNullish<List<String>>(attributes, "medicalDietaryRequirements")
 }

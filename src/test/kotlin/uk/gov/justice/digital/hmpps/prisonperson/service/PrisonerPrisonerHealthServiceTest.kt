@@ -22,6 +22,7 @@ import uk.gov.justice.digital.hmpps.prisonperson.dto.response.ValueWithMetadata
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.FieldMetadata
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.FoodAllergy
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.MedicalDietaryRequirement
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.PrisonerHealth
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.ReferenceDataCode
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.ReferenceDataDomain
@@ -62,6 +63,11 @@ class PrisonerPrisonerHealthServiceTest {
   fun beforeEach() {
     whenever(referenceDataCodeRepository.findById(REFERENCE_DATA_CODE_ID)).thenReturn(Optional.of(SMOKER_OR_VAPER))
     whenever(referenceDataCodeRepository.findById(FOOD_REFERENCE_DATA_CODE_ID)).thenReturn(Optional.of(EGG_ALLERGY))
+    whenever(referenceDataCodeRepository.findById(LOW_FAT_REFERENCE_DATA_CODE_ID)).thenReturn(
+      Optional.of(
+        LOW_FAT_REFERENCE_DATA_CODE,
+      ),
+    )
     whenever(authenticationFacade.getUserOrSystemInContext()).thenReturn(USER1)
   }
 
@@ -135,6 +141,7 @@ class PrisonerPrisonerHealthServiceTest {
         HealthDto(
           smokerOrVaper = ValueWithMetadata(SMOKER_OR_VAPER.toSimpleDto(), NOW, USER1),
           foodAllergies = listOf(EGG_ALLERGY.toSimpleDto()),
+          medicalDietaryRequirements = listOf(LOW_FAT_REFERENCE_DATA_CODE.toSimpleDto()),
         ),
       )
 
@@ -142,6 +149,7 @@ class PrisonerPrisonerHealthServiceTest {
         assertThat(prisonerNumber).isEqualTo(PRISONER_NUMBER)
         assertThat(smokerOrVaper).isEqualTo(SMOKER_OR_VAPER)
         assertThat(foodAllergies).containsAll(listOf(EGG_FOOD_ALLERGY))
+        assertThat(medicalDietaryRequirements).containsAll(listOf(LOW_FAT_DIET_REQUIREMENT))
 
         expectFieldHistory(
           PrisonPersonField.SMOKER_OR_VAPER,
@@ -169,6 +177,7 @@ class PrisonerPrisonerHealthServiceTest {
             prisonerNumber = PRISONER_NUMBER,
             smokerOrVaper = SMOKER_OR_VAPER,
             foodAllergies = mutableSetOf(EGG_FOOD_ALLERGY),
+            medicalDietaryRequirements = mutableSetOf(LOW_FAT_DIET_REQUIREMENT),
           ).also { it.updateFieldHistory(lastModifiedAt = NOW.minusDays(1), lastModifiedBy = USER2) },
         ),
       )
@@ -184,6 +193,7 @@ class PrisonerPrisonerHealthServiceTest {
         assertThat(prisonerNumber).isEqualTo(PRISONER_NUMBER)
         assertThat(smokerOrVaper).isEqualTo(null)
         assertThat(foodAllergies).isEqualTo(mutableSetOf<FoodAllergy>())
+        assertThat(medicalDietaryRequirements).isEqualTo(mutableSetOf<MedicalDietaryRequirement>())
 
         expectFieldHistory(
           PrisonPersonField.SMOKER_OR_VAPER,
@@ -262,17 +272,42 @@ class PrisonerPrisonerHealthServiceTest {
 
     val EGG_FOOD_ALLERGY = FoodAllergy(prisonerNumber = PRISONER_NUMBER, allergy = EGG_ALLERGY)
 
+    val LOW_FAT_REFERENCE_DATA_CODE_ID = "MEDICAL_DIET_LOW_FAT"
+    val LOW_FAT_REFERENCE_DATA_CODE = ReferenceDataCode(
+      id = LOW_FAT_REFERENCE_DATA_CODE_ID,
+      code = "LOW_FAT",
+      createdBy = USER1,
+      createdAt = NOW,
+      description = "Example medical diet code",
+      listSequence = 0,
+      domain = ReferenceDataDomain(
+        code = "MEDICAL_DIET",
+        createdBy = USER1,
+        createdAt = NOW,
+        listSequence = 0,
+        description = "Example medical diet domain",
+      ),
+    )
+
+    val LOW_FAT_DIET_REQUIREMENT = MedicalDietaryRequirement(
+      prisonerNumber = PRISONER_NUMBER,
+      dietaryRequirement = LOW_FAT_REFERENCE_DATA_CODE,
+    )
+
     val PRISONER_SEARCH_RESPONSE = PrisonerDto(PRISONER_NUMBER)
 
     val attributes = mutableMapOf<String, Any?>(
       Pair("smokerOrVaper", REFERENCE_DATA_CODE_ID),
       Pair("foodAllergies", listOf(FOOD_REFERENCE_DATA_CODE_ID)),
+      Pair("medicalDietaryRequirements", listOf(LOW_FAT_REFERENCE_DATA_CODE_ID)),
     )
+
     val HEALTH_UPDATE_REQUEST = PrisonerHealthUpdateRequest(attributes)
 
     val attributes_undefined = mutableMapOf<String, Any?>(
       Pair("smokerOrVaper", null),
-      Pair("foodAllergies", null),
+      Pair("foodAllergies", emptyList<String>()),
+      Pair("medicalDietaryRequirements", emptyList<String>()),
     )
     val HEALTH_UPDATE_REQUEST_WITH_NULL = PrisonerHealthUpdateRequest(attributes_undefined)
   }

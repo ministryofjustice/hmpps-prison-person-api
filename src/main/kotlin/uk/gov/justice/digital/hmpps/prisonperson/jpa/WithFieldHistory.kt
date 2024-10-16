@@ -36,6 +36,7 @@ abstract class WithFieldHistory<T : AbstractAggregateRoot<T>?> : AbstractAggrega
     source: Source = DPS,
     fields: Collection<PrisonPersonField>,
     migratedAt: ZonedDateTime? = null,
+    anomalous: Boolean? = null,
   ): Collection<PrisonPersonField> {
     val changedFields = mutableSetOf<PrisonPersonField>()
 
@@ -53,7 +54,7 @@ abstract class WithFieldHistory<T : AbstractAggregateRoot<T>?> : AbstractAggrega
 
           // Set appliesTo on previous history item if not already set
           previousVersion
-            ?.takeIf { it.appliesTo == null }
+            ?.takeIf { !it.anomalous && it.appliesTo == null }
             ?.let {
               it.appliesTo = if (appliesFrom > it.appliesFrom) appliesFrom else lastModifiedAt
               // If the resulting update to appliesTo causes it to be less than appliesFrom, throw exception:
@@ -70,6 +71,7 @@ abstract class WithFieldHistory<T : AbstractAggregateRoot<T>?> : AbstractAggrega
               createdBy = lastModifiedBy,
               source = source,
               migratedAt = migratedAt,
+              anomalous = anomalous == true,
             ).also { field.set(it, currentValue()) },
           )
           changedFields.add(field)

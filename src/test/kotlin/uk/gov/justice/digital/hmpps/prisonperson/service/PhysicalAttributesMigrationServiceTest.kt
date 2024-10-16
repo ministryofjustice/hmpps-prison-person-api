@@ -324,6 +324,7 @@ class PhysicalAttributesMigrationServiceTest {
       appliesFrom = THEN,
       createdAt = THEN,
       createdBy = USER1,
+      latestBooking = true,
     )
   }
 }

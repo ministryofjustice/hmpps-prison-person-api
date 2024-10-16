@@ -182,6 +182,7 @@ class ProfileDetailsPhysicalAttributesSyncService(
             createdAt = getter()!!.lastModifiedAt,
             createdBy = getter()!!.lastModifiedBy,
             source = NOMIS,
+            anomalous = latestBooking != true && appliesTo == null,
           ).also {
             field.set(
               it,

@@ -773,6 +773,7 @@ class ProfileDetailsPhysicalAttributesMigrationServiceTest {
       rightEyeColour = PRISONER_RIGHT_EYE_COLOUR,
       shoeSize = PRISONER_SHOE_SIZE,
       appliesFrom = THEN,
+      latestBooking = true,
     )
 
     val domains = setOf("HAIR", "FACIAL_HAIR", "FACE", "BUILD", "EYE")

@@ -97,12 +97,13 @@ class ProfileDetailsPhysicalAttributesMigrationService(
     attribute?.let {
       physicalAttributes.updateFieldHistory(
         appliesFrom = record.appliesFrom,
-        appliesTo = appliesTo,
+        appliesTo = if (!record.latestBooking) appliesTo else null,
         lastModifiedAt = it.lastModifiedAt,
         lastModifiedBy = it.lastModifiedBy,
         source = NOMIS,
         fields = listOf(field),
         migratedAt = now,
+        anomalous = !record.latestBooking && record.appliesTo == null,
       )
     }
   }

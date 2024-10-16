@@ -49,6 +49,7 @@ class FieldHistory(
   @Enumerated(STRING)
   val source: Source? = null,
 
+  val anomalous: Boolean,
 ) : FieldValues,
   Comparable<FieldHistory> {
 
@@ -73,13 +74,14 @@ class FieldHistory(
     mergedAt = mergedAt,
     mergedFrom = mergedFrom,
     source = source.toString(),
+    anomalous = anomalous,
   )
 
   override fun compareTo(other: FieldHistory) =
     compareValuesBy(
       this,
       other,
-      { it.appliesTo?.toInstant() ?: Instant.MAX },
+      { it.appliesTo?.toInstant() ?: if (it.anomalous) it.appliesFrom.toInstant() else Instant.MAX },
       { it.createdAt },
       { it.appliesFrom },
       { it.hashCode() },
@@ -104,6 +106,7 @@ class FieldHistory(
     if (mergedAt != other.mergedAt) return false
     if (mergedFrom != other.mergedFrom) return false
     if (source != other.source) return false
+    if (anomalous != other.anomalous) return false
 
     return true
   }
@@ -122,6 +125,7 @@ class FieldHistory(
     result = 31 * result + (mergedAt?.hashCode() ?: 0)
     result = 31 * result + (mergedFrom?.hashCode() ?: 0)
     result = 31 * result + (source?.hashCode() ?: 0)
+    result = 31 * result + (anomalous.hashCode())
     return result
   }
 
@@ -140,5 +144,6 @@ class FieldHistory(
     "mergedAt=$mergedAt, " +
     "mergedFrom=$mergedFrom, " +
     "source=$source" +
+    "anomalous=$anomalous" +
     ")"
 }

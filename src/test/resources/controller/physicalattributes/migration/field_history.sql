@@ -1,21 +1,21 @@
 INSERT INTO field_history (field_history_id, prisoner_number, field, value_int, value_string, value_ref, created_at,
-                           created_by, applies_from, applies_to, source)
+                           created_by, applies_from, applies_to, source, anomalous)
 VALUES (-101, 'A1234AA', 'HEIGHT', 180, null, null, '2024-01-02 09:10:11.123', 'USER1', '2024-01-02 09:10:11.123', NULL,
-        'DPS'),
+        'DPS', false),
        (-102, 'A1234AA', 'WEIGHT', 70, null, null, '2024-01-02 09:10:11.123', 'USER1', '2024-01-02 09:10:11.123', NULL,
-        'DPS'),
+        'DPS', false),
        (-103, 'A1234AA', 'HAIR', null, null, 'HAIR_BLACK', '2024-01-02 09:10:11.123', 'USER1', '2024-01-02 09:10:11.123',
-        NULL, 'DPS'),
+        NULL, 'DPS', false),
        (-104, 'A1234AA', 'FACIAL_HAIR', null, null, 'FACIAL_HAIR_SIDEBURNS', '2024-01-02 09:10:11.123', 'USER1',
-        '2024-01-02 09:10:11.123', NULL, 'DPS'),
+        '2024-01-02 09:10:11.123', NULL, 'DPS', false),
        (-105, 'A1234AA', 'FACE', null, null, 'FACE_ROUND', '2024-01-02 09:10:11.123', 'USER1', '2024-01-02 09:10:11.123',
-        NULL, 'DPS'),
+        NULL, 'DPS', false),
        (-106, 'A1234AA', 'BUILD', null, null, 'BUILD_HEAVY', '2024-01-02 09:10:11.123', 'USER1', '2024-01-02 09:10:11.123',
-        NULL, 'DPS'),
+        NULL, 'DPS', false),
        (-107, 'A1234AA', 'LEFT_EYE_COLOUR', null, null, 'EYE_BROWN', '2024-01-02 09:10:11.123', 'USER1',
-        '2024-01-02 09:10:11.123', NULL, 'DPS'),
+        '2024-01-02 09:10:11.123', NULL, 'DPS', false),
        (-108, 'A1234AA', 'RIGHT_EYE_COLOUR', null, null, 'EYE_BROWN', '2024-01-02 09:10:11.123', 'USER1',
-        '2024-01-02 09:10:11.123', NULL, 'DPS'),
+        '2024-01-02 09:10:11.123', NULL, 'DPS', false),
        (-109, 'A1234AA', 'SHOE_SIZE', null, '9', null, '2024-01-02 09:10:11.123', 'USER1', '2024-01-02 09:10:11.123', NULL,
-        'DPS');
+        'DPS', false);
 

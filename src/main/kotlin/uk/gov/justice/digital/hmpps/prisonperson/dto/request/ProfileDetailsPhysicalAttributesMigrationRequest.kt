@@ -57,12 +57,18 @@ data class ProfileDetailsPhysicalAttributesMigrationRequest(
   )
   val appliesTo: ZonedDateTime? = null,
 
+  @Schema(
+    description = "A flag to indicate this is the latest booking.",
+    example = "true",
+  )
+  val latestBooking: Boolean,
 ) : Comparable<ProfileDetailsPhysicalAttributesMigrationRequest> {
   override fun compareTo(other: ProfileDetailsPhysicalAttributesMigrationRequest): Int =
     compareValuesBy(
       this,
       other,
-      { it.appliesTo?.toInstant() ?: Instant.MAX },
+      { it.latestBooking },
+      { it.appliesTo?.toInstant() ?: if (!it.latestBooking) it.appliesFrom.toInstant() else Instant.MAX },
       { it.appliesFrom },
       { it.hashCode() },
     )

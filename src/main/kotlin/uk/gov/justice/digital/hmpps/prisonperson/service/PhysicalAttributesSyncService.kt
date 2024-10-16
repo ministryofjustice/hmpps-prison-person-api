@@ -107,6 +107,7 @@ class PhysicalAttributesSyncService(
           createdAt = createdAt,
           createdBy = createdBy,
           source = NOMIS,
+          anomalous = latestBooking != true && appliesTo == null,
         ).also { field.set(it, getter()) },
       )
     }

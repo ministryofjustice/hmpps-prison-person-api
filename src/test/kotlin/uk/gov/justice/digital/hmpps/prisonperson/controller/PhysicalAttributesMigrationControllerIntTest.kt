@@ -228,13 +228,41 @@ class PhysicalAttributesMigrationControllerIntTest : IntegrationTestBase() {
 
         expectFieldHistory(
           HEIGHT,
-          HistoryComparison(value = 189, appliesFrom = NOW.minusYears(3), appliesTo = NOW.minusYears(2), createdAt = NOW.minusYears(3), createdBy = USER2, source = NOMIS),
-          HistoryComparison(value = 190, appliesFrom = NOW.minusYears(2), appliesTo = null, createdAt = NOW.minusYears(2), createdBy = USER1, source = NOMIS),
+          HistoryComparison(
+            value = 189,
+            appliesFrom = NOW.minusYears(3),
+            appliesTo = NOW.minusYears(2),
+            createdAt = NOW.minusYears(3),
+            createdBy = USER2,
+            source = NOMIS,
+          ),
+          HistoryComparison(
+            value = 190,
+            appliesFrom = NOW.minusYears(2),
+            appliesTo = null,
+            createdAt = NOW.minusYears(2),
+            createdBy = USER1,
+            source = NOMIS,
+          ),
         )
         expectFieldHistory(
           WEIGHT,
-          HistoryComparison(value = 79, appliesFrom = NOW.minusYears(3), appliesTo = NOW.minusYears(2), createdAt = NOW.minusYears(3), createdBy = USER2, source = NOMIS),
-          HistoryComparison(value = 80, appliesFrom = NOW.minusYears(2), appliesTo = null, createdAt = NOW.minusYears(2), createdBy = USER1, source = NOMIS),
+          HistoryComparison(
+            value = 79,
+            appliesFrom = NOW.minusYears(3),
+            appliesTo = NOW.minusYears(2),
+            createdAt = NOW.minusYears(3),
+            createdBy = USER2,
+            source = NOMIS,
+          ),
+          HistoryComparison(
+            value = 80,
+            appliesFrom = NOW.minusYears(2),
+            appliesTo = null,
+            createdAt = NOW.minusYears(2),
+            createdBy = USER1,
+            source = NOMIS,
+          ),
         )
         expectNoFieldHistoryFor(HAIR, FACIAL_HAIR, FACE, BUILD, LEFT_EYE_COLOUR, RIGHT_EYE_COLOUR, SHOE_SIZE)
 
@@ -257,13 +285,41 @@ class PhysicalAttributesMigrationControllerIntTest : IntegrationTestBase() {
 
         expectFieldHistory(
           HEIGHT,
-          HistoryComparison(value = 189, appliesFrom = NOW.minusYears(3), appliesTo = NOW.minusYears(2), createdAt = NOW.minusYears(3), createdBy = USER2, source = NOMIS),
-          HistoryComparison(value = 190, appliesFrom = NOW.minusYears(2), appliesTo = null, createdAt = NOW.minusYears(2), createdBy = USER1, source = NOMIS),
+          HistoryComparison(
+            value = 189,
+            appliesFrom = NOW.minusYears(3),
+            appliesTo = NOW.minusYears(2),
+            createdAt = NOW.minusYears(3),
+            createdBy = USER2,
+            source = NOMIS,
+          ),
+          HistoryComparison(
+            value = 190,
+            appliesFrom = NOW.minusYears(2),
+            appliesTo = null,
+            createdAt = NOW.minusYears(2),
+            createdBy = USER1,
+            source = NOMIS,
+          ),
         )
         expectFieldHistory(
           WEIGHT,
-          HistoryComparison(value = 79, appliesFrom = NOW.minusYears(3), appliesTo = NOW.minusYears(2), createdAt = NOW.minusYears(3), createdBy = USER2, source = NOMIS),
-          HistoryComparison(value = 80, appliesFrom = NOW.minusYears(2), appliesTo = null, createdAt = NOW.minusYears(2), createdBy = USER1, source = NOMIS),
+          HistoryComparison(
+            value = 79,
+            appliesFrom = NOW.minusYears(3),
+            appliesTo = NOW.minusYears(2),
+            createdAt = NOW.minusYears(3),
+            createdBy = USER2,
+            source = NOMIS,
+          ),
+          HistoryComparison(
+            value = 80,
+            appliesFrom = NOW.minusYears(2),
+            appliesTo = null,
+            createdAt = NOW.minusYears(2),
+            createdBy = USER1,
+            source = NOMIS,
+          ),
         )
         expectNoFieldHistoryFor(HAIR, FACIAL_HAIR, FACE, BUILD, LEFT_EYE_COLOUR, RIGHT_EYE_COLOUR, SHOE_SIZE)
 
@@ -286,13 +342,41 @@ class PhysicalAttributesMigrationControllerIntTest : IntegrationTestBase() {
 
         expectFieldHistory(
           HEIGHT,
-          HistoryComparison(value = 189, appliesFrom = NOW.minusYears(2), appliesTo = NOW.minusYears(1), createdAt = NOW.minusYears(2), createdBy = USER2, source = NOMIS),
-          HistoryComparison(value = 190, appliesFrom = NOW.minusYears(3), appliesTo = null, createdAt = NOW.minusYears(3), createdBy = USER1, source = NOMIS),
+          HistoryComparison(
+            value = 189,
+            appliesFrom = NOW.minusYears(2),
+            appliesTo = NOW.minusYears(1),
+            createdAt = NOW.minusYears(2),
+            createdBy = USER2,
+            source = NOMIS,
+          ),
+          HistoryComparison(
+            value = 190,
+            appliesFrom = NOW.minusYears(3),
+            appliesTo = null,
+            createdAt = NOW.minusYears(3),
+            createdBy = USER1,
+            source = NOMIS,
+          ),
         )
         expectFieldHistory(
           WEIGHT,
-          HistoryComparison(value = 79, appliesFrom = NOW.minusYears(2), appliesTo = NOW.minusYears(1), createdAt = NOW.minusYears(2), createdBy = USER2, source = NOMIS),
-          HistoryComparison(value = 80, appliesFrom = NOW.minusYears(3), appliesTo = null, createdAt = NOW.minusYears(3), createdBy = USER1, source = NOMIS),
+          HistoryComparison(
+            value = 79,
+            appliesFrom = NOW.minusYears(2),
+            appliesTo = NOW.minusYears(1),
+            createdAt = NOW.minusYears(2),
+            createdBy = USER2,
+            source = NOMIS,
+          ),
+          HistoryComparison(
+            value = 80,
+            appliesFrom = NOW.minusYears(3),
+            appliesTo = null,
+            createdAt = NOW.minusYears(3),
+            createdBy = USER1,
+            source = NOMIS,
+          ),
         )
         expectNoFieldHistoryFor(HAIR, FACIAL_HAIR, FACE, BUILD, LEFT_EYE_COLOUR, RIGHT_EYE_COLOUR, SHOE_SIZE)
 
@@ -315,13 +399,41 @@ class PhysicalAttributesMigrationControllerIntTest : IntegrationTestBase() {
 
         expectFieldHistory(
           HEIGHT,
-          HistoryComparison(value = 189, appliesFrom = NOW.minusYears(2), appliesTo = NOW, createdAt = NOW.minusYears(2), createdBy = USER2, source = NOMIS),
-          HistoryComparison(value = 190, appliesFrom = NOW.minusYears(3), appliesTo = null, createdAt = NOW, createdBy = USER1, source = NOMIS),
+          HistoryComparison(
+            value = 189,
+            appliesFrom = NOW.minusYears(2),
+            appliesTo = NOW,
+            createdAt = NOW.minusYears(2),
+            createdBy = USER2,
+            source = NOMIS,
+          ),
+          HistoryComparison(
+            value = 190,
+            appliesFrom = NOW.minusYears(3),
+            appliesTo = null,
+            createdAt = NOW,
+            createdBy = USER1,
+            source = NOMIS,
+          ),
         )
         expectFieldHistory(
           WEIGHT,
-          HistoryComparison(value = 79, appliesFrom = NOW.minusYears(2), appliesTo = NOW, createdAt = NOW.minusYears(2), createdBy = USER2, source = NOMIS),
-          HistoryComparison(value = 80, appliesFrom = NOW.minusYears(3), appliesTo = null, createdAt = NOW, createdBy = USER1, source = NOMIS),
+          HistoryComparison(
+            value = 79,
+            appliesFrom = NOW.minusYears(2),
+            appliesTo = NOW,
+            createdAt = NOW.minusYears(2),
+            createdBy = USER2,
+            source = NOMIS,
+          ),
+          HistoryComparison(
+            value = 80,
+            appliesFrom = NOW.minusYears(3),
+            appliesTo = null,
+            createdAt = NOW,
+            createdBy = USER1,
+            source = NOMIS,
+          ),
         )
         expectNoFieldHistoryFor(HAIR, FACIAL_HAIR, FACE, BUILD, LEFT_EYE_COLOUR, RIGHT_EYE_COLOUR, SHOE_SIZE)
 
@@ -344,13 +456,41 @@ class PhysicalAttributesMigrationControllerIntTest : IntegrationTestBase() {
 
         expectFieldHistory(
           HEIGHT,
-          HistoryComparison(value = 189, appliesFrom = NOW.minusYears(2), appliesTo = NOW, createdAt = NOW.minusYears(2), createdBy = USER2, source = NOMIS),
-          HistoryComparison(value = 190, appliesFrom = NOW.minusYears(2), appliesTo = NOW, createdAt = NOW, createdBy = USER1, source = NOMIS),
+          HistoryComparison(
+            value = 189,
+            appliesFrom = NOW.minusYears(2),
+            appliesTo = NOW,
+            createdAt = NOW.minusYears(2),
+            createdBy = USER2,
+            source = NOMIS,
+          ),
+          HistoryComparison(
+            value = 190,
+            appliesFrom = NOW.minusYears(2),
+            appliesTo = null,
+            createdAt = NOW,
+            createdBy = USER1,
+            source = NOMIS,
+          ),
         )
         expectFieldHistory(
           WEIGHT,
-          HistoryComparison(value = 79, appliesFrom = NOW.minusYears(2), appliesTo = NOW, createdAt = NOW.minusYears(2), createdBy = USER2, source = NOMIS),
-          HistoryComparison(value = 80, appliesFrom = NOW.minusYears(2), appliesTo = NOW, createdAt = NOW, createdBy = USER1, source = NOMIS),
+          HistoryComparison(
+            value = 79,
+            appliesFrom = NOW.minusYears(2),
+            appliesTo = NOW,
+            createdAt = NOW.minusYears(2),
+            createdBy = USER2,
+            source = NOMIS,
+          ),
+          HistoryComparison(
+            value = 80,
+            appliesFrom = NOW.minusYears(2),
+            appliesTo = null,
+            createdAt = NOW,
+            createdBy = USER1,
+            source = NOMIS,
+          ),
         )
         expectNoFieldHistoryFor(HAIR, FACIAL_HAIR, FACE, BUILD, LEFT_EYE_COLOUR, RIGHT_EYE_COLOUR, SHOE_SIZE)
 
@@ -373,13 +513,41 @@ class PhysicalAttributesMigrationControllerIntTest : IntegrationTestBase() {
 
         expectFieldHistory(
           HEIGHT,
-          HistoryComparison(value = 189, appliesFrom = NOW.minusYears(2), appliesTo = NOW.minusYears(1), createdAt = NOW.minusYears(2), createdBy = USER2, source = NOMIS),
-          HistoryComparison(value = 190, appliesFrom = NOW.minusYears(3), appliesTo = null, createdAt = NOW.minusYears(3), createdBy = USER1, source = NOMIS),
+          HistoryComparison(
+            value = 189,
+            appliesFrom = NOW.minusYears(2),
+            appliesTo = NOW.minusYears(1),
+            createdAt = NOW.minusYears(2),
+            createdBy = USER2,
+            source = NOMIS,
+          ),
+          HistoryComparison(
+            value = 190,
+            appliesFrom = NOW.minusYears(3),
+            appliesTo = null,
+            createdAt = NOW.minusYears(3),
+            createdBy = USER1,
+            source = NOMIS,
+          ),
         )
         expectFieldHistory(
           WEIGHT,
-          HistoryComparison(value = 79, appliesFrom = NOW.minusYears(2), appliesTo = NOW.minusYears(1), createdAt = NOW.minusYears(2), createdBy = USER2, source = NOMIS),
-          HistoryComparison(value = 80, appliesFrom = NOW.minusYears(3), appliesTo = null, createdAt = NOW.minusYears(3), createdBy = USER1, source = NOMIS),
+          HistoryComparison(
+            value = 79,
+            appliesFrom = NOW.minusYears(2),
+            appliesTo = NOW.minusYears(1),
+            createdAt = NOW.minusYears(2),
+            createdBy = USER2,
+            source = NOMIS,
+          ),
+          HistoryComparison(
+            value = 80,
+            appliesFrom = NOW.minusYears(3),
+            appliesTo = null,
+            createdAt = NOW.minusYears(3),
+            createdBy = USER1,
+            source = NOMIS,
+          ),
         )
         expectNoFieldHistoryFor(HAIR, FACIAL_HAIR, FACE, BUILD, LEFT_EYE_COLOUR, RIGHT_EYE_COLOUR, SHOE_SIZE)
 
@@ -402,13 +570,41 @@ class PhysicalAttributesMigrationControllerIntTest : IntegrationTestBase() {
 
         expectFieldHistory(
           HEIGHT,
-          HistoryComparison(value = 189, appliesFrom = NOW.minusYears(1), appliesTo = NOW, createdAt = NOW.minusYears(1), createdBy = USER2, source = NOMIS),
-          HistoryComparison(value = 190, appliesFrom = NOW.minusYears(2), appliesTo = null, createdAt = NOW, createdBy = USER1, source = NOMIS),
+          HistoryComparison(
+            value = 189,
+            appliesFrom = NOW.minusYears(1),
+            appliesTo = null,
+            createdAt = NOW.minusYears(1),
+            createdBy = USER2,
+            source = NOMIS,
+          ),
+          HistoryComparison(
+            value = 190,
+            appliesFrom = NOW.minusYears(2),
+            appliesTo = null,
+            createdAt = NOW,
+            createdBy = USER1,
+            source = NOMIS,
+          ),
         )
         expectFieldHistory(
           WEIGHT,
-          HistoryComparison(value = 79, appliesFrom = NOW.minusYears(1), appliesTo = NOW, createdAt = NOW.minusYears(1), createdBy = USER2, source = NOMIS),
-          HistoryComparison(value = 80, appliesFrom = NOW.minusYears(2), appliesTo = null, createdAt = NOW, createdBy = USER1, source = NOMIS),
+          HistoryComparison(
+            value = 79,
+            appliesFrom = NOW.minusYears(1),
+            appliesTo = null,
+            createdAt = NOW.minusYears(1),
+            createdBy = USER2,
+            source = NOMIS,
+          ),
+          HistoryComparison(
+            value = 80,
+            appliesFrom = NOW.minusYears(2),
+            appliesTo = null,
+            createdAt = NOW,
+            createdBy = USER1,
+            source = NOMIS,
+          ),
         )
         expectNoFieldHistoryFor(HAIR, FACIAL_HAIR, FACE, BUILD, LEFT_EYE_COLOUR, RIGHT_EYE_COLOUR, SHOE_SIZE)
 
@@ -502,7 +698,8 @@ class PhysicalAttributesMigrationControllerIntTest : IntegrationTestBase() {
             "weight": 80,
             "appliesFrom": "2024-06-14T09:10:11.123+0100",
             "createdAt": "2024-06-14T09:10:11.123+0100",
-            "createdBy": "USER1"
+            "createdBy": "USER1",
+            "latestBooking": true
           }
         ]
       """.trimIndent()
@@ -516,7 +713,8 @@ class PhysicalAttributesMigrationControllerIntTest : IntegrationTestBase() {
             "weight": 80,
             "appliesFrom": "2024-06-14T09:10:11.123+0100",
             "createdAt": "2024-06-14T09:10:11.123+0100",
-            "createdBy": "USER1"
+            "createdBy": "USER1",
+            "latestBooking": true
           },
           { 
             "height": 188,
@@ -524,7 +722,8 @@ class PhysicalAttributesMigrationControllerIntTest : IntegrationTestBase() {
             "appliesFrom": "2024-06-12T09:10:11.123+0100",
             "appliesTo": "2024-06-13T09:10:11.123+0100",
             "createdAt": "2024-06-12T09:10:11.123+0100",
-            "createdBy": "CHANGE_TO_WEIGHT_ONLY"
+            "createdBy": "CHANGE_TO_WEIGHT_ONLY",
+            "latestBooking": false
           },
           { 
             "height": 188,
@@ -532,7 +731,8 @@ class PhysicalAttributesMigrationControllerIntTest : IntegrationTestBase() {
             "appliesFrom": "2024-06-11T09:10:11.123+0100",
             "appliesTo": "2024-06-12T09:10:11.123+0100",
             "createdAt": "2024-06-11T09:10:11.123+0100",
-            "createdBy": "CHANGE_TO_HEIGHT_ONLY"
+            "createdBy": "CHANGE_TO_HEIGHT_ONLY",
+            "latestBooking": false
           },
           { 
             "height": 189,
@@ -540,7 +740,8 @@ class PhysicalAttributesMigrationControllerIntTest : IntegrationTestBase() {
             "appliesFrom": "2024-06-10T09:10:11.123+0100",
             "appliesTo": "2024-06-11T09:10:11.123+0100",
             "createdAt": "2024-06-14T09:10:11.123+0100",
-            "createdBy": "NO_CHANGES_MADE"
+            "createdBy": "NO_CHANGES_MADE",
+            "latestBooking": false
           },
           { 
             "height": 189,
@@ -548,7 +749,8 @@ class PhysicalAttributesMigrationControllerIntTest : IntegrationTestBase() {
             "appliesFrom": "2024-06-09T09:10:11.123+0100",
             "appliesTo": "2024-06-10T09:10:11.123+0100",
             "createdAt": "2024-06-09T09:10:11.123+0100",
-            "createdBy": "USER2"
+            "createdBy": "USER2",
+            "latestBooking": false
           }
         ]
       """.trimIndent()
@@ -563,7 +765,8 @@ class PhysicalAttributesMigrationControllerIntTest : IntegrationTestBase() {
             "appliesFrom": "2022-06-14T09:10:11.123+0100",
             "appliesTo": "2023-06-14T09:10:11.123+0100",
             "createdAt": "2022-06-14T09:10:11.123+0100",
-            "createdBy": "USER2"
+            "createdBy": "USER2",
+            "latestBooking": false
           },
           { 
             "height": 190,
@@ -571,7 +774,8 @@ class PhysicalAttributesMigrationControllerIntTest : IntegrationTestBase() {
             "appliesFrom": "2021-06-14T09:10:11.123+0100",
             "appliesTo": "2024-06-14T09:10:11.123+0100",
             "createdAt": "2021-06-14T09:10:11.123+0100",
-            "createdBy": "USER1"
+            "createdBy": "USER1",
+            "latestBooking": true
           }
         ]
       """.trimIndent()
@@ -586,7 +790,8 @@ class PhysicalAttributesMigrationControllerIntTest : IntegrationTestBase() {
             "appliesFrom": "2022-06-14T09:10:11.123+0100",
             "appliesTo": "2024-06-14T09:10:11.123+0100",
             "createdAt": "2022-06-14T09:10:11.123+0100",
-            "createdBy": "USER2"
+            "createdBy": "USER2",
+            "latestBooking": false
           },
           { 
             "height": 190,
@@ -594,7 +799,8 @@ class PhysicalAttributesMigrationControllerIntTest : IntegrationTestBase() {
             "appliesFrom": "2021-06-14T09:10:11.123+0100",
             "appliesTo": "2024-06-14T09:10:11.123+0100",
             "createdAt": "2024-06-14T09:10:11.123+0100",
-            "createdBy": "USER1"
+            "createdBy": "USER1",
+            "latestBooking": true
           }
         ]
       """.trimIndent()
@@ -609,7 +815,8 @@ class PhysicalAttributesMigrationControllerIntTest : IntegrationTestBase() {
             "appliesFrom": "2022-06-14T09:10:11.123+0100",
             "appliesTo": "2024-06-14T09:10:11.123+0100",
             "createdAt": "2022-06-14T09:10:11.123+0100",
-            "createdBy": "USER2"
+            "createdBy": "USER2",
+            "latestBooking": false
           },
           { 
             "height": 190,
@@ -617,7 +824,8 @@ class PhysicalAttributesMigrationControllerIntTest : IntegrationTestBase() {
             "appliesFrom": "2022-06-14T09:10:11.123+0100",
             "appliesTo": "2024-06-14T09:10:11.123+0100",
             "createdAt": "2024-06-14T09:10:11.123+0100",
-            "createdBy": "USER1"
+            "createdBy": "USER1",
+            "latestBooking": true
           }
         ]
       """.trimIndent()
@@ -632,14 +840,16 @@ class PhysicalAttributesMigrationControllerIntTest : IntegrationTestBase() {
             "appliesFrom": "2022-06-14T09:10:11.123+0100",
             "appliesTo": "2023-06-14T09:10:11.123+0100",
             "createdAt": "2022-06-14T09:10:11.123+0100",
-            "createdBy": "USER2"
+            "createdBy": "USER2",
+            "latestBooking": false
           },
           { 
             "height": 190,
             "weight": 80,
             "appliesFrom": "2021-06-14T09:10:11.123+0100",
             "createdAt": "2021-06-14T09:10:11.123+0100",
-            "createdBy": "USER1"
+            "createdBy": "USER1",
+            "latestBooking": true
           }
         ]
       """.trimIndent()
@@ -654,7 +864,8 @@ class PhysicalAttributesMigrationControllerIntTest : IntegrationTestBase() {
             "appliesFrom": "2021-06-14T09:10:11.123+0100",
             "appliesTo": "2023-06-14T09:10:11.123+0100",
             "createdAt": "2021-06-14T09:10:11.123+0100",
-            "createdBy": "USER2"
+            "createdBy": "USER2",
+            "latestBooking": false
           },
           { 
             "height": 190,
@@ -662,7 +873,8 @@ class PhysicalAttributesMigrationControllerIntTest : IntegrationTestBase() {
             "appliesFrom": "2022-06-14T09:10:11.123+0100",
             "appliesTo": "2024-06-14T09:10:11.123+0100",
             "createdAt": "2022-06-14T09:10:11.123+0100",
-            "createdBy": "USER1"
+            "createdBy": "USER1",
+            "latestBooking": true
           }
         ]
       """.trimIndent()
@@ -677,14 +889,16 @@ class PhysicalAttributesMigrationControllerIntTest : IntegrationTestBase() {
             "appliesFrom": "2021-06-14T09:10:11.123+0100",
             "appliesTo": "2023-06-14T09:10:11.123+0100",
             "createdAt": "2021-06-14T09:10:11.123+0100",
-            "createdBy": "USER2"
+            "createdBy": "USER2",
+            "latestBooking": false
           },
           { 
             "height": 190,
             "weight": 80,
             "appliesFrom": "2022-06-14T09:10:11.123+0100",
             "createdAt": "2022-06-14T09:10:11.123+0100",
-            "createdBy": "USER1"
+            "createdBy": "USER1",
+            "latestBooking": true
           }
         ]
       """.trimIndent()
@@ -702,14 +916,16 @@ class PhysicalAttributesMigrationControllerIntTest : IntegrationTestBase() {
             "weight": 79,
             "appliesFrom": "2023-06-14T09:10:11.123+0100",
             "createdAt": "2023-06-14T09:10:11.123+0100",
-            "createdBy": "USER2"
+            "createdBy": "USER2",
+            "latestBooking": false
           },
           { 
             "height": 190,
             "weight": 80,
             "appliesFrom": "2022-06-14T09:10:11.123+0100",
             "createdAt": "2024-06-14T09:10:11.123+0100",
-            "createdBy": "USER1"
+            "createdBy": "USER1",
+            "latestBooking": true
           }
         ]
       """.trimIndent()

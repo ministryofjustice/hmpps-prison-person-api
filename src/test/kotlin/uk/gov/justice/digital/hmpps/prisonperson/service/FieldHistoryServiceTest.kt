@@ -86,6 +86,7 @@ class FieldHistoryServiceTest {
             createdAt = THEN,
             createdBy = USER1,
             source = Source.DPS,
+            anomalous = false,
           ),
           FieldHistory(
             fieldHistoryId = 2,
@@ -96,6 +97,7 @@ class FieldHistoryServiceTest {
             createdAt = NOW,
             createdBy = USER2,
             source = Source.DPS,
+            anomalous = false,
           ),
         ),
       )
@@ -111,6 +113,7 @@ class FieldHistoryServiceTest {
         createdAt = THEN,
         createdBy = "USER1",
         source = Source.DPS.toString(),
+        anomalous = false,
       ),
       FieldHistoryDto(
         prisonerNumber = "A1234AA",
@@ -120,6 +123,7 @@ class FieldHistoryServiceTest {
         createdAt = NOW,
         createdBy = "USER2",
         source = Source.DPS.toString(),
+        anomalous = false,
       ),
     )
   }

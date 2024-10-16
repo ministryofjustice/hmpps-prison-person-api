@@ -28,6 +28,7 @@ class FieldHistoryRepositoryTest : RepositoryTest() {
       appliesFrom = NOW.minusDays(2),
       appliesTo = NOW.minusDays(1),
       source = DPS,
+      anomalous = false,
     )
 
     val id = fieldHistoryRepository.save(fieldHistory).fieldHistoryId
@@ -48,6 +49,7 @@ class FieldHistoryRepositoryTest : RepositoryTest() {
       assertThat(appliesFrom).isEqualTo(NOW.minusDays(2))
       assertThat(appliesTo).isEqualTo(NOW.minusDays(1))
       assertThat(source).isEqualTo(DPS)
+      assertThat(anomalous).isEqualTo(false)
     }
   }
 
@@ -63,6 +65,7 @@ class FieldHistoryRepositoryTest : RepositoryTest() {
       appliesFrom = NOW.minusDays(2),
       appliesTo = NOW.minusDays(1),
       source = DPS,
+      anomalous = false,
     )
 
     val id = fieldHistoryRepository.save(fieldHistory).fieldHistoryId
@@ -83,6 +86,7 @@ class FieldHistoryRepositoryTest : RepositoryTest() {
       assertThat(appliesFrom).isEqualTo(NOW.minusDays(2))
       assertThat(appliesTo).isEqualTo(NOW.minusDays(1))
       assertThat(source).isEqualTo(DPS)
+      assertThat(anomalous).isEqualTo(false)
     }
   }
 
@@ -98,6 +102,7 @@ class FieldHistoryRepositoryTest : RepositoryTest() {
       appliesFrom = NOW.minusDays(2),
       appliesTo = NOW.minusDays(1),
       source = DPS,
+      anomalous = false,
     )
 
     val id = fieldHistoryRepository.save(fieldHistory).fieldHistoryId
@@ -118,6 +123,7 @@ class FieldHistoryRepositoryTest : RepositoryTest() {
       assertThat(appliesFrom).isEqualTo(NOW.minusDays(2))
       assertThat(appliesTo).isEqualTo(NOW.minusDays(1))
       assertThat(source).isEqualTo(DPS)
+      assertThat(anomalous).isEqualTo(false)
     }
   }
 
@@ -134,6 +140,7 @@ class FieldHistoryRepositoryTest : RepositoryTest() {
       appliesFrom = NOW.minusDays(2),
       appliesTo = NOW.minusDays(1),
       source = DPS,
+      anomalous = false,
     )
 
     assertThrows(DataIntegrityViolationException::class.java) {
@@ -157,6 +164,7 @@ class FieldHistoryRepositoryTest : RepositoryTest() {
       appliesFrom = NOW.minusDays(2),
       appliesTo = NOW.minusDays(1),
       source = DPS,
+      anomalous = false,
     )
 
     assertThrows(JpaObjectRetrievalFailureException::class.java) {
@@ -178,6 +186,7 @@ class FieldHistoryRepositoryTest : RepositoryTest() {
         appliesFrom = NOW,
         createdAt = NOW,
         createdBy = USER1,
+        anomalous = false,
       ),
     ).isEqualTo(
       FieldHistory(
@@ -187,6 +196,7 @@ class FieldHistoryRepositoryTest : RepositoryTest() {
         appliesFrom = NOW,
         createdAt = NOW,
         createdBy = USER1,
+        anomalous = false,
       ),
     )
 
@@ -198,6 +208,7 @@ class FieldHistoryRepositoryTest : RepositoryTest() {
         appliesFrom = NOW,
         createdAt = NOW,
         createdBy = USER1,
+        anomalous = false,
       ),
     ).isEqualTo(
       FieldHistory(
@@ -207,6 +218,7 @@ class FieldHistoryRepositoryTest : RepositoryTest() {
         appliesFrom = NOW,
         createdAt = NOW,
         createdBy = USER1,
+        anomalous = false,
       ),
     )
 
@@ -218,6 +230,7 @@ class FieldHistoryRepositoryTest : RepositoryTest() {
         appliesFrom = NOW,
         createdAt = NOW,
         createdBy = USER1,
+        anomalous = false,
       ),
     ).isNotEqualTo(
       FieldHistory(
@@ -227,6 +240,7 @@ class FieldHistoryRepositoryTest : RepositoryTest() {
         appliesFrom = NOW,
         createdAt = NOW,
         createdBy = USER1,
+        anomalous = false,
       ),
     )
 
@@ -238,6 +252,7 @@ class FieldHistoryRepositoryTest : RepositoryTest() {
         appliesFrom = NOW,
         createdAt = NOW,
         createdBy = USER1,
+        anomalous = false,
       ),
     ).isNotEqualTo(
       FieldHistory(
@@ -247,6 +262,7 @@ class FieldHistoryRepositoryTest : RepositoryTest() {
         appliesFrom = NOW,
         createdAt = NOW,
         createdBy = USER1,
+        anomalous = false,
       ),
     )
   }
@@ -260,6 +276,7 @@ class FieldHistoryRepositoryTest : RepositoryTest() {
         valueInt = INT_VALUE,
         createdAt = NOW,
         createdBy = USER1,
+        anomalous = false,
       ).toString(),
     ).isInstanceOf(String::class.java)
 
@@ -270,6 +287,7 @@ class FieldHistoryRepositoryTest : RepositoryTest() {
         valueRef = REF_DATA_CODE,
         createdAt = NOW,
         createdBy = USER1,
+        anomalous = false,
       ).toString(),
     ).isInstanceOf(String::class.java)
   }

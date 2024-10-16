@@ -49,6 +49,6 @@ data class FieldHistoryDto(
   @Schema(description = "The source of the change, either DPS or NOMIS. Will be NOMIS if the record was either migrated or synced from NOMIS")
   val source: String? = null,
 
-  @Schema(description = "A flag to indicate that when the data was migrated from NOMIS, the booking it was taken from did not have an end date")
+  @Schema(description = "A flag to indicate that when the data was migrated from NOMIS, the booking it was taken from was historical but did not have an end date")
   val anomalous: Boolean,
 )

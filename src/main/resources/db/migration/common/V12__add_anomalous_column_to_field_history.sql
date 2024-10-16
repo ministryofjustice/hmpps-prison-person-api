@@ -1,8 +1,8 @@
-alter table field_history
-    add column anomalous boolean;
-update field_history
-set anomalous = false
-where 1 = 1;
-alter table field_history
-    alter column anomalous set not null;
-COMMENT ON COLUMN field_history.anomalous IS 'A flag to indicate that when the data was migrated from NOMIS, the booking it was taken from did not have an end date';
+ALTER TABLE field_history
+    ADD COLUMN anomalous boolean;
+UPDATE field_history
+SET anomalous = FALSE
+WHERE 1 = 1;
+ALTER TABLE field_history
+    ALTER COLUMN anomalous SET NOT NULL;
+COMMENT ON COLUMN field_history.anomalous IS 'A flag to indicate that when the data was migrated from NOMIS, the booking it was taken from was historical but did not have an end date';

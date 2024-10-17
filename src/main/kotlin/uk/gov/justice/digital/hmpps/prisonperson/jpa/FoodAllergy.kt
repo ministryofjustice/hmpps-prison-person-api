@@ -7,11 +7,9 @@ import jakarta.persistence.GenerationType.IDENTITY
 import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
-import jakarta.persistence.Table
 import org.hibernate.Hibernate
 
 @Entity
-@Table(name = "food_allergies")
 class FoodAllergy(
   @Column(name = "prisoner_number", updatable = false, nullable = false)
   val prisonerNumber: String,

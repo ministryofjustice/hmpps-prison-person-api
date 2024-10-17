@@ -1,4 +1,4 @@
-INSERT INTO identifying_marks (
+INSERT INTO identifying_mark (
    identifying_mark_id,
    prisoner_number,
    body_part_code,
@@ -20,7 +20,7 @@ VALUES ('c46d0ce9-e586-4fa6-ae76-52ea8c242257',
         'USER_GEN'
     );
 
-INSERT INTO identifying_marks (
+INSERT INTO identifying_mark (
     identifying_mark_id,
     prisoner_number,
     body_part_code,
@@ -42,13 +42,13 @@ VALUES ('c46d0ce9-e586-4fa6-ae76-52ea8c242258',
         'USER_GEN'
        );
 
-INSERT INTO identifying_marks_images (
+INSERT INTO identifying_mark_image (
     identifying_mark_image_id,
     identifying_mark_id
 )
 VALUES ('c46d0ce9-e586-4fa6-ae76-52ea8c242260', 'c46d0ce9-e586-4fa6-ae76-52ea8c242258');
 
-INSERT INTO identifying_marks_images (
+INSERT INTO identifying_mark_image (
     identifying_mark_image_id,
     identifying_mark_id
 )

@@ -4,7 +4,6 @@ import org.assertj.core.api.Assertions.assertThat
 import org.awaitility.kotlin.await
 import org.awaitility.kotlin.matches
 import org.awaitility.kotlin.untilCallTo
-import org.hamcrest.Matchers.not
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -98,9 +97,9 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
       @Test
       @Sql(
         "classpath:jpa/repository/reset.sql",
-        "classpath:controller/physicalattributes/physical_attributes.sql",
-        "classpath:controller/physicalattributes/field_history.sql",
-        "classpath:controller/physicalattributes/field_metadata.sql",
+        "classpath:controller/physical_attributes/physical_attributes.sql",
+        "classpath:controller/physical_attributes/field_history.sql",
+        "classpath:controller/physical_attributes/field_metadata.sql",
       )
       fun `can return physical attributes`() {
         expectSuccessfulGetRequest().expectBody()
@@ -378,8 +377,8 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
 
       @Test
       @Sql("classpath:jpa/repository/reset.sql")
-      @Sql("classpath:controller/physicalattributes/physical_attributes.sql")
-      @Sql("classpath:controller/physicalattributes/field_history.sql")
+      @Sql("classpath:controller/physical_attributes/physical_attributes.sql")
+      @Sql("classpath:controller/physical_attributes/field_history.sql")
       fun `can update an existing set of physical attributes`() {
         expectFieldHistory(
           HEIGHT,
@@ -505,8 +504,8 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
 
       @Test
       @Sql("classpath:jpa/repository/reset.sql")
-      @Sql("classpath:controller/physicalattributes/physical_attributes.sql")
-      @Sql("classpath:controller/physicalattributes/field_history.sql")
+      @Sql("classpath:controller/physical_attributes/physical_attributes.sql")
+      @Sql("classpath:controller/physical_attributes/field_history.sql")
       fun `can update an existing set of physical attributes a number of times`() {
         expectFieldHistory(
           HEIGHT,
@@ -701,8 +700,8 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
 
       @Test
       @Sql("classpath:jpa/repository/reset.sql")
-      @Sql("classpath:controller/physicalattributes/migration/physical_attributes.sql")
-      @Sql("classpath:controller/physicalattributes/migration/field_history.sql")
+      @Sql("classpath:controller/physical_attributes/migration/physical_attributes.sql")
+      @Sql("classpath:controller/physical_attributes/migration/field_history.sql")
       fun `should publish domain event`() {
         expectSuccessfulUpdateFrom("""{ "height": 190, "weight": 90 }""")
 
@@ -727,8 +726,8 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
 
     @Test
     @Sql("classpath:jpa/repository/reset.sql")
-    @Sql("classpath:controller/physicalattributes/migration/physical_attributes.sql")
-    @Sql("classpath:controller/physicalattributes/migration/field_history.sql")
+    @Sql("classpath:controller/physical_attributes/migration/physical_attributes.sql")
+    @Sql("classpath:controller/physical_attributes/migration/field_history.sql")
     fun `should publish telemetry event`() {
       expectSuccessfulUpdateFrom("""{ "height": 190, "weight": 90 }""")
 

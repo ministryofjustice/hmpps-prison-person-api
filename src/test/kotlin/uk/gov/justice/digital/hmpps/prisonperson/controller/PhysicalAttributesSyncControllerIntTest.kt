@@ -148,8 +148,8 @@ class PhysicalAttributesSyncControllerIntTest : IntegrationTestBase() {
 
       @Test
       @Sql("classpath:jpa/repository/reset.sql")
-      @Sql("classpath:controller/physicalattributes/sync/physical_attributes.sql")
-      @Sql("classpath:controller/physicalattributes/sync/field_history.sql")
+      @Sql("classpath:controller/physical_attributes/sync/physical_attributes.sql")
+      @Sql("classpath:controller/physical_attributes/sync/field_history.sql")
       fun `can sync an update of existing physical attributes`() {
         expectFieldHistory(
           HEIGHT,
@@ -212,8 +212,8 @@ class PhysicalAttributesSyncControllerIntTest : IntegrationTestBase() {
 
       @Test
       @Sql("classpath:jpa/repository/reset.sql")
-      @Sql("classpath:controller/physicalattributes/sync/physical_attributes.sql")
-      @Sql("classpath:controller/physicalattributes/sync/field_history.sql")
+      @Sql("classpath:controller/physical_attributes/sync/physical_attributes.sql")
+      @Sql("classpath:controller/physical_attributes/sync/field_history.sql")
       fun `can sync an update of the existing physical attributes when the booking has an end date`() {
         expectFieldHistory(
           HEIGHT,
@@ -276,8 +276,8 @@ class PhysicalAttributesSyncControllerIntTest : IntegrationTestBase() {
 
       @Test
       @Sql("classpath:jpa/repository/reset.sql")
-      @Sql("classpath:controller/physicalattributes/sync/physical_attributes.sql")
-      @Sql("classpath:controller/physicalattributes/sync/field_history.sql")
+      @Sql("classpath:controller/physical_attributes/sync/physical_attributes.sql")
+      @Sql("classpath:controller/physical_attributes/sync/field_history.sql")
       fun `can sync a historical update of physical attributes`() {
         expectFieldHistory(
           HEIGHT,
@@ -417,8 +417,8 @@ class PhysicalAttributesSyncControllerIntTest : IntegrationTestBase() {
 
     @Test
     @Sql("classpath:jpa/repository/reset.sql")
-    @Sql("classpath:controller/physicalattributes/sync/physical_attributes.sql")
-    @Sql("classpath:controller/physicalattributes/sync/field_history.sql")
+    @Sql("classpath:controller/physical_attributes/sync/physical_attributes.sql")
+    @Sql("classpath:controller/physical_attributes/sync/field_history.sql")
     fun `returns 500 if history would have illogical applies_to and applies_from timestamps`() {
       webTestClient.put().uri("/sync/prisoners/${PRISONER_NUMBER}/physical-attributes")
         .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__PHYSICAL_ATTRIBUTES_SYNC__RW")))
@@ -490,9 +490,9 @@ class PhysicalAttributesSyncControllerIntTest : IntegrationTestBase() {
       @Test
       @Sql(
         "classpath:jpa/repository/reset.sql",
-        "classpath:controller/physicalattributes/migration/physical_attributes.sql",
-        "classpath:controller/physicalattributes/migration/field_history.sql",
-        "classpath:controller/physicalattributes/migration/field_metadata.sql",
+        "classpath:controller/physical_attributes/migration/physical_attributes.sql",
+        "classpath:controller/physical_attributes/migration/field_history.sql",
+        "classpath:controller/physical_attributes/migration/field_metadata.sql",
       )
       fun `can return physical attributes`() {
         expectSuccessfulGetRequest().expectBody()

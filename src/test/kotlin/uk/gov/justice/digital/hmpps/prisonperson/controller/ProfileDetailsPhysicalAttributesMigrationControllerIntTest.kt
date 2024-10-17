@@ -398,8 +398,8 @@ class ProfileDetailsPhysicalAttributesMigrationControllerIntTest : IntegrationTe
 
       @Test
       @Sql("classpath:jpa/repository/reset.sql")
-      @Sql("classpath:controller/physicalattributes/migration/physical_attributes.sql")
-      @Sql("classpath:controller/physicalattributes/migration/field_history.sql")
+      @Sql("classpath:controller/physical_attributes/migration/physical_attributes.sql")
+      @Sql("classpath:controller/physical_attributes/migration/field_history.sql")
       fun `migration rerun for a prisoner with existing profile details physical attributes data simply overwrites what was there`() {
         webTestClient.put().uri("/migration/prisoners/A1234AA/profile-details-physical-attributes")
           .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__PROFILE_DETAILS_PHYSICAL_ATTRIBUTES_MIGRATION__RW")))

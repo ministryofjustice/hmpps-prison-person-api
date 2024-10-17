@@ -9,7 +9,6 @@ import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.OneToMany
-import jakarta.persistence.Table
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.IdentifyingMarkDto
 import uk.gov.justice.digital.hmpps.prisonperson.mapper.toSimpleDto
 import uk.gov.justice.digital.hmpps.prisonperson.utils.GeneratedUuidV7
@@ -17,7 +16,6 @@ import java.time.ZonedDateTime
 import java.util.UUID
 
 @Entity
-@Table(name = "identifying_marks")
 class IdentifyingMark(
   @Id
   @GeneratedUuidV7
@@ -67,7 +65,6 @@ class IdentifyingMark(
 }
 
 @Entity
-@Table(name = "identifying_marks_images")
 class IdentifyingMarkImage(
   @Id
   @Column(name = "identifying_mark_image_id", updatable = false, nullable = false)

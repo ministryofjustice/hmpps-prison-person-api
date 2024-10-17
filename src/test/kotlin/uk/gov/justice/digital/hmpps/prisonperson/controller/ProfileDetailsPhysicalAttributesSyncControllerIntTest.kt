@@ -147,8 +147,8 @@ class ProfileDetailsPhysicalAttributesSyncControllerIntTest : IntegrationTestBas
 
       @Test
       @Sql("classpath:jpa/repository/reset.sql")
-      @Sql("classpath:controller/physicalattributes/profile_details_sync/physical_attributes.sql")
-      @Sql("classpath:controller/physicalattributes/profile_details_sync/field_history.sql")
+      @Sql("classpath:controller/physical_attributes/profile_details_sync/physical_attributes.sql")
+      @Sql("classpath:controller/physical_attributes/profile_details_sync/field_history.sql")
       fun `can sync an update of existing physical attributes`() {
         expectFieldHistory(
           HAIR,
@@ -201,8 +201,8 @@ class ProfileDetailsPhysicalAttributesSyncControllerIntTest : IntegrationTestBas
 
       @Test
       @Sql("classpath:jpa/repository/reset.sql")
-      @Sql("classpath:controller/physicalattributes/profile_details_sync/physical_attributes.sql")
-      @Sql("classpath:controller/physicalattributes/profile_details_sync/field_history.sql")
+      @Sql("classpath:controller/physical_attributes/profile_details_sync/physical_attributes.sql")
+      @Sql("classpath:controller/physical_attributes/profile_details_sync/field_history.sql")
       fun `can sync an update of the existing physical attributes when the booking has an end date`() {
         expectFieldHistory(
           HAIR,
@@ -257,8 +257,8 @@ class ProfileDetailsPhysicalAttributesSyncControllerIntTest : IntegrationTestBas
 
       @Test
       @Sql("classpath:jpa/repository/reset.sql")
-      @Sql("classpath:controller/physicalattributes/profile_details_sync/physical_attributes.sql")
-      @Sql("classpath:controller/physicalattributes/profile_details_sync/field_history.sql")
+      @Sql("classpath:controller/physical_attributes/profile_details_sync/physical_attributes.sql")
+      @Sql("classpath:controller/physical_attributes/profile_details_sync/field_history.sql")
       fun `can sync a historical update of physical attributes`() {
         expectFieldHistory(
           HAIR,
@@ -388,8 +388,8 @@ class ProfileDetailsPhysicalAttributesSyncControllerIntTest : IntegrationTestBas
 
     @Test
     @Sql("classpath:jpa/repository/reset.sql")
-    @Sql("classpath:controller/physicalattributes/profile_details_sync/physical_attributes.sql")
-    @Sql("classpath:controller/physicalattributes/profile_details_sync/field_history.sql")
+    @Sql("classpath:controller/physical_attributes/profile_details_sync/physical_attributes.sql")
+    @Sql("classpath:controller/physical_attributes/profile_details_sync/field_history.sql")
     fun `returns 500 if history would have illogical applies_to and applies_from timestamps`() {
       webTestClient.put().uri("/sync/prisoners/${PRISONER_NUMBER}/profile-details-physical-attributes")
         .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__PROFILE_DETAILS_PHYSICAL_ATTRIBUTES_SYNC__RW")))

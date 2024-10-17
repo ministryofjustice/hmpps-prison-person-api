@@ -61,9 +61,9 @@ class FieldHistoryControllerIntTest : IntegrationTestBase() {
       @Test
       @Sql(
         "classpath:jpa/repository/reset.sql",
-        "classpath:controller/physicalattributes/physical_attributes.sql",
-        "classpath:controller/physicalattributes/field_history.sql",
-        "classpath:controller/physicalattributes/field_metadata.sql",
+        "classpath:controller/physical_attributes/physical_attributes.sql",
+        "classpath:controller/physical_attributes/field_history.sql",
+        "classpath:controller/physical_attributes/field_metadata.sql",
       )
       fun `can return field history`() {
         expectSuccessfulGetRequest().expectBody()

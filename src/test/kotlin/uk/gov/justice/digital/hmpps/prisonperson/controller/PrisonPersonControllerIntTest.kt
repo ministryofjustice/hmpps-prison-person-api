@@ -42,9 +42,9 @@ class PrisonPersonControllerIntTest : IntegrationTestBase() {
     @Nested
     @Sql(
       "classpath:jpa/repository/reset.sql",
-      "classpath:controller/physicalattributes/physical_attributes.sql",
-      "classpath:controller/physicalattributes/field_history.sql",
-      "classpath:controller/physicalattributes/field_metadata.sql",
+      "classpath:controller/physical_attributes/physical_attributes.sql",
+      "classpath:controller/physical_attributes/field_history.sql",
+      "classpath:controller/physical_attributes/field_metadata.sql",
       "classpath:controller/prisoner_health/health.sql",
       "classpath:controller/prisoner_health/food_allergies.sql",
       "classpath:controller/prisoner_health/medical_dietary_requirements.sql",

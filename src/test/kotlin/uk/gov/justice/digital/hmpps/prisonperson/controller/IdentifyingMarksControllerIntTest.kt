@@ -80,7 +80,7 @@ class IdentifyingMarksControllerIntTest : IntegrationTestBase() {
 
       @Test
       @Sql("classpath:jpa/repository/reset.sql")
-      @Sql("classpath:controller/identifyingMarks/identifying_marks.sql")
+      @Sql("classpath:controller/identifying_marks/identifying_marks.sql")
       fun `can return list of identifying mark data for prisoner when found`() {
         val response = webTestClient.get().uri("/identifying-marks/prisoner/12345")
           .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RO")))
@@ -110,7 +110,7 @@ class IdentifyingMarksControllerIntTest : IntegrationTestBase() {
 
       @Test
       @Sql("classpath:jpa/repository/reset.sql")
-      @Sql("classpath:controller/identifyingMarks/identifying_marks.sql")
+      @Sql("classpath:controller/identifying_marks/identifying_marks.sql")
       fun `can return identifying mark data when found`() {
         val response = webTestClient.get().uri("/identifying-marks/mark/c46d0ce9-e586-4fa6-ae76-52ea8c242258")
           .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RO")))

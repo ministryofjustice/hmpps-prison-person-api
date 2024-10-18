@@ -78,11 +78,21 @@ class ProfileDetailsPhysicalAttributesMigrationService(
       }
     }
 
-    return physicalAttributesRepository.save(physicalAttributes).fieldHistory
+    val savedPhysicalAttributes = physicalAttributesRepository.save(physicalAttributes)
+
+    return savedPhysicalAttributes.fieldHistory
       .filter { it.migratedAt == now }
       .map { it.fieldHistoryId }
-      .also { physicalAttributes.publishUpdateEvent(PROFILE_DETAILS_PHYSICAL_ATTRIBUTES_MIGRATED, NOMIS, now, fieldsToMigrate, it) }
-      .also { physicalAttributesRepository.save(physicalAttributes) } // save() required after publishEvent
+      .also {
+        savedPhysicalAttributes.publishUpdateEvent(
+          PROFILE_DETAILS_PHYSICAL_ATTRIBUTES_MIGRATED,
+          NOMIS,
+          now,
+          fieldsToMigrate,
+          it,
+        )
+      }
+      .also { physicalAttributesRepository.save(savedPhysicalAttributes) } // save() required after publishEvent
       .let { ProfileDetailsPhysicalAttributesMigrationResponse(it) }
   }
 

@@ -60,9 +60,11 @@ class PhysicalAttributesSyncService(
 
     val changedFields = physicalAttributes.updateFieldHistory(request.createdAt, request.createdBy, NOMIS, fieldsToSync)
 
-    return physicalAttributesRepository.save(physicalAttributes).getLatestFieldHistoryIds()
-      .also { physicalAttributes.publishUpdateEvent(PHYSICAL_ATTRIBUTES_SYNCED, NOMIS, now, changedFields, it) }
-      .also { physicalAttributesRepository.save(physicalAttributes) } // save() required after publishEvent
+    val savedPhysicalAttributes = physicalAttributesRepository.save(physicalAttributes)
+
+    return savedPhysicalAttributes.getLatestFieldHistoryIds()
+      .also { savedPhysicalAttributes.publishUpdateEvent(PHYSICAL_ATTRIBUTES_SYNCED, NOMIS, now, changedFields, it) }
+      .also { physicalAttributesRepository.save(savedPhysicalAttributes) } // save() required after publishEvent
       .let { PhysicalAttributesSyncResponse(it) }
   }
 
@@ -86,7 +88,15 @@ class PhysicalAttributesSyncService(
 
     return request.addToHistory(prisonerNumber)
       .map { it.fieldHistoryId }
-      .also { physicalAttributes.publishUpdateEvent(PHYSICAL_ATTRIBUTES_SYNCED_HISTORICAL, NOMIS, now, emptyList(), it) }
+      .also {
+        physicalAttributes.publishUpdateEvent(
+          PHYSICAL_ATTRIBUTES_SYNCED_HISTORICAL,
+          NOMIS,
+          now,
+          emptyList(),
+          it,
+        )
+      }
       .also { physicalAttributesRepository.save(physicalAttributes) } // save() required after publishEvent
       .let { PhysicalAttributesSyncResponse(it) }
   }

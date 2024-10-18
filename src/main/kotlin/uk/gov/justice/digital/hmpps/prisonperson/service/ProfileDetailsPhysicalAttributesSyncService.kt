@@ -92,9 +92,19 @@ class ProfileDetailsPhysicalAttributesSyncService(
       .filter { (attr) -> attr != null }
       .flatMap { (attr, field) -> updateFieldHistory(attr!!, field, physicalAttributes) }
 
-    return physicalAttributesRepository.save(physicalAttributes).getLatestFieldHistoryIds(updatedFields)
-      .also { physicalAttributes.publishUpdateEvent(PROFILE_DETAILS_PHYSICAL_ATTRIBUTES_SYNCED, NOMIS, now, changedFields, it) }
-      .also { physicalAttributesRepository.save(physicalAttributes) } // save() required after publishEvent
+    val savedPhysicalAttributes = physicalAttributesRepository.save(physicalAttributes)
+
+    return savedPhysicalAttributes.getLatestFieldHistoryIds(updatedFields)
+      .also {
+        savedPhysicalAttributes.publishUpdateEvent(
+          PROFILE_DETAILS_PHYSICAL_ATTRIBUTES_SYNCED,
+          NOMIS,
+          now,
+          changedFields,
+          it,
+        )
+      }
+      .also { physicalAttributesRepository.save(savedPhysicalAttributes) } // save() required after publishEvent
       .let { ProfileDetailsPhysicalAttributesSyncResponse(it) }
   }
 
@@ -133,7 +143,15 @@ class ProfileDetailsPhysicalAttributesSyncService(
 
     return request.addToHistory(prisonerNumber)
       .map { it.fieldHistoryId }
-      .also { physicalAttributes.publishUpdateEvent(PROFILE_DETAILS_PHYSICAL_ATTRIBUTES_SYNCED_HISTORICAL, NOMIS, now, emptyList(), it) }
+      .also {
+        physicalAttributes.publishUpdateEvent(
+          PROFILE_DETAILS_PHYSICAL_ATTRIBUTES_SYNCED_HISTORICAL,
+          NOMIS,
+          now,
+          emptyList(),
+          it,
+        )
+      }
       .also { physicalAttributesRepository.save(physicalAttributes) } // save() required after publishEvent
       .let { ProfileDetailsPhysicalAttributesSyncResponse(it) }
   }

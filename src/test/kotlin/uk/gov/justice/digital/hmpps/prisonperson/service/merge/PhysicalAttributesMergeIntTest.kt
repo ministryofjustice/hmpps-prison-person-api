@@ -237,11 +237,13 @@ class PhysicalAttributesMergeIntTest : IntegrationTestBase() {
     awaitAtMost30Secs untilCallTo { fieldHistoryIds(PRISONER_MERGE_FROM).size } matches { it == 0 }
 
     verify(telemetryClient).trackEvent(
-      eq("prison-person-api-merge-complete"),
+      eq("prison-person-api-physical-attributes-merged"),
       eq(
         mapOf(
           "prisonerNumberFrom" to PRISONER_MERGE_FROM,
           "prisonerNumberTo" to PRISONER_MERGE_TO,
+          "source" to DPS.name,
+          "fields" to listOf(HEIGHT, WEIGHT).toString(),
         ),
       ),
       isNull(),

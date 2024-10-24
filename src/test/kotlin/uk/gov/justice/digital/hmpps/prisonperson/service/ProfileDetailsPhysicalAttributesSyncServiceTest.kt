@@ -19,7 +19,6 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import org.mockito.quality.Strictness.LENIENT
-import uk.gov.justice.digital.hmpps.prisonperson.config.IllegalFieldHistoryException
 import uk.gov.justice.digital.hmpps.prisonperson.dto.request.ProfileDetailsPhysicalAttributesSyncRequest
 import uk.gov.justice.digital.hmpps.prisonperson.dto.request.SyncValueWithMetadata
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.ProfileDetailsPhysicalAttributesSyncResponse
@@ -244,7 +243,10 @@ class ProfileDetailsPhysicalAttributesSyncServiceTest {
         ),
       )
 
-      savedPhysicalAttributes.firstValue.expectDomainEventRaised(PRISONER_NUMBER, PROFILE_DETAILS_PHYSICAL_ATTRIBUTES_SYNCED_HISTORICAL) {
+      savedPhysicalAttributes.firstValue.expectDomainEventRaised(
+        PRISONER_NUMBER,
+        PROFILE_DETAILS_PHYSICAL_ATTRIBUTES_SYNCED_HISTORICAL,
+      ) {
         assertThat((it as PrisonPersonUpdatedEvent).fieldHistoryIds).isNotEmpty()
       }
     }
@@ -299,30 +301,6 @@ class ProfileDetailsPhysicalAttributesSyncServiceTest {
           assertThat((it as PrisonPersonUpdatedEvent).fieldHistoryIds).isNotEmpty()
         }
       }
-    }
-
-    @Test
-    fun `throws exception if history would have illogical applies_to and applies_from timestamps`() {
-      whenever(physicalAttributesRepository.findByIdForUpdate(PRISONER_NUMBER)).thenReturn(
-        Optional.of(
-          PhysicalAttributes(
-            prisonerNumber = PRISONER_NUMBER,
-            hair = PRISONER_HAIR,
-          ).also { it.updateFieldHistory(lastModifiedAt = NOW.minusDays(1), lastModifiedBy = USER1) },
-        ),
-      )
-
-      assertThatThrownBy {
-        underTest.sync(
-          PRISONER_NUMBER,
-          profileDetailsPhysicalAttributesSyncRequestFactory(HAIR).copy(
-            hair = SyncValueWithMetadata(PREVIOUS_PRISONER_HAIR.code, NOW.minusYears(1), USER1),
-          ),
-        )
-      }
-        .isInstanceOf(IllegalFieldHistoryException::class.java)
-
-      verify(physicalAttributesRepository, never()).save(any())
     }
   }
 

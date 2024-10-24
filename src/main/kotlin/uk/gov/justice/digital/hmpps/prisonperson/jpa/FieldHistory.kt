@@ -49,7 +49,7 @@ class FieldHistory(
   @Enumerated(STRING)
   val source: Source? = null,
 
-  val anomalous: Boolean,
+  var anomalous: Boolean,
 ) : FieldValues,
   Comparable<FieldHistory> {
 

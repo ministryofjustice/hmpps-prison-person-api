@@ -1,0 +1,1 @@
+COMMENT ON COLUMN field_history.anomalous IS 'A flag to indicate that when the data was migrated from NOMIS, the booking it was taken from was historical and the booking start and/or end dates did not align sequentially into the timeline of other bookings for the same prisoner';

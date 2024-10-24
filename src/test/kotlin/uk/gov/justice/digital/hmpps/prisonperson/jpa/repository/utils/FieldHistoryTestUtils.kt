@@ -16,6 +16,7 @@ data class HistoryComparison<T>(
   val createdBy: String,
   val source: Source = DPS,
   val migratedAt: ZonedDateTime? = null,
+  val anomalous: Boolean? = false,
 )
 
 fun expectNoFieldHistoryFor(field: PrisonPersonField, history: Collection<FieldHistory>) {
@@ -39,6 +40,7 @@ fun <T> expectFieldHistory(
     assertThat(actual.createdAt).isEqualTo(expected.createdAt)
     assertThat(actual.createdBy).isEqualTo(expected.createdBy)
     assertThat(actual.source).isEqualTo(expected.source)
+    assertThat(actual.anomalous).isEqualTo(expected.anomalous)
   }
 }
 

@@ -577,6 +577,7 @@ class PhysicalAttributesMigrationControllerIntTest : IntegrationTestBase() {
             createdAt = NOW.minusYears(1),
             createdBy = USER2,
             source = NOMIS,
+            anomalous = true,
           ),
           HistoryComparison(
             value = 190,
@@ -596,6 +597,7 @@ class PhysicalAttributesMigrationControllerIntTest : IntegrationTestBase() {
             createdAt = NOW.minusYears(1),
             createdBy = USER2,
             source = NOMIS,
+            anomalous = true,
           ),
           HistoryComparison(
             value = 80,

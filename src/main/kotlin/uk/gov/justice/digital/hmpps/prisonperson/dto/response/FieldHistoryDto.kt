@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.prisonperson.dto.response
 
+import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL
 import io.swagger.v3.oas.annotations.media.Schema
@@ -9,7 +10,7 @@ import java.time.ZonedDateTime
 
 @Schema(description = "Field History")
 @JsonInclude(NON_NULL)
-data class FieldHistoryDto(
+data class FieldHistoryDto @JsonCreator constructor(
   @Schema(description = "Prisoner Number", example = "A1234AA")
   val prisonerNumber: String,
 

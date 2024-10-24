@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.prisonperson.dto.request
 
+import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL
 import io.swagger.v3.oas.annotations.media.Schema
@@ -9,7 +10,7 @@ import org.jetbrains.annotations.NotNull
   description = "Request object for creating an identifying mark for a prisoner.",
 )
 @JsonInclude(NON_NULL)
-class IdentifyingMarkRequest(
+class IdentifyingMarkRequest @JsonCreator constructor(
   @Schema(
     description = "The prisoner number of the prisoner this identifying mark is associated with.",
     example = "A1234AA",

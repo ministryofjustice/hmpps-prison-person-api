@@ -1,11 +1,12 @@
 package uk.gov.justice.digital.hmpps.prisonperson.service.event
 
+import com.fasterxml.jackson.annotation.JsonCreator
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField
 import uk.gov.justice.digital.hmpps.prisonperson.enums.Source
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME
 
-data class DomainEvent<T>(
+data class DomainEvent<T> @JsonCreator constructor(
   val eventType: String? = null,
   val additionalInformation: T?,
   val occurredAt: String,
@@ -26,14 +27,14 @@ data class DomainEvent<T>(
   )
 }
 
-data class PrisonPersonFieldInformation(
+data class PrisonPersonFieldInformation @JsonCreator constructor(
   val url: String,
   val source: Source,
   val prisonerNumber: String,
   val fields: Collection<PrisonPersonField>,
 )
 
-data class PrisonerMergedAdditionalInformation(
+data class PrisonerMergedAdditionalInformation @JsonCreator constructor(
   val nomsNumber: String,
   val removedNomsNumber: String,
   val reason: String,

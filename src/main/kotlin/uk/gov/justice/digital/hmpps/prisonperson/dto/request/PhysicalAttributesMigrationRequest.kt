@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.prisonperson.dto.request
 
+import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL
 import io.swagger.v3.oas.annotations.media.Schema
@@ -8,7 +9,7 @@ import java.time.ZonedDateTime
 
 @Schema(description = "Request object for migration of a prisoner's physical attributes")
 @JsonInclude(NON_NULL)
-data class PhysicalAttributesMigrationRequest(
+data class PhysicalAttributesMigrationRequest @JsonCreator constructor(
   @Schema(
     description = "Height (in centimetres). May be left null if no data available for height.",
     example = "180",

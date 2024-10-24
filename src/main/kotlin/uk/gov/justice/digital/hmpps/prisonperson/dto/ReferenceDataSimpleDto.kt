@@ -1,12 +1,13 @@
 package uk.gov.justice.digital.hmpps.prisonperson.dto
 
+import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL
 import io.swagger.v3.oas.annotations.media.Schema
 
 @Schema(description = "Reference Data Simple DTO - for use in dropdowns")
 @JsonInclude(NON_NULL)
-data class ReferenceDataSimpleDto(
+data class ReferenceDataSimpleDto @JsonCreator constructor(
   @Schema(description = "Id", example = "FACIAL_HAIR_BEARDED")
   val id: String,
 

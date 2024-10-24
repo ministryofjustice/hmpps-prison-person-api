@@ -1,6 +1,8 @@
 package uk.gov.justice.digital.hmpps.prisonperson.client.documentservice.dto
 
-data class DocumentDto(
+import com.fasterxml.jackson.annotation.JsonCreator
+
+data class DocumentDto @JsonCreator constructor(
   val documentUuid: String,
   val documentType: DocumentType,
   val documentFilename: String,

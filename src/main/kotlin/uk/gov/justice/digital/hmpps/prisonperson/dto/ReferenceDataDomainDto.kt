@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.prisonperson.dto
 
+import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL
 import io.swagger.v3.oas.annotations.media.Schema
@@ -7,7 +8,7 @@ import java.time.ZonedDateTime
 
 @Schema(description = "Reference Data Domain")
 @JsonInclude(NON_NULL)
-data class ReferenceDataDomainDto(
+data class ReferenceDataDomainDto @JsonCreator constructor(
   @Schema(description = "Short code for the reference data domain", example = "HAIR")
   val code: String,
 

@@ -1,10 +1,11 @@
 package uk.gov.justice.digital.hmpps.prisonperson.dto.request
 
+import com.fasterxml.jackson.annotation.JsonCreator
 import io.swagger.v3.oas.annotations.media.Schema
 import java.time.ZonedDateTime
 
 @Schema(description = "The sync value with metadata")
-data class SyncValueWithMetadata<T>(
+data class SyncValueWithMetadata<T> @JsonCreator constructor(
   @Schema(description = "Value")
   val value: T?,
 

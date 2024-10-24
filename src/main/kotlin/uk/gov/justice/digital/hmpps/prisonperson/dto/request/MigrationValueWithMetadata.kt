@@ -1,10 +1,11 @@
 package uk.gov.justice.digital.hmpps.prisonperson.dto.request
 
+import com.fasterxml.jackson.annotation.JsonCreator
 import io.swagger.v3.oas.annotations.media.Schema
 import java.time.ZonedDateTime
 
 @Schema(description = "The migration value (`ReferenceDataCode.code`) with metadata")
-data class MigrationValueWithMetadata<T>(
+data class MigrationValueWithMetadata<T> @JsonCreator constructor(
   @Schema(description = "Value")
   val value: T?,
 

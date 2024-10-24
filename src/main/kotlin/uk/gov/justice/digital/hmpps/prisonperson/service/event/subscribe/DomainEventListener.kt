@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.prisonperson.service.event.subscribe
 
+import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.awspring.cloud.sqs.annotation.SqsListener
@@ -55,9 +56,9 @@ class DomainEventListener(
   }
 }
 
-data class EventType(val Value: String, val Type: String)
-data class MessageAttributes(val eventType: EventType)
-data class Message(
+data class EventType @JsonCreator constructor(val Value: String, val Type: String)
+data class MessageAttributes @JsonCreator constructor(val eventType: EventType)
+data class Message @JsonCreator constructor(
   val Message: String,
   val MessageAttributes: MessageAttributes,
 )

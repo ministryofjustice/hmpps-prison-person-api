@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.prisonperson.dto.request
 
+import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL
 import io.swagger.v3.oas.annotations.media.Schema
@@ -15,7 +16,7 @@ import uk.gov.justice.digital.hmpps.prisonperson.utils.getAttributeAsNullish
     " updated to equal 'null'.",
 )
 @JsonInclude(NON_NULL)
-data class PhysicalAttributesUpdateRequest(
+data class PhysicalAttributesUpdateRequest @JsonCreator constructor(
   @Schema(hidden = true)
   private val attributes: MutableMap<String, Any?> = mutableMapOf(),
 ) {

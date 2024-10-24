@@ -1,11 +1,12 @@
 package uk.gov.justice.digital.hmpps.prisonperson.dto.response
 
+import com.fasterxml.jackson.annotation.JsonCreator
 import io.swagger.v3.oas.annotations.media.Schema
 import uk.gov.justice.digital.hmpps.prisonperson.dto.ReferenceDataSimpleDto
 import java.time.ZonedDateTime
 
 @Schema(description = "Physical Attributes")
-data class PhysicalAttributesDto(
+data class PhysicalAttributesDto @JsonCreator constructor(
   @Schema(description = "Height (in centimetres)")
   val height: ValueWithMetadata<Int?>? = null,
 

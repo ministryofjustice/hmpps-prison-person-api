@@ -1,5 +1,7 @@
 package uk.gov.justice.digital.hmpps.prisonperson.client.documentservice.dto
 
+import com.fasterxml.jackson.annotation.JsonCreator
+
 enum class DocumentType {
   PRISONER_PROFILE_PICTURE,
   PHYSICAL_IDENTIFIER_PICTURE,
@@ -17,7 +19,7 @@ enum class OrderByDirection {
   DESC,
 }
 
-data class DocumentSearchRequestDto(
+data class DocumentSearchRequestDto @JsonCreator constructor(
   val documentType: DocumentType?,
   val metadata: Map<String, String>?,
   val page: Int?,

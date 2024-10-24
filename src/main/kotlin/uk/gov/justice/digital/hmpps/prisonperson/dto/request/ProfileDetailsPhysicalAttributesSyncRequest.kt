@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.prisonperson.dto.request
 
+import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL
 import io.swagger.v3.oas.annotations.media.Schema
@@ -7,7 +8,7 @@ import java.time.ZonedDateTime
 
 @Schema(description = "Request object for syncing a prisoner's profile details physical attributes")
 @JsonInclude(NON_NULL)
-data class ProfileDetailsPhysicalAttributesSyncRequest(
+data class ProfileDetailsPhysicalAttributesSyncRequest @JsonCreator constructor(
   @Schema(
     description = "Hair type or colour",
   )

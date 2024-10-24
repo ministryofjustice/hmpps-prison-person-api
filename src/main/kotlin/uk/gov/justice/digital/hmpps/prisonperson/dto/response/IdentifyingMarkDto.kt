@@ -1,11 +1,12 @@
 package uk.gov.justice.digital.hmpps.prisonperson.dto.response
 
+import com.fasterxml.jackson.annotation.JsonCreator
 import io.swagger.v3.oas.annotations.media.Schema
 import uk.gov.justice.digital.hmpps.prisonperson.dto.ReferenceDataSimpleDto
 import java.time.ZonedDateTime
 
 @Schema(description = "Identifying Mark")
-data class IdentifyingMarkDto(
+data class IdentifyingMarkDto @JsonCreator constructor(
   @Schema(description = "The id of the identifying mark")
   val id: String,
 

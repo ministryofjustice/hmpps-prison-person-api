@@ -1,9 +1,10 @@
 package uk.gov.justice.digital.hmpps.prisonperson.dto.response
 
+import com.fasterxml.jackson.annotation.JsonCreator
 import io.swagger.v3.oas.annotations.media.Schema
 
 @Schema(description = "Physical Attributes")
-data class PhysicalAttributesSyncDto(
+data class PhysicalAttributesSyncDto @JsonCreator constructor(
   @Schema(description = "Height (in centimetres)")
   val height: Int? = null,
 

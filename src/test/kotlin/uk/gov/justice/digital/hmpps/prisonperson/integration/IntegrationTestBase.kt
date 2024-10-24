@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.prisonperson.integration
 
+import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.PropertyNamingStrategies
 import com.fasterxml.jackson.databind.annotation.JsonNaming
@@ -122,7 +123,7 @@ abstract class IntegrationTestBase : TestBase() {
   protected fun expectFieldMetadata(vararg comparison: FieldMetadata) = expectFieldMetadata(PRISONER_NUMBER, *comparison)
 
   @JsonNaming(value = PropertyNamingStrategies.UpperCamelCaseStrategy::class)
-  data class MsgBody(val Message: String)
+  data class MsgBody @JsonCreator constructor(val Message: String)
 
   init {
     // Resolves an issue where Wiremock keeps previous sockets open from other tests causing connection resets

@@ -140,8 +140,8 @@ class PrisonerPrisonerHealthServiceTest {
       ).isEqualTo(
         HealthDto(
           smokerOrVaper = ValueWithMetadata(SMOKER_OR_VAPER.toSimpleDto(), NOW, USER1),
-          foodAllergies = listOf(EGG_ALLERGY.toSimpleDto()),
-          medicalDietaryRequirements = listOf(LOW_FAT_REFERENCE_DATA_CODE.toSimpleDto()),
+          foodAllergies = ValueWithMetadata(listOf(EGG_ALLERGY.toSimpleDto()), NOW, USER1),
+          medicalDietaryRequirements = ValueWithMetadata(listOf(LOW_FAT_REFERENCE_DATA_CODE.toSimpleDto()), NOW, USER1),
         ),
       )
 
@@ -184,8 +184,9 @@ class PrisonerPrisonerHealthServiceTest {
 
       assertThat(underTest.createOrUpdate(PRISONER_NUMBER, HEALTH_UPDATE_REQUEST_WITH_NULL)).isEqualTo(
         HealthDto(
-          ValueWithMetadata(null, NOW, USER1),
-          emptyList(),
+          smokerOrVaper = ValueWithMetadata(null, NOW, USER1),
+          foodAllergies = ValueWithMetadata(emptyList(), NOW, USER1),
+          medicalDietaryRequirements = ValueWithMetadata(emptyList(), NOW, USER1),
         ),
       )
 

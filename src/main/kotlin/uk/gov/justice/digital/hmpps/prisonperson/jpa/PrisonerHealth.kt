@@ -16,6 +16,8 @@ import uk.gov.justice.digital.hmpps.prisonperson.dto.ReferenceDataSimpleDto
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.HealthDto
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.ValueWithMetadata
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField
+import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.FOOD_ALLERGY
+import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.MEDICAL_DIET
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.SMOKER_OR_VAPER
 import uk.gov.justice.digital.hmpps.prisonperson.enums.Source.DPS
 import uk.gov.justice.digital.hmpps.prisonperson.mapper.toSimpleDto
@@ -53,13 +55,22 @@ class PrisonerHealth(
 
   override fun fieldAccessors(): Map<PrisonPersonField, KMutableProperty0<*>> = mapOf(
     SMOKER_OR_VAPER to ::smokerOrVaper,
+    FOOD_ALLERGY to ::foodAllergies,
+    MEDICAL_DIET to ::medicalDietaryRequirements,
   )
 
   fun toDto(): HealthDto = HealthDto(
     smokerOrVaper = getRefDataValueWithMetadata(::smokerOrVaper, SMOKER_OR_VAPER),
-    foodAllergies = foodAllergies.map { allergy -> allergy.allergy.toSimpleDto() }.toList(),
-    medicalDietaryRequirements = medicalDietaryRequirements.map { dietaryRequirement -> dietaryRequirement.dietaryRequirement.toSimpleDto() }
-      .toList(),
+    foodAllergies = getReferenceDataListValueWithMetadata(
+      foodAllergies,
+      { allergies -> allergies.map { it.allergy } },
+      FOOD_ALLERGY,
+    ),
+    medicalDietaryRequirements = getReferenceDataListValueWithMetadata(
+      medicalDietaryRequirements,
+      { dietaryRequirements -> dietaryRequirements.map { it.dietaryRequirement } },
+      MEDICAL_DIET,
+    ),
   )
 
   override fun updateFieldHistory(
@@ -78,6 +89,20 @@ class PrisonerHealth(
         it.lastModifiedBy,
       )
     }
+
+  private fun <T> getReferenceDataListValueWithMetadata(
+    value: T,
+    mapper: (T) -> List<ReferenceDataCode>?,
+    field: PrisonPersonField,
+  ): ValueWithMetadata<List<ReferenceDataSimpleDto>?>? {
+    return fieldMetadata[field]?.let {
+      ValueWithMetadata(
+        mapper(value)?.map { code -> code.toSimpleDto() },
+        it.lastModifiedAt,
+        it.lastModifiedBy,
+      )
+    }
+  }
 
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
@@ -104,6 +129,8 @@ class PrisonerHealth(
   companion object {
     val allFields = listOf(
       SMOKER_OR_VAPER,
+      MEDICAL_DIET,
+      FOOD_ALLERGY,
     )
   }
 }

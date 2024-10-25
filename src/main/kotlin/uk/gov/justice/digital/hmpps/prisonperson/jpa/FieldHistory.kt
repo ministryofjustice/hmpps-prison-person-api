@@ -34,6 +34,9 @@ class FieldHistory(
   override var valueInt: Int? = null,
   override var valueString: String? = null,
 
+  @Column(columnDefinition = "text")
+  override var valueJson: String? = null,
+
   @ManyToOne
   @JoinColumn(name = "valueRef", referencedColumnName = "id")
   override var valueRef: ReferenceDataCode? = null,

@@ -68,14 +68,9 @@ enum class PrisonPersonField(
     { old, new ->
       run {
         if (new != null) {
-          val log = org.slf4j.LoggerFactory.getLogger(this::class.java)
           val objectMapper = jacksonObjectMapper()
           new as MutableSet<FoodAllergy>
           val res = objectMapper.writeValueAsString(new.map { it.allergy.id }.sorted())
-          log.info("!!!!!!!! -- Food allergy -- !!!!!!!!!")
-          log.info(old.valueJson)
-          log.info(res)
-          log.info("!!!!!!!! -- Food allergy -- !!!!!!!!!")
           old.valueJson != res
         } else {
           old.valueJson != new
@@ -112,7 +107,6 @@ enum class PrisonPersonField(
       }
     },
   ),
-  ;
 }
 
 interface FieldValues {

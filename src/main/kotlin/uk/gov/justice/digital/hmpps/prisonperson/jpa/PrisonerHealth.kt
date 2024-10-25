@@ -92,16 +92,14 @@ class PrisonerHealth(
 
   private fun <T> getReferenceDataListValueWithMetadata(
     value: T,
-    mapper: (T) -> List<ReferenceDataCode>?,
+    mapper: (T) -> List<ReferenceDataCode>,
     field: PrisonPersonField,
-  ): ValueWithMetadata<List<ReferenceDataSimpleDto>?>? {
-    return fieldMetadata[field]?.let {
-      ValueWithMetadata(
-        mapper(value)?.map { code -> code.toSimpleDto() },
-        it.lastModifiedAt,
-        it.lastModifiedBy,
-      )
-    }
+  ): ValueWithMetadata<List<ReferenceDataSimpleDto>>? = fieldMetadata[field]?.let {
+    ValueWithMetadata(
+      mapper(value).map { code -> code.toSimpleDto() },
+      it.lastModifiedAt,
+      it.lastModifiedBy,
+    )
   }
 
   override fun equals(other: Any?): Boolean {

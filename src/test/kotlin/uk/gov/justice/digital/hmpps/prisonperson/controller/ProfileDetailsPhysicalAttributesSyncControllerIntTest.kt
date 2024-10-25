@@ -336,6 +336,53 @@ class ProfileDetailsPhysicalAttributesSyncControllerIntTest : IntegrationTestBas
 
       @Test
       @Sql("classpath:jpa/repository/reset.sql")
+      @Sql("classpath:controller/physical_attributes/profile_details_sync/physical_attributes.sql")
+      @Sql("classpath:controller/physical_attributes/profile_details_sync/field_history.sql")
+      fun `adds anomalous flag if history would have illogical applies_to and applies_from timestamps`() {
+        webTestClient.put().uri("/sync/prisoners/${PRISONER_NUMBER}/profile-details-physical-attributes")
+          .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__PROFILE_DETAILS_PHYSICAL_ATTRIBUTES_SYNC__RW")))
+          .header("Content-Type", "application/json")
+          .bodyValue(
+            // language=json
+            """
+            {
+              "hair": {
+                  "value": "BLONDE",
+                  "lastModifiedAt": "1990-01-01T09:10:11.123+01:00",
+                  "lastModifiedBy": "USER1"
+                },
+               "appliesFrom": "2024-06-14T09:10:11.123+01:00",
+               "latestBooking": false
+            }
+            """.trimIndent(),
+          )
+          .exchange()
+          .expectStatus().isOk
+
+        expectFieldHistory(
+          HAIR,
+          HistoryComparison(
+            value = PRISONER_HAIR,
+            appliesFrom = ZonedDateTime.parse("2024-06-14T09:10:11.123+01:00"),
+            appliesTo = null,
+            createdAt = ZonedDateTime.parse("1990-01-01T09:10:11.123+01:00"),
+            createdBy = USER1,
+            source = NOMIS,
+            anomalous = true,
+          ),
+          HistoryComparison(
+            value = PREVIOUS_PRISONER_HAIR,
+            appliesFrom = THEN,
+            appliesTo = null,
+            createdAt = THEN,
+            createdBy = USER1,
+            source = DPS,
+          ),
+        )
+      }
+
+      @Test
+      @Sql("classpath:jpa/repository/reset.sql")
       fun `should publish domain event`() {
         expectSuccessfulSyncFrom(REQUEST_TO_SYNC_LATEST_PROFILE_DETAILS_PHYSICAL_ATTRIBUTES)
 
@@ -380,35 +427,6 @@ class ProfileDetailsPhysicalAttributesSyncControllerIntTest : IntegrationTestBas
           .bodyValue(requestBody)
           .exchange()
           .expectStatus().isOk
-    }
-  }
-
-  @Nested
-  inner class ErrorConditions {
-
-    @Test
-    @Sql("classpath:jpa/repository/reset.sql")
-    @Sql("classpath:controller/physical_attributes/profile_details_sync/physical_attributes.sql")
-    @Sql("classpath:controller/physical_attributes/profile_details_sync/field_history.sql")
-    fun `returns 500 if history would have illogical applies_to and applies_from timestamps`() {
-      webTestClient.put().uri("/sync/prisoners/${PRISONER_NUMBER}/profile-details-physical-attributes")
-        .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__PROFILE_DETAILS_PHYSICAL_ATTRIBUTES_SYNC__RW")))
-        .header("Content-Type", "application/json")
-        .bodyValue(
-          // language=json
-          """
-            {
-              "hair": {
-                  "value": "BLONDE",
-                  "lastModifiedAt": "1990-01-01T09:10:11.123+0100",
-                  "lastModifiedBy": "USER1"
-                },
-               "appliesFrom": "2024-06-14T09:10:11.123+0100"
-            }
-          """.trimIndent(),
-        )
-        .exchange()
-        .expectStatus().is5xxServerError
     }
   }
 
@@ -466,7 +484,8 @@ class ProfileDetailsPhysicalAttributesSyncControllerIntTest : IntegrationTestBas
                 "lastModifiedAt": "2024-06-14T09:10:11.123+0100",
                 "lastModifiedBy": "USER1"
             },
-           "appliesFrom": "2023-01-02T09:10:11.123+0000"
+           "appliesFrom": "2023-01-02T09:10:11.123+0000",
+           "latestBooking": true
         }
       """.trimIndent()
 

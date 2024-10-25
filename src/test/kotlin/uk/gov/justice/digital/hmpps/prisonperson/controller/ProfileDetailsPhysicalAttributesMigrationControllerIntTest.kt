@@ -640,6 +640,7 @@ class ProfileDetailsPhysicalAttributesMigrationControllerIntTest : IntegrationTe
     val PREV_DATE = NOW.minusDays(2)
 
     val SINGLE_CURRENT_RECORD_MIGRATION =
+      // language=json
       """
         [
           {
@@ -678,12 +679,14 @@ class ProfileDetailsPhysicalAttributesMigrationControllerIntTest : IntegrationTe
                 "lastModifiedAt": "$NOW",
                 "lastModifiedBy": "$USER1"
             },
-            "appliesFrom": "$THEN"
+            "appliesFrom": "$THEN",
+            "latestBooking": true
           }
         ]
       """.trimIndent()
 
     val PHYSICAL_ATTRIBUTES_WITH_HISTORY_MIGRATION =
+      // language=json
       """
         [
           {
@@ -761,7 +764,8 @@ class ProfileDetailsPhysicalAttributesMigrationControllerIntTest : IntegrationTe
                 "lastModifiedAt": "$NOW",
                 "lastModifiedBy": "$USER1"
             },
-            "appliesFrom": "$THEN"
+            "appliesFrom": "$THEN",
+            "latestBooking": true
           }
         ]
       """.trimIndent()

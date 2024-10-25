@@ -365,6 +365,73 @@ class PhysicalAttributesSyncControllerIntTest : IntegrationTestBase() {
 
       @Test
       @Sql("classpath:jpa/repository/reset.sql")
+      @Sql("classpath:controller/physical_attributes/sync/physical_attributes.sql")
+      @Sql("classpath:controller/physical_attributes/sync/field_history.sql")
+      fun `adds anomalous flag if history would have illogical applies_to and applies_from timestamps`() {
+        webTestClient.put().uri("/sync/prisoners/${PRISONER_NUMBER}/physical-attributes")
+          .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__PHYSICAL_ATTRIBUTES_SYNC__RW")))
+          .header("Content-Type", "application/json")
+          .bodyValue(
+            // language=json
+            """
+          { 
+            "height": 200,
+            "weight": 100,
+            "appliesFrom": "2024-06-14T09:10:11.123+0100",
+            "createdAt": "1990-01-01T09:10:11.123+0100",
+            "createdBy": "USER1",
+            "latestBooking": false
+          }
+            """.trimIndent(),
+          )
+          .exchange()
+          .expectStatus().isOk
+
+        expectFieldHistory(
+          HEIGHT,
+          HistoryComparison(
+            value = 200,
+            appliesFrom = ZonedDateTime.parse("2024-06-14T09:10:11.123+01:00"),
+            appliesTo = null,
+            createdAt = ZonedDateTime.parse("1990-01-01T09:10:11.123+01:00"),
+            createdBy = USER1,
+            source = NOMIS,
+            anomalous = true,
+          ),
+          HistoryComparison(
+            value = 180,
+            appliesFrom = THEN,
+            appliesTo = null,
+            createdAt = THEN,
+            createdBy = USER1,
+            source = DPS,
+          ),
+        )
+
+        expectFieldHistory(
+          WEIGHT,
+          HistoryComparison(
+            value = 100,
+            appliesFrom = ZonedDateTime.parse("2024-06-14T09:10:11.123+01:00"),
+            appliesTo = null,
+            createdAt = ZonedDateTime.parse("1990-01-01T09:10:11.123+01:00"),
+            createdBy = USER1,
+            source = NOMIS,
+            anomalous = true,
+          ),
+          HistoryComparison(
+            value = 70,
+            appliesFrom = THEN,
+            appliesTo = null,
+            createdAt = THEN,
+            createdBy = USER1,
+            source = DPS,
+          ),
+        )
+      }
+
+      @Test
+      @Sql("classpath:jpa/repository/reset.sql")
       fun `should publish domain event`() {
         expectSuccessfulSyncFrom(REQUEST_TO_SYNC_LATEST_PHYSICAL_ATTRIBUTES)
 
@@ -409,34 +476,6 @@ class PhysicalAttributesSyncControllerIntTest : IntegrationTestBase() {
           .bodyValue(requestBody)
           .exchange()
           .expectStatus().isOk
-    }
-  }
-
-  @Nested
-  inner class ErrorConditions {
-
-    @Test
-    @Sql("classpath:jpa/repository/reset.sql")
-    @Sql("classpath:controller/physical_attributes/sync/physical_attributes.sql")
-    @Sql("classpath:controller/physical_attributes/sync/field_history.sql")
-    fun `returns 500 if history would have illogical applies_to and applies_from timestamps`() {
-      webTestClient.put().uri("/sync/prisoners/${PRISONER_NUMBER}/physical-attributes")
-        .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__PHYSICAL_ATTRIBUTES_SYNC__RW")))
-        .header("Content-Type", "application/json")
-        .bodyValue(
-          // language=json
-          """
-          { 
-            "height": 200,
-            "weight": 100,
-            "appliesFrom": "2024-06-14T09:10:11.123+0100",
-            "createdAt": "1990-01-01T09:10:11.123+0100",
-            "createdBy": "USER1"
-          }
-          """.trimIndent(),
-        )
-        .exchange()
-        .expectStatus().is5xxServerError
     }
   }
 
@@ -566,7 +605,8 @@ class PhysicalAttributesSyncControllerIntTest : IntegrationTestBase() {
           "weight": 80,
           "appliesFrom": "2024-06-14T09:10:11.123+0100",
           "createdAt": "2024-06-14T09:10:11.123+0100",
-          "createdBy": "USER1"
+          "createdBy": "USER1",
+          "latestBooking": true
         }
       """.trimIndent()
 

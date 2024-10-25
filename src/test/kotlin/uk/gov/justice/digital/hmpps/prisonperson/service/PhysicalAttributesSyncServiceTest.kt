@@ -14,13 +14,11 @@ import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.junit.jupiter.MockitoSettings
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
-import org.mockito.kotlin.isNull
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import org.mockito.quality.Strictness.LENIENT
-import uk.gov.justice.digital.hmpps.prisonperson.config.IllegalFieldHistoryException
 import uk.gov.justice.digital.hmpps.prisonperson.dto.request.PhysicalAttributesSyncRequest
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.PhysicalAttributesSyncDto
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.PhysicalAttributesSyncResponse
@@ -271,7 +269,10 @@ class PhysicalAttributesSyncServiceTest {
         ),
       )
 
-      savedPhysicalAttributes.firstValue.expectDomainEventRaised(PRISONER_NUMBER, PHYSICAL_ATTRIBUTES_SYNCED_HISTORICAL) {
+      savedPhysicalAttributes.firstValue.expectDomainEventRaised(
+        PRISONER_NUMBER,
+        PHYSICAL_ATTRIBUTES_SYNCED_HISTORICAL,
+      ) {
         assertThat((it as PrisonPersonUpdatedEvent).fieldHistoryIds).isNotEmpty()
       }
     }
@@ -328,32 +329,6 @@ class PhysicalAttributesSyncServiceTest {
           assertThat((it as PrisonPersonUpdatedEvent).fieldHistoryIds).isNotEmpty()
         }
       }
-    }
-
-    @Test
-    fun `throws exception if history would have illogical applies_to and applies_from timestamps`() {
-      whenever(physicalAttributesRepository.findByIdForUpdate(PRISONER_NUMBER)).thenReturn(
-        Optional.of(
-          PhysicalAttributes(
-            prisonerNumber = PRISONER_NUMBER,
-            height = PRISONER_HEIGHT,
-            weight = PRISONER_WEIGHT,
-          ).also { it.updateFieldHistory(lastModifiedAt = NOW.minusDays(1), lastModifiedBy = USER1) },
-        ),
-      )
-
-      assertThatThrownBy {
-        underTest.sync(
-          PRISONER_NUMBER,
-          PHYSICAL_ATTRIBUTES_SYNC_REQUEST.copy(
-            height = PRISONER_HEIGHT + 1,
-            createdAt = NOW.minusYears(1),
-          ),
-        )
-      }
-        .isInstanceOf(IllegalFieldHistoryException::class.java)
-
-      verify(physicalAttributesRepository, never()).save(any())
     }
   }
 

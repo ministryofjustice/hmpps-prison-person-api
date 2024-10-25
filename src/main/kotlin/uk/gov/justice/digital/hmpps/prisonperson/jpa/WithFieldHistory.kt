@@ -1,7 +1,6 @@
 package uk.gov.justice.digital.hmpps.prisonperson.jpa
 
 import org.springframework.data.domain.AbstractAggregateRoot
-import uk.gov.justice.digital.hmpps.prisonperson.config.IllegalFieldHistoryException
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField
 import uk.gov.justice.digital.hmpps.prisonperson.enums.Source
 import uk.gov.justice.digital.hmpps.prisonperson.enums.Source.DPS
@@ -57,8 +56,11 @@ abstract class WithFieldHistory<T : AbstractAggregateRoot<T>?> : AbstractAggrega
             ?.takeIf { !it.anomalous && it.appliesTo == null }
             ?.let {
               it.appliesTo = if (appliesFrom > it.appliesFrom) appliesFrom else lastModifiedAt
-              // If the resulting update to appliesTo causes it to be less than appliesFrom, throw exception:
-              if (it.appliesFrom > it.appliesTo) throw IllegalFieldHistoryException(prisonerNumber)
+              // If the resulting update to appliesTo causes it to be less than appliesFrom, null it and apply the anomalous flag
+              if (it.appliesFrom > it.appliesTo) {
+                it.anomalous = true
+                it.appliesTo = null
+              }
             }
 
           fieldHistory.add(

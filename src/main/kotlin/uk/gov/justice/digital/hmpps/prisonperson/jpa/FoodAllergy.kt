@@ -40,3 +40,7 @@ class FoodAllergy(
     return result
   }
 }
+
+data class FoodAllergies(val allergies: List<String>) {
+  constructor(allergies: Collection<FoodAllergy>) : this(allergies.map { it.allergy.code }.sorted())
+}

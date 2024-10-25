@@ -1,8 +1,12 @@
 package uk.gov.justice.digital.hmpps.prisonperson.enums
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.FOOD_ALLERGY
+import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.MEDICAL_DIET
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.FoodAllergies
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.FoodAllergy
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.JsonObject
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.MedicalDietaryRequirement
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.MedicalDietaryRequirements
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.ReferenceDataCode
 
 private val getInt: (FieldValues) -> Int? = { it.valueInt }
@@ -37,20 +41,11 @@ enum class PrisonPersonField(
     { it.valueJson },
     { values, value ->
       run {
-        val objectMapper = jacksonObjectMapper()
         value as MutableSet<FoodAllergy>
-        val res = objectMapper.writeValueAsString(value.map { it.allergy.id }.sorted())
-        values.valueJson = res
+        values.valueJson = JsonObject(FOOD_ALLERGY, FoodAllergies(value))
       }
     },
-    { old, new ->
-      run {
-        val objectMapper = jacksonObjectMapper()
-        new as MutableSet<FoodAllergy>
-        val res = objectMapper.writeValueAsString(new.map { it.allergy.id }.sorted())
-        old.valueJson != res
-      }
-    },
+    { old, new -> old.valueJson?.value != new },
     "FOOD_ALLERGY",
   ),
 
@@ -58,20 +53,11 @@ enum class PrisonPersonField(
     { it.valueJson },
     { values, value ->
       run {
-        val objectMapper = jacksonObjectMapper()
         value as MutableSet<MedicalDietaryRequirement>
-        val res = objectMapper.writeValueAsString(value.map { it.dietaryRequirement.id }.sorted())
-        values.valueJson = res
+        values.valueJson = JsonObject(MEDICAL_DIET, MedicalDietaryRequirements(value))
       }
     },
-    { old, new ->
-      run {
-        val objectMapper = jacksonObjectMapper()
-        new as MutableSet<MedicalDietaryRequirement>
-        val res = objectMapper.writeValueAsString(new.map { it.dietaryRequirement.id }.sorted())
-        old.valueJson != res
-      }
-    },
+    { old, new -> old.valueJson?.value != new },
     "MEDICAL_DIET",
   ),
 }
@@ -80,5 +66,5 @@ interface FieldValues {
   var valueInt: Int?
   var valueString: String?
   var valueRef: ReferenceDataCode?
-  var valueJson: String?
+  var valueJson: JsonObject?
 }

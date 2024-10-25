@@ -42,3 +42,7 @@ class MedicalDietaryRequirement(
     return result
   }
 }
+
+data class MedicalDietaryRequirements(val medicalDietaryRequirements: List<String>) {
+  constructor(medicalDietaryRequirements: Collection<MedicalDietaryRequirement>) : this(medicalDietaryRequirements.map { it.dietaryRequirement.code }.sorted())
+}

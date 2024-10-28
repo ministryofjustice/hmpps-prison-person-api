@@ -1,7 +1,5 @@
 package uk.gov.justice.digital.hmpps.prisonperson.enums
 
-import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.FOOD_ALLERGY
-import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.MEDICAL_DIET
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.FoodAllergies
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.FoodAllergy
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.JsonObject
@@ -45,7 +43,7 @@ enum class PrisonPersonField(
         values.valueJson = JsonObject(FOOD_ALLERGY, FoodAllergies(value))
       }
     },
-    { old, new -> old.valueJson?.value != new },
+    { old, new -> old.valueJson?.value != FoodAllergies(new as MutableSet<FoodAllergy>) },
     "FOOD_ALLERGY",
   ),
 
@@ -57,7 +55,7 @@ enum class PrisonPersonField(
         values.valueJson = JsonObject(MEDICAL_DIET, MedicalDietaryRequirements(value))
       }
     },
-    { old, new -> old.valueJson?.value != new },
+    { old, new -> old.valueJson?.value != MedicalDietaryRequirements(new as MutableSet<MedicalDietaryRequirement>) },
     "MEDICAL_DIET",
   ),
 }

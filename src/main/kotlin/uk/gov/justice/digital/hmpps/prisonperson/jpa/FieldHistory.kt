@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.prisonperson.jpa
 
 import jakarta.persistence.Column
+import jakarta.persistence.Convert
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType.STRING
 import jakarta.persistence.Enumerated
@@ -34,8 +35,8 @@ class FieldHistory(
   override var valueInt: Int? = null,
   override var valueString: String? = null,
 
-  @Column(columnDefinition = "text")
-  override var valueJson: String? = null,
+  @Convert(converter = JsonObjectConverter::class)
+  override var valueJson: JsonObject? = null,
 
   @ManyToOne
   @JoinColumn(name = "valueRef", referencedColumnName = "id")

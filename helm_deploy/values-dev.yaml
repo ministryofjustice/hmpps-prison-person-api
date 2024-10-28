@@ -22,4 +22,4 @@ generic-prometheus-alerts:
   alertSeverity: hmpps-prison-person-api-dev
   businessHoursOnly: true
   rdsAlertsDatabases:
-    cloud-platform-a40b7024a320758f: prison-person-api
+    cloud-platform-a40b7024a320758f: "HMPPS Prison Person API DB (dev)"

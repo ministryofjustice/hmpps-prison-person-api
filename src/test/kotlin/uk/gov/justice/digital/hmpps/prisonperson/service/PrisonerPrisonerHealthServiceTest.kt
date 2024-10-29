@@ -21,8 +21,11 @@ import uk.gov.justice.digital.hmpps.prisonperson.dto.response.HealthDto
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.ValueWithMetadata
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.FieldMetadata
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.FoodAllergies
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.FoodAllergy
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.JsonObject
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.MedicalDietaryRequirement
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.MedicalDietaryRequirements
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.PrisonerHealth
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.ReferenceDataCode
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.ReferenceDataDomain
@@ -86,10 +89,28 @@ class PrisonerPrisonerHealthServiceTest {
         PrisonerHealth(
           prisonerNumber = PRISONER_NUMBER,
           smokerOrVaper = SMOKER_OR_VAPER,
+          medicalDietaryRequirements = mutableSetOf(
+            LOW_FAT_DIET_REQUIREMENT,
+          ),
+          foodAllergies = mutableSetOf(
+            EGG_FOOD_ALLERGY,
+          ),
           fieldMetadata = mutableMapOf(
             PrisonPersonField.SMOKER_OR_VAPER to FieldMetadata(
               PRISONER_NUMBER,
               PrisonPersonField.SMOKER_OR_VAPER,
+              NOW,
+              USER1,
+            ),
+            PrisonPersonField.MEDICAL_DIET to FieldMetadata(
+              PRISONER_NUMBER,
+              PrisonPersonField.MEDICAL_DIET,
+              NOW,
+              USER1,
+            ),
+            PrisonPersonField.FOOD_ALLERGY to FieldMetadata(
+              PRISONER_NUMBER,
+              PrisonPersonField.MEDICAL_DIET,
               NOW,
               USER1,
             ),
@@ -108,6 +129,30 @@ class PrisonerPrisonerHealthServiceTest {
             description = REFERENCE_DATA_CODE_DESCRPTION,
             listSequence = REFERENCE_DATA_LIST_SEQUENCE,
             isActive = true,
+          ),
+          NOW,
+          USER1,
+        ),
+        medicalDietaryRequirements = ValueWithMetadata(
+          listOf(
+            ReferenceDataSimpleDto(
+              id = LOW_FAT_REFERENCE_DATA_CODE_ID,
+              description = LOW_FAT_DIET_REQUIREMENT.dietaryRequirement.description,
+              listSequence = LOW_FAT_DIET_REQUIREMENT.dietaryRequirement.listSequence,
+              isActive = true,
+            ),
+          ),
+          NOW,
+          USER1,
+        ),
+        foodAllergies = ValueWithMetadata(
+          listOf(
+            ReferenceDataSimpleDto(
+              id = EGG_ALLERGY.id,
+              description = EGG_ALLERGY.description,
+              listSequence = EGG_ALLERGY.listSequence,
+              isActive = true,
+            ),
           ),
           NOW,
           USER1,
@@ -162,6 +207,34 @@ class PrisonerPrisonerHealthServiceTest {
             appliesTo = null,
           ),
         )
+        expectFieldHistory(
+          PrisonPersonField.MEDICAL_DIET,
+          fieldHistory,
+          HistoryComparison(
+            value = JsonObject(
+              field = PrisonPersonField.MEDICAL_DIET,
+              value = MedicalDietaryRequirements(medicalDietaryRequirements = listOf(LOW_FAT_REFERENCE_DATA_CODE_ID)),
+            ),
+            createdAt = NOW,
+            createdBy = USER1,
+            appliesFrom = NOW,
+            appliesTo = null,
+          ),
+        )
+        expectFieldHistory(
+          PrisonPersonField.FOOD_ALLERGY,
+          fieldHistory,
+          HistoryComparison(
+            value = JsonObject(
+              field = PrisonPersonField.FOOD_ALLERGY,
+              value = FoodAllergies(listOf(EGG_ALLERGY.id)),
+            ),
+            createdAt = NOW,
+            createdBy = USER1,
+            appliesFrom = NOW,
+            appliesTo = null,
+          ),
+        )
       }
     }
 
@@ -190,6 +263,22 @@ class PrisonerPrisonerHealthServiceTest {
         ),
       )
 
+      fun <T> firstHistory(value: T): HistoryComparison<T> = HistoryComparison(
+        value = value,
+        createdAt = NOW.minusDays(1),
+        createdBy = USER2,
+        appliesFrom = NOW.minusDays(1),
+        appliesTo = NOW,
+      )
+
+      fun <T> secondHistory(value: T): HistoryComparison<T> = HistoryComparison(
+        value = value,
+        createdAt = NOW,
+        createdBy = USER1,
+        appliesFrom = NOW,
+        appliesTo = null,
+      )
+
       with(savedPrisonerHealth.firstValue) {
         assertThat(prisonerNumber).isEqualTo(PRISONER_NUMBER)
         assertThat(smokerOrVaper).isEqualTo(null)
@@ -199,20 +288,42 @@ class PrisonerPrisonerHealthServiceTest {
         expectFieldHistory(
           PrisonPersonField.SMOKER_OR_VAPER,
           fieldHistory,
-          HistoryComparison(
-            value = SMOKER_OR_VAPER,
-            createdAt = NOW.minusDays(1),
-            createdBy = USER2,
-            appliesFrom = NOW.minusDays(1),
-            appliesTo = NOW,
+          firstHistory(SMOKER_OR_VAPER),
+          secondHistory(null),
+        )
+
+        expectFieldHistory(
+          PrisonPersonField.MEDICAL_DIET,
+          fieldHistory,
+          firstHistory(
+            JsonObject(
+              field = PrisonPersonField.MEDICAL_DIET,
+              value = MedicalDietaryRequirements(medicalDietaryRequirements = listOf(LOW_FAT_REFERENCE_DATA_CODE_ID)),
+            ),
           ),
-          HistoryComparison(
-            value = null,
-            createdAt = NOW,
-            createdBy = USER1,
-            appliesFrom = NOW,
-            appliesTo = null,
+          secondHistory(
+            JsonObject(
+              field = PrisonPersonField.MEDICAL_DIET,
+              value = MedicalDietaryRequirements(medicalDietaryRequirements = emptyList<String>()),
+            ),
           ),
+        )
+
+        expectFieldHistory(
+          PrisonPersonField.FOOD_ALLERGY,
+          fieldHistory,
+          firstHistory(
+            JsonObject(
+              field = PrisonPersonField.FOOD_ALLERGY,
+              value = FoodAllergies(listOf(EGG_ALLERGY.id)),
+            ),
+          ),
+          secondHistory(
+            JsonObject(
+              field = PrisonPersonField.FOOD_ALLERGY,
+              value = FoodAllergies(emptyList<String>()),
+            ),
+          )
         )
       }
     }

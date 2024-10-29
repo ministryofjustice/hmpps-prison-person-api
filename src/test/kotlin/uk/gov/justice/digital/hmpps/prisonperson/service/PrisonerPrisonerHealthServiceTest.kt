@@ -323,7 +323,7 @@ class PrisonerPrisonerHealthServiceTest {
               field = PrisonPersonField.FOOD_ALLERGY,
               value = FoodAllergies(emptyList<String>()),
             ),
-          )
+          ),
         )
       }
     }

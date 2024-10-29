@@ -18,3 +18,5 @@ generic-service:
 # See https://user-guide.cloud-platform.service.justice.gov.uk/documentation/monitoring-an-app/how-to-create-alarms.html#creating-your-own-custom-alerts
 generic-prometheus-alerts:
   alertSeverity: hmpps-prison-person-api-preprod
+  rdsAlertsDatabases:
+    cloud-platform-8dd69b293e33c4be: "HMPPS Prison Person API DB (preprod)"

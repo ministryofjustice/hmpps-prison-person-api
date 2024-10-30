@@ -23,3 +23,6 @@ generic-prometheus-alerts:
   businessHoursOnly: true
   rdsAlertsDatabases:
     cloud-platform-a40b7024a320758f: "HMPPS Prison Person API DB (dev)"
+  sqsAlertsQueueNames:
+    - connect-dps-development-prison_person_domain_events_queue
+    - connect-dps-development-prison_person_domain_events_dl

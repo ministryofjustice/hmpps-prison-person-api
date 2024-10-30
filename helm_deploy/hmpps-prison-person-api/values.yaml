@@ -74,3 +74,5 @@ generic-service:
 
 generic-prometheus-alerts:
   targetApplication: hmpps-prison-person-api
+  sqsAlertsOldestThreshold: 10
+  sqsAlertsTotalMessagesThreshold: 1

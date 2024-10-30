@@ -22,7 +22,7 @@ class ClientTrackingConfiguration(private val clientTrackingInterceptor: ClientT
     registry.addInterceptor(clientTrackingInterceptor).addPathPatterns("/**")
   }
 
-  companion object {
+  private companion object {
     private val log = LoggerFactory.getLogger(this::class.java)
   }
 }

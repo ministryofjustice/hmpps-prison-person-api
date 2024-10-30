@@ -41,7 +41,7 @@ data class PrisonPersonUpdatedEvent(
 
   override fun getTelemetryEvent(): TelemetryEvent =
     TelemetryEvent(
-      eventType.telemetryEventName!!,
+      eventType.telemetryEventDetails!!.name,
       mapOf(
         "prisonerNumber" to prisonerNumber,
         "source" to source.name,
@@ -79,7 +79,7 @@ data class PrisonPersonMergedEvent(
 
   override fun getTelemetryEvent(): TelemetryEvent =
     TelemetryEvent(
-      eventType.telemetryEventName!!,
+      eventType.telemetryEventDetails!!.name,
       mapOf(
         "prisonerNumberFrom" to prisonerNumberFrom,
         "prisonerNumberTo" to prisonerNumberTo,

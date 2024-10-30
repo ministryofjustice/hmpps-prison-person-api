@@ -169,7 +169,7 @@ class PrisonerPhotographControllerIntTest : IntegrationTestBase() {
     }
   }
 
-  companion object {
+  private companion object {
     val DOCUMENT_DTO = DocumentDto(
       documentUuid = "abc",
       documentType = DocumentType.PRISONER_PROFILE_PICTURE,

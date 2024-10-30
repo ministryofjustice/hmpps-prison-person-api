@@ -35,3 +35,6 @@ generic-prometheus-alerts:
   alertSeverity: hmpps-prison-person-api-prod
   rdsAlertsDatabases:
     cloud-platform-e6f0c67759ffad65: "HMPPS Prison Person API DB (prod)"
+  sqsAlertsQueueNames:
+    - connect-dps-prod-prison_person_domain_events_queue
+    - connect-dps-prod-prison_person_domain_events_dl

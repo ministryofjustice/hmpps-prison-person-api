@@ -30,6 +30,7 @@ import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.WEIGHT
 import uk.gov.justice.digital.hmpps.prisonperson.enums.Source.DPS
 import uk.gov.justice.digital.hmpps.prisonperson.enums.Source.NOMIS
 import uk.gov.justice.digital.hmpps.prisonperson.integration.IntegrationTestBase
+import uk.gov.justice.digital.hmpps.prisonperson.integration.wiremock.PRISON_ID
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.FieldMetadata
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.utils.HistoryComparison
 import uk.gov.justice.digital.hmpps.prisonperson.service.event.DomainEvent
@@ -463,7 +464,8 @@ class PhysicalAttributesSyncControllerIntTest : IntegrationTestBase() {
           argThat { it ->
             it["prisonerNumber"] == PRISONER_NUMBER &&
               it["source"] == NOMIS.name &&
-              it["fields"] == listOf(HEIGHT.name, WEIGHT.name).toString()
+              it["fields"] == listOf(HEIGHT.name, WEIGHT.name).toString() &&
+              it["prisonId"] == PRISON_ID
           },
           isNull(),
         )

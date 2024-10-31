@@ -13,6 +13,7 @@ import uk.gov.justice.digital.hmpps.prisonperson.config.DownstreamServiceExcepti
 import uk.gov.justice.digital.hmpps.prisonperson.integration.wiremock.PRISONER_NUMBER
 import uk.gov.justice.digital.hmpps.prisonperson.integration.wiremock.PRISONER_NUMBER_NOT_FOUND
 import uk.gov.justice.digital.hmpps.prisonperson.integration.wiremock.PRISONER_NUMBER_THROW_EXCEPTION
+import uk.gov.justice.digital.hmpps.prisonperson.integration.wiremock.PRISON_ID
 import uk.gov.justice.digital.hmpps.prisonperson.integration.wiremock.PrisonerSearchServer
 
 class PrisonerSearchClientTest {
@@ -31,7 +32,7 @@ class PrisonerSearchClientTest {
 
     val result = client.getPrisoner(PRISONER_NUMBER)
 
-    assertThat(result!!).isEqualTo(PrisonerDto(prisonerNumber = PRISONER_NUMBER))
+    assertThat(result!!).isEqualTo(PrisonerDto(prisonerNumber = PRISONER_NUMBER, prisonId = PRISON_ID))
   }
 
   @Test

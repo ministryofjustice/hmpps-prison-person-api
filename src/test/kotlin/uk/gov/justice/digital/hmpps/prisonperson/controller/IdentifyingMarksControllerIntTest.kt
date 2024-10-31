@@ -262,7 +262,7 @@ class IdentifyingMarksControllerIntTest : IntegrationTestBase() {
     }
   }
 
-  companion object {
+  private companion object {
     val DOCUMENT_DTO = DocumentDto(
       documentUuid = "c46d0ce9-e586-4fa6-ae76-52ea8c242260",
       documentType = DocumentType.PHYSICAL_IDENTIFIER_PICTURE,

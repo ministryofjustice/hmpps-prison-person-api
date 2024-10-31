@@ -14,6 +14,7 @@ import org.junit.jupiter.api.extension.ExtensionContext
 import uk.gov.justice.digital.hmpps.prisonperson.client.prisonersearch.dto.PrisonerDto
 
 internal const val PRISONER_NUMBER = "A1234AA"
+internal const val PRISON_ID = "MDI"
 internal const val PRISONER_NUMBER_NOT_FOUND = "NOT_FOUND"
 internal const val PRISONER_NUMBER_THROW_EXCEPTION = "THROW"
 
@@ -42,7 +43,7 @@ class PrisonerSearchServer : WireMockServer(WIREMOCK_PORT) {
           aResponse()
             .withHeader("Content-Type", "application/json")
             .withBody(
-              mapper.writeValueAsString(PrisonerDto(prisonerNumber = prisonNumber)),
+              mapper.writeValueAsString(PrisonerDto(prisonerNumber = prisonNumber, prisonId = PRISON_ID)),
             )
             .withStatus(200),
         ),

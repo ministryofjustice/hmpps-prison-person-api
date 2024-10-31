@@ -5,7 +5,14 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.prisonperson.enums.EventType.PHYSICAL_ATTRIBUTES_MERGED
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField
+import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.BUILD
+import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.FACE
+import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.FACIAL_HAIR
+import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.HAIR
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.HEIGHT
+import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.LEFT_EYE_COLOUR
+import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.RIGHT_EYE_COLOUR
+import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.SHOE_SIZE
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField.WEIGHT
 import uk.gov.justice.digital.hmpps.prisonperson.enums.Source.DPS
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.FieldHistory
@@ -141,6 +148,7 @@ class PhysicalAttributesMergeService(
 
   private companion object {
     private val log = LoggerFactory.getLogger(this::class.java)
-    val fieldsToMerge = listOf(HEIGHT, WEIGHT)
+    val fieldsToMerge =
+      listOf(HEIGHT, WEIGHT, HAIR, FACIAL_HAIR, FACE, BUILD, LEFT_EYE_COLOUR, RIGHT_EYE_COLOUR, SHOE_SIZE)
   }
 }

@@ -47,7 +47,9 @@ dependencies {
   testImplementation("org.awaitility:awaitility-kotlin:4.2.2")
   testImplementation("org.springframework.security:spring-security-test")
   testImplementation("io.opentelemetry:opentelemetry-sdk-testing:1.43.0")
-
+  testImplementation("io.swagger.parser.v3:swagger-parser:2.1.23") {
+    exclude(group = "io.swagger.core.v3")
+  }
   // Developer experience
   developmentOnly("org.springframework.boot:spring-boot-devtools")
 }

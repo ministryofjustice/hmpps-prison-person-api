@@ -52,9 +52,9 @@ class PhysicalAttributesMergeIntTest : IntegrationTestBase() {
 
   @Test
   @Sql("classpath:jpa/repository/reset.sql")
-  @Sql("classpath:service/event/physical_attributes.sql")
-  @Sql("classpath:service/event/physical_attributes_metadata.sql")
-  @Sql("classpath:service/event/physical_attributes_history.sql")
+  @Sql("classpath:service/merge/physical_attributes/full/physical_attributes.sql")
+  @Sql("classpath:service/merge/physical_attributes/full/physical_attributes_metadata.sql")
+  @Sql("classpath:service/merge/physical_attributes/full/physical_attributes_history.sql")
   fun `can handle merge TO a prisoner record with the latest field values`() {
     // ------------------
     // Before the merge:
@@ -114,9 +114,9 @@ class PhysicalAttributesMergeIntTest : IntegrationTestBase() {
 
   @Test
   @Sql("classpath:jpa/repository/reset.sql")
-  @Sql("classpath:service/event/physical_attributes.sql")
-  @Sql("classpath:service/event/physical_attributes_metadata.sql")
-  @Sql("classpath:service/event/physical_attributes_history.sql")
+  @Sql("classpath:service/merge/physical_attributes/full/physical_attributes.sql")
+  @Sql("classpath:service/merge/physical_attributes/full/physical_attributes_metadata.sql")
+  @Sql("classpath:service/merge/physical_attributes/full/physical_attributes_history.sql")
   fun `can handle merge FROM a prisoner record with the latest field values`() {
     // ------------------
     // Before the merge:
@@ -176,9 +176,9 @@ class PhysicalAttributesMergeIntTest : IntegrationTestBase() {
 
   @Test
   @Sql("classpath:jpa/repository/reset.sql")
-  @Sql("classpath:service/event/physical_attributes.sql")
-  @Sql("classpath:service/event/physical_attributes_metadata.sql")
-  @Sql("classpath:service/event/physical_attributes_history.sql")
+  @Sql("classpath:service/merge/physical_attributes/full/physical_attributes.sql")
+  @Sql("classpath:service/merge/physical_attributes/full/physical_attributes_metadata.sql")
+  @Sql("classpath:service/merge/physical_attributes/full/physical_attributes_history.sql")
   fun `can handle merge TO a prisoner with no prison person data`() {
     // ------------------
     // Before the merge:
@@ -228,9 +228,9 @@ class PhysicalAttributesMergeIntTest : IntegrationTestBase() {
 
   @Test
   @Sql("classpath:jpa/repository/reset.sql")
-  @Sql("classpath:service/event/physical_attributes.sql")
-  @Sql("classpath:service/event/physical_attributes_metadata.sql")
-  @Sql("classpath:service/event/physical_attributes_history.sql")
+  @Sql("classpath:service/merge/physical_attributes/full/physical_attributes.sql")
+  @Sql("classpath:service/merge/physical_attributes/full/physical_attributes_metadata.sql")
+  @Sql("classpath:service/merge/physical_attributes/full/physical_attributes_history.sql")
   fun `can handle merge FROM a prisoner with no prison person data`() {
     // ------------------
     // Before the merge:
@@ -279,9 +279,56 @@ class PhysicalAttributesMergeIntTest : IntegrationTestBase() {
 
   @Test
   @Sql("classpath:jpa/repository/reset.sql")
-  @Sql("classpath:service/event/physical_attributes.sql")
-  @Sql("classpath:service/event/physical_attributes_metadata.sql")
-  @Sql("classpath:service/event/physical_attributes_history.sql")
+  @Sql("classpath:service/merge/physical_attributes/partial/physical_attributes.sql")
+  @Sql("classpath:service/merge/physical_attributes/partial/physical_attributes_metadata.sql")
+  @Sql("classpath:service/merge/physical_attributes/partial/physical_attributes_history.sql")
+  fun `can handle merges where prisoners have no history for some fields`() {
+    // ------------------
+    // Before the merge:
+    // ------------------
+    assertThat(fieldHistoryIds(PRISONER_MERGE_TO)).containsExactlyInAnyOrderElementsOf(
+      PRISONER1_HEIGHT_AND_WEIGHT_FIELD_IDS,
+    )
+    assertThat(fieldHistoryIds(PRISONER_MERGE_FROM)).containsExactlyInAnyOrderElementsOf(
+      PRISONER2_HEIGHT_AND_WEIGHT_FIELD_IDS,
+    )
+    expectFieldMetadata(
+      PRISONER_MERGE_TO,
+      FieldMetadata(PRISONER_MERGE_TO, HEIGHT, ZonedDateTime.parse("2024-01-10T00:00:00+00:00"), USER1),
+      FieldMetadata(PRISONER_MERGE_TO, WEIGHT, ZonedDateTime.parse("2024-01-05T00:00:00+00:00"), USER1),
+    )
+
+    publishPrisonerMergedMessage(PRISONER_MERGE_TO, PRISONER_MERGE_FROM)
+    awaitAtMost30Secs untilCallTo { prisonPersonQueue.countAllMessagesOnQueue() } matches { it == 0 }
+    awaitAtMost30Secs untilCallTo { fieldHistoryIds(PRISONER_MERGE_FROM).size } matches { it == 0 }
+
+    // -----------------
+    // After the merge:
+    // -----------------
+    assertThat(fieldHistoryIds(PRISONER_MERGE_TO)).containsExactlyInAnyOrderElementsOf(
+      PRISONER1_HEIGHT_AND_WEIGHT_FIELD_IDS + PRISONER2_HEIGHT_AND_WEIGHT_FIELD_IDS,
+    )
+    fieldHistoryRepository.findAllById(PRISONER2_HEIGHT_AND_WEIGHT_FIELD_IDS).forEach {
+      assertThat(it.mergedFrom).isEqualTo(PRISONER_MERGE_FROM)
+      assertThat(it.mergedAt).isEqualTo(ZonedDateTime.now(clock))
+    }
+    assertThat(fieldHistoryRepository.getReferenceById(-10).appliesTo).isEqualTo(ZonedDateTime.now(clock))
+    expectFieldMetadata(
+      PRISONER_MERGE_TO,
+      FieldMetadata(PRISONER_MERGE_TO, HEIGHT, ZonedDateTime.parse("2024-01-10T00:00:00+00:00"), USER1),
+      FieldMetadata(PRISONER_MERGE_TO, WEIGHT, ZonedDateTime.parse("2024-01-05T00:00:00+00:00"), USER1),
+    )
+
+    assertThat(fieldHistoryIds(PRISONER_MERGE_FROM)).isEmpty()
+    assertThat(physicalAttributesRepository.findByIdOrNull(PRISONER_MERGE_FROM)).isNull()
+    assertThat(fieldMetadataRepository.findAllByPrisonerNumber(PRISONER_MERGE_FROM)).isEmpty()
+  }
+
+  @Test
+  @Sql("classpath:jpa/repository/reset.sql")
+  @Sql("classpath:service/merge/physical_attributes/full/physical_attributes.sql")
+  @Sql("classpath:service/merge/physical_attributes/full/physical_attributes_metadata.sql")
+  @Sql("classpath:service/merge/physical_attributes/full/physical_attributes_history.sql")
   fun `domain event raised when merge completes`() {
     publishPrisonerMergedMessage(PRISONER_MERGE_TO, PRISONER_MERGE_FROM)
 
@@ -315,9 +362,9 @@ class PhysicalAttributesMergeIntTest : IntegrationTestBase() {
 
   @Test
   @Sql("classpath:jpa/repository/reset.sql")
-  @Sql("classpath:service/event/physical_attributes.sql")
-  @Sql("classpath:service/event/physical_attributes_metadata.sql")
-  @Sql("classpath:service/event/physical_attributes_history.sql")
+  @Sql("classpath:service/merge/physical_attributes/full/physical_attributes.sql")
+  @Sql("classpath:service/merge/physical_attributes/full/physical_attributes_metadata.sql")
+  @Sql("classpath:service/merge/physical_attributes/full/physical_attributes_history.sql")
   fun `telemetry event raised when merge completes`() {
     publishPrisonerMergedMessage(PRISONER_MERGE_TO, PRISONER_MERGE_FROM)
     awaitAtMost30Secs untilCallTo { prisonPersonQueue.countAllMessagesOnQueue() } matches { it == 0 }
@@ -400,55 +447,51 @@ class PhysicalAttributesMergeIntTest : IntegrationTestBase() {
     const val PRISONER_MERGE_FROM = PRISONER2
     const val NO_PRISON_PERSON_DATA = "Z1234ZZ"
 
-    val PRISONER1_FIELD_IDS = listOf<Long>(
-      -1,
-      -2,
-      -3,
-      -4,
-      -5,
-      -101,
-      -102,
-      -103,
-      -201,
-      -202,
-      -203,
-      -301,
-      -302,
-      -303,
-      -401,
-      -402,
-      -403,
-      -501,
-      -502,
-      -503,
-      -601,
-      -602,
-      -603,
-      -701,
-      -702,
-      -703,
+    val PRISONER1_HEIGHT_AND_WEIGHT_FIELD_IDS = listOf<Long>(-1, -2, -3, -4, -5)
+    val PRISONER1_FIELD_IDS = PRISONER1_HEIGHT_AND_WEIGHT_FIELD_IDS.plus(
+      listOf(
+        -101,
+        -102,
+        -103,
+        -201,
+        -202,
+        -203,
+        -301,
+        -302,
+        -303,
+        -401,
+        -402,
+        -403,
+        -501,
+        -502,
+        -503,
+        -601,
+        -602,
+        -603,
+        -701,
+        -702,
+        -703,
+      ),
     )
 
-    val PRISONER2_FIELD_IDS = listOf<Long>(
-      -6,
-      -7,
-      -8,
-      -9,
-      -10,
-      -104,
-      -105,
-      -204,
-      -205,
-      -304,
-      -305,
-      -404,
-      -405,
-      -504,
-      -505,
-      -604,
-      -605,
-      -704,
-      -705,
+    val PRISONER2_HEIGHT_AND_WEIGHT_FIELD_IDS = listOf<Long>(-6, -7, -8, -9, -10)
+    val PRISONER2_FIELD_IDS = PRISONER2_HEIGHT_AND_WEIGHT_FIELD_IDS.plus(
+      listOf(
+        -104,
+        -105,
+        -204,
+        -205,
+        -304,
+        -305,
+        -404,
+        -405,
+        -504,
+        -505,
+        -604,
+        -605,
+        -704,
+        -705,
+      ),
     )
   }
 }

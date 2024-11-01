@@ -20,7 +20,7 @@ generic-service:
     annotations:
       nginx.ingress.kubernetes.io/server-snippet: |
         server_tokens off;
-        location /queue-admin/** {
+        location /queue-admin/retry-all-dlqs {
           deny all;
           return 401;
         }

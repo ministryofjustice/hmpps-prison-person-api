@@ -66,13 +66,18 @@ class PhysicalAttributesMergeService(
       physicalAttributesService.newPhysicalAttributesFor(prisonerNumberTo)
     }
 
-    fieldsToMerge.map { field ->
-      val latestFrom = historyFrom.last { it.field == field }
+    fieldsToMerge.forEach { field ->
+      val latestFrom = historyFrom.lastOrNull { it.field == field }
       val latestTo = historyTo.lastOrNull { it.field == field }
+
+      if (latestFrom == null) {
+        log.debug("Prisoner: '$prisonerNumberFrom' has nothing to merge for field: '$field'")
+        return@forEach
+      }
 
       log.debug(
         "Merging field: $field, history id: ${latestFrom.fieldHistoryId} " +
-          "from prisoner: '${latestFrom.prisonerNumber}', into prisoner: '$prisonerNumberTo'",
+          "from prisoner: '$prisonerNumberFrom', into prisoner: '$prisonerNumberTo'",
       )
 
       mergeLatest(latestFrom, latestTo, prisonerNumberTo, physicalAttributes)

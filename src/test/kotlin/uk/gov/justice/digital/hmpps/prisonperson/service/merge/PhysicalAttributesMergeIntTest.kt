@@ -450,11 +450,6 @@ class PhysicalAttributesMergeIntTest : IntegrationTestBase() {
     val PRISONER1_HEIGHT_AND_WEIGHT_FIELD_IDS = listOf<Long>(-1, -2, -3, -4, -5)
     val PRISONER1_FIELD_IDS = PRISONER1_HEIGHT_AND_WEIGHT_FIELD_IDS.plus(
       listOf(
-        -1,
-        -2,
-        -3,
-        -4,
-        -5,
         -101,
         -102,
         -103,
@@ -481,12 +476,7 @@ class PhysicalAttributesMergeIntTest : IntegrationTestBase() {
 
     val PRISONER2_HEIGHT_AND_WEIGHT_FIELD_IDS = listOf<Long>(-6, -7, -8, -9, -10)
     val PRISONER2_FIELD_IDS = PRISONER2_HEIGHT_AND_WEIGHT_FIELD_IDS.plus(
-      listOf<Long>(
-        -6,
-        -7,
-        -8,
-        -9,
-        -10,
+      listOf(
         -104,
         -105,
         -204,

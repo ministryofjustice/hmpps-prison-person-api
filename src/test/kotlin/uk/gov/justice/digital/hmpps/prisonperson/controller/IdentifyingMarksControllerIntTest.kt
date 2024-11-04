@@ -260,6 +260,72 @@ class IdentifyingMarksControllerIntTest : IntegrationTestBase() {
           .expectStatus().isBadRequest
       }
     }
+
+    // PATCH routes
+    @Nested
+    inner class PatchMarkHappyPath {
+      @Test
+      @Sql("classpath:jpa/repository/reset.sql")
+      @Sql("classpath:controller/identifying_marks/identifying_marks.sql")
+      fun `can update an existing identifying mark`() {
+        webTestClient.patch().uri("/identifying-marks/mark/c46d0ce9-e586-4fa6-ae76-52ea8c242257")
+          .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RW")))
+          .header("Content-Type", "application/json")
+          .bodyValue(
+            // language=json
+            """
+              {
+                "bodyPart": "BODY_PART_ARM",
+                "markType": "MARK_TYPE_TAT",
+                "side": "SIDE_L",
+                "partOrientation": "PART_ORIENT_LOW",
+                "comment": "It's a tattoo now"
+              }
+            """.trimIndent(),
+          )
+          .exchange()
+          .expectStatus().isOk
+          .expectBody()
+          .json(
+            // language=json
+            """
+            {
+              "id": "c46d0ce9-e586-4fa6-ae76-52ea8c242257",
+              "prisonerNumber": "12345",
+              "bodyPart": {
+                "id": "BODY_PART_ARM",
+                "description": "Arm",
+                "listSequence": 0,
+                "isActive": true
+              },
+              "markType": {
+                "id": "MARK_TYPE_TAT",
+                "description": "Tattoo",
+                "listSequence": 0,
+                "isActive": true
+              },
+              "side": {
+                "id": "SIDE_L",
+                "description": "Left",
+                "listSequence": 2,
+                "isActive": true
+              },
+              "partOrientation": {
+                "id": "PART_ORIENT_LOW",
+                "description": "Low",
+                "listSequence": 0,
+                "isActive": true
+              },
+              "comment": "It's a tattoo now",
+              "photographUuids": [],
+              "createdAt": "2024-01-02T09:10:11+0000",
+              "createdBy": "USER_GEN"
+            }
+          """.trimIndent(),
+            true,
+          )
+      }
+    }
   }
 
   private companion object {

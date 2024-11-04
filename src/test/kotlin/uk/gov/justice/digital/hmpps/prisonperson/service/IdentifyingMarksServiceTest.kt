@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.prisonperson.service
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertThrows
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -13,11 +14,11 @@ import org.mockito.Captor
 import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
+import org.mockito.kotlin.firstValue
 import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import org.springframework.data.jpa.domain.AbstractAuditable_.createdBy
 import org.springframework.http.MediaType
 import org.springframework.mock.web.MockMultipartFile
 import uk.gov.justice.digital.hmpps.prisonperson.client.documentservice.DocumentServiceClient
@@ -26,6 +27,7 @@ import uk.gov.justice.digital.hmpps.prisonperson.client.documentservice.dto.Docu
 import uk.gov.justice.digital.hmpps.prisonperson.client.documentservice.dto.DocumentType
 import uk.gov.justice.digital.hmpps.prisonperson.config.GenericNotFoundException
 import uk.gov.justice.digital.hmpps.prisonperson.dto.request.IdentifyingMarkRequest
+import uk.gov.justice.digital.hmpps.prisonperson.dto.request.IdentifyingMarkUpdateRequest
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.IdentifyingMarkDto
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.IdentifyingMark
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.IdentifyingMarkImage
@@ -38,6 +40,7 @@ import uk.gov.justice.digital.hmpps.prisonperson.utils.AuthenticationFacade
 import java.time.ZonedDateTime
 import java.util.Optional
 import java.util.UUID
+
 @ExtendWith(MockitoExtension::class)
 class IdentifyingMarksServiceTest {
   @Mock
@@ -58,6 +61,18 @@ class IdentifyingMarksServiceTest {
   @AfterEach
   fun afterEach() {
     reset(documentServiceClient, identifyingMarksRepository, referenceDataCodeRepository, authenticationFacade)
+  }
+
+  @BeforeEach
+  fun beforeEach() {
+    whenever(authenticationFacade.getUserOrSystemInContext()).thenReturn(USER1)
+    whenever(referenceDataCodeRepository.findById(LEG_REFERENCE.id)).thenReturn(Optional.of(LEG_REFERENCE))
+    whenever(referenceDataCodeRepository.findById(ARM_REFERENCE.id)).thenReturn(Optional.of(ARM_REFERENCE))
+    whenever(referenceDataCodeRepository.findById(SCAR_REFERENCE.id)).thenReturn(Optional.of(SCAR_REFERENCE))
+    whenever(referenceDataCodeRepository.findById(TATTOO_REFERENCE.id)).thenReturn(Optional.of(TATTOO_REFERENCE))
+    whenever(referenceDataCodeRepository.findById(LEFT_SIDE_REFERENCE.id)).thenReturn(Optional.of(LEFT_SIDE_REFERENCE))
+    whenever(referenceDataCodeRepository.findById(CENTRE_REFERENCE.id)).thenReturn(Optional.of(CENTRE_REFERENCE))
+
   }
 
   @Nested
@@ -85,19 +100,19 @@ class IdentifyingMarksServiceTest {
   inner class GetIdentifyingMarkById {
     @Test
     fun `can convert to dto and return`() {
-      whenever(identifyingMarksRepository.findById(UUID.fromString(MARK1_ID))).thenReturn(Optional.of(MARK1))
+      whenever(identifyingMarksRepository.findById(UUID.fromString(MARK_1_ID))).thenReturn(Optional.of(MARK1))
 
-      val result = underTest.getIdentifyingMarkById(MARK1_ID)
+      val result = underTest.getIdentifyingMarkById(MARK_1_ID)
 
       assertThat(result).isEqualTo(MARK_1_DTO)
     }
 
     @Test
     fun `throws 404 when identifying mark not found`() {
-      whenever(identifyingMarksRepository.findById(UUID.fromString(MARK1_ID))).thenReturn(Optional.empty())
+      whenever(identifyingMarksRepository.findById(UUID.fromString(MARK_1_ID))).thenReturn(Optional.empty())
 
       val exception = assertThrows(GenericNotFoundException::class.java) {
-        underTest.getIdentifyingMarkById(MARK1_ID)
+        underTest.getIdentifyingMarkById(MARK_1_ID)
       }
 
       assertThat(exception.message).isEqualTo("Identifying mark not found")
@@ -111,12 +126,6 @@ class IdentifyingMarksServiceTest {
 
     @Test
     fun `can create identifying mark with no file`() {
-      whenever(authenticationFacade.getUserOrSystemInContext()).thenReturn(USER1)
-      whenever(referenceDataCodeRepository.findById("BODY_PART_LEG")).thenReturn(Optional.of(LEG_REFERENCE))
-      whenever(referenceDataCodeRepository.findById("MARK_TYPE_SCAR")).thenReturn(Optional.of(SCAR_REFERENCE))
-      whenever(referenceDataCodeRepository.findById("SIDE_L")).thenReturn(Optional.of(LEFT_SIDE_REFERENCE))
-      whenever(referenceDataCodeRepository.findById("PART_ORIENT_CENTR")).thenReturn(Optional.of(CENTRE_REFERENCE))
-
       val identifyingMarkRequest = IdentifyingMarkRequest(
         prisonerNumber = PRISONER_NUMBER,
         bodyPart = "BODY_PART_LEG",
@@ -185,7 +194,16 @@ class IdentifyingMarksServiceTest {
       whenever(referenceDataCodeRepository.findById("MARK_TYPE_SCAR")).thenReturn(Optional.of(SCAR_REFERENCE))
       whenever(referenceDataCodeRepository.findById("SIDE_L")).thenReturn(Optional.of(LEFT_SIDE_REFERENCE))
       whenever(referenceDataCodeRepository.findById("PART_ORIENT_CENTR")).thenReturn(Optional.of(CENTRE_REFERENCE))
-      whenever(documentServiceClient.putDocument(file.bytes, "fileName.jpg", DocumentType.PHYSICAL_IDENTIFIER_PICTURE, mapOf("prisonerNumber" to "A1234AA"), fileType, DOCUMENT_REQ_CONTEXT)).thenReturn(documentDto)
+      whenever(
+        documentServiceClient.putDocument(
+          file.bytes,
+          "fileName.jpg",
+          DocumentType.PHYSICAL_IDENTIFIER_PICTURE,
+          mapOf("prisonerNumber" to "A1234AA"),
+          fileType,
+          DOCUMENT_REQ_CONTEXT,
+        ),
+      ).thenReturn(documentDto)
 
       val identifyingMarkRequest = IdentifyingMarkRequest(
         prisonerNumber = PRISONER_NUMBER,
@@ -220,16 +238,14 @@ class IdentifyingMarksServiceTest {
       assertThat(capturedIdentifyingMark.partOrientation).isEqualTo(identifyingMark.partOrientation)
       assertThat(capturedIdentifyingMark.comment).isEqualTo(identifyingMark.comment)
       assertThat(capturedIdentifyingMark.createdBy).isEqualTo(identifyingMark.createdBy)
-      assertThat(capturedIdentifyingMark.photographUuids)
-        .usingRecursiveComparison()
-        .isEqualTo(
-          setOf(
-            IdentifyingMarkImage(
-              identifyingMarkImageId = UUID.fromString(MARK1_ID),
-              identifyingMark = capturedIdentifyingMark,
-            ),
+      assertThat(capturedIdentifyingMark.photographUuids).usingRecursiveComparison().isEqualTo(
+        setOf(
+          IdentifyingMarkImage(
+            identifyingMarkImageId = UUID.fromString(MARK_1_ID),
+            identifyingMark = capturedIdentifyingMark,
           ),
-        )
+        ),
+      )
 
       assertThat(result).isEqualTo(MARK_1_DTO)
     }
@@ -250,7 +266,16 @@ class IdentifyingMarksServiceTest {
       whenever(referenceDataCodeRepository.findById("MARK_TYPE_SCAR")).thenReturn(Optional.of(SCAR_REFERENCE))
       whenever(referenceDataCodeRepository.findById("SIDE_L")).thenReturn(Optional.of(LEFT_SIDE_REFERENCE))
       whenever(referenceDataCodeRepository.findById("PART_ORIENT_CENTR")).thenReturn(Optional.of(CENTRE_REFERENCE))
-      whenever(documentServiceClient.putDocument(file.bytes, "fileName.jpg", DocumentType.PHYSICAL_IDENTIFIER_PICTURE, mapOf("prisonerNumber" to "A1234AA"), fileType, DOCUMENT_REQ_CONTEXT)).thenThrow(RuntimeException("Put document request failed"))
+      whenever(
+        documentServiceClient.putDocument(
+          file.bytes,
+          "fileName.jpg",
+          DocumentType.PHYSICAL_IDENTIFIER_PICTURE,
+          mapOf("prisonerNumber" to "A1234AA"),
+          fileType,
+          DOCUMENT_REQ_CONTEXT,
+        ),
+      ).thenThrow(RuntimeException("Put document request failed"))
 
       val identifyingMarkRequest = IdentifyingMarkRequest(
         prisonerNumber = PRISONER_NUMBER,
@@ -268,21 +293,84 @@ class IdentifyingMarksServiceTest {
     }
   }
 
+  @Nested
+  inner class Update {
+    @Captor
+    lateinit var updatedIdentifyingMark: ArgumentCaptor<IdentifyingMark>
+
+    @BeforeEach
+    fun beforeEach() {
+      whenever(identifyingMarksRepository.save(updatedIdentifyingMark.capture())).thenAnswer { updatedIdentifyingMark.firstValue }
+    }
+
+    @Test
+    fun `updating existing identifying mark`() {
+      whenever(identifyingMarksRepository.findById(MARK_1_ID_UUID)).thenReturn(
+        Optional.of(
+          IdentifyingMark(
+            prisonerNumber = PRISONER_NUMBER,
+            identifyingMarkId = MARK_1_ID_UUID,
+            createdAt = NOW.minusDays(1),
+            createdBy = USER1,
+            bodyPart = LEG_REFERENCE,
+            markType = SCAR_REFERENCE,
+          ),
+        ),
+      )
+
+      val attributes = mutableMapOf<String, Any?>(
+        Pair("bodyPart", ARM_REFERENCE.id),
+        Pair("markType", TATTOO_REFERENCE.id),
+        Pair("side", LEFT_SIDE_REFERENCE.id),
+        Pair("partOrientation", CENTRE_REFERENCE.id),
+        Pair("comment", MARK1.comment),
+      )
+
+      val result = underTest.update(MARK_1_ID, IdentifyingMarkUpdateRequest(attributes))
+      assertThat(result).isEqualTo(
+        IdentifyingMarkDto(
+          id = MARK_1_ID,
+          prisonerNumber = PRISONER_NUMBER,
+          bodyPart = ARM_REFERENCE.toSimpleDto(),
+          markType = TATTOO_REFERENCE.toSimpleDto(),
+          side = LEFT_SIDE_REFERENCE.toSimpleDto(),
+          partOrientation = CENTRE_REFERENCE.toSimpleDto(),
+          comment = MARK1.comment,
+          createdAt = NOW.minusDays(1),
+          createdBy = USER1,
+        ),
+      )
+    }
+  }
+
   private companion object {
     const val PRISONER_NUMBER = "A1234AA"
+    val NOW = ZonedDateTime.now()
 
     const val USER1 = "USER1"
 
-    val BODY_PART_DOMAIN = ReferenceDataDomain("BODY_PART", "Body part identifying mark is on", 0, ZonedDateTime.now(), createdBy = "OMS_OWNER")
+    val BODY_PART_DOMAIN = ReferenceDataDomain(
+      "BODY_PART",
+      "Body part identifying mark is on",
+      0,
+      ZonedDateTime.now(),
+      createdBy = "OMS_OWNER",
+    )
 
     val LEG_REFERENCE = ReferenceDataCode("BODY_PART_LEG", "LEG", BODY_PART_DOMAIN, "Leg", 1, createdBy = "OMS_OWNER")
-    val SCAR_REFERENCE = ReferenceDataCode("MARK_TYPE_SCAR", "SCAR", BODY_PART_DOMAIN, "Scar", 0, createdBy = "OMS_OWNER")
+    val ARM_REFERENCE = ReferenceDataCode("BODY_PART_ARM", "ARM", BODY_PART_DOMAIN, "Arm", 1, createdBy = "OMS_OWNER")
+    val SCAR_REFERENCE =
+      ReferenceDataCode("MARK_TYPE_SCAR", "SCAR", BODY_PART_DOMAIN, "Scar", 0, createdBy = "OMS_OWNER")
+    val TATTOO_REFERENCE =
+      ReferenceDataCode("MARK_TYPE_TATTOO", "TATTOO", BODY_PART_DOMAIN, "Tattoo", 0, createdBy = "OMS_OWNER")
     val LEFT_SIDE_REFERENCE = ReferenceDataCode("SIDE_L", "L", BODY_PART_DOMAIN, "Left", 0, createdBy = "OMS_OWNER")
-    val CENTRE_REFERENCE = ReferenceDataCode("PART_ORIENT_CENTR", "CENTR", BODY_PART_DOMAIN, "Centre", 0, createdBy = "OMS_OWNER")
+    val CENTRE_REFERENCE =
+      ReferenceDataCode("PART_ORIENT_CENTR", "CENTR", BODY_PART_DOMAIN, "Centre", 0, createdBy = "OMS_OWNER")
 
-    val MARK1_ID = "c46d0ce9-e586-4fa6-ae76-52ea8c242260"
+    val MARK_1_ID = "c46d0ce9-e586-4fa6-ae76-52ea8c242260"
+    val MARK_1_ID_UUID = UUID.fromString(MARK_1_ID)
     val MARK1 = IdentifyingMark(
-      identifyingMarkId = UUID.fromString(MARK1_ID),
+      identifyingMarkId = UUID.fromString(MARK_1_ID),
       prisonerNumber = PRISONER_NUMBER,
       bodyPart = LEG_REFERENCE,
       markType = SCAR_REFERENCE,

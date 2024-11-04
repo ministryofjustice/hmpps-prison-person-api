@@ -20,7 +20,7 @@ class DomainEventListener(
   private val prisonPersonMergeService: PrisonPersonMergeService,
   private val mapper: ObjectMapper,
 ) {
-  companion object {
+  private companion object {
     val log: Logger = LoggerFactory.getLogger(this::class.java)
   }
 

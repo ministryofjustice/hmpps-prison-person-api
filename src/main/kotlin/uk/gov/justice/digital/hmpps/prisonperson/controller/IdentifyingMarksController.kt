@@ -100,6 +100,7 @@ class IdentifyingMarksController(private val identifyingMarksService: Identifyin
       ),
     ],
   )
+
   fun getIdentifyingMarkById(
     @PathVariable
     @Parameter(
@@ -209,5 +210,4 @@ class IdentifyingMarksController(private val identifyingMarksService: Identifyin
     @Valid
     identifyingMarkUpdateRequest: IdentifyingMarkUpdateRequest,
   ): IdentifyingMarkDto = identifyingMarksService.update(uuid, identifyingMarkUpdateRequest)
-
 }

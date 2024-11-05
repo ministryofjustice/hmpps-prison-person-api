@@ -78,6 +78,7 @@ class NullishReferenceDataCodeValidatorTest {
   @Test
   fun `invalid values (allowNull=true)`() {
     validator.initialize(NullishReferenceDataCode(domains = arrayOf("EXAMPLE_DOMAIN"), allowNull = true))
+    assertThat(validator.isValid(Defined("NON_EXISTING_CODE"), null)).isFalse()
     assertThat(validator.isValid(Defined("EXAMPLE_TWO_CODE"), null)).isFalse()
   }
 
@@ -91,6 +92,7 @@ class NullishReferenceDataCodeValidatorTest {
   @Test
   fun `invalid values (allowNull=false)`() {
     validator.initialize(NullishReferenceDataCode(domains = arrayOf("EXAMPLE_DOMAIN"), allowNull = true))
+    assertThat(validator.isValid(Defined("NON_EXISTING_CODE"), null)).isFalse()
     assertThat(validator.isValid(Defined("EXAMPLE_TWO_CODE"), null)).isFalse()
     assertThat(validator.isValid(Defined(null), null)).isTrue()
   }

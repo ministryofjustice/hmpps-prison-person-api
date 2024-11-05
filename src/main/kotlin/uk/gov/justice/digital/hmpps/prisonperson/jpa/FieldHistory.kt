@@ -111,6 +111,7 @@ class FieldHistory(
     if (mergedFrom != other.mergedFrom) return false
     if (source != other.source) return false
     if (anomalous != other.anomalous) return false
+    if (valueJson != other.valueJson) return false
 
     return true
   }
@@ -130,6 +131,7 @@ class FieldHistory(
     result = 31 * result + (mergedFrom?.hashCode() ?: 0)
     result = 31 * result + (source?.hashCode() ?: 0)
     result = 31 * result + (anomalous.hashCode())
+    result = 31 * result + (valueJson?.hashCode() ?: 0)
     return result
   }
 
@@ -149,5 +151,6 @@ class FieldHistory(
     "mergedFrom=$mergedFrom, " +
     "source=$source" +
     "anomalous=$anomalous" +
+    "valueJson=$valueJson, " +
     ")"
 }

@@ -10,6 +10,7 @@ import uk.gov.justice.digital.hmpps.prisonperson.jpa.ReferenceDataCode
 private val getInt: (FieldValues) -> Int? = { it.valueInt }
 private val getString: (FieldValues) -> String? = { it.valueString }
 private val getRef: (FieldValues) -> ReferenceDataCode? = { it.valueRef }
+private val getJson: (FieldValues) -> JsonObject? = { it.valueJson }
 
 private val setInt: (FieldValues, Any?) -> Unit = { values, value -> values.valueInt = value as Int? }
 private val setString: (FieldValues, Any?) -> Unit = { values, value -> values.valueString = value as String? }
@@ -36,7 +37,7 @@ enum class PrisonPersonField(
   SHOE_SIZE(getString, setString, hasChangedString, null),
   SMOKER_OR_VAPER(getRef, setRef, hasChangedRef, "SMOKE"),
   FOOD_ALLERGY(
-    { it.valueJson },
+    getJson,
     { values, value ->
       run {
         value as MutableSet<FoodAllergy>
@@ -48,7 +49,7 @@ enum class PrisonPersonField(
   ),
 
   MEDICAL_DIET(
-    { it.valueJson },
+    getJson,
     { values, value ->
       run {
         value as MutableSet<MedicalDietaryRequirement>

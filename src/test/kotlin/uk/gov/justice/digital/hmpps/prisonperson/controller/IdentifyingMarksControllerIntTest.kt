@@ -275,7 +275,7 @@ class IdentifyingMarksControllerIntTest : IntegrationTestBase() {
         @MethodSource("uk.gov.justice.digital.hmpps.prisonperson.controller.IdentifyingMarksControllerIntTest#patchMarkValidations")
         fun `PATCH mark validations`(requestBody: String, message: String) {
           webTestClient.patch().uri("/identifying-marks/mark/$MARK_ONE_ID")
-            .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__HEALTH__RW")))
+            .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RW")))
             .header("Content-Type", "application/json").bodyValue(requestBody).exchange()
             .expectStatus().isBadRequest.expectBody().jsonPath("userMessage").isEqualTo(message)
         }

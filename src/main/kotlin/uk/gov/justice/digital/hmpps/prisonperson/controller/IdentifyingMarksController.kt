@@ -162,7 +162,7 @@ class IdentifyingMarksController(private val identifyingMarksService: Identifyin
   @ResponseStatus(HttpStatus.OK)
   @PreAuthorize("hasRole('ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RW')")
   @Operation(
-    summary = "Updates the health information for a prisoner",
+    summary = "Updates the identifying mark",
     description = "Requires role `ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RW`",
     responses = [
       ApiResponse(
@@ -201,7 +201,7 @@ class IdentifyingMarksController(private val identifyingMarksService: Identifyin
       ),
     ],
   )
-  fun createOrUpdateHealth(
+  fun updateIdentifyingMark(
     @Schema(description = "The UUID of the mark", example = "A1234AA", required = true)
     @PathVariable
     uuid: String,

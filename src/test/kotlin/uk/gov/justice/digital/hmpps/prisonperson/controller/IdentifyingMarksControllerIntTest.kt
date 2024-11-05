@@ -8,7 +8,9 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.CsvSource
+import org.junit.jupiter.params.provider.MethodSource
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.core.io.ByteArrayResource
 import org.springframework.http.MediaType
@@ -25,6 +27,7 @@ import uk.gov.justice.digital.hmpps.prisonperson.integration.wiremock.DocumentSe
 import uk.gov.justice.digital.hmpps.prisonperson.utils.UuidV7Generator.Companion.uuidGenerator
 import java.time.ZonedDateTime
 import java.util.UUID
+import java.util.stream.Stream
 
 class IdentifyingMarksControllerIntTest : IntegrationTestBase() {
 
@@ -263,17 +266,32 @@ class IdentifyingMarksControllerIntTest : IntegrationTestBase() {
 
     // PATCH routes
     @Nested
-    inner class PatchMarkHappyPath {
-      @Test
-      @Sql("classpath:jpa/repository/reset.sql")
-      @Sql("classpath:controller/identifying_marks/identifying_marks.sql")
-      fun `can update an existing identifying mark`() {
-        webTestClient.patch().uri("/identifying-marks/mark/c46d0ce9-e586-4fa6-ae76-52ea8c242257")
-          .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RW")))
-          .header("Content-Type", "application/json")
-          .bodyValue(
-            // language=json
-            """
+    @Sql("classpath:jpa/repository/reset.sql")
+    @Sql("classpath:controller/identifying_marks/identifying_marks.sql")
+    inner class PatchMark {
+      @Nested
+      inner class PatchMarkValidation {
+        @ParameterizedTest(name = "PATCH Mark invalid request: {0}")
+        @MethodSource("uk.gov.justice.digital.hmpps.prisonperson.controller.IdentifyingMarksControllerIntTest#patchMarkValidations")
+        fun `PATCH mark validations`(requestBody: String, message: String) {
+          webTestClient.patch().uri("/identifying-marks/mark/$MARK_ONE_ID")
+            .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__HEALTH__RW")))
+            .header("Content-Type", "application/json").bodyValue(requestBody).exchange()
+            .expectStatus().isBadRequest.expectBody().jsonPath("userMessage").isEqualTo(message)
+        }
+
+      }
+
+      @Nested
+      inner class PatchMarkHappyPath {
+        @Test
+        fun `can update an existing identifying mark`() {
+          webTestClient.patch().uri("/identifying-marks/mark/c46d0ce9-e586-4fa6-ae76-52ea8c242257")
+            .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RW")))
+            .header("Content-Type", "application/json")
+            .bodyValue(
+              // language=json
+              """
               {
                 "bodyPart": "BODY_PART_ARM",
                 "markType": "MARK_TYPE_TAT",
@@ -282,13 +300,13 @@ class IdentifyingMarksControllerIntTest : IntegrationTestBase() {
                 "comment": "It's a tattoo now"
               }
             """.trimIndent(),
-          )
-          .exchange()
-          .expectStatus().isOk
-          .expectBody()
-          .json(
-            // language=json
-            """
+            )
+            .exchange()
+            .expectStatus().isOk
+            .expectBody()
+            .json(
+              // language=json
+              """
             {
               "id": "c46d0ce9-e586-4fa6-ae76-52ea8c242257",
               "prisonerNumber": "12345",
@@ -322,13 +340,16 @@ class IdentifyingMarksControllerIntTest : IntegrationTestBase() {
               "createdBy": "USER_GEN"
             }
           """.trimIndent(),
-            true,
-          )
+              true,
+            )
+        }
       }
     }
   }
 
   private companion object {
+    val MARK_ONE_ID = "c46d0ce9-e586-4fa6-ae76-52ea8c242257"
+
     val DOCUMENT_DTO = DocumentDto(
       documentUuid = "c46d0ce9-e586-4fa6-ae76-52ea8c242260",
       documentType = DocumentType.PHYSICAL_IDENTIFIER_PICTURE,
@@ -350,5 +371,24 @@ class IdentifyingMarksControllerIntTest : IntegrationTestBase() {
       MediaType.IMAGE_JPEG_VALUE,
       "mock content".toByteArray(),
     )
+
+    val MARK_TYPE_VALIDATION_ERROR =
+      "Validation failure(s): Type of identifying mark should a reference data code ID in the correct domain, or Undefined."
+    val BODY_PART_VALIDATION_ERROR =
+      "Validation failure(s): Body part of identifying mark should a reference data code ID in the correct domain, or Undefined."
+    val PATCH_MARK_VALIDATION_ERROR =
+      "Validation failure(s): The value must be a reference domain code id of the correct domain, null, or Undefined."
+
+    @JvmStatic
+    fun patchMarkValidations(): Stream<Arguments> {
+      return Stream.of(
+        Arguments.of("""{"markType": "SIDE_R"}""".trimMargin(), MARK_TYPE_VALIDATION_ERROR),
+        Arguments.of("""{"markType": null}""".trimMargin(), MARK_TYPE_VALIDATION_ERROR),
+        Arguments.of("""{"bodyPart": "SIDE_R"}""".trimMargin(), BODY_PART_VALIDATION_ERROR),
+        Arguments.of("""{"bodyPart": null}""".trimMargin(), BODY_PART_VALIDATION_ERROR),
+        Arguments.of("""{"side": "MARK_TYPE_TAT"}""".trimMargin(), PATCH_MARK_VALIDATION_ERROR),
+        Arguments.of("""{"partOrientation": "MARK_TYPE_TAT"}""".trimMargin(), PATCH_MARK_VALIDATION_ERROR),
+      )
+    }
   }
 }

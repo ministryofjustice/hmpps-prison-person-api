@@ -279,7 +279,6 @@ class IdentifyingMarksControllerIntTest : IntegrationTestBase() {
             .header("Content-Type", "application/json").bodyValue(requestBody).exchange()
             .expectStatus().isBadRequest.expectBody().jsonPath("userMessage").isEqualTo(message)
         }
-
       }
 
       @Nested
@@ -299,7 +298,7 @@ class IdentifyingMarksControllerIntTest : IntegrationTestBase() {
                 "partOrientation": "PART_ORIENT_LOW",
                 "comment": "It's a tattoo now"
               }
-            """.trimIndent(),
+              """.trimIndent(),
             )
             .exchange()
             .expectStatus().isOk
@@ -307,39 +306,39 @@ class IdentifyingMarksControllerIntTest : IntegrationTestBase() {
             .json(
               // language=json
               """
-            {
-              "id": "c46d0ce9-e586-4fa6-ae76-52ea8c242257",
-              "prisonerNumber": "12345",
-              "bodyPart": {
-                "id": "BODY_PART_ARM",
-                "description": "Arm",
-                "listSequence": 0,
-                "isActive": true
-              },
-              "markType": {
-                "id": "MARK_TYPE_TAT",
-                "description": "Tattoo",
-                "listSequence": 0,
-                "isActive": true
-              },
-              "side": {
-                "id": "SIDE_L",
-                "description": "Left",
-                "listSequence": 2,
-                "isActive": true
-              },
-              "partOrientation": {
-                "id": "PART_ORIENT_LOW",
-                "description": "Low",
-                "listSequence": 0,
-                "isActive": true
-              },
-              "comment": "It's a tattoo now",
-              "photographUuids": [],
-              "createdAt": "2024-01-02T09:10:11+0000",
-              "createdBy": "USER_GEN"
-            }
-          """.trimIndent(),
+              {
+                "id": "c46d0ce9-e586-4fa6-ae76-52ea8c242257",
+                "prisonerNumber": "12345",
+                "bodyPart": {
+                  "id": "BODY_PART_ARM",
+                  "description": "Arm",
+                  "listSequence": 0,
+                  "isActive": true
+                },
+                "markType": {
+                  "id": "MARK_TYPE_TAT",
+                  "description": "Tattoo",
+                  "listSequence": 0,
+                  "isActive": true
+                },
+                "side": {
+                  "id": "SIDE_L",
+                  "description": "Left",
+                  "listSequence": 2,
+                  "isActive": true
+                },
+                "partOrientation": {
+                  "id": "PART_ORIENT_LOW",
+                  "description": "Low",
+                  "listSequence": 0,
+                  "isActive": true
+                },
+                "comment": "It's a tattoo now",
+                "photographUuids": [],
+                "createdAt": "2024-01-02T09:10:11+0000",
+                "createdBy": "USER_GEN"
+              }
+              """.trimIndent(),
               true,
             )
         }

@@ -72,7 +72,6 @@ class IdentifyingMarksServiceTest {
     whenever(referenceDataCodeRepository.findById(TATTOO_REFERENCE.id)).thenReturn(Optional.of(TATTOO_REFERENCE))
     whenever(referenceDataCodeRepository.findById(LEFT_SIDE_REFERENCE.id)).thenReturn(Optional.of(LEFT_SIDE_REFERENCE))
     whenever(referenceDataCodeRepository.findById(CENTRE_REFERENCE.id)).thenReturn(Optional.of(CENTRE_REFERENCE))
-
   }
 
   @Nested

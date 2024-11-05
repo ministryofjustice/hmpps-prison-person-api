@@ -100,7 +100,6 @@ class IdentifyingMarksController(private val identifyingMarksService: Identifyin
       ),
     ],
   )
-
   fun getIdentifyingMarkById(
     @PathVariable
     @Parameter(

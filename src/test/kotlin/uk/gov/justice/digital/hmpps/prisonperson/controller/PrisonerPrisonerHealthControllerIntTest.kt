@@ -133,7 +133,7 @@ class PrisonerPrisonerHealthControllerIntTest : IntegrationTestBase() {
       @Sql("classpath:jpa/repository/reset.sql")
       fun `can create new health information`() {
         expectSuccessfulUpdateFrom(VALID_REQUEST_BODY).expectBody().json(
-          SMOKER_NO_MILK_ALLERGY_RESPONSE,
+          SMOKER_NO_MILK_ALLERGY_ALL_UPDATED_RESPONSE,
           true,
         )
 
@@ -153,6 +153,8 @@ class PrisonerPrisonerHealthControllerIntTest : IntegrationTestBase() {
       @Sql("classpath:jpa/repository/reset.sql")
       @Sql("classpath:controller/prisoner_health/health.sql")
       @Sql("classpath:controller/prisoner_health/food_allergies.sql")
+      @Sql("classpath:controller/prisoner_health/medical_dietary_requirements.sql")
+      @Sql("classpath:controller/prisoner_health/field_metadata.sql")
       @Sql("classpath:controller/prisoner_health/field_history.sql")
       fun `can update existing health information`() {
         expectFieldHistory(
@@ -167,7 +169,7 @@ class PrisonerPrisonerHealthControllerIntTest : IntegrationTestBase() {
         )
 
         expectSuccessfulUpdateFrom(VALID_REQUEST_BODY).expectBody().json(
-          SMOKER_NO_MILK_ALLERGY_RESPONSE,
+          SMOKER_NO_MILK_ALLERGY_MEDICAL_NOT_UPDATED_RESPONSE,
           true,
         )
 
@@ -194,6 +196,8 @@ class PrisonerPrisonerHealthControllerIntTest : IntegrationTestBase() {
       @Sql("classpath:jpa/repository/reset.sql")
       @Sql("classpath:controller/prisoner_health/health.sql")
       @Sql("classpath:controller/prisoner_health/food_allergies.sql")
+      @Sql("classpath:controller/prisoner_health/medical_dietary_requirements.sql")
+      @Sql("classpath:controller/prisoner_health/field_metadata.sql")
       @Sql("classpath:controller/prisoner_health/field_history.sql")
       fun `can update existing health information to null`() {
         expectFieldHistory(
@@ -210,7 +214,7 @@ class PrisonerPrisonerHealthControllerIntTest : IntegrationTestBase() {
         expectSuccessfulUpdateFrom(
           // language=json
           """
-            { "smokerOrVaper": null, "foodAllergies": [] }
+            { "smokerOrVaper": null, "foodAllergies": [], "medicalDietaryRequirements": [] }
           """.trimIndent(),
         ).expectBody().json(
           // language=json
@@ -220,8 +224,16 @@ class PrisonerPrisonerHealthControllerIntTest : IntegrationTestBase() {
                 "lastModifiedAt":"2024-06-14T09:10:11+0100",
                 "lastModifiedBy":"USER1"
               },
-              "foodAllergies": [],
-              "medicalDietaryRequirements": []
+              "foodAllergies": {
+                "value": [], 
+                "lastModifiedAt":"2024-06-14T09:10:11+0100",
+                "lastModifiedBy":"USER1"
+              },
+              "medicalDietaryRequirements": {
+                "value": [], 
+                "lastModifiedAt":"2024-06-14T09:10:11+0100",
+                "lastModifiedBy":"USER1"
+              }
             }
           """.trimIndent(),
           true,
@@ -250,6 +262,8 @@ class PrisonerPrisonerHealthControllerIntTest : IntegrationTestBase() {
       @Sql("classpath:jpa/repository/reset.sql")
       @Sql("classpath:controller/prisoner_health/health.sql")
       @Sql("classpath:controller/prisoner_health/food_allergies.sql")
+      @Sql("classpath:controller/prisoner_health/medical_dietary_requirements.sql")
+      @Sql("classpath:controller/prisoner_health/field_metadata.sql")
       @Sql("classpath:controller/prisoner_health/field_history.sql")
       fun `can update only smoker or vaper`() {
         expectFieldHistory(
@@ -354,19 +368,34 @@ class PrisonerPrisonerHealthControllerIntTest : IntegrationTestBase() {
           "lastModifiedAt": "2024-06-14T09:10:11+0100",
           "lastModifiedBy": "USER1"
         },
-        "foodAllergies": [
-          {
-            "id": "FOOD_ALLERGY_EGG",
-            "description": "Egg",
-            "listSequence": 0,
-            "isActive": true
-          }
-        ],
-        "medicalDietaryRequirements": []
+        "foodAllergies": {
+          "value":  [
+            {
+              "id": "FOOD_ALLERGY_EGG",
+              "description": "Egg",
+              "listSequence": 0,
+              "isActive": true
+            }
+          ],
+          "lastModifiedAt": "2024-01-02T09:10:11+0000",
+          "lastModifiedBy": "USER1"
+        },
+        "medicalDietaryRequirements": {
+          "value":  [
+            {
+              "id": "MEDICAL_DIET_LOW_FAT",
+              "description": "Low fat",
+              "listSequence": 0,
+              "isActive": true
+            }
+          ],
+          "lastModifiedAt": "2024-01-02T09:10:11+0000",
+          "lastModifiedBy": "USER1"
+        }
       }
       """.trimIndent()
 
-    val SMOKER_NO_MILK_ALLERGY_RESPONSE =
+    val SMOKER_NO_MILK_ALLERGY_ALL_UPDATED_RESPONSE =
       // language=json
       """
       {
@@ -380,15 +409,64 @@ class PrisonerPrisonerHealthControllerIntTest : IntegrationTestBase() {
           "lastModifiedAt": "2024-06-14T09:10:11+0100",
           "lastModifiedBy": "USER1"
         },
-        "foodAllergies": [
-          {
-            "id": "FOOD_ALLERGY_MILK",
-            "description": "Milk",
+        "foodAllergies": {
+          "value": [
+            {
+              "id": "FOOD_ALLERGY_MILK",
+              "description": "Milk",
+              "listSequence": 0,
+              "isActive": true
+            }
+          ],
+          "lastModifiedAt": "2024-06-14T09:10:11+0100",
+          "lastModifiedBy": "USER1"
+        },
+        "medicalDietaryRequirements": {
+          "value": [],
+          "lastModifiedAt": "2024-06-14T09:10:11+0100",
+          "lastModifiedBy": "USER1"
+        }
+      }
+      """.trimIndent()
+
+    val SMOKER_NO_MILK_ALLERGY_MEDICAL_NOT_UPDATED_RESPONSE =
+      // language=json
+      """
+      {
+        "smokerOrVaper": {
+          "value": {
+            "id": "SMOKE_NO",
+            "description": "No, they do not smoke or vape",
             "listSequence": 0,
             "isActive": true
-          }
-        ],
-        "medicalDietaryRequirements": []
+          },
+          "lastModifiedAt": "2024-06-14T09:10:11+0100",
+          "lastModifiedBy": "USER1"
+        },
+        "foodAllergies": {
+          "value": [
+            {
+              "id": "FOOD_ALLERGY_MILK",
+              "description": "Milk",
+              "listSequence": 0,
+              "isActive": true
+            }
+          ],
+          "lastModifiedAt": "2024-06-14T09:10:11+0100",
+          "lastModifiedBy": "USER1"
+        },
+        "medicalDietaryRequirements": {
+          "value": [
+            {
+              "id": "MEDICAL_DIET_LOW_FAT",
+              "description": "Low fat",
+              "listSequence": 0,
+              "isActive": true
+            }
+          ],
+          "lastModifiedAt": "2024-01-02T09:10:11+0000",
+          "lastModifiedBy": "USER1"
+        }
       }
       """.trimIndent()
   }

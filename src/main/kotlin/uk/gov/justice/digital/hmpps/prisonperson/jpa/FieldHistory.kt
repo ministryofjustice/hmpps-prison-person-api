@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.prisonperson.jpa
 
 import jakarta.persistence.Column
+import jakarta.persistence.Convert
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType.STRING
 import jakarta.persistence.Enumerated
@@ -33,6 +34,9 @@ class FieldHistory(
 
   override var valueInt: Int? = null,
   override var valueString: String? = null,
+
+  @Convert(converter = JsonObjectConverter::class)
+  override var valueJson: JsonObject? = null,
 
   @ManyToOne
   @JoinColumn(name = "valueRef", referencedColumnName = "id")
@@ -107,6 +111,7 @@ class FieldHistory(
     if (mergedFrom != other.mergedFrom) return false
     if (source != other.source) return false
     if (anomalous != other.anomalous) return false
+    if (valueJson != other.valueJson) return false
 
     return true
   }
@@ -126,6 +131,7 @@ class FieldHistory(
     result = 31 * result + (mergedFrom?.hashCode() ?: 0)
     result = 31 * result + (source?.hashCode() ?: 0)
     result = 31 * result + (anomalous.hashCode())
+    result = 31 * result + (valueJson?.hashCode() ?: 0)
     return result
   }
 
@@ -145,5 +151,6 @@ class FieldHistory(
     "mergedFrom=$mergedFrom, " +
     "source=$source" +
     "anomalous=$anomalous" +
+    "valueJson=$valueJson, " +
     ")"
 }

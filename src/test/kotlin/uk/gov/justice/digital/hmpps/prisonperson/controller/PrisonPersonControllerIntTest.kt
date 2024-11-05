@@ -143,22 +143,30 @@ class PrisonPersonControllerIntTest : IntegrationTestBase() {
                     "lastModifiedAt": "2024-01-02T09:10:11+0000",
                     "lastModifiedBy": "USER1"
                   },
-                  "foodAllergies": [
-                    {
-                      "id": "FOOD_ALLERGY_EGG",
-                      "description": "Egg",
-                      "listSequence": 0,
-                      "isActive": true
-                    }
-                  ],
-                  "medicalDietaryRequirements": [
-                    {
-                      "id": "MEDICAL_DIET_LOW_FAT",
-                      "description": "Low fat",
-                      "listSequence": 0,
-                      "isActive": true
-                    }
-                  ]
+                  "foodAllergies": { 
+                    "value": [
+                      {
+                        "id": "FOOD_ALLERGY_EGG",
+                        "description": "Egg",
+                        "listSequence": 0,
+                        "isActive": true
+                      }
+                    ],
+                    "lastModifiedAt": "2024-01-02T09:10:11+0000",
+                    "lastModifiedBy": "USER1"
+                  },
+                  "medicalDietaryRequirements": {
+                    "value": [
+                      {
+                        "id": "MEDICAL_DIET_LOW_FAT",
+                        "description": "Low fat",
+                        "listSequence": 0,
+                        "isActive": true
+                      }
+                    ],
+                    "lastModifiedAt": "2024-01-02T09:10:11+0000",
+                    "lastModifiedBy": "USER1"
+                  }
                 }
               }
             """.trimIndent(),

@@ -9,6 +9,7 @@ import uk.gov.justice.digital.hmpps.prisonperson.client.documentservice.dto.Docu
 import uk.gov.justice.digital.hmpps.prisonperson.client.documentservice.dto.DocumentType
 import uk.gov.justice.digital.hmpps.prisonperson.config.GenericNotFoundException
 import uk.gov.justice.digital.hmpps.prisonperson.dto.request.IdentifyingMarkRequest
+import uk.gov.justice.digital.hmpps.prisonperson.dto.request.IdentifyingMarkUpdateRequest
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.IdentifyingMarkDto
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.IdentifyingMark
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.IdentifyingMarkImage
@@ -81,6 +82,22 @@ class IdentifyingMarksService(
     }
 
     // TODO consider deleting the doc from document service if the db save fails
+    return identifyingMarksRepository.save(identifyingMark).toDto()
+  }
+
+  @Transactional
+  fun update(
+    uuid: String,
+    request: IdentifyingMarkUpdateRequest,
+  ): IdentifyingMarkDto {
+    val identifyingMark = identifyingMarksRepository.findById(UUID.fromString(uuid)).orElseThrow().apply {
+      request.markType.let<String> { markType = toReferenceDataCode(referenceDataCodeRepository, it)!! }
+      request.bodyPart.let<String> { bodyPart = toReferenceDataCode(referenceDataCodeRepository, it)!! }
+      request.side.apply(this::side) { toReferenceDataCode(referenceDataCodeRepository, it) }
+      request.partOrientation.apply(this::partOrientation) { toReferenceDataCode(referenceDataCodeRepository, it) }
+      request.comment.apply(this::comment)
+    }
+
     return identifyingMarksRepository.save(identifyingMark).toDto()
   }
 }

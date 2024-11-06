@@ -27,22 +27,22 @@ class IdentifyingMark(
 
   @ManyToOne
   @JoinColumn(name = "body_part_code", referencedColumnName = "id", nullable = false)
-  val bodyPart: ReferenceDataCode,
+  var bodyPart: ReferenceDataCode,
 
   @ManyToOne
   @JoinColumn(name = "mark_type", referencedColumnName = "id", nullable = false)
-  val markType: ReferenceDataCode,
+  var markType: ReferenceDataCode,
 
   @ManyToOne
   @JoinColumn(name = "side_code", referencedColumnName = "id")
-  val side: ReferenceDataCode? = null,
+  var side: ReferenceDataCode? = null,
 
   @ManyToOne
   @JoinColumn(name = "part_orientation", referencedColumnName = "id")
-  val partOrientation: ReferenceDataCode? = null,
+  var partOrientation: ReferenceDataCode? = null,
 
   @Column(name = "comment_text")
-  val comment: String? = null,
+  var comment: String? = null,
 
   @OneToMany(mappedBy = "identifyingMark", fetch = EAGER, cascade = [PERSIST, MERGE])
   var photographUuids: Set<IdentifyingMarkImage> = emptySet(),

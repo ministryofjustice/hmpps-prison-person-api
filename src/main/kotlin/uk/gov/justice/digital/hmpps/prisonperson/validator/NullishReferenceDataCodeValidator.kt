@@ -27,13 +27,9 @@ class NullishReferenceDataCodeValidator(
     when (value) {
       Nullish.Undefined -> true
       is Nullish.Defined -> {
-        if (value.value == null) {
-          this.allowNull
-        } else {
-          val referenceDataCode = referenceDataCodeRepository.findById(value.value).getOrNull()
-
-          validDomains.contains(referenceDataCode?.domain?.code)
-        }
+        value.value?.let {
+          referenceDataCodeRepository.findById(it).getOrNull()?.domain?.code in validDomains
+        } ?: allowNull
       }
 
       null -> false

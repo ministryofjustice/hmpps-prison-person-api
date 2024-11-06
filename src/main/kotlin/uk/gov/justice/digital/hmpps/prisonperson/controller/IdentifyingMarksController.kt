@@ -166,7 +166,7 @@ class IdentifyingMarksController(private val identifyingMarksService: Identifyin
     description = "Requires role `ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RW`",
     responses = [
       ApiResponse(
-        responseCode = "201",
+        responseCode = "200",
         description = "Returns prisoner's identifying mark",
       ),
       ApiResponse(
@@ -202,7 +202,7 @@ class IdentifyingMarksController(private val identifyingMarksService: Identifyin
     ],
   )
   fun updateIdentifyingMark(
-    @Schema(description = "The UUID of the mark", example = "A1234AA", required = true)
+    @Schema(description = "The UUID of the mark", example = "3946f7d9-25d0-449f-bf17-1ade41559391", required = true)
     @PathVariable
     uuid: String,
     @RequestBody

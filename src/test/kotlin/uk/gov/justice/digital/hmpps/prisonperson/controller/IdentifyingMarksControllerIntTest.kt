@@ -149,7 +149,7 @@ class IdentifyingMarksControllerIntTest : IntegrationTestBase() {
 
         documentService.stubPostNewDocument(
           uuid = docUuid.toString(),
-          documentType = DocumentType.PHYSICAL_IDENTIFIER_PICTURE,
+          documentType = DocumentType.DISTINGUISHING_MARK_IMAGE,
           result = DOCUMENT_DTO,
         )
 
@@ -265,7 +265,7 @@ class IdentifyingMarksControllerIntTest : IntegrationTestBase() {
   private companion object {
     val DOCUMENT_DTO = DocumentDto(
       documentUuid = "c46d0ce9-e586-4fa6-ae76-52ea8c242260",
-      documentType = DocumentType.PHYSICAL_IDENTIFIER_PICTURE,
+      documentType = DocumentType.DISTINGUISHING_MARK_IMAGE,
       documentFilename = "fileName",
       filename = "fileName",
       fileExtension = "jpg",

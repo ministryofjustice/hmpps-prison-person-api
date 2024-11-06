@@ -64,7 +64,7 @@ class IdentifyingMarksService(
       val uploadedDocument = documentServiceClient.putDocument(
         document = file.bytes,
         filename = file.originalFilename,
-        documentType = DocumentType.PHYSICAL_IDENTIFIER_PICTURE,
+        documentType = DocumentType.DISTINGUISHING_MARK_IMAGE,
         meta = mapOf("prisonerNumber" to identifyingMarkRequest.prisonerNumber),
         fileType,
         documentRequestContext = DocumentRequestContext(

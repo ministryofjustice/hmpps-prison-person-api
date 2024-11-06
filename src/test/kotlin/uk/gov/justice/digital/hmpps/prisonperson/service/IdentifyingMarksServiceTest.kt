@@ -167,7 +167,7 @@ class IdentifyingMarksServiceTest {
 
       val documentDto = DocumentDto(
         documentUuid = "c46d0ce9-e586-4fa6-ae76-52ea8c242260",
-        documentType = DocumentType.PHYSICAL_IDENTIFIER_PICTURE,
+        documentType = DocumentType.DISTINGUISHING_MARK_IMAGE,
         documentFilename = "fileName.jpg",
         filename = "fileName",
         fileExtension = "jpg",
@@ -185,7 +185,7 @@ class IdentifyingMarksServiceTest {
       whenever(referenceDataCodeRepository.findById("MARK_TYPE_SCAR")).thenReturn(Optional.of(SCAR_REFERENCE))
       whenever(referenceDataCodeRepository.findById("SIDE_L")).thenReturn(Optional.of(LEFT_SIDE_REFERENCE))
       whenever(referenceDataCodeRepository.findById("PART_ORIENT_CENTR")).thenReturn(Optional.of(CENTRE_REFERENCE))
-      whenever(documentServiceClient.putDocument(file.bytes, "fileName.jpg", DocumentType.PHYSICAL_IDENTIFIER_PICTURE, mapOf("prisonerNumber" to "A1234AA"), fileType, DOCUMENT_REQ_CONTEXT)).thenReturn(documentDto)
+      whenever(documentServiceClient.putDocument(file.bytes, "fileName.jpg", DocumentType.DISTINGUISHING_MARK_IMAGE, mapOf("prisonerNumber" to "A1234AA"), fileType, DOCUMENT_REQ_CONTEXT)).thenReturn(documentDto)
 
       val identifyingMarkRequest = IdentifyingMarkRequest(
         prisonerNumber = PRISONER_NUMBER,
@@ -250,7 +250,7 @@ class IdentifyingMarksServiceTest {
       whenever(referenceDataCodeRepository.findById("MARK_TYPE_SCAR")).thenReturn(Optional.of(SCAR_REFERENCE))
       whenever(referenceDataCodeRepository.findById("SIDE_L")).thenReturn(Optional.of(LEFT_SIDE_REFERENCE))
       whenever(referenceDataCodeRepository.findById("PART_ORIENT_CENTR")).thenReturn(Optional.of(CENTRE_REFERENCE))
-      whenever(documentServiceClient.putDocument(file.bytes, "fileName.jpg", DocumentType.PHYSICAL_IDENTIFIER_PICTURE, mapOf("prisonerNumber" to "A1234AA"), fileType, DOCUMENT_REQ_CONTEXT)).thenThrow(RuntimeException("Put document request failed"))
+      whenever(documentServiceClient.putDocument(file.bytes, "fileName.jpg", DocumentType.DISTINGUISHING_MARK_IMAGE, mapOf("prisonerNumber" to "A1234AA"), fileType, DOCUMENT_REQ_CONTEXT)).thenThrow(RuntimeException("Put document request failed"))
 
       val identifyingMarkRequest = IdentifyingMarkRequest(
         prisonerNumber = PRISONER_NUMBER,

@@ -175,7 +175,7 @@ class IdentifyingMarksServiceTest {
 
       val documentDto = DocumentDto(
         documentUuid = "c46d0ce9-e586-4fa6-ae76-52ea8c242260",
-        documentType = DocumentType.PHYSICAL_IDENTIFIER_PICTURE,
+        documentType = DocumentType.DISTINGUISHING_MARK_IMAGE,
         documentFilename = "fileName.jpg",
         filename = "fileName",
         fileExtension = "jpg",
@@ -197,7 +197,7 @@ class IdentifyingMarksServiceTest {
         documentServiceClient.putDocument(
           file.bytes,
           "fileName.jpg",
-          DocumentType.PHYSICAL_IDENTIFIER_PICTURE,
+          DocumentType.DISTINGUISHING_MARK_IMAGE,
           mapOf("prisonerNumber" to "A1234AA"),
           fileType,
           DOCUMENT_REQ_CONTEXT,
@@ -269,7 +269,7 @@ class IdentifyingMarksServiceTest {
         documentServiceClient.putDocument(
           file.bytes,
           "fileName.jpg",
-          DocumentType.PHYSICAL_IDENTIFIER_PICTURE,
+          DocumentType.DISTINGUISHING_MARK_IMAGE,
           mapOf("prisonerNumber" to "A1234AA"),
           fileType,
           DOCUMENT_REQ_CONTEXT,

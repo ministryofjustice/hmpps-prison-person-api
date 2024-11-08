@@ -6,11 +6,9 @@ management.endpoint:
   info.cache.time-to-live: 0
 
 api:
-  base:
-    url:
-      oauth: http://localhost:8090/auth
-      prisoner-search: http://localhost:8112
-      document-service: http://localhost:8113
+  oauth.base.url: http://localhost:8090/auth
+  prisoner-search.base.url: http://localhost:8112
+  document-service.base.url: http://localhost:8113
 
 spring:
   datasource:

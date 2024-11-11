@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestPart
@@ -209,4 +210,51 @@ class IdentifyingMarksController(private val identifyingMarksService: Identifyin
     @Valid
     identifyingMarkUpdateRequest: IdentifyingMarkUpdateRequest,
   ): IdentifyingMarkDto = identifyingMarksService.update(uuid, identifyingMarkUpdateRequest)
+
+  @PutMapping("/mark/{uuid}/photo", produces = [MediaType.APPLICATION_JSON_VALUE])
+  @ResponseStatus(HttpStatus.OK)
+  @PreAuthorize("hasRole('ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RW')")
+  @Operation(
+    summary = "Add a new photo for the identifying mark",
+    description = "Stores a new identifying mark photo and sets it to the current photo for the identifying mark." +
+      "The image file supplied on the file attribute of a multipart/form-date submission.  \n" +
+      "Returns the identifying mark detail\n" +
+      "Requires role `ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RW`",
+    responses = [
+      ApiResponse(
+        responseCode = "200",
+        description = "Returns uploaded photograph document data",
+      ),
+      ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized to access this endpoint",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
+      ),
+      ApiResponse(
+        responseCode = "403",
+        description = "Missing required role. Requires ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RW",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
+      ),
+      ApiResponse(
+        responseCode = "404",
+        description = "Data not found",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
+      ),
+    ],
+  )
+  fun updateIdentifyingMarkPhoto(
+    @Schema(description = "The UUID of the mark", example = "3946f7d9-25d0-449f-bf17-1ade41559391", required = true)
+    @PathVariable
+    uuid: String,
+    @RequestPart
+    @Parameter(
+      description = "File part of the multipart request",
+      required = false,
+    )
+    file: MultipartFile?,
+  ) = identifyingMarksService.updatePhoto(
+    uuid,
+    file,
+    fileType = MediaType.parseMediaType(file?.contentType ?: MediaType.APPLICATION_OCTET_STREAM_VALUE),
+  )
 }

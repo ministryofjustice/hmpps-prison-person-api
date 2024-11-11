@@ -22,6 +22,7 @@ import uk.gov.justice.digital.hmpps.prisonperson.client.documentservice.dto.Docu
 import uk.gov.justice.digital.hmpps.prisonperson.client.documentservice.dto.DocumentType
 import uk.gov.justice.digital.hmpps.prisonperson.dto.ReferenceDataSimpleDto
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.IdentifyingMarkDto
+import uk.gov.justice.digital.hmpps.prisonperson.dto.response.IdentifyingMarkImageDto
 import uk.gov.justice.digital.hmpps.prisonperson.integration.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.prisonperson.integration.wiremock.DocumentServiceExtension.Companion.documentService
 import uk.gov.justice.digital.hmpps.prisonperson.utils.UuidV7Generator.Companion.uuidGenerator
@@ -131,8 +132,8 @@ class IdentifyingMarksControllerIntTest : IntegrationTestBase() {
         assertThat(response?.partOrientation).isEqualTo(ReferenceDataSimpleDto("PART_ORIENT_CENTR", "Centre", 0, true))
         assertThat(response?.comment).isEqualTo("Another scar")
         assertThat(response?.photographUuids).containsExactlyInAnyOrder(
-          "c46d0ce9-e586-4fa6-ae76-52ea8c242260",
-          "c46d0ce9-e586-4fa6-ae76-52ea8c242261",
+          IdentifyingMarkImageDto("c46d0ce9-e586-4fa6-ae76-52ea8c242260", false),
+          IdentifyingMarkImageDto("c46d0ce9-e586-4fa6-ae76-52ea8c242261", true),
         )
         assertThat(response?.createdAt).isEqualTo(ZonedDateTime.parse("2024-01-02T09:10:11+00:00"))
         assertThat(response?.createdBy).isEqualTo("USER_GEN")
@@ -183,7 +184,7 @@ class IdentifyingMarksControllerIntTest : IntegrationTestBase() {
         assertThat(response?.side).isEqualTo(ReferenceDataSimpleDto("SIDE_R", "Right", 1, true))
         assertThat(response?.partOrientation).isEqualTo(ReferenceDataSimpleDto("PART_ORIENT_CENTR", "Centre", 0, true))
         assertThat(response?.comment).isEqualTo("Comment")
-        assertThat(response?.photographUuids).containsExactly(DOCUMENT_DTO.documentUuid)
+        assertThat(response?.photographUuids).containsExactly(IdentifyingMarkImageDto(DOCUMENT_DTO.documentUuid, true))
         assertThat(response?.createdAt is ZonedDateTime)
         assertThat(response?.createdBy).isEqualTo("prison-person-api-client")
 
@@ -264,11 +265,11 @@ class IdentifyingMarksControllerIntTest : IntegrationTestBase() {
       }
     }
 
-    // PATCH routes
+    // Update routes
     @Nested
     @Sql("classpath:jpa/repository/reset.sql")
     @Sql("classpath:controller/identifying_marks/identifying_marks.sql")
-    inner class PatchMark {
+    inner class UpdateMark {
       @Nested
       inner class PatchMarkValidation {
         @ParameterizedTest(name = "PATCH Mark invalid request: {0}")
@@ -343,6 +344,42 @@ class IdentifyingMarksControllerIntTest : IntegrationTestBase() {
             )
         }
       }
+
+      @Nested
+      inner class UpdateImageHappyPath {
+        @Test
+        fun `can update the image on a mark`() {
+          mockkObject(uuidGenerator)
+          val docUuid = UUID.randomUUID()
+          every { uuidGenerator.generate() } returns docUuid
+
+          documentService.stubPostNewDocument(
+            uuid = docUuid.toString(),
+            documentType = DocumentType.DISTINGUISHING_MARK_IMAGE,
+            result = DOCUMENT_DTO,
+          )
+
+          val bodyBuilder = MultipartBodyBuilder()
+          bodyBuilder.part("file", ByteArrayResource(MULTIPART_FILE.bytes))
+            .header("Content-Disposition", "form-data; name=file; filename=filename.jpg")
+
+          val response = webTestClient.put().uri("/identifying-marks/mark/c46d0ce9-e586-4fa6-ae76-52ea8c242258/photo")
+            .contentType(MediaType.MULTIPART_FORM_DATA)
+            .bodyValue(bodyBuilder.build())
+            .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RW")))
+            .exchange()
+            .expectStatus().isOk
+            .expectBody(IdentifyingMarkDto::class.java)
+            .returnResult()
+            .responseBody
+
+          assertThat(response?.photographUuids).containsExactlyInAnyOrder(
+            IdentifyingMarkImageDto("c46d0ce9-e586-4fa6-ae76-52ea8c242260", false),
+            IdentifyingMarkImageDto("c46d0ce9-e586-4fa6-ae76-52ea8c242261", false),
+            IdentifyingMarkImageDto(DOCUMENT_DTO.documentUuid, true),
+          )
+        }
+      }
     }
   }
 
@@ -350,7 +387,7 @@ class IdentifyingMarksControllerIntTest : IntegrationTestBase() {
     val MARK_ONE_ID = "c46d0ce9-e586-4fa6-ae76-52ea8c242257"
 
     val DOCUMENT_DTO = DocumentDto(
-      documentUuid = "c46d0ce9-e586-4fa6-ae76-52ea8c242260",
+      documentUuid = "c46d0ce9-e586-4fa6-ae76-52ea8c242263",
       documentType = DocumentType.DISTINGUISHING_MARK_IMAGE,
       documentFilename = "fileName",
       filename = "fileName",

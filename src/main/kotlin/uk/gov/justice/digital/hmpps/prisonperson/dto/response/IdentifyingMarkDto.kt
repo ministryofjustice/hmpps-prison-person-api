@@ -9,7 +9,10 @@ data class IdentifyingMarkDto(
   @Schema(description = "The id of the identifying mark")
   val id: String,
 
-  @Schema(description = "The prisoner number of the prisoner this identifying mark is associated with", example = "A1234AA")
+  @Schema(
+    description = "The prisoner number of the prisoner this identifying mark is associated with",
+    example = "A1234AA",
+  )
   val prisonerNumber: String,
 
   @Schema(description = "The body part the mark is on")
@@ -28,7 +31,7 @@ data class IdentifyingMarkDto(
   val comment: String? = null,
 
   @Schema(description = "List of photograph UUIDs associated with this identifying mark")
-  val photographUuids: List<String> = emptyList(),
+  val photographUuids: List<IdentifyingMarkImageDto> = emptyList(),
 
   @Schema(
     description = "The date and time the data was last modified",
@@ -37,4 +40,13 @@ data class IdentifyingMarkDto(
 
   @Schema(description = "Username of the user that last modified this field", example = "USER1")
   val createdBy: String,
+)
+
+@Schema(description = "Identifying mark image")
+data class IdentifyingMarkImageDto(
+  @Schema(description = "The uuid of the identifying mark")
+  val id: String,
+
+  @Schema(description = "Whether the identifying mark is the latest one or not")
+  val latest: Boolean,
 )

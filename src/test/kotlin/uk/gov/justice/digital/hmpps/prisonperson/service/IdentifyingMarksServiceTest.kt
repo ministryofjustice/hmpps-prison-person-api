@@ -29,6 +29,7 @@ import uk.gov.justice.digital.hmpps.prisonperson.config.GenericNotFoundException
 import uk.gov.justice.digital.hmpps.prisonperson.dto.request.IdentifyingMarkRequest
 import uk.gov.justice.digital.hmpps.prisonperson.dto.request.IdentifyingMarkUpdateRequest
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.IdentifyingMarkDto
+import uk.gov.justice.digital.hmpps.prisonperson.dto.response.IdentifyingMarkImageDto
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.IdentifyingMark
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.IdentifyingMarkImage
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.ReferenceDataCode
@@ -242,6 +243,7 @@ class IdentifyingMarksServiceTest {
           IdentifyingMarkImage(
             identifyingMarkImageId = UUID.fromString(MARK_1_ID),
             identifyingMark = capturedIdentifyingMark,
+            latest = true,
           ),
         ),
       )
@@ -340,6 +342,74 @@ class IdentifyingMarksServiceTest {
         ),
       )
     }
+
+    @Test
+    fun `updating identifying marks image`() {
+      // create mock MultiPartFile
+      val fileType = MediaType.IMAGE_JPEG
+      val file = MockMultipartFile(
+        "file",
+        "fileName.jpg",
+        MediaType.IMAGE_JPEG_VALUE,
+        "mock content".toByteArray(),
+      )
+
+      val documentDto = DocumentDto(
+        documentUuid = "c46d0ce9-e586-4fa6-ae76-52ea8c242260",
+        documentType = DocumentType.DISTINGUISHING_MARK_IMAGE,
+        documentFilename = "fileName.jpg",
+        filename = "fileName",
+        fileExtension = "jpg",
+        fileSize = 80,
+        fileHash = "hash",
+        mimeType = "mime",
+        metadata = mapOf("prisonerNumber" to "A1234AA"),
+        createdTime = "2021-01-01T00:00:00",
+        createdByServiceName = "service",
+        createdByUsername = "user",
+      )
+
+      whenever(
+        documentServiceClient.putDocument(
+          file.bytes,
+          "fileName.jpg",
+          DocumentType.DISTINGUISHING_MARK_IMAGE,
+          mapOf("prisonerNumber" to "A1234AA"),
+          fileType,
+          DOCUMENT_REQ_CONTEXT,
+        ),
+      ).thenReturn(documentDto)
+
+      whenever(identifyingMarksRepository.findById(MARK_1_ID_UUID)).thenReturn(
+        Optional.of(
+          IdentifyingMark(
+            prisonerNumber = PRISONER_NUMBER,
+            identifyingMarkId = MARK_1_ID_UUID,
+            createdAt = NOW.minusDays(1),
+            createdBy = USER1,
+            bodyPart = LEG_REFERENCE,
+            markType = SCAR_REFERENCE,
+          ).apply {
+            photographUuids =
+              mutableSetOf(
+                IdentifyingMarkImage(
+                  identifyingMarkImageId = UUID.fromString("21855879-1fce-4493-b1eb-0345563eb607"),
+                  identifyingMark = this,
+                  latest = true,
+                ),
+              )
+          },
+        ),
+      )
+
+      val result = underTest.updatePhoto(MARK_1_ID, file, fileType)
+      assertThat(result.photographUuids).isEqualTo(
+        listOf(
+          IdentifyingMarkImageDto("21855879-1fce-4493-b1eb-0345563eb607", false),
+          IdentifyingMarkImageDto("c46d0ce9-e586-4fa6-ae76-52ea8c242260", true),
+        ),
+      )
+    }
   }
 
   private companion object {
@@ -376,7 +446,7 @@ class IdentifyingMarksServiceTest {
       side = LEFT_SIDE_REFERENCE,
       partOrientation = CENTRE_REFERENCE,
       comment = "Comment",
-      photographUuids = emptySet(),
+      photographUuids = mutableSetOf(),
       createdAt = ZonedDateTime.parse("2024-01-02T09:10:11+00:00"),
       createdBy = "PERSON1",
     )
@@ -402,7 +472,7 @@ class IdentifyingMarksServiceTest {
       side = LEFT_SIDE_REFERENCE,
       partOrientation = CENTRE_REFERENCE,
       comment = "Comment",
-      photographUuids = emptySet(),
+      photographUuids = mutableSetOf(),
       createdAt = ZonedDateTime.parse("2024-01-02T09:10:11+00:00"),
       createdBy = "PERSON1",
     )

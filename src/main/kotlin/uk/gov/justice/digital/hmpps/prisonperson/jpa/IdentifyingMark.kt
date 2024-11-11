@@ -10,6 +10,7 @@ import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.OneToMany
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.IdentifyingMarkDto
+import uk.gov.justice.digital.hmpps.prisonperson.dto.response.IdentifyingMarkImageDto
 import uk.gov.justice.digital.hmpps.prisonperson.mapper.toSimpleDto
 import uk.gov.justice.digital.hmpps.prisonperson.utils.GeneratedUuidV7
 import java.time.ZonedDateTime
@@ -45,7 +46,7 @@ class IdentifyingMark(
   var comment: String? = null,
 
   @OneToMany(mappedBy = "identifyingMark", fetch = EAGER, cascade = [PERSIST, MERGE])
-  var photographUuids: Set<IdentifyingMarkImage> = emptySet(),
+  var photographUuids: MutableSet<IdentifyingMarkImage> = mutableSetOf(),
 
   val createdAt: ZonedDateTime = ZonedDateTime.now(),
   val createdBy: String,
@@ -58,10 +59,22 @@ class IdentifyingMark(
     side?.toSimpleDto(),
     partOrientation?.toSimpleDto(),
     comment,
-    photographUuids.map { it.identifyingMarkImageId.toString() },
+    photographUuids.map { it.toDto() },
     createdAt,
     createdBy,
   )
+
+  fun addNewImage(uuid: String): IdentifyingMarkImage {
+    val identifyingMarkImage = IdentifyingMarkImage(
+      identifyingMarkImageId = UUID.fromString(uuid),
+      identifyingMark = this,
+      latest = true,
+    )
+
+    photographUuids.find { it.latest }?.latest = false
+    photographUuids.add(identifyingMarkImage)
+    return identifyingMarkImage
+  }
 }
 
 @Entity
@@ -73,4 +86,11 @@ class IdentifyingMarkImage(
   @ManyToOne
   @JoinColumn(name = "identifying_mark_id", referencedColumnName = "identifying_mark_id")
   val identifyingMark: IdentifyingMark,
-)
+
+  var latest: Boolean = false,
+) {
+  fun toDto(): IdentifyingMarkImageDto = IdentifyingMarkImageDto(
+    id = identifyingMarkImageId.toString(),
+    latest = latest,
+  )
+}

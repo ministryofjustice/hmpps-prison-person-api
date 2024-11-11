@@ -12,7 +12,6 @@ import uk.gov.justice.digital.hmpps.prisonperson.dto.request.IdentifyingMarkRequ
 import uk.gov.justice.digital.hmpps.prisonperson.dto.request.IdentifyingMarkUpdateRequest
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.IdentifyingMarkDto
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.IdentifyingMark
-import uk.gov.justice.digital.hmpps.prisonperson.jpa.IdentifyingMarkImage
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.IdentifyingMarksRepository
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.ReferenceDataCodeRepository
 import uk.gov.justice.digital.hmpps.prisonperson.utils.AuthenticationFacade
@@ -74,11 +73,7 @@ class IdentifyingMarksService(
         ),
       )
 
-      val identifyingMarkImage = IdentifyingMarkImage(
-        identifyingMarkImageId = UUID.fromString(uploadedDocument.documentUuid),
-        identifyingMark = identifyingMark,
-      )
-      identifyingMark.photographUuids = setOf(identifyingMarkImage)
+      identifyingMark.addNewImage(uploadedDocument.documentUuid)
     }
 
     // TODO consider deleting the doc from document service if the db save fails
@@ -96,6 +91,33 @@ class IdentifyingMarksService(
       request.side.apply(this::side) { toReferenceDataCode(referenceDataCodeRepository, it) }
       request.partOrientation.apply(this::partOrientation) { toReferenceDataCode(referenceDataCodeRepository, it) }
       request.comment.apply(this::comment)
+    }
+
+    return identifyingMarksRepository.save(identifyingMark).toDto()
+  }
+
+  fun updatePhoto(uuid: String, file: MultipartFile?, fileType: MediaType): IdentifyingMarkDto {
+    val username = authenticationFacade.getUserOrSystemInContext()
+    val identifyingMark = identifyingMarksRepository.findById(UUID.fromString(uuid)).orElseThrow()
+
+    if (file?.isEmpty == false) {
+      if (fileType == null) {
+        throw IllegalArgumentException("File type must not be null")
+      }
+
+      val uploadedDocument = documentServiceClient.putDocument(
+        document = file.bytes,
+        filename = file.originalFilename,
+        documentType = DocumentType.DISTINGUISHING_MARK_IMAGE,
+        meta = mapOf("prisonerNumber" to identifyingMark.prisonerNumber),
+        fileType,
+        documentRequestContext = DocumentRequestContext(
+          serviceName = "hmpps-prison-person-api",
+          username,
+        ),
+      )
+
+      identifyingMark.addNewImage(uploadedDocument.documentUuid)
     }
 
     return identifyingMarksRepository.save(identifyingMark).toDto()

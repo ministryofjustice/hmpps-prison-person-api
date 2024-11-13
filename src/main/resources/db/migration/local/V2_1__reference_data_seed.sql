@@ -6,10 +6,10 @@ VALUES ('HAIR', 'Hair type or colour', 0, '2024-07-11 17:00:00+0100', 'OMS_OWNER
        ('BUILD', 'Build', 0, '2024-07-11 17:00:00+0100', 'OMS_OWNER'),
        ('EYE', 'Eye colour', 0, '2024-07-11 17:00:00+0100', 'OMS_OWNER'),
        ('SMOKE', 'Smoker or vaper', 0, '2024-07-11 17:00:00+0100', 'OMS_OWNER'),
-       ('MARK_TYPE', 'Type of identifying mark', 0, '2024-07-21 14:00:00+0100', 'OMS_OWNER'),
-       ('SIDE', 'Side identifying mark is on', 0, '2024-07-21 14:00:00+0100', 'OMS_OWNER'),
-       ('PART_ORIENT', 'Position of identifying mark', 0, '2024-07-21 14:00:00+0100', 'OMS_OWNER'),
-       ('BODY_PART', 'Body part identifying mark is on', 0, '2024-07-21 14:00:00+0100', 'OMS_OWNER');
+       ('MARK_TYPE', 'Type of distinguishing mark', 0, '2024-07-21 14:00:00+0100', 'OMS_OWNER'),
+       ('SIDE', 'Side distinguishing mark is on', 0, '2024-07-21 14:00:00+0100', 'OMS_OWNER'),
+       ('PART_ORIENT', 'Position of distinguishing mark', 0, '2024-07-21 14:00:00+0100', 'OMS_OWNER'),
+       ('BODY_PART', 'Body part distinguishing mark is on', 0, '2024-07-21 14:00:00+0100', 'OMS_OWNER');
 
 INSERT INTO reference_data_code (id, domain, code, description, list_sequence, created_at, created_by)
 VALUES
@@ -69,7 +69,7 @@ VALUES
 ('SMOKE_VAPER', 'SMOKE', 'VAPER', 'Yes, they smoke or use nicotine replacement therapy (NRT)', 0,
  '2024-07-11 17:00:00+0100', 'OMS_OWNER'),
 ('SMOKE_NO', 'SMOKE', 'NO', 'No, they do not smoke or vape', 0, '2024-07-11 17:00:00+0100', 'OMS_OWNER'),
--- Identifying marks
+-- Distinguishing marks
 ('MARK_TYPE_MARK', 'MARK_TYPE', 'MARK', 'Mark', 0, '2024-07-21 14:00:00+0100', 'OMS_OWNER'),
 ('MARK_TYPE_OTH', 'MARK_TYPE', 'OTH', 'Other', 0, '2024-07-21 14:00:00+0100', 'OMS_OWNER'),
 ('MARK_TYPE_SCAR', 'MARK_TYPE', 'SCAR', 'Scar', 0, '2024-07-21 14:00:00+0100', 'OMS_OWNER'),

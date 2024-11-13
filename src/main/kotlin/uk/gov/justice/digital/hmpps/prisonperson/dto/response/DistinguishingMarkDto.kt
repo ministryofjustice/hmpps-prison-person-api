@@ -4,13 +4,13 @@ import io.swagger.v3.oas.annotations.media.Schema
 import uk.gov.justice.digital.hmpps.prisonperson.dto.ReferenceDataSimpleDto
 import java.time.ZonedDateTime
 
-@Schema(description = "Identifying Mark")
-data class IdentifyingMarkDto(
-  @Schema(description = "The id of the identifying mark")
+@Schema(description = "Distinguishing mark")
+data class DistinguishingMarkDto(
+  @Schema(description = "The id of the distinguishing mark")
   val id: String,
 
   @Schema(
-    description = "The prisoner number of the prisoner this identifying mark is associated with",
+    description = "The prisoner number of the prisoner this distinguishing mark is associated with",
     example = "A1234AA",
   )
   val prisonerNumber: String,
@@ -18,7 +18,7 @@ data class IdentifyingMarkDto(
   @Schema(description = "The body part the mark is on")
   val bodyPart: ReferenceDataSimpleDto,
 
-  @Schema(description = "The type of identifying mark (e.g. tattoo, scar)")
+  @Schema(description = "The type of distinguishing mark (e.g. tattoo, scar)")
   val markType: ReferenceDataSimpleDto,
 
   @Schema(description = "The side of the body part the mark is on")
@@ -27,11 +27,11 @@ data class IdentifyingMarkDto(
   @Schema(description = "The orientation of the mark on the body part (e.g. Centre, Low, Upper)")
   val partOrientation: ReferenceDataSimpleDto? = null,
 
-  @Schema(description = "Comment about the identifying mark")
+  @Schema(description = "Comment about the distinguishing mark")
   val comment: String? = null,
 
-  @Schema(description = "List of photograph UUIDs associated with this identifying mark")
-  val photographUuids: List<IdentifyingMarkImageDto> = emptyList(),
+  @Schema(description = "List of photograph UUIDs associated with this distinguishing mark")
+  val photographUuids: List<DistinguishingMarkImageDto> = emptyList(),
 
   @Schema(
     description = "The date and time the data was last modified",
@@ -42,11 +42,11 @@ data class IdentifyingMarkDto(
   val createdBy: String,
 )
 
-@Schema(description = "Identifying mark image")
-data class IdentifyingMarkImageDto(
-  @Schema(description = "The uuid of the identifying mark")
+@Schema(description = "Distinguishing mark image")
+data class DistinguishingMarkImageDto(
+  @Schema(description = "The uuid of the distinguishing mark")
   val id: String,
 
-  @Schema(description = "Whether the identifying mark is the latest one or not")
+  @Schema(description = "Whether the distinguishing mark is the latest one or not")
   val latest: Boolean,
 )

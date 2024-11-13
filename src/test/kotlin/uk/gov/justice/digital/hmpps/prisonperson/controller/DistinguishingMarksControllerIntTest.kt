@@ -21,8 +21,8 @@ import org.springframework.web.multipart.MultipartFile
 import uk.gov.justice.digital.hmpps.prisonperson.client.documentservice.dto.DocumentDto
 import uk.gov.justice.digital.hmpps.prisonperson.client.documentservice.dto.DocumentType
 import uk.gov.justice.digital.hmpps.prisonperson.dto.ReferenceDataSimpleDto
-import uk.gov.justice.digital.hmpps.prisonperson.dto.response.IdentifyingMarkDto
-import uk.gov.justice.digital.hmpps.prisonperson.dto.response.IdentifyingMarkImageDto
+import uk.gov.justice.digital.hmpps.prisonperson.dto.response.DistinguishingMarkDto
+import uk.gov.justice.digital.hmpps.prisonperson.dto.response.DistinguishingMarkImageDto
 import uk.gov.justice.digital.hmpps.prisonperson.integration.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.prisonperson.integration.wiremock.DocumentServiceExtension.Companion.documentService
 import uk.gov.justice.digital.hmpps.prisonperson.utils.UuidV7Generator.Companion.uuidGenerator
@@ -30,26 +30,26 @@ import java.time.ZonedDateTime
 import java.util.UUID
 import java.util.stream.Stream
 
-class IdentifyingMarksControllerIntTest : IntegrationTestBase() {
+class DistinguishingMarksControllerIntTest : IntegrationTestBase() {
 
   @TestConfiguration
-  @DisplayName("/identifyingMarks")
+  @DisplayName("/distinguishingMarks")
   @Nested
-  inner class IdentifyingMarksControllerIntTest {
+  inner class DistinguishingMarksControllerIntTest {
 
     @Nested
     inner class Security {
 
       @Test
       fun `access forbidden when no authority`() {
-        webTestClient.get().uri("/identifying-marks/prisoner/A1234AA")
+        webTestClient.get().uri("/distinguishing-marks/prisoner/A1234AA")
           .exchange()
           .expectStatus().isUnauthorized
       }
 
       @Test
       fun `access forbidden when no role`() {
-        webTestClient.get().uri("/identifying-marks/prisoner/A1234AA")
+        webTestClient.get().uri("/distinguishing-marks/prisoner/A1234AA")
           .headers(setAuthorisation(roles = listOf()))
           .exchange()
           .expectStatus().isForbidden
@@ -57,7 +57,7 @@ class IdentifyingMarksControllerIntTest : IntegrationTestBase() {
 
       @Test
       fun `access forbidden with wrong role`() {
-        webTestClient.get().uri("/identifying-marks/prisoner/A1234AA")
+        webTestClient.get().uri("/distinguishing-marks/prisoner/A1234AA")
           .headers(setAuthorisation(roles = listOf("ROLE_IS_WRONG")))
           .exchange()
           .expectStatus().isForbidden
@@ -65,11 +65,11 @@ class IdentifyingMarksControllerIntTest : IntegrationTestBase() {
     }
 
     @Nested
-    inner class GetIdentifyingMarksForPrisonerHappyPath {
+    inner class GetDistinguishingMarksForPrisonerHappyPath {
 
       @Test
       fun `can return empty list when none are found`() {
-        webTestClient.get().uri("/identifying-marks/prisoner/A1234AA")
+        webTestClient.get().uri("/distinguishing-marks/prisoner/A1234AA")
           .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RO")))
           .exchange()
           .expectStatus().isOk
@@ -84,13 +84,13 @@ class IdentifyingMarksControllerIntTest : IntegrationTestBase() {
 
       @Test
       @Sql("classpath:jpa/repository/reset.sql")
-      @Sql("classpath:controller/identifying_marks/identifying_marks.sql")
-      fun `can return list of identifying mark data for prisoner when found`() {
-        val response = webTestClient.get().uri("/identifying-marks/prisoner/12345")
+      @Sql("classpath:controller/distinguishing_marks/distinguishing_marks.sql")
+      fun `can return list of distinguishing mark data for prisoner when found`() {
+        val response = webTestClient.get().uri("/distinguishing-marks/prisoner/12345")
           .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RO")))
           .exchange()
           .expectStatus().isOk
-          .expectBodyList(IdentifyingMarkDto::class.java)
+          .expectBodyList(DistinguishingMarkDto::class.java)
           .returnResult()
           .responseBody
 
@@ -101,12 +101,12 @@ class IdentifyingMarksControllerIntTest : IntegrationTestBase() {
     }
 
     @Nested
-    inner class GetIdentifyingMarkHappyPath {
+    inner class GetDistinguishingMarkHappyPath {
 
       @Test
       @Sql("classpath:jpa/repository/reset.sql")
       fun `can return 404 when not found`() {
-        webTestClient.get().uri("/identifying-marks/mark/c46d0ce9-e586-4fa6-ae76-52ea8c242258")
+        webTestClient.get().uri("/distinguishing-marks/mark/c46d0ce9-e586-4fa6-ae76-52ea8c242258")
           .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RO")))
           .exchange()
           .expectStatus().isNotFound
@@ -114,13 +114,13 @@ class IdentifyingMarksControllerIntTest : IntegrationTestBase() {
 
       @Test
       @Sql("classpath:jpa/repository/reset.sql")
-      @Sql("classpath:controller/identifying_marks/identifying_marks.sql")
-      fun `can return identifying mark data when found`() {
-        val response = webTestClient.get().uri("/identifying-marks/mark/c46d0ce9-e586-4fa6-ae76-52ea8c242258")
+      @Sql("classpath:controller/distinguishing_marks/distinguishing_marks.sql")
+      fun `can return distinguishing mark data when found`() {
+        val response = webTestClient.get().uri("/distinguishing-marks/mark/c46d0ce9-e586-4fa6-ae76-52ea8c242258")
           .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RO")))
           .exchange()
           .expectStatus().isOk
-          .expectBody(IdentifyingMarkDto::class.java)
+          .expectBody(DistinguishingMarkDto::class.java)
           .returnResult()
           .responseBody
 
@@ -132,8 +132,8 @@ class IdentifyingMarksControllerIntTest : IntegrationTestBase() {
         assertThat(response?.partOrientation).isEqualTo(ReferenceDataSimpleDto("PART_ORIENT_CENTR", "Centre", 0, true))
         assertThat(response?.comment).isEqualTo("Another scar")
         assertThat(response?.photographUuids).containsExactlyInAnyOrder(
-          IdentifyingMarkImageDto("c46d0ce9-e586-4fa6-ae76-52ea8c242260", false),
-          IdentifyingMarkImageDto("c46d0ce9-e586-4fa6-ae76-52ea8c242261", true),
+          DistinguishingMarkImageDto("c46d0ce9-e586-4fa6-ae76-52ea8c242260", false),
+          DistinguishingMarkImageDto("c46d0ce9-e586-4fa6-ae76-52ea8c242261", true),
         )
         assertThat(response?.createdAt).isEqualTo(ZonedDateTime.parse("2024-01-02T09:10:11+00:00"))
         assertThat(response?.createdBy).isEqualTo("USER_GEN")
@@ -141,7 +141,7 @@ class IdentifyingMarksControllerIntTest : IntegrationTestBase() {
     }
 
     @Nested
-    inner class PostIdentifyingMarkHappyPath {
+    inner class PostDistinguishingMarkHappyPath {
 
       @Test
       @Sql("classpath:jpa/repository/reset.sql")
@@ -167,13 +167,13 @@ class IdentifyingMarksControllerIntTest : IntegrationTestBase() {
         bodyBuilder.part("partOrientation", "PART_ORIENT_CENTR")
         bodyBuilder.part("comment", "Comment")
 
-        val response = webTestClient.post().uri("/identifying-marks/mark")
+        val response = webTestClient.post().uri("/distinguishing-marks/mark")
           .contentType(MediaType.MULTIPART_FORM_DATA)
           .bodyValue(bodyBuilder.build())
           .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RW")))
           .exchange()
           .expectStatus().isOk
-          .expectBody(IdentifyingMarkDto::class.java)
+          .expectBody(DistinguishingMarkDto::class.java)
           .returnResult()
           .responseBody
 
@@ -184,7 +184,7 @@ class IdentifyingMarksControllerIntTest : IntegrationTestBase() {
         assertThat(response?.side).isEqualTo(ReferenceDataSimpleDto("SIDE_R", "Right", 1, true))
         assertThat(response?.partOrientation).isEqualTo(ReferenceDataSimpleDto("PART_ORIENT_CENTR", "Centre", 0, true))
         assertThat(response?.comment).isEqualTo("Comment")
-        assertThat(response?.photographUuids).containsExactly(IdentifyingMarkImageDto(DOCUMENT_DTO.documentUuid, true))
+        assertThat(response?.photographUuids).containsExactly(DistinguishingMarkImageDto(DOCUMENT_DTO.documentUuid, true))
         assertThat(response?.createdAt is ZonedDateTime)
         assertThat(response?.createdBy).isEqualTo("prison-person-api-client")
 
@@ -206,13 +206,13 @@ class IdentifyingMarksControllerIntTest : IntegrationTestBase() {
         bodyBuilder.part("partOrientation", "PART_ORIENT_CENTR")
         bodyBuilder.part("comment", "Comment")
 
-        val response = webTestClient.post().uri("/identifying-marks/mark")
+        val response = webTestClient.post().uri("/distinguishing-marks/mark")
           .contentType(MediaType.MULTIPART_FORM_DATA)
           .bodyValue(bodyBuilder.build())
           .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RW")))
           .exchange()
           .expectStatus().isOk
-          .expectBody(IdentifyingMarkDto::class.java)
+          .expectBody(DistinguishingMarkDto::class.java)
           .returnResult()
           .responseBody
 
@@ -256,7 +256,7 @@ class IdentifyingMarksControllerIntTest : IntegrationTestBase() {
         if (partOrientation.isNotEmpty()) bodyBuilder.part("partOrientation", partOrientation)
         if (comment.isNotEmpty()) bodyBuilder.part("comment", comment)
 
-        webTestClient.post().uri("/identifying-marks/mark")
+        webTestClient.post().uri("/distinguishing-marks/mark")
           .contentType(MediaType.MULTIPART_FORM_DATA)
           .bodyValue(bodyBuilder.build())
           .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RW")))
@@ -268,14 +268,14 @@ class IdentifyingMarksControllerIntTest : IntegrationTestBase() {
     // Update routes
     @Nested
     @Sql("classpath:jpa/repository/reset.sql")
-    @Sql("classpath:controller/identifying_marks/identifying_marks.sql")
+    @Sql("classpath:controller/distinguishing_marks/distinguishing_marks.sql")
     inner class UpdateMark {
       @Nested
       inner class PatchMarkValidation {
         @ParameterizedTest(name = "PATCH Mark invalid request: {0}")
-        @MethodSource("uk.gov.justice.digital.hmpps.prisonperson.controller.IdentifyingMarksControllerIntTest#patchMarkValidations")
+        @MethodSource("uk.gov.justice.digital.hmpps.prisonperson.controller.DistinguishingMarksControllerIntTest#patchMarkValidations")
         fun `PATCH mark validations`(requestBody: String, message: String) {
-          webTestClient.patch().uri("/identifying-marks/mark/$MARK_ONE_ID")
+          webTestClient.patch().uri("/distinguishing-marks/mark/$MARK_ONE_ID")
             .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RW")))
             .header("Content-Type", "application/json").bodyValue(requestBody).exchange()
             .expectStatus().isBadRequest.expectBody().jsonPath("userMessage").isEqualTo(message)
@@ -285,8 +285,8 @@ class IdentifyingMarksControllerIntTest : IntegrationTestBase() {
       @Nested
       inner class PatchMarkHappyPath {
         @Test
-        fun `can update an existing identifying mark`() {
-          webTestClient.patch().uri("/identifying-marks/mark/c46d0ce9-e586-4fa6-ae76-52ea8c242257")
+        fun `can update an existing distinguishing mark`() {
+          webTestClient.patch().uri("/distinguishing-marks/mark/c46d0ce9-e586-4fa6-ae76-52ea8c242257")
             .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RW")))
             .header("Content-Type", "application/json")
             .bodyValue(
@@ -363,20 +363,20 @@ class IdentifyingMarksControllerIntTest : IntegrationTestBase() {
           bodyBuilder.part("file", ByteArrayResource(MULTIPART_FILE.bytes))
             .header("Content-Disposition", "form-data; name=file; filename=filename.jpg")
 
-          val response = webTestClient.put().uri("/identifying-marks/mark/c46d0ce9-e586-4fa6-ae76-52ea8c242258/photo")
+          val response = webTestClient.put().uri("/distinguishing-marks/mark/c46d0ce9-e586-4fa6-ae76-52ea8c242258/photo")
             .contentType(MediaType.MULTIPART_FORM_DATA)
             .bodyValue(bodyBuilder.build())
             .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RW")))
             .exchange()
             .expectStatus().isOk
-            .expectBody(IdentifyingMarkDto::class.java)
+            .expectBody(DistinguishingMarkDto::class.java)
             .returnResult()
             .responseBody
 
           assertThat(response?.photographUuids).containsExactlyInAnyOrder(
-            IdentifyingMarkImageDto("c46d0ce9-e586-4fa6-ae76-52ea8c242260", false),
-            IdentifyingMarkImageDto("c46d0ce9-e586-4fa6-ae76-52ea8c242261", false),
-            IdentifyingMarkImageDto(DOCUMENT_DTO.documentUuid, true),
+            DistinguishingMarkImageDto("c46d0ce9-e586-4fa6-ae76-52ea8c242260", false),
+            DistinguishingMarkImageDto("c46d0ce9-e586-4fa6-ae76-52ea8c242261", false),
+            DistinguishingMarkImageDto(DOCUMENT_DTO.documentUuid, true),
           )
         }
       }
@@ -409,9 +409,9 @@ class IdentifyingMarksControllerIntTest : IntegrationTestBase() {
     )
 
     val MARK_TYPE_VALIDATION_ERROR =
-      "Validation failure(s): Type of identifying mark should a reference data code ID in the correct domain, or Undefined."
+      "Validation failure(s): Type of distinguishing mark should a reference data code ID in the correct domain, or Undefined."
     val BODY_PART_VALIDATION_ERROR =
-      "Validation failure(s): Body part of identifying mark should a reference data code ID in the correct domain, or Undefined."
+      "Validation failure(s): Body part of distinguishing mark should a reference data code ID in the correct domain, or Undefined."
     val PATCH_MARK_VALIDATION_ERROR =
       "Validation failure(s): The value must be a reference domain code id of the correct domain, null, or Undefined."
 

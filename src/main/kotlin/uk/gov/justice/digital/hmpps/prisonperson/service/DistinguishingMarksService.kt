@@ -8,51 +8,51 @@ import uk.gov.justice.digital.hmpps.prisonperson.client.documentservice.Document
 import uk.gov.justice.digital.hmpps.prisonperson.client.documentservice.dto.DocumentRequestContext
 import uk.gov.justice.digital.hmpps.prisonperson.client.documentservice.dto.DocumentType
 import uk.gov.justice.digital.hmpps.prisonperson.config.GenericNotFoundException
-import uk.gov.justice.digital.hmpps.prisonperson.dto.request.IdentifyingMarkRequest
-import uk.gov.justice.digital.hmpps.prisonperson.dto.request.IdentifyingMarkUpdateRequest
-import uk.gov.justice.digital.hmpps.prisonperson.dto.response.IdentifyingMarkDto
-import uk.gov.justice.digital.hmpps.prisonperson.jpa.IdentifyingMark
-import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.IdentifyingMarksRepository
+import uk.gov.justice.digital.hmpps.prisonperson.dto.request.DistinguishingMarkRequest
+import uk.gov.justice.digital.hmpps.prisonperson.dto.request.DistinguishingMarkUpdateRequest
+import uk.gov.justice.digital.hmpps.prisonperson.dto.response.DistinguishingMarkDto
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.DistinguishingMark
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.DistinguishingMarksRepository
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.ReferenceDataCodeRepository
 import uk.gov.justice.digital.hmpps.prisonperson.utils.AuthenticationFacade
 import uk.gov.justice.digital.hmpps.prisonperson.utils.toReferenceDataCode
 import java.util.UUID
 
 @Service
-class IdentifyingMarksService(
+class DistinguishingMarksService(
   private val documentServiceClient: DocumentServiceClient,
-  private val identifyingMarksRepository: IdentifyingMarksRepository,
+  private val distinguishingMarksRepository: DistinguishingMarksRepository,
   private val authenticationFacade: AuthenticationFacade,
   private val referenceDataCodeRepository: ReferenceDataCodeRepository,
 ) {
-  fun getIdentifyingMarksForPrisoner(prisonerNumber: String): List<IdentifyingMarkDto> =
-    identifyingMarksRepository.findAllByPrisonerNumber(prisonerNumber).map {
+  fun getDistinguishingMarksForPrisoner(prisonerNumber: String): List<DistinguishingMarkDto> =
+    distinguishingMarksRepository.findAllByPrisonerNumber(prisonerNumber).map {
       it.toDto()
     }
 
-  fun getIdentifyingMarkById(uuid: String): IdentifyingMarkDto {
+  fun getDistinguishingMarkById(uuid: String): DistinguishingMarkDto {
     val uuidObj = UUID.fromString(uuid)
-    val identifyingMark = identifyingMarksRepository.findById(uuidObj).orElseThrow {
-      GenericNotFoundException("Identifying mark not found")
+    val distinguishingMark = distinguishingMarksRepository.findById(uuidObj).orElseThrow {
+      GenericNotFoundException("Distinguishing mark not found")
     }
-    return identifyingMark.toDto()
+    return distinguishingMark.toDto()
   }
 
   @Transactional
   fun create(
     file: MultipartFile?,
     fileType: MediaType?,
-    identifyingMarkRequest: IdentifyingMarkRequest,
-  ): IdentifyingMarkDto {
+    distinguishingMarkRequest: DistinguishingMarkRequest,
+  ): DistinguishingMarkDto {
     val username = authenticationFacade.getUserOrSystemInContext()
 
-    val identifyingMark = IdentifyingMark(
-      prisonerNumber = identifyingMarkRequest.prisonerNumber,
-      markType = toReferenceDataCode(referenceDataCodeRepository, identifyingMarkRequest.markType)!!,
-      bodyPart = toReferenceDataCode(referenceDataCodeRepository, identifyingMarkRequest.bodyPart)!!,
-      side = toReferenceDataCode(referenceDataCodeRepository, identifyingMarkRequest.side),
-      partOrientation = toReferenceDataCode(referenceDataCodeRepository, identifyingMarkRequest.partOrientation),
-      comment = identifyingMarkRequest.comment,
+    val distinguishingMark = DistinguishingMark(
+      prisonerNumber = distinguishingMarkRequest.prisonerNumber,
+      markType = toReferenceDataCode(referenceDataCodeRepository, distinguishingMarkRequest.markType)!!,
+      bodyPart = toReferenceDataCode(referenceDataCodeRepository, distinguishingMarkRequest.bodyPart)!!,
+      side = toReferenceDataCode(referenceDataCodeRepository, distinguishingMarkRequest.side),
+      partOrientation = toReferenceDataCode(referenceDataCodeRepository, distinguishingMarkRequest.partOrientation),
+      comment = distinguishingMarkRequest.comment,
       createdBy = username,
     )
 
@@ -65,7 +65,7 @@ class IdentifyingMarksService(
         document = file.bytes,
         filename = file.originalFilename,
         documentType = DocumentType.DISTINGUISHING_MARK_IMAGE,
-        meta = mapOf("prisonerNumber" to identifyingMarkRequest.prisonerNumber),
+        meta = mapOf("prisonerNumber" to distinguishingMarkRequest.prisonerNumber),
         fileType,
         documentRequestContext = DocumentRequestContext(
           serviceName = "hmpps-prison-person-api",
@@ -73,19 +73,19 @@ class IdentifyingMarksService(
         ),
       )
 
-      identifyingMark.addNewImage(uploadedDocument.documentUuid)
+      distinguishingMark.addNewImage(uploadedDocument.documentUuid)
     }
 
     // TODO consider deleting the doc from document service if the db save fails
-    return identifyingMarksRepository.save(identifyingMark).toDto()
+    return distinguishingMarksRepository.save(distinguishingMark).toDto()
   }
 
   @Transactional
   fun update(
     uuid: String,
-    request: IdentifyingMarkUpdateRequest,
-  ): IdentifyingMarkDto {
-    val identifyingMark = identifyingMarksRepository.findById(UUID.fromString(uuid)).orElseThrow().apply {
+    request: DistinguishingMarkUpdateRequest,
+  ): DistinguishingMarkDto {
+    val distinguishingMark = distinguishingMarksRepository.findById(UUID.fromString(uuid)).orElseThrow().apply {
       request.markType.let<String> { markType = toReferenceDataCode(referenceDataCodeRepository, it)!! }
       request.bodyPart.let<String> { bodyPart = toReferenceDataCode(referenceDataCodeRepository, it)!! }
       request.side.apply(this::side) { toReferenceDataCode(referenceDataCodeRepository, it) }
@@ -93,12 +93,12 @@ class IdentifyingMarksService(
       request.comment.apply(this::comment)
     }
 
-    return identifyingMarksRepository.save(identifyingMark).toDto()
+    return distinguishingMarksRepository.save(distinguishingMark).toDto()
   }
 
-  fun updatePhoto(uuid: String, file: MultipartFile?, fileType: MediaType): IdentifyingMarkDto {
+  fun updatePhoto(uuid: String, file: MultipartFile?, fileType: MediaType): DistinguishingMarkDto {
     val username = authenticationFacade.getUserOrSystemInContext()
-    val identifyingMark = identifyingMarksRepository.findById(UUID.fromString(uuid)).orElseThrow()
+    val distinguishingMark = distinguishingMarksRepository.findById(UUID.fromString(uuid)).orElseThrow()
 
     if (file?.isEmpty == false) {
       if (fileType == null) {
@@ -109,7 +109,7 @@ class IdentifyingMarksService(
         document = file.bytes,
         filename = file.originalFilename,
         documentType = DocumentType.DISTINGUISHING_MARK_IMAGE,
-        meta = mapOf("prisonerNumber" to identifyingMark.prisonerNumber),
+        meta = mapOf("prisonerNumber" to distinguishingMark.prisonerNumber),
         fileType,
         documentRequestContext = DocumentRequestContext(
           serviceName = "hmpps-prison-person-api",
@@ -117,9 +117,9 @@ class IdentifyingMarksService(
         ),
       )
 
-      identifyingMark.addNewImage(uploadedDocument.documentUuid)
+      distinguishingMark.addNewImage(uploadedDocument.documentUuid)
     }
 
-    return identifyingMarksRepository.save(identifyingMark).toDto()
+    return distinguishingMarksRepository.save(distinguishingMark).toDto()
   }
 }

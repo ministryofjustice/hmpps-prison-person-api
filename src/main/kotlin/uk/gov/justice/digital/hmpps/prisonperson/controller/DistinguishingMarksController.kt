@@ -21,28 +21,28 @@ import org.springframework.web.bind.annotation.RequestPart
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.multipart.MultipartFile
-import uk.gov.justice.digital.hmpps.prisonperson.dto.request.IdentifyingMarkRequest
-import uk.gov.justice.digital.hmpps.prisonperson.dto.request.IdentifyingMarkUpdateRequest
-import uk.gov.justice.digital.hmpps.prisonperson.dto.response.IdentifyingMarkDto
-import uk.gov.justice.digital.hmpps.prisonperson.service.IdentifyingMarksService
+import uk.gov.justice.digital.hmpps.prisonperson.dto.request.DistinguishingMarkRequest
+import uk.gov.justice.digital.hmpps.prisonperson.dto.request.DistinguishingMarkUpdateRequest
+import uk.gov.justice.digital.hmpps.prisonperson.dto.response.DistinguishingMarkDto
+import uk.gov.justice.digital.hmpps.prisonperson.service.DistinguishingMarksService
 import uk.gov.justice.hmpps.kotlin.common.ErrorResponse
 
 @RestController
-@Tag(name = "Identifying marks", description = "Identifying marks linked to a prisoner")
-@RequestMapping("/identifying-marks")
-class IdentifyingMarksController(private val identifyingMarksService: IdentifyingMarksService) {
+@Tag(name = "Distinguishing marks", description = "Distinguishing marks linked to a prisoner")
+@RequestMapping("/distinguishing-marks")
+class DistinguishingMarksController(private val distinguishingMarksService: DistinguishingMarksService) {
   @GetMapping("/prisoner/{prisonerNumber}", produces = [MediaType.APPLICATION_JSON_VALUE])
   @ResponseStatus(HttpStatus.OK)
   @PreAuthorize("hasRole('ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RO')")
   @Operation(
-    summary = "Get all identifying marks for a prisoner",
-    description = "description = \"Returns a list of identifying marks for a prisoner." +
-      "Images associated with the identifying marks must be downloaded separately" +
+    summary = "Get all distinguishing marks for a prisoner",
+    description = "description = \"Returns a list of distinguishing marks for a prisoner." +
+      "Images associated with the distinguishing marks must be downloaded separately" +
       "Requires role `ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RW`",
     responses = [
       ApiResponse(
         responseCode = "200",
-        description = "Returns identifying marks for the prisoner",
+        description = "Returns distinguishing marks for the prisoner",
       ),
       ApiResponse(
         responseCode = "401",
@@ -61,7 +61,7 @@ class IdentifyingMarksController(private val identifyingMarksService: Identifyin
       ),
     ],
   )
-  fun getIdentifyingMarksForPrisoner(
+  fun getDistinguishingMarksForPrisoner(
     @PathVariable
     @Parameter(
       description = "The prisoner number",
@@ -69,20 +69,20 @@ class IdentifyingMarksController(private val identifyingMarksService: Identifyin
       required = true,
     )
     prisonerNumber: String,
-  ): List<IdentifyingMarkDto> = identifyingMarksService.getIdentifyingMarksForPrisoner(prisonerNumber)
+  ): List<DistinguishingMarkDto> = distinguishingMarksService.getDistinguishingMarksForPrisoner(prisonerNumber)
 
   @GetMapping("/mark/{uuid}", produces = [MediaType.APPLICATION_JSON_VALUE])
   @ResponseStatus(HttpStatus.OK)
   @PreAuthorize("hasRole('ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RO')")
   @Operation(
-    summary = "Get identifying mark by id",
-    description = "description = \"Returns the identifying mark requested." +
-      "Images associated with the identifying mark must be downloaded separately" +
+    summary = "Get distinguishing mark by id",
+    description = "description = \"Returns the distinguishing mark requested." +
+      "Images associated with the distinguishing mark must be downloaded separately" +
       "Requires role `ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RW`",
     responses = [
       ApiResponse(
         responseCode = "200",
-        description = "Returns identifying marks for the prisoner",
+        description = "Returns distinguishing marks for the prisoner",
       ),
       ApiResponse(
         responseCode = "401",
@@ -101,23 +101,23 @@ class IdentifyingMarksController(private val identifyingMarksService: Identifyin
       ),
     ],
   )
-  fun getIdentifyingMarkById(
+  fun getDistinguishingMarkById(
     @PathVariable
     @Parameter(
-      description = "The uuid of the identifying mark",
+      description = "The uuid of the distinguishing mark",
       required = true,
     )
     uuid: String,
-  ): IdentifyingMarkDto? = identifyingMarksService.getIdentifyingMarkById(uuid)
+  ): DistinguishingMarkDto? = distinguishingMarksService.getDistinguishingMarkById(uuid)
 
   @PostMapping("/mark", produces = [MediaType.APPLICATION_JSON_VALUE])
   @ResponseStatus(HttpStatus.OK)
   @PreAuthorize("hasRole('ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RW')")
   @Operation(
-    summary = "Post an identifying mark",
-    description = "description = \"Stores a new identifying mark entry in the database. " +
+    summary = "Post an distinguishing mark",
+    description = "description = \"Stores a new distinguishing mark entry in the database. " +
       "Optionally stores an image file supplied on the file attribute of a multipart/form-date submission  \n" +
-      "returns the identifying mark detail\"\n" +
+      "returns the distinguishing mark detail\"\n" +
       "Requires role `ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RW`",
     responses = [
       ApiResponse(
@@ -141,7 +141,7 @@ class IdentifyingMarksController(private val identifyingMarksService: Identifyin
       ),
     ],
   )
-  fun putIdentifyingMark(
+  fun putDistinguishingMark(
     @RequestPart
     @Parameter(
       description = "File part of the multipart request",
@@ -149,26 +149,26 @@ class IdentifyingMarksController(private val identifyingMarksService: Identifyin
     )
     file: MultipartFile?,
     @Parameter(
-      description = "The identifying mark request",
+      description = "The distinguishing mark request",
       required = true,
     )
-    identifyingMarkRequest: IdentifyingMarkRequest,
-  ): IdentifyingMarkDto = identifyingMarksService.create(
+    distinguishingMarkRequest: DistinguishingMarkRequest,
+  ): DistinguishingMarkDto = distinguishingMarksService.create(
     file,
     fileType = MediaType.parseMediaType(file?.contentType ?: MediaType.APPLICATION_OCTET_STREAM_VALUE),
-    identifyingMarkRequest,
+    distinguishingMarkRequest,
   )
 
   @PatchMapping("/mark/{uuid}")
   @ResponseStatus(HttpStatus.OK)
   @PreAuthorize("hasRole('ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RW')")
   @Operation(
-    summary = "Updates the identifying mark",
+    summary = "Updates the distinguishing mark",
     description = "Requires role `ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RW`",
     responses = [
       ApiResponse(
         responseCode = "200",
-        description = "Returns prisoner's identifying mark",
+        description = "Returns prisoner's distinguishing mark",
       ),
       ApiResponse(
         responseCode = "400",
@@ -202,23 +202,23 @@ class IdentifyingMarksController(private val identifyingMarksService: Identifyin
       ),
     ],
   )
-  fun updateIdentifyingMark(
+  fun updateDistinguishingMark(
     @Schema(description = "The UUID of the mark", example = "3946f7d9-25d0-449f-bf17-1ade41559391", required = true)
     @PathVariable
     uuid: String,
     @RequestBody
     @Valid
-    identifyingMarkUpdateRequest: IdentifyingMarkUpdateRequest,
-  ): IdentifyingMarkDto = identifyingMarksService.update(uuid, identifyingMarkUpdateRequest)
+    distinguishingMarkUpdateRequest: DistinguishingMarkUpdateRequest,
+  ): DistinguishingMarkDto = distinguishingMarksService.update(uuid, distinguishingMarkUpdateRequest)
 
   @PutMapping("/mark/{uuid}/photo", produces = [MediaType.APPLICATION_JSON_VALUE])
   @ResponseStatus(HttpStatus.OK)
   @PreAuthorize("hasRole('ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RW')")
   @Operation(
-    summary = "Add a new photo for the identifying mark",
-    description = "Stores a new identifying mark photo and sets it to the current photo for the identifying mark." +
+    summary = "Add a new photo for the distinguishing mark",
+    description = "Stores a new distinguishing mark photo and sets it to the current photo for the distinguishing mark." +
       "The image file supplied on the file attribute of a multipart/form-date submission.  \n" +
-      "Returns the identifying mark detail\n" +
+      "Returns the distinguishing mark detail\n" +
       "Requires role `ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RW`",
     responses = [
       ApiResponse(
@@ -242,7 +242,7 @@ class IdentifyingMarksController(private val identifyingMarksService: Identifyin
       ),
     ],
   )
-  fun updateIdentifyingMarkPhoto(
+  fun updateDistinguishingMarkPhoto(
     @Schema(description = "The UUID of the mark", example = "3946f7d9-25d0-449f-bf17-1ade41559391", required = true)
     @PathVariable
     uuid: String,
@@ -252,7 +252,7 @@ class IdentifyingMarksController(private val identifyingMarksService: Identifyin
       required = false,
     )
     file: MultipartFile?,
-  ) = identifyingMarksService.updatePhoto(
+  ) = distinguishingMarksService.updatePhoto(
     uuid,
     file,
     fileType = MediaType.parseMediaType(file?.contentType ?: MediaType.APPLICATION_OCTET_STREAM_VALUE),

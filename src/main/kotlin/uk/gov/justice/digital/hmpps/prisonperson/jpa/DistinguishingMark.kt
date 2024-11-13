@@ -9,19 +9,19 @@ import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.OneToMany
-import uk.gov.justice.digital.hmpps.prisonperson.dto.response.IdentifyingMarkDto
-import uk.gov.justice.digital.hmpps.prisonperson.dto.response.IdentifyingMarkImageDto
+import uk.gov.justice.digital.hmpps.prisonperson.dto.response.DistinguishingMarkDto
+import uk.gov.justice.digital.hmpps.prisonperson.dto.response.DistinguishingMarkImageDto
 import uk.gov.justice.digital.hmpps.prisonperson.mapper.toSimpleDto
 import uk.gov.justice.digital.hmpps.prisonperson.utils.GeneratedUuidV7
 import java.time.ZonedDateTime
 import java.util.UUID
 
 @Entity
-class IdentifyingMark(
+class DistinguishingMark(
   @Id
   @GeneratedUuidV7
-  @Column(name = "identifying_mark_id", updatable = false, nullable = false)
-  val identifyingMarkId: UUID? = null,
+  @Column(name = "distinguishing_mark_id", updatable = false, nullable = false)
+  val distinguishingMarkId: UUID? = null,
 
   @Column(name = "prisoner_number", updatable = false, nullable = false)
   val prisonerNumber: String,
@@ -45,14 +45,14 @@ class IdentifyingMark(
   @Column(name = "comment_text")
   var comment: String? = null,
 
-  @OneToMany(mappedBy = "identifyingMark", fetch = EAGER, cascade = [PERSIST, MERGE])
-  var photographUuids: MutableSet<IdentifyingMarkImage> = mutableSetOf(),
+  @OneToMany(mappedBy = "distinguishingMark", fetch = EAGER, cascade = [PERSIST, MERGE])
+  var photographUuids: MutableSet<DistinguishingMarkImage> = mutableSetOf(),
 
   val createdAt: ZonedDateTime = ZonedDateTime.now(),
   val createdBy: String,
 ) {
-  fun toDto(): IdentifyingMarkDto = IdentifyingMarkDto(
-    id = identifyingMarkId.toString(),
+  fun toDto(): DistinguishingMarkDto = DistinguishingMarkDto(
+    id = distinguishingMarkId.toString(),
     prisonerNumber,
     bodyPart.toSimpleDto(),
     markType.toSimpleDto(),
@@ -64,33 +64,33 @@ class IdentifyingMark(
     createdBy,
   )
 
-  fun addNewImage(uuid: String): IdentifyingMarkImage {
-    val identifyingMarkImage = IdentifyingMarkImage(
-      identifyingMarkImageId = UUID.fromString(uuid),
-      identifyingMark = this,
+  fun addNewImage(uuid: String): DistinguishingMarkImage {
+    val distinguishingMarkImage = DistinguishingMarkImage(
+      distinguishingMarkImageId = UUID.fromString(uuid),
+      distinguishingMark = this,
       latest = true,
     )
 
     photographUuids.find { it.latest }?.latest = false
-    photographUuids.add(identifyingMarkImage)
-    return identifyingMarkImage
+    photographUuids.add(distinguishingMarkImage)
+    return distinguishingMarkImage
   }
 }
 
 @Entity
-class IdentifyingMarkImage(
+class DistinguishingMarkImage(
   @Id
-  @Column(name = "identifying_mark_image_id", updatable = false, nullable = false)
-  val identifyingMarkImageId: UUID,
+  @Column(name = "distinguishing_mark_image_id", updatable = false, nullable = false)
+  val distinguishingMarkImageId: UUID,
 
   @ManyToOne
-  @JoinColumn(name = "identifying_mark_id", referencedColumnName = "identifying_mark_id")
-  val identifyingMark: IdentifyingMark,
+  @JoinColumn(name = "distinguishing_mark_id", referencedColumnName = "distinguishing_mark_id")
+  val distinguishingMark: DistinguishingMark,
 
   var latest: Boolean = false,
 ) {
-  fun toDto(): IdentifyingMarkImageDto = IdentifyingMarkImageDto(
-    id = identifyingMarkImageId.toString(),
+  fun toDto(): DistinguishingMarkImageDto = DistinguishingMarkImageDto(
+    id = distinguishingMarkImageId.toString(),
     latest = latest,
   )
 }

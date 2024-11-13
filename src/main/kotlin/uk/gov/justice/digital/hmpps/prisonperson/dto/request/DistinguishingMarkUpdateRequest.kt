@@ -8,34 +8,34 @@ import uk.gov.justice.digital.hmpps.prisonperson.utils.Nullish
 import uk.gov.justice.digital.hmpps.prisonperson.utils.getAttributeAsNullish
 
 @Schema(
-  description = "Request object for updating a prisoner's identifying mark. Can include one or multiple fields. " +
+  description = "Request object for updating a prisoner's distinguishing mark. Can include one or multiple fields. " +
     "If an attribute is provided and set to 'null' it will be updated equal to 'null'. " +
     "If it is not provided it is not updated",
 )
 @JsonInclude(NON_NULL)
-class IdentifyingMarkUpdateRequest(
+class DistinguishingMarkUpdateRequest(
   @Schema(hidden = true)
   private val attributes: MutableMap<String, Any?> = mutableMapOf(),
 ) {
   @Schema(
-    description = "Type of identifying mark. `ReferenceDataCode.id`.",
+    description = "Type of distinguishing mark. `ReferenceDataCode.id`.",
     example = "MARK_TYPE_SCAR",
   )
   @field:NullishReferenceDataCode(
     domains = ["MARK_TYPE"],
     allowNull = false,
-    message = "Type of identifying mark should a reference data code ID in the correct domain, or Undefined.",
+    message = "Type of distinguishing mark should a reference data code ID in the correct domain, or Undefined.",
   )
   val markType: Nullish<String> = getAttributeAsNullish(attributes, "markType")
 
   @Schema(
-    description = "Part of body the identifying mark is on. `ReferenceDataCode.id`.",
+    description = "Part of body the distinguishing mark is on. `ReferenceDataCode.id`.",
     example = "BODY_PART_HEAD",
   )
   @field:NullishReferenceDataCode(
     domains = ["BODY_PART"],
     allowNull = false,
-    message = "Body part of identifying mark should a reference data code ID in the correct domain, or Undefined.",
+    message = "Body part of distinguishing mark should a reference data code ID in the correct domain, or Undefined.",
   )
   val bodyPart: Nullish<String> = getAttributeAsNullish(attributes, "bodyPart")
 
@@ -58,7 +58,7 @@ class IdentifyingMarkUpdateRequest(
   val partOrientation: Nullish<String> = getAttributeAsNullish(attributes, "partOrientation")
 
   @Schema(
-    description = "Comment about the identifying mark.",
+    description = "Comment about the distinguishing mark.",
     example = "Long healed scar from an old fight",
   )
   val comment: Nullish<String> = getAttributeAsNullish(attributes, "comment")

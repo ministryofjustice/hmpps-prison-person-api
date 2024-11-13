@@ -23,7 +23,7 @@ import org.springframework.context.annotation.Configuration
 @Configuration
 class OpenApiConfiguration(
   buildProperties: BuildProperties,
-  @Value("\${api.base.url.oauth}") val oauthUrl: String,
+  @Value("\${api.oauth.base.url}") val oauthUrl: String,
 ) {
   private val version: String = buildProperties.version
 

@@ -13,19 +13,19 @@ spring:
     oauth2:
       resource-server:
         jwt:
-          jwk-set-uri: ${api.base.url.oauth}/.well-known/jwks.json
+          jwk-set-uri: ${api.oauth.base.url}/.well-known/jwks.json
 
       client:
         registration:
-          prisoner-search-api:
+          hmpps-prison-person-api:
             provider: hmpps-auth
-            client-id: ${prisoner-search.client.id}
-            client-secret: ${prisoner-search.client.secret}
+            client-id: ${client.id}
+            client-secret: ${client.secret}
             authorization-grant-type: client_credentials
             scope: read
         provider:
           hmpps-auth:
-            token-uri: ${api.base.url.oauth}/oauth/token
+            token-uri: ${api.oauth.base.url}/oauth/token
 
   jackson:
     date-format: "yyyy-MM-dd'T'HH:mm:ssZ"

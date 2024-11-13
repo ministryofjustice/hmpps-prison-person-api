@@ -9,9 +9,9 @@ generic-service:
     EVENTS_PUBLISH: true
     EVENTS_SUBSCRIBE: true
     EVENTS_BASE_URL: https://prison-person-api.prison.service.justice.gov.uk
-    API_BASE_URL_OAUTH: https://sign-in.hmpps.service.justice.gov.uk/auth
-    API_BASE_URL_PRISONER_SEARCH: https://prisoner-search.prison.service.justice.gov.uk
-    API_BASE_URL_DOCUMENT_SERVICE: https://document-api.hmpps.service.justice.gov.uk
+    API_OAUTH_BASE_URL: https://sign-in.hmpps.service.justice.gov.uk/auth
+    API_PRISONER_SEARCH_BASE_URL: https://prisoner-search.prison.service.justice.gov.uk
+    API_DOCUMENT_SERVICE_BASE_URL: https://document-api.hmpps.service.justice.gov.uk
 
   postgresDatabaseRestore:
     enabled: true

@@ -6,7 +6,7 @@ generic-service:
     host: prison-person-api.prison.service.justice.gov.uk
 
   env:
-    EVENTS_PUBLISH: false
+    EVENTS_PUBLISH: true
     EVENTS_SUBSCRIBE: true
     EVENTS_BASE_URL: https://prison-person-api.prison.service.justice.gov.uk
     API_OAUTH_BASE_URL: https://sign-in.hmpps.service.justice.gov.uk/auth

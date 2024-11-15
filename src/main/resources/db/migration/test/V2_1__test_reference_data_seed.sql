@@ -67,7 +67,7 @@ VALUES
 ('EYE_PINK', 'EYE', 'PINK', 'Pink', 0, '2024-07-11 17:00:00+0100', 'OMS_OWNER'),
 -- Smoker or vaper
 ('SMOKE_SMOKER', 'SMOKE', 'SMOKER', 'Yes, they smoke', 0, '2024-07-11 17:00:00+0100', 'OMS_OWNER'),
-('SMOKE_VAPER', 'SMOKE', 'VAPER', 'Yes, they smoke or use nicotine replacement therapy (NRT)', 0,
+('SMOKE_VAPER', 'SMOKE', 'VAPER', 'Yes, they vape or use nicotine replacement therapy (NRT)', 0,
  '2024-07-11 17:00:00+0100', 'OMS_OWNER'),
 ('SMOKE_NO', 'SMOKE', 'NO', 'No, they do not smoke or vape', 0, '2024-07-11 17:00:00+0100', 'OMS_OWNER'),
 -- Distinguishing marks
@@ -130,7 +130,8 @@ VALUES
  'CONNECT_DPS'),
 ('MEDICAL_DIET_COELIAC', 'MEDICAL_DIET', 'COELIAC', 'Coeliac', 0, '2024-07-21 14:00:00+0100', 'CONNECT_DPS'),
 ('MEDICAL_DIET_PREGNANT', 'MEDICAL_DIET', 'PREGNANT', 'Pregnant', 0, '2024-07-21 14:00:00+0100', 'CONNECT_DPS'),
-('MEDICAL_DIET_DISORDERED_EATING', 'MEDICAL_DIET', 'DISORDERED_EATING', 'Disordered eating', 0, '2024-07-21 14:00:00+0100',
+('MEDICAL_DIET_DISORDERED_EATING', 'MEDICAL_DIET', 'DISORDERED_EATING', 'Disordered eating', 0,
+ '2024-07-21 14:00:00+0100',
  'CONNECT_DPS'),
 ('MEDICAL_DIET_OTHER', 'MEDICAL_DIET', 'OTHER', 'Other', 0, '2024-07-21 14:00:00+0100', 'CONNECT_DPS');
 

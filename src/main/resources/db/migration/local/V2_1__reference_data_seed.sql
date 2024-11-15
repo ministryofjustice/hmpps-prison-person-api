@@ -66,7 +66,7 @@ VALUES
 ('EYE_WHITE', 'EYE', 'WHITE', 'White', 0, '2024-07-11 17:00:00+0100', 'OMS_OWNER'),
 -- Smoker or vaper
 ('SMOKE_SMOKER', 'SMOKE', 'SMOKER', 'Yes, they smoke', 0, '2024-07-11 17:00:00+0100', 'OMS_OWNER'),
-('SMOKE_VAPER', 'SMOKE', 'VAPER', 'Yes, they smoke or use nicotine replacement therapy (NRT)', 0,
+('SMOKE_VAPER', 'SMOKE', 'VAPER', 'Yes, they vape or use nicotine replacement therapy (NRT)', 0,
  '2024-07-11 17:00:00+0100', 'OMS_OWNER'),
 ('SMOKE_NO', 'SMOKE', 'NO', 'No, they do not smoke or vape', 0, '2024-07-11 17:00:00+0100', 'OMS_OWNER'),
 -- Identifying marks

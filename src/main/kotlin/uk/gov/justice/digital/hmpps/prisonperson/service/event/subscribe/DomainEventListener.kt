@@ -3,8 +3,6 @@ package uk.gov.justice.digital.hmpps.prisonperson.service.event.subscribe
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.awspring.cloud.sqs.annotation.SqsListener
-import io.opentelemetry.api.trace.SpanKind
-import io.opentelemetry.instrumentation.annotations.WithSpan
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
@@ -26,7 +24,6 @@ class DomainEventListener(
 
   @Transactional
   @SqsListener("prisonperson", factory = "hmppsQueueContainerFactoryProxy")
-  @WithSpan(value = "hmpps-prison-person-domain-event-queue", kind = SpanKind.SERVER)
   fun onDomainEvent(requestJson: String) {
     val (message, messageAttributes) = mapper.readValue(requestJson, Message::class.java)
     val eventType = messageAttributes.eventType.Value

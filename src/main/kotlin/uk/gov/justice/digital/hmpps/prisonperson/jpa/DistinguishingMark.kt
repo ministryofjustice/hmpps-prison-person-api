@@ -71,7 +71,10 @@ class DistinguishingMark(
       latest = true,
     )
 
-    photographUuids.find { it.latest }?.latest = false
+    photographUuids.find { it.latest }?.let {
+      it.latest = false
+    }
+
     photographUuids.add(distinguishingMarkImage)
     return distinguishingMarkImage
   }

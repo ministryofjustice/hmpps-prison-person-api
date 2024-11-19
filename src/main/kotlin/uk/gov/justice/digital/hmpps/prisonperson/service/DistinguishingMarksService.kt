@@ -30,9 +30,8 @@ class DistinguishingMarksService(
       it.toDto()
     }
 
-  fun getDistinguishingMarkById(uuid: String): DistinguishingMarkDto {
-    val uuidObj = UUID.fromString(uuid)
-    val distinguishingMark = distinguishingMarksRepository.findById(uuidObj).orElseThrow {
+  fun getDistinguishingMarkById(uuid: UUID): DistinguishingMarkDto {
+    val distinguishingMark = distinguishingMarksRepository.findById(uuid).orElseThrow {
       GenericNotFoundException("Distinguishing mark not found")
     }
     return distinguishingMark.toDto()
@@ -82,10 +81,10 @@ class DistinguishingMarksService(
 
   @Transactional
   fun update(
-    uuid: String,
+    uuid: UUID,
     request: DistinguishingMarkUpdateRequest,
   ): DistinguishingMarkDto {
-    val distinguishingMark = distinguishingMarksRepository.findById(UUID.fromString(uuid)).orElseThrow().apply {
+    val distinguishingMark = distinguishingMarksRepository.findById(uuid).orElseThrow().apply {
       request.markType.let<String> { markType = toReferenceDataCode(referenceDataCodeRepository, it)!! }
       request.bodyPart.let<String> { bodyPart = toReferenceDataCode(referenceDataCodeRepository, it)!! }
       request.side.apply(this::side) { toReferenceDataCode(referenceDataCodeRepository, it) }
@@ -96,9 +95,10 @@ class DistinguishingMarksService(
     return distinguishingMarksRepository.save(distinguishingMark).toDto()
   }
 
-  fun updatePhoto(uuid: String, file: MultipartFile?, fileType: MediaType): DistinguishingMarkDto {
+  fun updatePhoto(uuid: UUID, file: MultipartFile?, fileType: MediaType): DistinguishingMarkDto {
     val username = authenticationFacade.getUserOrSystemInContext()
-    val distinguishingMark = distinguishingMarksRepository.findById(UUID.fromString(uuid)).orElseThrow()
+    val distinguishingMark = distinguishingMarksRepository.findById(uuid)
+      .orElseThrow { GenericNotFoundException("Distinguishing mark not found") }
 
     if (file?.isEmpty == false) {
       if (fileType == null) {

@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestPart
@@ -26,6 +25,7 @@ import uk.gov.justice.digital.hmpps.prisonperson.dto.request.DistinguishingMarkU
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.DistinguishingMarkDto
 import uk.gov.justice.digital.hmpps.prisonperson.service.DistinguishingMarksService
 import uk.gov.justice.hmpps.kotlin.common.ErrorResponse
+import java.util.UUID
 
 @RestController
 @Tag(name = "Distinguishing marks", description = "Distinguishing marks linked to a prisoner")
@@ -107,7 +107,7 @@ class DistinguishingMarksController(private val distinguishingMarksService: Dist
       description = "The uuid of the distinguishing mark",
       required = true,
     )
-    uuid: String,
+    uuid: UUID,
   ): DistinguishingMarkDto? = distinguishingMarksService.getDistinguishingMarkById(uuid)
 
   @PostMapping("/mark", produces = [MediaType.APPLICATION_JSON_VALUE])
@@ -205,13 +205,13 @@ class DistinguishingMarksController(private val distinguishingMarksService: Dist
   fun updateDistinguishingMark(
     @Schema(description = "The UUID of the mark", example = "3946f7d9-25d0-449f-bf17-1ade41559391", required = true)
     @PathVariable
-    uuid: String,
+    uuid: UUID,
     @RequestBody
     @Valid
     distinguishingMarkUpdateRequest: DistinguishingMarkUpdateRequest,
   ): DistinguishingMarkDto = distinguishingMarksService.update(uuid, distinguishingMarkUpdateRequest)
 
-  @PutMapping("/mark/{uuid}/photo", produces = [MediaType.APPLICATION_JSON_VALUE])
+  @PostMapping("/mark/{uuid}/photo", produces = [MediaType.APPLICATION_JSON_VALUE])
   @ResponseStatus(HttpStatus.OK)
   @PreAuthorize("hasRole('ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RW')")
   @Operation(
@@ -245,7 +245,7 @@ class DistinguishingMarksController(private val distinguishingMarksService: Dist
   fun updateDistinguishingMarkPhoto(
     @Schema(description = "The UUID of the mark", example = "3946f7d9-25d0-449f-bf17-1ade41559391", required = true)
     @PathVariable
-    uuid: String,
+    uuid: UUID,
     @RequestPart
     @Parameter(
       description = "File part of the multipart request",

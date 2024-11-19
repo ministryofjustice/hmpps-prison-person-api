@@ -100,7 +100,7 @@ class DistinguishingMarksServiceTest {
   inner class GetDistinguishingMarkById {
     @Test
     fun `can convert to dto and return`() {
-      whenever(distinguishingMarksRepository.findById(UUID.fromString(MARK_1_ID))).thenReturn(Optional.of(MARK1))
+      whenever(distinguishingMarksRepository.findById(MARK_1_ID)).thenReturn(Optional.of(MARK1))
 
       val result = underTest.getDistinguishingMarkById(MARK_1_ID)
 
@@ -109,7 +109,7 @@ class DistinguishingMarksServiceTest {
 
     @Test
     fun `throws 404 when distinguishing mark not found`() {
-      whenever(distinguishingMarksRepository.findById(UUID.fromString(MARK_1_ID))).thenReturn(Optional.empty())
+      whenever(distinguishingMarksRepository.findById(MARK_1_ID)).thenReturn(Optional.empty())
 
       val exception = assertThrows(GenericNotFoundException::class.java) {
         underTest.getDistinguishingMarkById(MARK_1_ID)
@@ -241,7 +241,7 @@ class DistinguishingMarksServiceTest {
       assertThat(capturedDistinguishingMark.photographUuids).usingRecursiveComparison().isEqualTo(
         setOf(
           DistinguishingMarkImage(
-            distinguishingMarkImageId = UUID.fromString(MARK_1_ID),
+            distinguishingMarkImageId = MARK_1_ID,
             distinguishingMark = capturedDistinguishingMark,
             latest = true,
           ),
@@ -306,11 +306,11 @@ class DistinguishingMarksServiceTest {
 
     @Test
     fun `updating existing distinguishing mark`() {
-      whenever(distinguishingMarksRepository.findById(MARK_1_ID_UUID)).thenReturn(
+      whenever(distinguishingMarksRepository.findById(MARK_1_ID)).thenReturn(
         Optional.of(
           DistinguishingMark(
             prisonerNumber = PRISONER_NUMBER,
-            distinguishingMarkId = MARK_1_ID_UUID,
+            distinguishingMarkId = MARK_1_ID,
             createdAt = NOW.minusDays(1),
             createdBy = USER1,
             bodyPart = LEG_REFERENCE,
@@ -330,7 +330,7 @@ class DistinguishingMarksServiceTest {
       val result = underTest.update(MARK_1_ID, DistinguishingMarkUpdateRequest(attributes))
       assertThat(result).isEqualTo(
         DistinguishingMarkDto(
-          id = MARK_1_ID,
+          id = MARK_1_ID.toString(),
           prisonerNumber = PRISONER_NUMBER,
           bodyPart = ARM_REFERENCE.toSimpleDto(),
           markType = TATTOO_REFERENCE.toSimpleDto(),
@@ -339,6 +339,65 @@ class DistinguishingMarksServiceTest {
           comment = MARK1.comment,
           createdAt = NOW.minusDays(1),
           createdBy = USER1,
+        ),
+      )
+    }
+
+    @Test
+    fun `updating a distinguishing mark with an initial image`() {
+      // create mock MultiPartFile
+      val fileType = MediaType.IMAGE_JPEG
+      val file = MockMultipartFile(
+        "file",
+        "fileName.jpg",
+        MediaType.IMAGE_JPEG_VALUE,
+        "mock content".toByteArray(),
+      )
+
+      val documentDto = DocumentDto(
+        documentUuid = "c46d0ce9-e586-4fa6-ae76-52ea8c242260",
+        documentType = DocumentType.DISTINGUISHING_MARK_IMAGE,
+        documentFilename = "fileName.jpg",
+        filename = "fileName",
+        fileExtension = "jpg",
+        fileSize = 80,
+        fileHash = "hash",
+        mimeType = "mime",
+        metadata = mapOf("prisonerNumber" to "A1234AA"),
+        createdTime = "2021-01-01T00:00:00",
+        createdByServiceName = "service",
+        createdByUsername = "user",
+      )
+
+      whenever(
+        documentServiceClient.putDocument(
+          file.bytes,
+          "fileName.jpg",
+          DocumentType.DISTINGUISHING_MARK_IMAGE,
+          mapOf("prisonerNumber" to "A1234AA"),
+          fileType,
+          DOCUMENT_REQ_CONTEXT,
+        ),
+      ).thenReturn(documentDto)
+
+      whenever(distinguishingMarksRepository.findById(MARK_1_ID)).thenReturn(
+        Optional.of(
+          DistinguishingMark(
+            prisonerNumber = PRISONER_NUMBER,
+            distinguishingMarkId = MARK_1_ID,
+            createdAt = NOW.minusDays(1),
+            createdBy = USER1,
+            bodyPart = LEG_REFERENCE,
+            markType = SCAR_REFERENCE,
+            photographUuids = mutableSetOf(),
+          ),
+        ),
+      )
+
+      val result = underTest.updatePhoto(MARK_1_ID, file, fileType)
+      assertThat(result.photographUuids).isEqualTo(
+        listOf(
+          DistinguishingMarkImageDto("c46d0ce9-e586-4fa6-ae76-52ea8c242260", true),
         ),
       )
     }
@@ -380,11 +439,11 @@ class DistinguishingMarksServiceTest {
         ),
       ).thenReturn(documentDto)
 
-      whenever(distinguishingMarksRepository.findById(MARK_1_ID_UUID)).thenReturn(
+      whenever(distinguishingMarksRepository.findById(MARK_1_ID)).thenReturn(
         Optional.of(
           DistinguishingMark(
             prisonerNumber = PRISONER_NUMBER,
-            distinguishingMarkId = MARK_1_ID_UUID,
+            distinguishingMarkId = MARK_1_ID,
             createdAt = NOW.minusDays(1),
             createdBy = USER1,
             bodyPart = LEG_REFERENCE,
@@ -436,10 +495,9 @@ class DistinguishingMarksServiceTest {
     val CENTRE_REFERENCE =
       ReferenceDataCode("PART_ORIENT_CENTR", "CENTR", BODY_PART_DOMAIN, "Centre", 0, createdBy = "OMS_OWNER")
 
-    val MARK_1_ID = "c46d0ce9-e586-4fa6-ae76-52ea8c242260"
-    val MARK_1_ID_UUID = UUID.fromString(MARK_1_ID)
+    val MARK_1_ID = UUID.fromString("c46d0ce9-e586-4fa6-ae76-52ea8c242260")
     val MARK1 = DistinguishingMark(
-      distinguishingMarkId = UUID.fromString(MARK_1_ID),
+      distinguishingMarkId = MARK_1_ID,
       prisonerNumber = PRISONER_NUMBER,
       bodyPart = LEG_REFERENCE,
       markType = SCAR_REFERENCE,

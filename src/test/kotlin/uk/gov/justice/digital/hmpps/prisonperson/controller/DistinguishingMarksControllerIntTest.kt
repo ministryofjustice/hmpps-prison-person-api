@@ -363,7 +363,7 @@ class DistinguishingMarksControllerIntTest : IntegrationTestBase() {
           bodyBuilder.part("file", ByteArrayResource(MULTIPART_FILE.bytes))
             .header("Content-Disposition", "form-data; name=file; filename=filename.jpg")
 
-          val response = webTestClient.put().uri("/distinguishing-marks/mark/c46d0ce9-e586-4fa6-ae76-52ea8c242258/photo")
+          val response = webTestClient.post().uri("/distinguishing-marks/mark/c46d0ce9-e586-4fa6-ae76-52ea8c242258/photo")
             .contentType(MediaType.MULTIPART_FORM_DATA)
             .bodyValue(bodyBuilder.build())
             .headers(setAuthorisation(roles = listOf("ROLE_PRISON_PERSON_API__PRISON_PERSON_DATA__RW")))

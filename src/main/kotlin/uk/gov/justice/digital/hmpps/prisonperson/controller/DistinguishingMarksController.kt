@@ -249,12 +249,12 @@ class DistinguishingMarksController(private val distinguishingMarksService: Dist
     @RequestPart
     @Parameter(
       description = "File part of the multipart request",
-      required = false,
+      required = true,
     )
-    file: MultipartFile?,
+    file: MultipartFile,
   ) = distinguishingMarksService.updatePhoto(
     uuid,
     file,
-    fileType = MediaType.parseMediaType(file?.contentType ?: MediaType.APPLICATION_OCTET_STREAM_VALUE),
+    fileType = MediaType.parseMediaType(file.contentType ?: MediaType.APPLICATION_OCTET_STREAM_VALUE),
   )
 }

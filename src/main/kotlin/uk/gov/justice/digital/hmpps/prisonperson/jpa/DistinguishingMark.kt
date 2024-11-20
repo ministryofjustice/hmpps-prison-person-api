@@ -11,6 +11,7 @@ import jakarta.persistence.ManyToOne
 import jakarta.persistence.OneToMany
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.DistinguishingMarkDto
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.DistinguishingMarkImageDto
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.DistinguishingMarkImageRepository
 import uk.gov.justice.digital.hmpps.prisonperson.mapper.toSimpleDto
 import uk.gov.justice.digital.hmpps.prisonperson.utils.GeneratedUuidV7
 import java.time.ZonedDateTime
@@ -64,16 +65,20 @@ class DistinguishingMark(
     createdBy,
   )
 
-  fun addNewImage(uuid: String): DistinguishingMarkImage {
+  fun addNewImage(
+    uuid: String,
+    distinguishingMarkImageRepository: DistinguishingMarkImageRepository,
+  ): DistinguishingMarkImage {
     val distinguishingMarkImage = DistinguishingMarkImage(
       distinguishingMarkImageId = UUID.fromString(uuid),
       distinguishingMark = this,
       latest = true,
     )
 
-    photographUuids.find { it.latest }?.let {
-      it.latest = false
-    }
+    photographUuids
+      .find { it.latest }
+      ?.apply { latest = false }
+      ?.let { distinguishingMarkImageRepository.saveAndFlush(it) }
 
     photographUuids.add(distinguishingMarkImage)
     return distinguishingMarkImage

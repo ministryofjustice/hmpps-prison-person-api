@@ -34,6 +34,7 @@ import uk.gov.justice.digital.hmpps.prisonperson.jpa.DistinguishingMark
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.DistinguishingMarkImage
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.ReferenceDataCode
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.ReferenceDataDomain
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.DistinguishingMarkImageRepository
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.DistinguishingMarksRepository
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.ReferenceDataCodeRepository
 import uk.gov.justice.digital.hmpps.prisonperson.mapper.toSimpleDto
@@ -49,6 +50,9 @@ class DistinguishingMarksServiceTest {
 
   @Mock
   lateinit var distinguishingMarksRepository: DistinguishingMarksRepository
+
+  @Mock
+  lateinit var distinguishingMarkImageRepository: DistinguishingMarkImageRepository
 
   @Mock
   lateinit var referenceDataCodeRepository: ReferenceDataCodeRepository

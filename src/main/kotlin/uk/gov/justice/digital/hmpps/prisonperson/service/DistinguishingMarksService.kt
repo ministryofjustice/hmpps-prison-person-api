@@ -12,6 +12,7 @@ import uk.gov.justice.digital.hmpps.prisonperson.dto.request.DistinguishingMarkR
 import uk.gov.justice.digital.hmpps.prisonperson.dto.request.DistinguishingMarkUpdateRequest
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.DistinguishingMarkDto
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.DistinguishingMark
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.DistinguishingMarkImageRepository
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.DistinguishingMarksRepository
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.ReferenceDataCodeRepository
 import uk.gov.justice.digital.hmpps.prisonperson.utils.AuthenticationFacade
@@ -22,6 +23,7 @@ import java.util.UUID
 class DistinguishingMarksService(
   private val documentServiceClient: DocumentServiceClient,
   private val distinguishingMarksRepository: DistinguishingMarksRepository,
+  private val distinguishingMarkImageRepository: DistinguishingMarkImageRepository,
   private val authenticationFacade: AuthenticationFacade,
   private val referenceDataCodeRepository: ReferenceDataCodeRepository,
 ) {
@@ -72,7 +74,10 @@ class DistinguishingMarksService(
         ),
       )
 
-      distinguishingMark.addNewImage(uploadedDocument.documentUuid)
+      distinguishingMark.addNewImage(
+        uploadedDocument.documentUuid,
+        distinguishingMarkImageRepository,
+      )
     }
 
     // TODO consider deleting the doc from document service if the db save fails
@@ -101,10 +106,6 @@ class DistinguishingMarksService(
       .orElseThrow { GenericNotFoundException("Distinguishing mark not found") }
 
     if (file?.isEmpty == false) {
-      if (fileType == null) {
-        throw IllegalArgumentException("File type must not be null")
-      }
-
       val uploadedDocument = documentServiceClient.putDocument(
         document = file.bytes,
         filename = file.originalFilename,
@@ -117,7 +118,10 @@ class DistinguishingMarksService(
         ),
       )
 
-      distinguishingMark.addNewImage(uploadedDocument.documentUuid)
+      distinguishingMark.addNewImage(
+        uploadedDocument.documentUuid,
+        distinguishingMarkImageRepository,
+      )
     }
 
     return distinguishingMarksRepository.save(distinguishingMark).toDto()

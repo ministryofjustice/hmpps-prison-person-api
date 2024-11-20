@@ -2,7 +2,7 @@ package uk.gov.justice.digital.hmpps.prisonperson.jpa.repository
 
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
-import uk.gov.justice.digital.hmpps.prisonperson.jpa.IdentifyingMarkImage
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.DistinguishingMarkImage
 
 @Repository
-interface IdentifyingMarkImageRepository : JpaRepository<IdentifyingMarkImage, String>
+interface DistinguishingMarkImageRepository : JpaRepository<DistinguishingMarkImage, String>

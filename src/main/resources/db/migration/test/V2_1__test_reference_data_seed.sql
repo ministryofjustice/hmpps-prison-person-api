@@ -6,10 +6,10 @@ VALUES ('HAIR', 'Hair type or colour', 0, '2024-07-11 17:00:00+0100', 'OMS_OWNER
        ('BUILD', 'Build', 0, '2024-07-11 17:00:00+0100', 'OMS_OWNER'),
        ('EYE', 'Eye colour', 0, '2024-07-11 17:00:00+0100', 'OMS_OWNER'),
        ('SMOKE', 'Smoker or vaper', 0, '2024-07-11 17:00:00+0100', 'OMS_OWNER'),
-       ('MARK_TYPE', 'Type of identifying mark', 0, '2024-07-21 14:00:00+0100', 'OMS_OWNER'),
-       ('SIDE', 'Side identifying mark is on', 0, '2024-07-21 14:00:00+0100', 'OMS_OWNER'),
-       ('PART_ORIENT', 'Position of identifying mark', 0, '2024-07-21 14:00:00+0100', 'OMS_OWNER'),
-       ('BODY_PART', 'Body part identifying mark is on', 0, '2024-07-21 14:00:00+0100', 'OMS_OWNER'),
+       ('MARK_TYPE', 'Type of distinguishing mark', 0, '2024-07-21 14:00:00+0100', 'OMS_OWNER'),
+       ('SIDE', 'Side distinguishing mark is on', 0, '2024-07-21 14:00:00+0100', 'OMS_OWNER'),
+       ('PART_ORIENT', 'Position of distinguishing mark', 0, '2024-07-21 14:00:00+0100', 'OMS_OWNER'),
+       ('BODY_PART', 'Body part distinguishing mark is on', 0, '2024-07-21 14:00:00+0100', 'OMS_OWNER'),
        ('FOOD_ALLERGY', 'Food allergy', 0, '2024-07-21 14:00:00+0100', 'CONNECT_DPS'),
        ('MEDICAL_DIET', 'Medical dietary requirements', 0, '2024-07-21 14:00:00+0100', 'CONNECT_DPS');
 

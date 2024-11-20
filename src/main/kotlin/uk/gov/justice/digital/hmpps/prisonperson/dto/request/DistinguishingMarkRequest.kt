@@ -6,26 +6,26 @@ import io.swagger.v3.oas.annotations.media.Schema
 import org.jetbrains.annotations.NotNull
 
 @Schema(
-  description = "Request object for creating an identifying mark for a prisoner.",
+  description = "Request object for creating an distinguishing mark for a prisoner.",
 )
 @JsonInclude(NON_NULL)
-class IdentifyingMarkRequest(
+class DistinguishingMarkRequest(
   @Schema(
-    description = "The prisoner number of the prisoner this identifying mark is associated with.",
+    description = "The prisoner number of the prisoner this distinguishing mark is associated with.",
     example = "A1234AA",
   )
   @NotNull("Prisoner number is required.")
   val prisonerNumber: String,
 
   @Schema(
-    description = "Type of identifying mark. `ReferenceDataCode.id`.",
+    description = "Type of distinguishing mark. `ReferenceDataCode.id`.",
     example = "MARK_TYPE_SCAR",
   )
   @NotNull("Mark type is required.")
   val markType: String,
 
   @Schema(
-    description = "Part of body the identifying mark is on. `ReferenceDataCode.id`.",
+    description = "Part of body the distinguishing mark is on. `ReferenceDataCode.id`.",
     example = "BODY_PART_HEAD",
   )
   @NotNull("Body part is required.")
@@ -44,7 +44,7 @@ class IdentifyingMarkRequest(
   val partOrientation: String?,
 
   @Schema(
-    description = "Comment about the identifying mark.",
+    description = "Comment about the distinguishing mark.",
     example = "Long healed scar from an old fight",
   )
   val comment: String?,

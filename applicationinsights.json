@@ -17,22 +17,44 @@
     "percentage": 100,
     "overrides": [
       {
-        "telemetryType": "request",
+        "telemetryType": "dependency",
         "attributes": [
           {
-            "key": "http.url",
-            "value": "https?://[^/]+/health.*",
-            "matchType": "regexp"
+            "key": "db.system",
+            "value": "postgresql",
+            "matchType": "strict"
           }
         ],
-        "percentage": 10
+        "percentage": 5
       },
       {
         "telemetryType": "dependency",
         "attributes": [
           {
-            "key": "db.operation",
-            "value": "SELECT",
+            "key": "server.address",
+            "value": "(sign-in|sts.eu).*",
+            "matchType": "regexp"
+          }
+        ],
+        "percentage": 5
+      },
+      {
+        "telemetryType": "request",
+        "attributes": [
+          {
+            "key": "url.path",
+            "value": "/health.*",
+            "matchType": "regexp"
+          }
+        ],
+        "percentage": 5
+      },
+      {
+        "telemetryType": "request",
+        "attributes": [
+          {
+            "key": "url.path",
+            "value": "/info",
             "matchType": "strict"
           }
         ],

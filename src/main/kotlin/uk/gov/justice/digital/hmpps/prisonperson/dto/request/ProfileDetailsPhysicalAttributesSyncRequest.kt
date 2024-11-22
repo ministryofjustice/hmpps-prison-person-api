@@ -65,4 +65,12 @@ data class ProfileDetailsPhysicalAttributesSyncRequest(
     example = "true",
   )
   val latestBooking: Boolean? = true,
+
+  @Schema(
+    description = "An indication of whether the sync is to correct the current physical attributes. " +
+      "This is used, for example, when a 'move booking' event occurs where we are correcting an update that was made to " +
+      "the wrong prisoner record. The values will be corrected and the history item will be removed",
+    example = "false",
+  )
+  val correction: Boolean? = false,
 )

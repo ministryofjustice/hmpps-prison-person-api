@@ -1,22 +1,14 @@
-package uk.gov.justice.digital.hmpps.prisonperson.dto.request
+package uk.gov.justice.digital.hmpps.prisonperson.dto.request.distinguishingmarks
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL
 import io.swagger.v3.oas.annotations.media.Schema
 import org.jetbrains.annotations.NotNull
 import java.time.ZonedDateTime
-import java.util.*
 
 @Schema(description = "Request object for syncing a prisoner's distinguishing marks")
 @JsonInclude(NON_NULL)
-class DistinguishingMarkSyncRequest(
-  @Schema(
-    description = "The UUID of the distinguishing mark. If it is not provided a new distinguishing mark will be created.",
-    example = "af168736-d276-46a1-8038-e2cb84da4cdf",
-    required = true,
-  )
-  uuid: UUID?,
-
+class DistinguishingMarkCreationSyncRequest(
   @Schema(
     description = "Type of distinguishing mark. `ReferenceDataCode.id`.",
     example = "MARK_TYPE_SCAR",

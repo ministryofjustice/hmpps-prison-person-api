@@ -13,6 +13,7 @@ import org.mockito.junit.jupiter.MockitoSettings
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.whenever
 import org.mockito.quality.Strictness.LENIENT
+import org.openapitools.jackson.nullable.JsonNullable
 import uk.gov.justice.digital.hmpps.prisonperson.client.prisonersearch.PrisonerSearchClient
 import uk.gov.justice.digital.hmpps.prisonperson.client.prisonersearch.dto.PrisonerDto
 import uk.gov.justice.digital.hmpps.prisonperson.dto.ReferenceDataSimpleDto
@@ -408,19 +409,16 @@ class PrisonerPrisonerHealthServiceTest {
 
     val PRISONER_SEARCH_RESPONSE = PrisonerDto(PRISONER_NUMBER)
 
-    val attributes = mutableMapOf<String, Any?>(
-      Pair("smokerOrVaper", REFERENCE_DATA_CODE_ID),
-      Pair("foodAllergies", listOf(FOOD_REFERENCE_DATA_CODE_ID)),
-      Pair("medicalDietaryRequirements", listOf(LOW_FAT_REFERENCE_DATA_CODE_ID)),
+    val HEALTH_UPDATE_REQUEST = PrisonerHealthUpdateRequest(
+      smokerOrVaper = JsonNullable.of(REFERENCE_DATA_CODE_ID),
+      foodAllergies = JsonNullable.of(listOf(FOOD_REFERENCE_DATA_CODE_ID)),
+      medicalDietaryRequirements = JsonNullable.of(listOf(LOW_FAT_REFERENCE_DATA_CODE_ID)),
     )
 
-    val HEALTH_UPDATE_REQUEST = PrisonerHealthUpdateRequest(attributes)
-
-    val attributes_undefined = mutableMapOf<String, Any?>(
-      Pair("smokerOrVaper", null),
-      Pair("foodAllergies", emptyList<String>()),
-      Pair("medicalDietaryRequirements", emptyList<String>()),
+    val HEALTH_UPDATE_REQUEST_WITH_NULL = PrisonerHealthUpdateRequest(
+      smokerOrVaper = JsonNullable.of(null),
+      foodAllergies = JsonNullable.of(emptyList<String>()),
+      medicalDietaryRequirements = JsonNullable.of(emptyList<String>()),
     )
-    val HEALTH_UPDATE_REQUEST_WITH_NULL = PrisonerHealthUpdateRequest(attributes_undefined)
   }
 }

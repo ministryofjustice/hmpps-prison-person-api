@@ -12,6 +12,7 @@ import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.PrisonerHealthRe
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.ReferenceDataCodeRepository
 import uk.gov.justice.digital.hmpps.prisonperson.utils.AuthenticationFacade
 import uk.gov.justice.digital.hmpps.prisonperson.utils.toReferenceDataCode
+import uk.gov.justice.digital.hmpps.prisonperson.utils.toReferenceDataCodeWithDefault
 import uk.gov.justice.digital.hmpps.prisonperson.utils.validatePrisonerNumber
 import java.time.Clock
 import java.time.ZonedDateTime
@@ -36,12 +37,9 @@ class PrisonerHealthService(
   ): HealthDto {
     val now = ZonedDateTime.now(clock)
     val health = prisonerHealthRepository.findById(prisonerNumber).orElseGet { newHealthFor(prisonerNumber) }.apply {
-      request.smokerOrVaper.apply(
-        this::smokerOrVaper,
-        { toReferenceDataCode(referenceDataCodeRepository, it) },
-      )
+      smokerOrVaper = toReferenceDataCodeWithDefault(referenceDataCodeRepository, request.smokerOrVaper, this.smokerOrVaper)
 
-      request.foodAllergies.let<List<String>> {
+      request.foodAllergies.ifPresent {
         foodAllergies.apply { clear() }.addAll(
           it!!.map { allergyCode ->
             FoodAllergy(
@@ -52,7 +50,7 @@ class PrisonerHealthService(
         )
       }
 
-      request.medicalDietaryRequirements.let<List<String>> {
+      request.medicalDietaryRequirements.ifPresent {
         medicalDietaryRequirements.apply { clear() }.addAll(
           it!!.map { dietaryCode ->
             MedicalDietaryRequirement(

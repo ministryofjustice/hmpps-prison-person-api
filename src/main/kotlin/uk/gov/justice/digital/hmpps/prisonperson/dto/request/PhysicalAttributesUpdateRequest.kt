@@ -4,10 +4,9 @@ import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.media.Schema.RequiredMode.NOT_REQUIRED
-import uk.gov.justice.digital.hmpps.prisonperson.annotation.NullishRange
-import uk.gov.justice.digital.hmpps.prisonperson.annotation.NullishShoeSize
-import uk.gov.justice.digital.hmpps.prisonperson.utils.Nullish
-import uk.gov.justice.digital.hmpps.prisonperson.utils.getAttributeAsNullish
+import org.openapitools.jackson.nullable.JsonNullable
+import uk.gov.justice.digital.hmpps.prisonperson.annotation.JsonNullableRange
+import uk.gov.justice.digital.hmpps.prisonperson.annotation.JsonNullableShoeSize
 
 @Schema(
   description = "Request object for updating a prisoner's physical attributes. Can include one or multiple attributes. " +
@@ -16,9 +15,6 @@ import uk.gov.justice.digital.hmpps.prisonperson.utils.getAttributeAsNullish
 )
 @JsonInclude(NON_NULL)
 data class PhysicalAttributesUpdateRequest(
-  @Schema(hidden = true)
-  private val attributes: MutableMap<String, Any?> = mutableMapOf(),
-) {
   @Schema(
     description = "Height (in centimetres).",
     example = "180",
@@ -26,12 +22,12 @@ data class PhysicalAttributesUpdateRequest(
     requiredMode = NOT_REQUIRED,
     nullable = true,
   )
-  @field:NullishRange(
+  @field:JsonNullableRange(
     min = 50,
     max = 280,
     message = "The height must be a plausible value in centimetres (between 50 and 280), null or not provided",
   )
-  val height: Nullish<Int> = getAttributeAsNullish<Int>(attributes, "height")
+  val height: JsonNullable<Int?> = JsonNullable.undefined(),
 
   @Schema(
     description = "Weight (in kilograms).",
@@ -40,12 +36,12 @@ data class PhysicalAttributesUpdateRequest(
     requiredMode = NOT_REQUIRED,
     nullable = true,
   )
-  @field:NullishRange(
+  @field:JsonNullableRange(
     min = 12,
     max = 640,
     message = "The weight must be a plausible value in kilograms (between 12 and 640), null or not provided",
   )
-  val weight: Nullish<Int> = getAttributeAsNullish<Int>(attributes, "weight")
+  val weight: JsonNullable<Int?> = JsonNullable.undefined(),
 
   @Schema(
     description = "Hair type or colour. `ReferenceDataCode.id`.",
@@ -54,7 +50,7 @@ data class PhysicalAttributesUpdateRequest(
     requiredMode = NOT_REQUIRED,
     nullable = true,
   )
-  val hair: Nullish<String> = getAttributeAsNullish<String>(attributes, "hair")
+  val hair: JsonNullable<String?> = JsonNullable.undefined(),
 
   @Schema(
     description = "Facial hair type. `ReferenceDataCode.id`.",
@@ -63,7 +59,7 @@ data class PhysicalAttributesUpdateRequest(
     requiredMode = NOT_REQUIRED,
     nullable = true,
   )
-  val facialHair: Nullish<String> = getAttributeAsNullish<String>(attributes, "facialHair")
+  val facialHair: JsonNullable<String?> = JsonNullable.undefined(),
 
   @Schema(
     description = "Face shape. `ReferenceDataCode.id`.",
@@ -72,7 +68,7 @@ data class PhysicalAttributesUpdateRequest(
     requiredMode = NOT_REQUIRED,
     nullable = true,
   )
-  val face: Nullish<String> = getAttributeAsNullish<String>(attributes, "face")
+  val face: JsonNullable<String?> = JsonNullable.undefined(),
 
   @Schema(
     description = "Build. `ReferenceDataCode.id`.",
@@ -81,7 +77,7 @@ data class PhysicalAttributesUpdateRequest(
     requiredMode = NOT_REQUIRED,
     nullable = true,
   )
-  val build: Nullish<String> = getAttributeAsNullish<String>(attributes, "build")
+  val build: JsonNullable<String?> = JsonNullable.undefined(),
 
   @Schema(
     description = "Left eye colour. `ReferenceDataCode.id`.",
@@ -90,7 +86,7 @@ data class PhysicalAttributesUpdateRequest(
     requiredMode = NOT_REQUIRED,
     nullable = true,
   )
-  val leftEyeColour: Nullish<String> = getAttributeAsNullish<String>(attributes, "leftEyeColour")
+  val leftEyeColour: JsonNullable<String?> = JsonNullable.undefined(),
 
   @Schema(
     description = "Right eye colour. `ReferenceDataCode.id`.",
@@ -99,7 +95,7 @@ data class PhysicalAttributesUpdateRequest(
     requiredMode = NOT_REQUIRED,
     nullable = true,
   )
-  val rightEyeColour: Nullish<String> = getAttributeAsNullish<String>(attributes, "rightEyeColour")
+  val rightEyeColour: JsonNullable<String?> = JsonNullable.undefined(),
 
   @Schema(
     description = "Shoe size (in UK half sizes).",
@@ -108,10 +104,10 @@ data class PhysicalAttributesUpdateRequest(
     requiredMode = NOT_REQUIRED,
     nullable = true,
   )
-  @field:NullishShoeSize(
+  @field:JsonNullableShoeSize(
     min = "1",
     max = "25",
     message = "The shoe size must be a whole or half size between 1 and 25, null or not provided",
   )
-  val shoeSize: Nullish<String> = getAttributeAsNullish<String>(attributes, "shoeSize")
-}
+  val shoeSize: JsonNullable<String?> = JsonNullable.undefined(),
+)

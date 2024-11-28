@@ -63,7 +63,7 @@ class PrisonerPrisonerHealthControllerIntTest : IntegrationTestBase() {
         expectBadRequestFrom(
           prisonerNumber = PRISONER_NUMBER,
           requestBody = """{ "smokerOrVaper": 123 }""",
-          message = "Validation failure: Couldn't read request body",
+          message = "Validation failure(s): The value must be a reference domain code id of the correct domain, null, or Undefined.",
         )
       }
 

@@ -19,6 +19,7 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import org.openapitools.jackson.nullable.JsonNullable
 import org.springframework.http.MediaType
 import org.springframework.mock.web.MockMultipartFile
 import uk.gov.justice.digital.hmpps.prisonperson.client.documentservice.DocumentServiceClient
@@ -323,15 +324,15 @@ class DistinguishingMarksServiceTest {
         ),
       )
 
-      val attributes = mutableMapOf<String, Any?>(
-        Pair("bodyPart", ARM_REFERENCE.id),
-        Pair("markType", TATTOO_REFERENCE.id),
-        Pair("side", LEFT_SIDE_REFERENCE.id),
-        Pair("partOrientation", CENTRE_REFERENCE.id),
-        Pair("comment", MARK1.comment),
+      val updateRequest = DistinguishingMarkUpdateRequest(
+        bodyPart = JsonNullable.of(ARM_REFERENCE.id),
+        markType = JsonNullable.of(TATTOO_REFERENCE.id),
+        side = JsonNullable.of(LEFT_SIDE_REFERENCE.id),
+        partOrientation = JsonNullable.of(CENTRE_REFERENCE.id),
+        comment = JsonNullable.of(MARK1.comment),
       )
 
-      val result = underTest.update(MARK_1_ID, DistinguishingMarkUpdateRequest(attributes))
+      val result = underTest.update(MARK_1_ID, updateRequest)
       assertThat(result).isEqualTo(
         DistinguishingMarkDto(
           id = MARK_1_ID.toString(),

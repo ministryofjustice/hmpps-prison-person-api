@@ -17,6 +17,7 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.mockito.quality.Strictness.LENIENT
+import org.openapitools.jackson.nullable.JsonNullable
 import uk.gov.justice.digital.hmpps.prisonperson.client.prisonersearch.PrisonerSearchClient
 import uk.gov.justice.digital.hmpps.prisonperson.client.prisonersearch.dto.PrisonerDto
 import uk.gov.justice.digital.hmpps.prisonperson.dto.request.PhysicalAttributesUpdateRequest
@@ -106,7 +107,9 @@ class PhysicalAttributesServiceTest {
 
     @Test
     fun `creates new physical attributes`() {
-      whenever(prisonerSearchClient.getPrisoner(PRISONER_NUMBER)).thenReturn(PRISONER_SEARCH_RESPONSE)
+      whenever(prisonerSearchClient.getPrisoner(PRISONER_NUMBER)).thenReturn(
+        PRISONER_SEARCH_RESPONSE,
+      )
       whenever(physicalAttributesRepository.findById(PRISONER_NUMBER)).thenReturn(Optional.empty())
 
       assertThat(underTest.createOrUpdate(PRISONER_NUMBER, PHYSICAL_ATTRIBUTES_UPDATE_REQUEST))
@@ -158,7 +161,12 @@ class PhysicalAttributesServiceTest {
       whenever(prisonerSearchClient.getPrisoner(PRISONER_NUMBER)).thenReturn(null)
       whenever(physicalAttributesRepository.findById(PRISONER_NUMBER)).thenReturn(Optional.empty())
 
-      assertThatThrownBy { underTest.createOrUpdate(PRISONER_NUMBER, PHYSICAL_ATTRIBUTES_UPDATE_REQUEST) }
+      assertThatThrownBy {
+        underTest.createOrUpdate(
+          PRISONER_NUMBER,
+          PHYSICAL_ATTRIBUTES_UPDATE_REQUEST,
+        )
+      }
         .isInstanceOf(IllegalArgumentException::class.java)
         .hasMessage("Prisoner number '${PRISONER_NUMBER}' not found")
 
@@ -167,10 +175,19 @@ class PhysicalAttributesServiceTest {
 
     @Test
     fun `does not create new physical attributes if prisoner found in prisoner search matched on a different id`() {
-      whenever(prisonerSearchClient.getPrisoner(PRISONER_NUMBER)).thenReturn(PrisonerDto(prisonerNumber = "somethingelse"))
+      whenever(prisonerSearchClient.getPrisoner(PRISONER_NUMBER)).thenReturn(
+        PrisonerDto(
+          prisonerNumber = "somethingelse",
+        ),
+      )
       whenever(physicalAttributesRepository.findById(PRISONER_NUMBER)).thenReturn(Optional.empty())
 
-      assertThatThrownBy { underTest.createOrUpdate(PRISONER_NUMBER, PHYSICAL_ATTRIBUTES_UPDATE_REQUEST) }
+      assertThatThrownBy {
+        underTest.createOrUpdate(
+          PRISONER_NUMBER,
+          PHYSICAL_ATTRIBUTES_UPDATE_REQUEST,
+        )
+      }
         .isInstanceOf(IllegalArgumentException::class.java)
         .hasMessage("Prisoner number '${PRISONER_NUMBER}' not found")
 
@@ -185,7 +202,12 @@ class PhysicalAttributesServiceTest {
             prisonerNumber = PRISONER_NUMBER,
             height = PREVIOUS_PRISONER_HEIGHT,
             weight = PREVIOUS_PRISONER_WEIGHT,
-          ).also { it.updateFieldHistory(lastModifiedAt = NOW.minusDays(1), lastModifiedBy = USER2) },
+          ).also {
+            it.updateFieldHistory(
+              lastModifiedAt = NOW.minusDays(1),
+              lastModifiedBy = USER2,
+            )
+          },
         ),
       )
 
@@ -264,12 +286,11 @@ class PhysicalAttributesServiceTest {
     val NOW: ZonedDateTime = ZonedDateTime.now()
     val THEN: ZonedDateTime = NOW.minusDays(1)
 
-    val attributes = mutableMapOf<String, Any?>(
-      Pair("height", PRISONER_HEIGHT),
-      Pair("weight", PRISONER_WEIGHT),
+    val PHYSICAL_ATTRIBUTES_UPDATE_REQUEST = PhysicalAttributesUpdateRequest(
+      height = JsonNullable.of(PRISONER_HEIGHT),
+      weight = JsonNullable.of(PRISONER_WEIGHT),
     )
 
-    val PHYSICAL_ATTRIBUTES_UPDATE_REQUEST = PhysicalAttributesUpdateRequest(attributes)
     val PRISONER_SEARCH_RESPONSE = PrisonerDto(PRISONER_NUMBER)
   }
 }

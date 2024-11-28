@@ -2,13 +2,13 @@ package uk.gov.justice.digital.hmpps.prisonperson.annotation
 
 import jakarta.validation.Constraint
 import jakarta.validation.Payload
-import uk.gov.justice.digital.hmpps.prisonperson.validator.NullishShoeSizeValidator
+import uk.gov.justice.digital.hmpps.prisonperson.validator.JsonNullableShoeSizeValidator
 import kotlin.reflect.KClass
 
 @Target(AnnotationTarget.FIELD, AnnotationTarget.VALUE_PARAMETER)
 @Retention(AnnotationRetention.RUNTIME)
-@Constraint(validatedBy = [NullishShoeSizeValidator::class])
-annotation class NullishShoeSize(
+@Constraint(validatedBy = [JsonNullableShoeSizeValidator::class])
+annotation class JsonNullableShoeSize(
   val min: String,
   val max: String,
   val message: String = "The value must be a whole or half shoe size within the specified range, null or Undefined.",

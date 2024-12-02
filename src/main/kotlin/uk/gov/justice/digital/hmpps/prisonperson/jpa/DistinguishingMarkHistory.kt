@@ -5,6 +5,8 @@ import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
+import jakarta.persistence.JoinColumn
+import jakarta.persistence.ManyToOne
 import uk.gov.justice.digital.hmpps.prisonperson.enums.Source
 import java.time.ZonedDateTime
 import java.util.*
@@ -15,7 +17,9 @@ class DistinguishingMarkHistory(
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   val historyId: Long = -1,
 
-  var distinguishingMarkId: UUID,
+  @ManyToOne
+  @JoinColumn(name = "distinguishing_mark_id", referencedColumnName = "distinguishing_mark_id", nullable = false)
+  var mark: DistinguishingMark? = null,
 
   @Convert(converter = DistinguishingMarkConverter::class)
   var valueJson: DistinguishingMark? = null,

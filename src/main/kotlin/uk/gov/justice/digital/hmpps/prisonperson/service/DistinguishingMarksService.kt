@@ -85,9 +85,10 @@ class DistinguishingMarksService(
     }
 
     // TODO consider deleting the doc from document service if the db save fails
-    val savedMark = distinguishingMarksRepository.save(distinguishingMark)
-      .also { it.updateFieldHistory(now, username) }
-    return savedMark.toDto()
+
+    return distinguishingMarksRepository.save(
+      distinguishingMark.also { it.updateFieldHistory(now, username) },
+    ).toDto()
   }
 
   @Transactional

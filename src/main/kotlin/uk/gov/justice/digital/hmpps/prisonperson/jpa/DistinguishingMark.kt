@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.prisonperson.jpa
 
-import jakarta.persistence.CascadeType.ALL
 import jakarta.persistence.CascadeType.MERGE
 import jakarta.persistence.CascadeType.PERSIST
 import jakarta.persistence.Column
@@ -61,7 +60,7 @@ class DistinguishingMark(
   // History
 
   // Stores snapshots of each update to a distinguishing mark
-  @OneToMany(mappedBy = "distinguishingMarkId", fetch = LAZY, cascade = [ALL], orphanRemoval = true)
+  @OneToMany(mappedBy = "mark", fetch = LAZY, orphanRemoval = true)
   @SortNatural
   val history: SortedSet<DistinguishingMarkHistory> = sortedSetOf(),
 ) {
@@ -118,7 +117,7 @@ class DistinguishingMark(
 
       history.add(
         DistinguishingMarkHistory(
-          distinguishingMarkId = this.distinguishingMarkId!!,
+          mark = this,
           valueJson = this,
           appliesFrom = appliesFrom,
           appliesTo = appliesTo,

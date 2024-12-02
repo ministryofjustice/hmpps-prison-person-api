@@ -13,6 +13,7 @@ import org.mockito.ArgumentMatchers.any
 import org.mockito.Captor
 import org.mockito.InjectMocks
 import org.mockito.Mock
+import org.mockito.Spy
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.firstValue
 import org.mockito.kotlin.never
@@ -39,6 +40,7 @@ import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.DistinguishingMa
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.ReferenceDataCodeRepository
 import uk.gov.justice.digital.hmpps.prisonperson.mapper.toSimpleDto
 import uk.gov.justice.digital.hmpps.prisonperson.utils.AuthenticationFacade
+import java.time.Clock
 import java.time.ZonedDateTime
 import java.util.Optional
 import java.util.UUID
@@ -63,9 +65,18 @@ class DistinguishingMarksServiceTest {
   @InjectMocks
   lateinit var underTest: DistinguishingMarksService
 
+  @Spy
+  val clock: Clock? = Clock.fixed(NOW.toInstant(), NOW.zone)
+
   @AfterEach
   fun afterEach() {
-    reset(documentServiceClient, distinguishingMarksRepository, referenceDataCodeRepository, authenticationFacade)
+    reset(
+      documentServiceClient,
+      distinguishingMarksRepository,
+      distinguishingMarkImageRepository,
+      referenceDataCodeRepository,
+      authenticationFacade,
+    )
   }
 
   @BeforeEach
@@ -477,7 +488,8 @@ class DistinguishingMarksServiceTest {
 
   private companion object {
     const val PRISONER_NUMBER = "A1234AA"
-    val NOW = ZonedDateTime.now()
+    val NOW: ZonedDateTime = ZonedDateTime.now()
+    val THEN: ZonedDateTime = NOW.minusDays(1)
 
     const val USER1 = "USER1"
 

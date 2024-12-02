@@ -1,20 +1,26 @@
 package uk.gov.justice.digital.hmpps.prisonperson.jpa
 
+import jakarta.persistence.CascadeType.ALL
 import jakarta.persistence.CascadeType.MERGE
 import jakarta.persistence.CascadeType.PERSIST
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.FetchType.EAGER
+import jakarta.persistence.FetchType.LAZY
 import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.OneToMany
+import org.hibernate.annotations.SortNatural
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.DistinguishingMarkDto
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.DistinguishingMarkImageDto
+import uk.gov.justice.digital.hmpps.prisonperson.enums.Source
+import uk.gov.justice.digital.hmpps.prisonperson.enums.Source.DPS
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.DistinguishingMarkImageRepository
 import uk.gov.justice.digital.hmpps.prisonperson.mapper.toSimpleDto
 import uk.gov.justice.digital.hmpps.prisonperson.utils.GeneratedUuidV7
 import java.time.ZonedDateTime
+import java.util.SortedSet
 import java.util.UUID
 
 @Entity
@@ -51,6 +57,13 @@ class DistinguishingMark(
 
   val createdAt: ZonedDateTime = ZonedDateTime.now(),
   val createdBy: String,
+
+  // History
+
+  // Stores snapshots of each update to a distinguishing mark
+  @OneToMany(mappedBy = "distinguishingMarkId", fetch = LAZY, cascade = [ALL], orphanRemoval = true)
+  @SortNatural
+  val history: SortedSet<DistinguishingMarkHistory> = sortedSetOf(),
 ) {
   fun toDto(): DistinguishingMarkDto = DistinguishingMarkDto(
     id = distinguishingMarkId.toString(),
@@ -82,6 +95,41 @@ class DistinguishingMark(
 
     photographUuids.add(distinguishingMarkImage)
     return distinguishingMarkImage
+  }
+
+  fun updateFieldHistory(
+    lastModifiedAt: ZonedDateTime,
+    lastModifiedBy: String,
+  ) =
+    updateFieldHistory(lastModifiedAt, null, lastModifiedAt, lastModifiedBy, DPS)
+
+  fun updateFieldHistory(
+    appliesFrom: ZonedDateTime,
+    appliesTo: ZonedDateTime?,
+    lastModifiedAt: ZonedDateTime,
+    lastModifiedBy: String,
+    source: Source = DPS,
+    migratedAt: ZonedDateTime? = null,
+    anomalous: Boolean? = null,
+  ) {
+    val previousVersion = history.lastOrNull()
+    if (previousVersion == null || previousVersion.valueJson != this) {
+      previousVersion?.updateAppliesTo(appliesFrom, lastModifiedAt)
+
+      history.add(
+        DistinguishingMarkHistory(
+          distinguishingMarkId = this.distinguishingMarkId!!,
+          valueJson = this,
+          appliesFrom = appliesFrom,
+          appliesTo = appliesTo,
+          createdAt = lastModifiedAt,
+          createdBy = lastModifiedBy,
+          source = source,
+          migratedAt = migratedAt,
+          anomalous = anomalous == true,
+        ),
+      )
+    }
   }
 }
 

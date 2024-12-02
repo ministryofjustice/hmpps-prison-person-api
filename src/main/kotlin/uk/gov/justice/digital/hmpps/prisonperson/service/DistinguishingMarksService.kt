@@ -17,6 +17,8 @@ import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.DistinguishingMa
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.ReferenceDataCodeRepository
 import uk.gov.justice.digital.hmpps.prisonperson.utils.AuthenticationFacade
 import uk.gov.justice.digital.hmpps.prisonperson.utils.toReferenceDataCode
+import java.time.Clock
+import java.time.ZonedDateTime
 import java.util.UUID
 
 @Service
@@ -26,6 +28,7 @@ class DistinguishingMarksService(
   private val distinguishingMarkImageRepository: DistinguishingMarkImageRepository,
   private val authenticationFacade: AuthenticationFacade,
   private val referenceDataCodeRepository: ReferenceDataCodeRepository,
+  private val clock: Clock,
 ) {
   fun getDistinguishingMarksForPrisoner(prisonerNumber: String): List<DistinguishingMarkDto> =
     distinguishingMarksRepository.findAllByPrisonerNumber(prisonerNumber).map {
@@ -46,6 +49,7 @@ class DistinguishingMarksService(
     distinguishingMarkRequest: DistinguishingMarkRequest,
   ): DistinguishingMarkDto {
     val username = authenticationFacade.getUserOrSystemInContext()
+    val now = ZonedDateTime.now(clock)
 
     val distinguishingMark = DistinguishingMark(
       prisonerNumber = distinguishingMarkRequest.prisonerNumber,
@@ -81,7 +85,9 @@ class DistinguishingMarksService(
     }
 
     // TODO consider deleting the doc from document service if the db save fails
-    return distinguishingMarksRepository.save(distinguishingMark).toDto()
+    val savedMark = distinguishingMarksRepository.save(distinguishingMark)
+      .also { it.updateFieldHistory(now, username) }
+    return savedMark.toDto()
   }
 
   @Transactional

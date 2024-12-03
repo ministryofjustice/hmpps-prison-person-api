@@ -78,6 +78,7 @@ class DistinguishingMarksSyncController {
     ],
   )
   fun createNewDistinguishingMark(
+    @Parameter(description = "The prisoner number", example = "A1234AA", required = true)
     @PathVariable
     prisonerNumber: String,
     @RequestBody
@@ -126,10 +127,10 @@ class DistinguishingMarksSyncController {
     ],
   )
   fun syncUpdateDistinguishingMark(
-    @Schema(description = "The prisoner number", example = "A1234AA", required = true)
+    @Parameter(description = "The prisoner number", example = "A1234AA", required = true)
     @PathVariable
     prisonerNumber: String,
-    @Schema(
+    @Parameter(
       description = "The UUID of the distinguishing mark to delete",
       example = "22198ef9-445d-449a-b016-0521ebfb5c2d",
       required = true,
@@ -182,10 +183,10 @@ class DistinguishingMarksSyncController {
     ],
   )
   fun syncDeleteDistinguishingMark(
-    @Schema(description = "The prisoner number", example = "A1234AA", required = true)
+    @Parameter(description = "The prisoner number", example = "A1234AA", required = true)
     @PathVariable
     prisonerNumber: String,
-    @Schema(
+    @Parameter(
       description = "The UUID of the distinguishing mark to delete",
       example = "22198ef9-445d-449a-b016-0521ebfb5c2d",
       required = true,
@@ -235,10 +236,10 @@ class DistinguishingMarksSyncController {
     ],
   )
   fun syncCreateDistinguishingMarkImage(
-    @Schema(description = "The prisoner number", example = "A1234AA", required = true)
+    @Parameter(description = "The prisoner number", example = "A1234AA", required = true)
     @PathVariable
     prisonerNumber: String,
-    @Schema(
+    @Parameter(
       description = "The UUID of the distinguishing mark to add the image to",
       example = "22198ef9-445d-449a-b016-0521ebfb5c2d",
       required = true,
@@ -252,7 +253,7 @@ class DistinguishingMarksSyncController {
     )
     file: MultipartFile?,
     @Parameter(
-      description = "The distinguishing mark request",
+      description = "The distinguishing mark image request",
       required = true,
     )
     distinguishingMarkImageCreateSyncRequest: DistinguishingMarkImageCreateSyncRequest,
@@ -298,12 +299,27 @@ class DistinguishingMarksSyncController {
     ],
   )
   fun syncUpdateDistinguishingMarkImage(
+    @Parameter(description = "The prisoner number", example = "A1234AA", required = true)
     @PathVariable
     prisonerNumber: String,
+    @Parameter(
+      description = "The ID of the distinguishing mark",
+      example = "3b47dc4c-5d61-434e-ae7c-29e10718e780",
+      required = true,
+    )
     @PathVariable
     distinguishingMarkId: String,
+    @Parameter(
+      description = "The ID of the image being updated",
+      example = "3b47dc4c-5d61-434e-ae7c-29e10718e780",
+      required = true,
+    )
     @PathVariable
     imageId: String,
+    @Parameter(
+      description = "The distinguishing mark image request",
+      required = true,
+    )
     @RequestBody
     @Validated
     request: DistinguishingMarkImageUpdateSyncRequest,
@@ -350,9 +366,23 @@ class DistinguishingMarksSyncController {
     ],
   )
   fun syncDeleteDistinguishingMarkImage(
-    @PathVariable prisonerNumber: String,
-    @PathVariable distinguishingMarkId: String,
-    @PathVariable imageId: String,
+    @Parameter(description = "The prisoner number", example = "A1234AA", required = true)
+    @PathVariable
+    prisonerNumber: String,
+    @Parameter(
+      description = "The ID of the distinguishing mark",
+      example = "3b47dc4c-5d61-434e-ae7c-29e10718e780",
+      required = true,
+    )
+    @PathVariable
+    distinguishingMarkId: String,
+    @Parameter(
+      description = "The ID of the image being updated",
+      example = "3b47dc4c-5d61-434e-ae7c-29e10718e780",
+      required = true,
+    )
+    @PathVariable
+    imageId: String,
   ): DistinguishingMarkImageSyncResponse {
     // Hard or soft delete? Image history will be in the history table so soft delete is possible
     // If you delete something from a historical booking, what will that look like?

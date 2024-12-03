@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.multipart.MultipartFile
 import uk.gov.justice.digital.hmpps.prisonperson.dto.request.distinguishingmarks.DistinguishingMarkCreationSyncRequest
+import uk.gov.justice.digital.hmpps.prisonperson.dto.request.distinguishingmarks.DistinguishingMarkImageCreateSyncRequest
 import uk.gov.justice.digital.hmpps.prisonperson.dto.request.distinguishingmarks.DistinguishingMarkImageUpdateSyncRequest
 import uk.gov.justice.digital.hmpps.prisonperson.dto.request.distinguishingmarks.DistinguishingMarkUpdateSyncRequest
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.DistinguishingMarkImageSyncResponse
@@ -42,7 +43,7 @@ Create / Update(latest/not latest) / Delete image
 @RequestMapping("/sync/prisoners/{prisonerNumber}/distinguishing-marks", produces = [MediaType.APPLICATION_JSON_VALUE])
 class DistinguishingMarksSyncController {
   @PostMapping
-  @ResponseStatus(HttpStatus.OK)
+  @ResponseStatus(HttpStatus.CREATED)
   @PreAuthorize("hasRole('ROLE_PRISON_PERSON_API__DISTHINGUISHING_MARKS_SYNC__RW')")
   @Operation(
     summary = "SYNC endpoint to sync new distinguishing marks made in NOMIS",
@@ -199,7 +200,7 @@ class DistinguishingMarksSyncController {
   }
 
   @PostMapping("/{distinguishingMarkId}/images")
-  @ResponseStatus(HttpStatus.OK)
+  @ResponseStatus(HttpStatus.CREATED)
   @PreAuthorize("hasRole('ROLE_PRISON_PERSON_API__DISTINGUISHING_MARKS_SYNC_RW')")
   @Operation(
     summary = "SYNC endpoint to sync distinguishing mark image creations made in NOMIS",
@@ -250,6 +251,11 @@ class DistinguishingMarksSyncController {
       required = false,
     )
     file: MultipartFile?,
+    @Parameter(
+      description = "The distinguishing mark request",
+      required = true,
+    )
+    distinguishingMarkImageCreateSyncRequest: DistinguishingMarkImageCreateSyncRequest,
   ): DistinguishingMarkImageSyncResponse {
     // Needs applies from/to for historical images.
     // Historical images will need to be added to the array in the correct entry in the history table

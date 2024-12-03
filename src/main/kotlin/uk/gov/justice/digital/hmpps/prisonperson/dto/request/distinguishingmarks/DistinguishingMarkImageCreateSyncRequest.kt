@@ -6,43 +6,18 @@ import io.swagger.v3.oas.annotations.media.Schema
 import org.jetbrains.annotations.NotNull
 import java.time.ZonedDateTime
 
-@Schema(description = "Request object for syncing a prisoner's distinguishing marks")
+@Schema(description = "Request object for creating a an image for a prisoner's distinguishing mark")
 @JsonInclude(NON_NULL)
-class DistinguishingMarkCreationSyncRequest(
+class DistinguishingMarkImageCreateSyncRequest(
   @Schema(
-    description = "Type of distinguishing mark. `ReferenceDataCode.id`.",
-    example = "MARK_TYPE_SCAR",
+    description = "Source of the image (e.g. LIVE, WEB)",
+    example = "LIVE",
   )
-  @NotNull("Mark type is required.")
-  val markType: String,
+  @NotNull("Image source is required")
+  val imageSource: String,
 
   @Schema(
-    description = "Part of body the distinguishing mark is on. `ReferenceDataCode.id`.",
-    example = "BODY_PART_HEAD",
-  )
-  @NotNull("Body part is required.")
-  val bodyPart: String,
-
-  @Schema(
-    description = "Side of the body part the mark is on. `ReferenceDataCode.id`. May be left null if unentered.",
-    example = "SIDE_R",
-  )
-  val side: String?,
-
-  @Schema(
-    description = "Orientation of the mark on the body part. `ReferenceDataCode.id`. May be left null if unentered.",
-    example = "PART_ORIENT_CENTR",
-  )
-  val partOrientation: String?,
-
-  @Schema(
-    description = "Comment about the distinguishing mark. May be left null if unentered.",
-    example = "Long healed scar from an old fight",
-  )
-  val comment: String?,
-
-  @Schema(
-    description = "The timestamp indicating from when this mark was valid for the prisoner. " +
+    description = "The timestamp indicating from when this image was valid for the prisoner. " +
       "For edits to the current booking, this should be equal to the 'createdAt' date. " +
       "For edits to historical bookings, this should be equal to the booking start date.",
     required = true,
@@ -50,7 +25,7 @@ class DistinguishingMarkCreationSyncRequest(
   val appliesFrom: ZonedDateTime,
 
   @Schema(
-    description = "The timestamp of when this mark should no longer be considered applicable. " +
+    description = "The timestamp of when this image should no longer be considered applicable. " +
       "For edits to the current booking, this should be left null. " +
       "For edits to historical bookings, this should be equal to the booking end date.",
     nullable = true,

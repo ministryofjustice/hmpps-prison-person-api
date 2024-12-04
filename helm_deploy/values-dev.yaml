@@ -20,7 +20,7 @@ generic-service:
     enabled: true
     startup: '30 6 * * 1-5' # Start at 6.30am UTC Monday-Friday
     shutdown: '30 21 * * 1-5' # Stop at 9.30pm UTC Monday-Friday
-    retryDlqSchedule: '*/10 7-21 * * 1-5' # Every 10 minutes 7am - 9pm UTC Monday-Friday
+    retryDlqSchedule: '*/10 7-20 * * 1-5' # Every 10 minutes 7:00am - 8:50pm UTC Monday-Friday
 
 # CloudPlatform AlertManager receiver to route prometheus alerts to slack
 # See https://user-guide.cloud-platform.service.justice.gov.uk/documentation/monitoring-an-app/how-to-create-alarms.html#creating-your-own-custom-alerts

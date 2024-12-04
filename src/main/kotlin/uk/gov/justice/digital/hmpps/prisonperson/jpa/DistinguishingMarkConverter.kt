@@ -14,4 +14,3 @@ class DistinguishingMarkConverter(val objectMapper: ObjectMapper) : AttributeCon
   override fun convertToEntityAttribute(json: String?): DistinguishingMark? =
     json?.let { objectMapper.readValue(it, DistinguishingMark::class.java) }
 }
-

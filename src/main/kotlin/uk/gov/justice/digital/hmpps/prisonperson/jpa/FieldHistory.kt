@@ -16,7 +16,6 @@ import uk.gov.justice.digital.hmpps.prisonperson.enums.FieldValues
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField
 import uk.gov.justice.digital.hmpps.prisonperson.enums.Source
 import uk.gov.justice.digital.hmpps.prisonperson.mapper.toSimpleDto
-import java.time.Instant
 import java.time.ZonedDateTime
 
 @Entity

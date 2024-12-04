@@ -4,6 +4,4 @@ import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.DistinguishingMa
 
 class DistinguishingMarkHistoryService(
   private val distinguishingMarkHistoryRepository: DistinguishingMarkHistoryRepository,
-) {
-
-}
+)

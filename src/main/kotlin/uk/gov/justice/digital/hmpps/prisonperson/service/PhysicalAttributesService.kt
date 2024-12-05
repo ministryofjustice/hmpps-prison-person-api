@@ -12,7 +12,7 @@ import uk.gov.justice.digital.hmpps.prisonperson.jpa.PhysicalAttributes
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.PhysicalAttributesRepository
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.ReferenceDataCodeRepository
 import uk.gov.justice.digital.hmpps.prisonperson.utils.AuthenticationFacade
-import uk.gov.justice.digital.hmpps.prisonperson.utils.toReferenceDataCode
+import uk.gov.justice.digital.hmpps.prisonperson.utils.toReferenceDataCodeWithDefault
 import uk.gov.justice.digital.hmpps.prisonperson.utils.validatePrisonerNumber
 import java.time.Clock
 import java.time.ZonedDateTime
@@ -40,15 +40,15 @@ class PhysicalAttributesService(
     val physicalAttributes = physicalAttributesRepository.findById(prisonerNumber)
       .orElseGet { newPhysicalAttributesFor(prisonerNumber) }
       .apply {
-        request.height.apply(::height)
-        request.weight.apply(::weight)
-        request.hair.apply(::hair, { toReferenceDataCode(referenceDataCodeRepository, it) })
-        request.facialHair.apply(::facialHair, { toReferenceDataCode(referenceDataCodeRepository, it) })
-        request.face.apply(::face, { toReferenceDataCode(referenceDataCodeRepository, it) })
-        request.build.apply(::build, { toReferenceDataCode(referenceDataCodeRepository, it) })
-        request.leftEyeColour.apply(::leftEyeColour, { toReferenceDataCode(referenceDataCodeRepository, it) })
-        request.rightEyeColour.apply(::rightEyeColour, { toReferenceDataCode(referenceDataCodeRepository, it) })
-        request.shoeSize.apply(::shoeSize)
+        height = request.height.orElse(this.height)
+        weight = request.weight.orElse(this.weight)
+        hair = toReferenceDataCodeWithDefault(referenceDataCodeRepository, request.hair, this.hair)
+        facialHair = toReferenceDataCodeWithDefault(referenceDataCodeRepository, request.facialHair, this.facialHair)
+        face = toReferenceDataCodeWithDefault(referenceDataCodeRepository, request.face, this.face)
+        build = toReferenceDataCodeWithDefault(referenceDataCodeRepository, request.build, this.build)
+        leftEyeColour = toReferenceDataCodeWithDefault(referenceDataCodeRepository, request.leftEyeColour, this.leftEyeColour)
+        rightEyeColour = toReferenceDataCodeWithDefault(referenceDataCodeRepository, request.rightEyeColour, this.rightEyeColour)
+        shoeSize = request.shoeSize.orElse(this.shoeSize)
       }
       .also {
         val changedFields = it.updateFieldHistory(now, authenticationFacade.getUserOrSystemInContext())

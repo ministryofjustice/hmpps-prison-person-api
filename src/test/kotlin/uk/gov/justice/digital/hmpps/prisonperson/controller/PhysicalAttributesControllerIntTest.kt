@@ -230,7 +230,7 @@ class PhysicalAttributesControllerIntTest : IntegrationTestBase() {
       fun `bad request when field type is not as expected`() {
         expectBadRequestFrom(
           requestBody = """{ "hair": 123 }""",
-          message = "Validation failure: Couldn't read request body",
+          message = "Validation failure: Invalid reference data code: 123",
         )
       }
 

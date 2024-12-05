@@ -17,6 +17,7 @@ import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.DistinguishingMa
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.ReferenceDataCodeRepository
 import uk.gov.justice.digital.hmpps.prisonperson.utils.AuthenticationFacade
 import uk.gov.justice.digital.hmpps.prisonperson.utils.toReferenceDataCode
+import uk.gov.justice.digital.hmpps.prisonperson.utils.toReferenceDataCodeWithDefault
 import java.util.UUID
 
 @Service
@@ -90,13 +91,12 @@ class DistinguishingMarksService(
     request: DistinguishingMarkUpdateRequest,
   ): DistinguishingMarkDto {
     val distinguishingMark = distinguishingMarksRepository.findById(uuid).orElseThrow().apply {
-      request.markType.let<String> { markType = toReferenceDataCode(referenceDataCodeRepository, it)!! }
-      request.bodyPart.let<String> { bodyPart = toReferenceDataCode(referenceDataCodeRepository, it)!! }
-      request.side.apply(this::side) { toReferenceDataCode(referenceDataCodeRepository, it) }
-      request.partOrientation.apply(this::partOrientation) { toReferenceDataCode(referenceDataCodeRepository, it) }
-      request.comment.apply(this::comment)
+      markType = toReferenceDataCodeWithDefault(referenceDataCodeRepository, request.markType, this.markType)!!
+      bodyPart = toReferenceDataCodeWithDefault(referenceDataCodeRepository, request.bodyPart, this.bodyPart)!!
+      side = toReferenceDataCodeWithDefault(referenceDataCodeRepository, request.side, this.side)
+      partOrientation = toReferenceDataCodeWithDefault(referenceDataCodeRepository, request.partOrientation, this.partOrientation)
+      comment = request.comment.orElse(this.comment)
     }
-
     return distinguishingMarksRepository.save(distinguishingMark).toDto()
   }
 

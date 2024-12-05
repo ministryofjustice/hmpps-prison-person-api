@@ -10,23 +10,21 @@ import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.junit.jupiter.MockitoSettings
 import org.mockito.kotlin.whenever
 import org.mockito.quality.Strictness.LENIENT
-import uk.gov.justice.digital.hmpps.prisonperson.annotation.NullishReferenceDataCode
+import uk.gov.justice.digital.hmpps.prisonperson.annotation.JsonNullableReferenceDataCode
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.ReferenceDataCode
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.ReferenceDataDomain
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.ReferenceDataCodeRepository
-import uk.gov.justice.digital.hmpps.prisonperson.utils.Nullish.Defined
-import uk.gov.justice.digital.hmpps.prisonperson.utils.Nullish.Undefined
 import java.util.*
 
 @ExtendWith(MockitoExtension::class)
 @MockitoSettings(strictness = LENIENT)
-class NullishReferenceDataCodeValidatorTest {
+class JsonNullableReferenceDataCodeValidatorTest {
 
   @Mock
   lateinit var referenceDataCodeRepository: ReferenceDataCodeRepository
 
   @InjectMocks
-  lateinit var validator: NullishReferenceDataCodeValidator
+  lateinit var validator: JsonNullableReferenceDataCodeValidator
 
   @BeforeEach
   fun setUp() {
@@ -69,31 +67,29 @@ class NullishReferenceDataCodeValidatorTest {
 
   @Test
   fun `valid values (allowNull=true)`() {
-    validator.initialize(NullishReferenceDataCode(domains = arrayOf("EXAMPLE_DOMAIN"), allowNull = true))
-    assertThat(validator.isValid(Undefined, null)).isTrue()
-    assertThat(validator.isValid(Defined("EXAMPLE_DOMAIN_CODE"), null)).isTrue()
-    assertThat(validator.isValid(Defined(null), null)).isTrue()
+    validator.initialize(JsonNullableReferenceDataCode(domains = arrayOf("EXAMPLE_DOMAIN"), allowNull = true))
+    assertThat(validator.isValid("EXAMPLE_DOMAIN_CODE", null)).isTrue()
+    assertThat(validator.isValid(null, null)).isTrue()
   }
 
   @Test
   fun `invalid values (allowNull=true)`() {
-    validator.initialize(NullishReferenceDataCode(domains = arrayOf("EXAMPLE_DOMAIN"), allowNull = true))
-    assertThat(validator.isValid(Defined("NON_EXISTING_CODE"), null)).isFalse()
-    assertThat(validator.isValid(Defined("EXAMPLE_TWO_CODE"), null)).isFalse()
+    validator.initialize(JsonNullableReferenceDataCode(domains = arrayOf("EXAMPLE_DOMAIN"), allowNull = true))
+    assertThat(validator.isValid("NON_EXISTING_CODE", null)).isFalse()
+    assertThat(validator.isValid("EXAMPLE_TWO_CODE", null)).isFalse()
   }
 
   @Test
   fun `valid values (allowNull=false)`() {
-    validator.initialize(NullishReferenceDataCode(domains = arrayOf("EXAMPLE_DOMAIN"), allowNull = false))
-    assertThat(validator.isValid(Undefined, null)).isTrue()
-    assertThat(validator.isValid(Defined("EXAMPLE_DOMAIN_CODE"), null)).isTrue()
+    validator.initialize(JsonNullableReferenceDataCode(domains = arrayOf("EXAMPLE_DOMAIN"), allowNull = false))
+    assertThat(validator.isValid("EXAMPLE_DOMAIN_CODE", null)).isTrue()
   }
 
   @Test
   fun `invalid values (allowNull=false)`() {
-    validator.initialize(NullishReferenceDataCode(domains = arrayOf("EXAMPLE_DOMAIN"), allowNull = true))
-    assertThat(validator.isValid(Defined("NON_EXISTING_CODE"), null)).isFalse()
-    assertThat(validator.isValid(Defined("EXAMPLE_TWO_CODE"), null)).isFalse()
-    assertThat(validator.isValid(Defined(null), null)).isTrue()
+    validator.initialize(JsonNullableReferenceDataCode(domains = arrayOf("EXAMPLE_DOMAIN"), allowNull = true))
+    assertThat(validator.isValid("NON_EXISTING_CODE", null)).isFalse()
+    assertThat(validator.isValid("EXAMPLE_TWO_CODE", null)).isFalse()
+    assertThat(validator.isValid(null, null)).isTrue()
   }
 }

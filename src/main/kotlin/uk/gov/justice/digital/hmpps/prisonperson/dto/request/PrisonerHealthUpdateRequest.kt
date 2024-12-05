@@ -4,9 +4,11 @@ import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.media.Schema.RequiredMode.NOT_REQUIRED
-import uk.gov.justice.digital.hmpps.prisonperson.annotation.NullishReferenceDataCodeList
-import uk.gov.justice.digital.hmpps.prisonperson.utils.Nullish
-import uk.gov.justice.digital.hmpps.prisonperson.utils.getAttributeAsNullish
+import jakarta.validation.constraints.NotNull
+import org.openapitools.jackson.nullable.JsonNullable
+import uk.gov.justice.digital.hmpps.prisonperson.annotation.JsonNullableReferenceDataCode
+
+const val REF_DATA_LIST_ERROR = "The value must be a a list of domain codes of the correct domain, an empty list, or Undefined."
 
 @Schema(
   description = "Request object for updating a prisoner's health information. Can include one or multiple fields. " +
@@ -15,9 +17,6 @@ import uk.gov.justice.digital.hmpps.prisonperson.utils.getAttributeAsNullish
 )
 @JsonInclude(NON_NULL)
 data class PrisonerHealthUpdateRequest(
-  @Schema(hidden = true)
-  private val attributes: MutableMap<String, Any?> = mutableMapOf(),
-) {
   @Schema(
     description = "Smoker or vaper. `ReferenceDataCode`.`id`.",
     type = "string",
@@ -25,28 +24,47 @@ data class PrisonerHealthUpdateRequest(
     requiredMode = NOT_REQUIRED,
     nullable = true,
   )
-  val smokerOrVaper: Nullish<String> = getAttributeAsNullish<String>(attributes, "smokerOrVaper")
+  @field:JsonNullableReferenceDataCode(
+    domains = ["SMOKE"],
+    allowNull = true,
+  )
+  val smokerOrVaper: JsonNullable<String?> = JsonNullable.undefined(),
 
   @Schema(
     description = "The food allergies the prisoner has. A list of `ReferenceDataCode`.`id`",
     type = "string[]",
     example = "[FOOD_ALLERGY_EGG, FOOD_ALLERGY_MILK]",
     requiredMode = NOT_REQUIRED,
+    nullable = false,
   )
-  @field:NullishReferenceDataCodeList(
-    domains = ["FOOD_ALLERGY"],
-  )
-  val foodAllergies: Nullish<List<String>> = getAttributeAsNullish<List<String>>(attributes, "foodAllergies")
+  @field:NotNull(message = REF_DATA_LIST_ERROR)
+  val foodAllergies: JsonNullable<
+    List<
+      @JsonNullableReferenceDataCode(
+        domains = ["FOOD_ALLERGY"],
+        allowNull = false,
+        message = REF_DATA_LIST_ERROR,
+      )
+      String,
+      >,
+    > = JsonNullable.undefined(),
 
   @Schema(
     description = "The medical dietary requirements the prisoner has. A list of `ReferenceDataCode`.`id`",
     type = "string[]",
     example = "[MEDICAL_DIET_LOW_FAT, FREE_FROM_EGG]",
     requiredMode = NOT_REQUIRED,
+    nullable = false,
   )
-  @field:NullishReferenceDataCodeList(
-    domains = ["MEDICAL_DIET", "FREE_FROM"],
-  )
-  val medicalDietaryRequirements: Nullish<List<String>> =
-    getAttributeAsNullish<List<String>>(attributes, "medicalDietaryRequirements")
-}
+  @field:NotNull(message = REF_DATA_LIST_ERROR)
+  val medicalDietaryRequirements: JsonNullable<
+    List<
+      @JsonNullableReferenceDataCode(
+        domains = ["MEDICAL_DIET", "FREE_FROM"],
+        allowNull = false,
+        message = REF_DATA_LIST_ERROR,
+      )
+      String,
+      >,
+    > = JsonNullable.undefined(),
+)

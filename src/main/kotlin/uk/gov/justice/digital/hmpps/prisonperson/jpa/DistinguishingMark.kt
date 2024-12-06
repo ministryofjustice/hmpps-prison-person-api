@@ -5,16 +5,21 @@ import jakarta.persistence.CascadeType.PERSIST
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.FetchType.EAGER
+import jakarta.persistence.FetchType.LAZY
 import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.OneToMany
+import org.hibernate.annotations.SortNatural
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.DistinguishingMarkDto
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.DistinguishingMarkImageDto
+import uk.gov.justice.digital.hmpps.prisonperson.enums.Source
+import uk.gov.justice.digital.hmpps.prisonperson.enums.Source.DPS
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.DistinguishingMarkImageRepository
 import uk.gov.justice.digital.hmpps.prisonperson.mapper.toSimpleDto
 import uk.gov.justice.digital.hmpps.prisonperson.utils.GeneratedUuidV7
 import java.time.ZonedDateTime
+import java.util.SortedSet
 import java.util.UUID
 
 @Entity
@@ -51,6 +56,13 @@ class DistinguishingMark(
 
   val createdAt: ZonedDateTime = ZonedDateTime.now(),
   val createdBy: String,
+
+  // History
+
+  // Stores snapshots of each update to a distinguishing mark
+  @OneToMany(mappedBy = "mark", fetch = LAZY, orphanRemoval = true)
+  @SortNatural
+  val history: SortedSet<DistinguishingMarkHistory> = sortedSetOf(),
 ) {
   fun toDto(): DistinguishingMarkDto = DistinguishingMarkDto(
     id = distinguishingMarkId.toString(),
@@ -83,6 +95,73 @@ class DistinguishingMark(
     photographUuids.add(distinguishingMarkImage)
     return distinguishingMarkImage
   }
+
+  fun updateFieldHistory(
+    lastModifiedAt: ZonedDateTime,
+    lastModifiedBy: String,
+  ) =
+    updateFieldHistory(lastModifiedAt, null, lastModifiedAt, lastModifiedBy, DPS)
+
+  fun updateFieldHistory(
+    appliesFrom: ZonedDateTime,
+    appliesTo: ZonedDateTime?,
+    lastModifiedAt: ZonedDateTime,
+    lastModifiedBy: String,
+    source: Source = DPS,
+    migratedAt: ZonedDateTime? = null,
+    anomalous: Boolean? = null,
+  ) {
+    val previousVersion = history.lastOrNull()
+    if (previousVersion == null || previousVersion.valueJson != this) {
+      previousVersion?.updateAppliesTo(appliesFrom, lastModifiedAt)
+
+      history.add(
+        DistinguishingMarkHistory(
+          mark = this,
+          valueJson = this,
+          appliesFrom = appliesFrom,
+          appliesTo = appliesTo,
+          createdAt = lastModifiedAt,
+          createdBy = lastModifiedBy,
+          source = source,
+          migratedAt = migratedAt,
+          anomalous = anomalous == true,
+        ),
+      )
+    }
+  }
+
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (javaClass != other?.javaClass) return false
+
+    other as DistinguishingMark
+
+    if (prisonerNumber != other.prisonerNumber) return false
+    if (bodyPart != other.bodyPart) return false
+    if (markType != other.markType) return false
+    if (side != other.side) return false
+    if (partOrientation != other.partOrientation) return false
+    if (comment != other.comment) return false
+    if (photographUuids != other.photographUuids) return false
+    if (createdAt != other.createdAt) return false
+    if (createdBy != other.createdBy) return false
+
+    return true
+  }
+
+  override fun hashCode(): Int {
+    var result = prisonerNumber.hashCode()
+    result = 31 * result + bodyPart.hashCode()
+    result = 31 * result + markType.hashCode()
+    result = 31 * result + (side?.hashCode() ?: 0)
+    result = 31 * result + (partOrientation?.hashCode() ?: 0)
+    result = 31 * result + (comment?.hashCode() ?: 0)
+    result = 31 * result + photographUuids.hashCode()
+    result = 31 * result + createdAt.hashCode()
+    result = 31 * result + createdBy.hashCode()
+    return result
+  }
 }
 
 @Entity
@@ -101,4 +180,22 @@ class DistinguishingMarkImage(
     id = distinguishingMarkImageId.toString(),
     latest = latest,
   )
+
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (javaClass != other?.javaClass) return false
+
+    other as DistinguishingMarkImage
+
+    if (latest != other.latest) return false
+    if (distinguishingMark != other.distinguishingMark) return false
+
+    return true
+  }
+
+  override fun hashCode(): Int {
+    var result = latest.hashCode()
+    result = 31 * result + distinguishingMark.hashCode()
+    return result
+  }
 }

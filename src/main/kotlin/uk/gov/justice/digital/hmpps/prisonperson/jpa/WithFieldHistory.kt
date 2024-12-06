@@ -52,16 +52,7 @@ abstract class WithFieldHistory<T : AbstractAggregateRoot<T>?> : AbstractAggrega
           )
 
           // Set appliesTo on previous history item if not already set
-          previousVersion
-            ?.takeIf { !it.anomalous && it.appliesTo == null }
-            ?.let {
-              it.appliesTo = if (appliesFrom > it.appliesFrom) appliesFrom else lastModifiedAt
-              // If the resulting update to appliesTo causes it to be less than appliesFrom, null it and apply the anomalous flag
-              if (it.appliesFrom > it.appliesTo) {
-                it.anomalous = true
-                it.appliesTo = null
-              }
-            }
+          previousVersion?.updateAppliesTo(appliesFrom, lastModifiedAt)
 
           fieldHistory.add(
             FieldHistory(

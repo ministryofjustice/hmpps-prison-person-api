@@ -4,6 +4,8 @@ import org.assertj.core.api.Assertions.assertThat
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField
 import uk.gov.justice.digital.hmpps.prisonperson.enums.Source
 import uk.gov.justice.digital.hmpps.prisonperson.enums.Source.DPS
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.DistinguishingMark
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.DistinguishingMarkHistory
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.FieldHistory
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.HistoryItem
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.PhysicalAttributes
@@ -37,6 +39,19 @@ fun <T> assertHistoryItemEqual(
   assertThat(actual.anomalous).isEqualTo(expected.anomalous)
 }
 
+fun expectDistinguishingMarksHistory(
+  history: Collection<DistinguishingMarkHistory>,
+  vararg comparison: HistoryComparison<DistinguishingMark>,
+) {
+  assertThat(history).hasSize(comparison.size)
+  history.forEachIndexed { index, actual ->
+    val expected = comparison[index]
+    assertThat(actual.mark).isEqualTo(expected.value)
+    assertThat(actual.valueJson).isEqualTo(expected.value)
+    assertHistoryItemEqual(expected, actual)
+  }
+}
+
 // Refactor this for history items so that history item tests can all use it regardless of the fields
 fun <T> expectFieldHistory(
   field: PrisonPersonField,
@@ -52,6 +67,9 @@ fun <T> expectFieldHistory(
     assertHistoryItemEqual(expected, actual)
   }
 }
+
+fun DistinguishingMark.expectHistory(vararg comparison: HistoryComparison<DistinguishingMark>) =
+  expectDistinguishingMarksHistory(history, *comparison)
 
 fun <T> PhysicalAttributes.expectFieldHistory(field: PrisonPersonField, vararg comparison: HistoryComparison<T>) =
   expectFieldHistory(field, fieldHistory, *comparison)

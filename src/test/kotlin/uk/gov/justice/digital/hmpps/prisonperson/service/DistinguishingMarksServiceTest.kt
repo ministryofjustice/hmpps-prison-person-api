@@ -15,6 +15,7 @@ import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.Spy
 import org.mockito.junit.jupiter.MockitoExtension
+import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.firstValue
 import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
@@ -31,13 +32,17 @@ import uk.gov.justice.digital.hmpps.prisonperson.dto.request.DistinguishingMarkR
 import uk.gov.justice.digital.hmpps.prisonperson.dto.request.DistinguishingMarkUpdateRequest
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.DistinguishingMarkDto
 import uk.gov.justice.digital.hmpps.prisonperson.dto.response.DistinguishingMarkImageDto
+import uk.gov.justice.digital.hmpps.prisonperson.enums.Source
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.DistinguishingMark
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.DistinguishingMarkHistory
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.DistinguishingMarkImage
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.ReferenceDataCode
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.ReferenceDataDomain
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.DistinguishingMarkImageRepository
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.DistinguishingMarksRepository
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.ReferenceDataCodeRepository
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.utils.HistoryComparison
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.utils.expectHistory
 import uk.gov.justice.digital.hmpps.prisonperson.mapper.toSimpleDto
 import uk.gov.justice.digital.hmpps.prisonperson.utils.AuthenticationFacade
 import java.time.Clock
@@ -67,6 +72,8 @@ class DistinguishingMarksServiceTest {
 
   @Spy
   val clock: Clock? = Clock.fixed(NOW.toInstant(), NOW.zone)
+
+  private val savedDistinguishingMark = argumentCaptor<DistinguishingMark>()
 
   @AfterEach
   fun afterEach() {
@@ -174,6 +181,15 @@ class DistinguishingMarksServiceTest {
       assertThat(capturedDistinguishingMark.partOrientation).isEqualTo(distinguishingMark.partOrientation)
       assertThat(capturedDistinguishingMark.comment).isEqualTo(distinguishingMark.comment)
       assertThat(capturedDistinguishingMark.createdBy).isEqualTo(distinguishingMark.createdBy)
+      capturedDistinguishingMark.expectHistory(
+        HistoryComparison(
+          value = capturedDistinguishingMark,
+          createdAt = NOW,
+          createdBy = USER1,
+          appliesFrom = NOW,
+          appliesTo = null,
+        ),
+      )
 
       assertThat(result).isEqualTo(MARK_1_DTO)
     }
@@ -263,6 +279,16 @@ class DistinguishingMarksServiceTest {
         ),
       )
 
+      capturedDistinguishingMark.expectHistory(
+        HistoryComparison(
+          value = capturedDistinguishingMark,
+          createdAt = NOW,
+          createdBy = USER1,
+          appliesFrom = NOW,
+          appliesTo = null,
+        ),
+      )
+
       assertThat(result).isEqualTo(MARK_1_DTO)
     }
 
@@ -330,7 +356,33 @@ class DistinguishingMarksServiceTest {
             createdBy = USER1,
             bodyPart = LEG_REFERENCE,
             markType = SCAR_REFERENCE,
-          ),
+          ).also {
+            it.history.add(
+              DistinguishingMarkHistory(
+                mark = DistinguishingMark(
+                  prisonerNumber = PRISONER_NUMBER,
+                  distinguishingMarkId = MARK_1_ID,
+                  createdAt = THEN,
+                  createdBy = USER1,
+                  bodyPart = LEG_REFERENCE,
+                  markType = SCAR_REFERENCE,
+                ),
+                valueJson = DistinguishingMark(
+                  prisonerNumber = PRISONER_NUMBER,
+                  distinguishingMarkId = MARK_1_ID,
+                  createdAt = THEN,
+                  createdBy = USER1,
+                  bodyPart = LEG_REFERENCE,
+                  markType = SCAR_REFERENCE,
+                ),
+                createdAt = THEN,
+                createdBy = USER1,
+                anomalous = false,
+                appliesFrom = THEN,
+                source = Source.DPS,
+              ),
+            )
+          },
         ),
       )
 
@@ -356,6 +408,51 @@ class DistinguishingMarksServiceTest {
           createdBy = USER1,
         ),
       )
+
+      with(updatedDistinguishingMark.firstValue) {
+        assertThat(bodyPart).isEqualTo(ARM_REFERENCE)
+        assertThat(markType).isEqualTo(TATTOO_REFERENCE)
+        assertThat(side).isEqualTo(LEFT_SIDE_REFERENCE)
+        assertThat(partOrientation).isEqualTo(CENTRE_REFERENCE)
+        assertThat(comment).isEqualTo(MARK1.comment)
+
+        expectHistory(
+          HistoryComparison(
+            value = DistinguishingMark(
+              prisonerNumber = PRISONER_NUMBER,
+              distinguishingMarkId = MARK_1_ID,
+              createdAt = THEN,
+              createdBy = USER1,
+              bodyPart = LEG_REFERENCE,
+              markType = SCAR_REFERENCE,
+            ),
+            createdAt = THEN,
+            createdBy = USER1,
+            anomalous = false,
+            appliesFrom = THEN,
+            appliesTo = NOW,
+          ),
+
+          HistoryComparison(
+            value = DistinguishingMark(
+              prisonerNumber = PRISONER_NUMBER,
+              distinguishingMarkId = MARK_1_ID,
+              createdAt = THEN,
+              createdBy = USER1,
+              bodyPart = ARM_REFERENCE,
+              markType = TATTOO_REFERENCE,
+              side = LEFT_SIDE_REFERENCE,
+              partOrientation = CENTRE_REFERENCE,
+              comment = MARK1.comment,
+            ),
+            createdAt = NOW,
+            createdBy = USER1,
+            anomalous = false,
+            appliesFrom = NOW,
+            appliesTo = null,
+          ),
+        )
+      }
     }
 
     @Test
@@ -400,12 +497,38 @@ class DistinguishingMarksServiceTest {
           DistinguishingMark(
             prisonerNumber = PRISONER_NUMBER,
             distinguishingMarkId = MARK_1_ID,
-            createdAt = NOW.minusDays(1),
+            createdAt = THEN,
             createdBy = USER1,
             bodyPart = LEG_REFERENCE,
             markType = SCAR_REFERENCE,
             photographUuids = mutableSetOf(),
-          ),
+          ).also {
+            it.history.add(
+              DistinguishingMarkHistory(
+                mark = DistinguishingMark(
+                  prisonerNumber = PRISONER_NUMBER,
+                  distinguishingMarkId = MARK_1_ID,
+                  createdAt = THEN,
+                  createdBy = USER1,
+                  bodyPart = LEG_REFERENCE,
+                  markType = SCAR_REFERENCE,
+                ),
+                valueJson = DistinguishingMark(
+                  prisonerNumber = PRISONER_NUMBER,
+                  distinguishingMarkId = MARK_1_ID,
+                  createdAt = THEN,
+                  createdBy = USER1,
+                  bodyPart = LEG_REFERENCE,
+                  markType = SCAR_REFERENCE,
+                ),
+                createdAt = THEN,
+                createdBy = USER1,
+                anomalous = false,
+                appliesFrom = THEN,
+                source = Source.DPS,
+              ),
+            )
+          },
         ),
       )
 
@@ -415,6 +538,54 @@ class DistinguishingMarksServiceTest {
           DistinguishingMarkImageDto("c46d0ce9-e586-4fa6-ae76-52ea8c242260", true),
         ),
       )
+
+      with(updatedDistinguishingMark.firstValue) {
+        assertThat(bodyPart).isEqualTo(LEG_REFERENCE)
+        assertThat(markType).isEqualTo(SCAR_REFERENCE)
+
+        expectHistory(
+          HistoryComparison(
+            value = DistinguishingMark(
+              prisonerNumber = PRISONER_NUMBER,
+              distinguishingMarkId = MARK_1_ID,
+              createdAt = THEN,
+              createdBy = USER1,
+              bodyPart = LEG_REFERENCE,
+              markType = SCAR_REFERENCE,
+              photographUuids = mutableSetOf(),
+            ),
+            createdAt = THEN,
+            createdBy = USER1,
+            anomalous = false,
+            appliesFrom = THEN,
+            appliesTo = NOW,
+          ),
+
+          HistoryComparison(
+            value = DistinguishingMark(
+              prisonerNumber = PRISONER_NUMBER,
+              distinguishingMarkId = MARK_1_ID,
+              createdAt = THEN,
+              createdBy = USER1,
+              bodyPart = LEG_REFERENCE,
+              markType = SCAR_REFERENCE,
+            ).also {
+              it.photographUuids = mutableSetOf(
+                DistinguishingMarkImage(
+                  distinguishingMarkImageId = UUID.fromString("c46d0ce9-e586-4fa6-ae76-52ea8c242260"),
+                  distinguishingMark = it,
+                  latest = true,
+                ),
+              )
+            },
+            createdAt = NOW,
+            createdBy = USER1,
+            anomalous = false,
+            appliesFrom = NOW,
+            appliesTo = null,
+          ),
+        )
+      }
     }
 
     @Test
@@ -464,14 +635,13 @@ class DistinguishingMarksServiceTest {
             bodyPart = LEG_REFERENCE,
             markType = SCAR_REFERENCE,
           ).apply {
-            photographUuids =
-              mutableSetOf(
-                DistinguishingMarkImage(
-                  distinguishingMarkImageId = UUID.fromString("21855879-1fce-4493-b1eb-0345563eb607"),
-                  distinguishingMark = this,
-                  latest = true,
-                ),
-              )
+            photographUuids = mutableSetOf(
+              DistinguishingMarkImage(
+                distinguishingMarkImageId = UUID.fromString("21855879-1fce-4493-b1eb-0345563eb607"),
+                distinguishingMark = this,
+                latest = true,
+              ),
+            )
           },
         ),
       )

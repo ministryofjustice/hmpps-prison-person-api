@@ -130,6 +130,38 @@ class DistinguishingMark(
       )
     }
   }
+
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (javaClass != other?.javaClass) return false
+
+    other as DistinguishingMark
+
+    if (prisonerNumber != other.prisonerNumber) return false
+    if (bodyPart != other.bodyPart) return false
+    if (markType != other.markType) return false
+    if (side != other.side) return false
+    if (partOrientation != other.partOrientation) return false
+    if (comment != other.comment) return false
+    if (photographUuids != other.photographUuids) return false
+    if (createdAt != other.createdAt) return false
+    if (createdBy != other.createdBy) return false
+
+    return true
+  }
+
+  override fun hashCode(): Int {
+    var result = prisonerNumber.hashCode()
+    result = 31 * result + bodyPart.hashCode()
+    result = 31 * result + markType.hashCode()
+    result = 31 * result + (side?.hashCode() ?: 0)
+    result = 31 * result + (partOrientation?.hashCode() ?: 0)
+    result = 31 * result + (comment?.hashCode() ?: 0)
+    result = 31 * result + photographUuids.hashCode()
+    result = 31 * result + createdAt.hashCode()
+    result = 31 * result + createdBy.hashCode()
+    return result
+  }
 }
 
 @Entity
@@ -148,4 +180,22 @@ class DistinguishingMarkImage(
     id = distinguishingMarkImageId.toString(),
     latest = latest,
   )
+
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (javaClass != other?.javaClass) return false
+
+    other as DistinguishingMarkImage
+
+    if (latest != other.latest) return false
+    if (distinguishingMark != other.distinguishingMark) return false
+
+    return true
+  }
+
+  override fun hashCode(): Int {
+    var result = latest.hashCode()
+    result = 31 * result + distinguishingMark.hashCode()
+    return result
+  }
 }

@@ -59,6 +59,7 @@ class DistinguishingMarksService(
       partOrientation = toReferenceDataCode(referenceDataCodeRepository, distinguishingMarkRequest.partOrientation),
       comment = distinguishingMarkRequest.comment,
       createdBy = username,
+      createdAt = now,
     )
 
     if (file?.isEmpty == false) {
@@ -96,6 +97,9 @@ class DistinguishingMarksService(
     uuid: UUID,
     request: DistinguishingMarkUpdateRequest,
   ): DistinguishingMarkDto {
+    val username = authenticationFacade.getUserOrSystemInContext()
+    val now = ZonedDateTime.now(clock)
+
     val distinguishingMark = distinguishingMarksRepository.findById(uuid).orElseThrow().apply {
       request.markType.let<String> { markType = toReferenceDataCode(referenceDataCodeRepository, it)!! }
       request.bodyPart.let<String> { bodyPart = toReferenceDataCode(referenceDataCodeRepository, it)!! }
@@ -104,10 +108,13 @@ class DistinguishingMarksService(
       request.comment.apply(this::comment)
     }
 
-    return distinguishingMarksRepository.save(distinguishingMark).toDto()
+    return distinguishingMarksRepository.save(
+      distinguishingMark.also { it.updateFieldHistory(now, username)}
+    ).toDto()
   }
 
   fun updatePhoto(uuid: UUID, file: MultipartFile?, fileType: MediaType): DistinguishingMarkDto {
+    val now = ZonedDateTime.now(clock)
     val username = authenticationFacade.getUserOrSystemInContext()
     val distinguishingMark = distinguishingMarksRepository.findById(uuid)
       .orElseThrow { GenericNotFoundException("Distinguishing mark not found") }
@@ -131,6 +138,8 @@ class DistinguishingMarksService(
       )
     }
 
-    return distinguishingMarksRepository.save(distinguishingMark).toDto()
+    return distinguishingMarksRepository.save(
+      distinguishingMark.also { it.updateFieldHistory(now, username)}
+    ).toDto()
   }
 }

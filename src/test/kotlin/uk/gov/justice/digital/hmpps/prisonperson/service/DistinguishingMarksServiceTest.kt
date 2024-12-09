@@ -501,7 +501,7 @@ class DistinguishingMarksServiceTest {
             createdBy = USER1,
             bodyPart = LEG_REFERENCE,
             markType = SCAR_REFERENCE,
-            photographUuids = mutableSetOf(),
+            photographUuids = mutableListOf(),
           ).also {
             it.history.add(
               DistinguishingMarkHistory(
@@ -552,7 +552,7 @@ class DistinguishingMarksServiceTest {
               createdBy = USER1,
               bodyPart = LEG_REFERENCE,
               markType = SCAR_REFERENCE,
-              photographUuids = mutableSetOf(),
+              photographUuids = mutableListOf(),
             ),
             createdAt = THEN,
             createdBy = USER1,
@@ -570,7 +570,7 @@ class DistinguishingMarksServiceTest {
               bodyPart = LEG_REFERENCE,
               markType = SCAR_REFERENCE,
             ).also {
-              it.photographUuids = mutableSetOf(
+              it.photographUuids = mutableListOf(
                 DistinguishingMarkImage(
                   distinguishingMarkImageId = UUID.fromString("c46d0ce9-e586-4fa6-ae76-52ea8c242260"),
                   distinguishingMark = it,
@@ -630,12 +630,54 @@ class DistinguishingMarksServiceTest {
           DistinguishingMark(
             prisonerNumber = PRISONER_NUMBER,
             distinguishingMarkId = MARK_1_ID,
-            createdAt = NOW.minusDays(1),
+            createdAt = THEN,
             createdBy = USER1,
             bodyPart = LEG_REFERENCE,
             markType = SCAR_REFERENCE,
-          ).apply {
-            photographUuids = mutableSetOf(
+          ).also {
+            it.history.add(
+              DistinguishingMarkHistory(
+                mark = DistinguishingMark(
+                  prisonerNumber = PRISONER_NUMBER,
+                  distinguishingMarkId = MARK_1_ID,
+                  createdAt = THEN,
+                  createdBy = USER1,
+                  bodyPart = LEG_REFERENCE,
+                  markType = SCAR_REFERENCE,
+                ).apply {
+                  photographUuids = mutableListOf(
+                    DistinguishingMarkImage(
+                      distinguishingMarkImageId = UUID.fromString("21855879-1fce-4493-b1eb-0345563eb607"),
+                      distinguishingMark = this,
+                      latest = true,
+                    ),
+                  )
+                },
+                valueJson = DistinguishingMark(
+                  prisonerNumber = PRISONER_NUMBER,
+                  distinguishingMarkId = MARK_1_ID,
+                  createdAt = THEN,
+                  createdBy = USER1,
+                  bodyPart = LEG_REFERENCE,
+                  markType = SCAR_REFERENCE,
+                ).apply {
+                  photographUuids = mutableListOf(
+                    DistinguishingMarkImage(
+                      distinguishingMarkImageId = UUID.fromString("21855879-1fce-4493-b1eb-0345563eb607"),
+                      distinguishingMark = this,
+                      latest = true,
+                    ),
+                  )
+                },
+                createdAt = THEN,
+                createdBy = USER1,
+                anomalous = false,
+                appliesFrom = THEN,
+                source = Source.DPS,
+              ),
+            )
+          }.apply {
+            photographUuids = mutableListOf(
               DistinguishingMarkImage(
                 distinguishingMarkImageId = UUID.fromString("21855879-1fce-4493-b1eb-0345563eb607"),
                 distinguishingMark = this,
@@ -653,6 +695,67 @@ class DistinguishingMarksServiceTest {
           DistinguishingMarkImageDto("c46d0ce9-e586-4fa6-ae76-52ea8c242260", true),
         ),
       )
+
+      with(updatedDistinguishingMark.firstValue) {
+        assertThat(bodyPart).isEqualTo(LEG_REFERENCE)
+        assertThat(markType).isEqualTo(SCAR_REFERENCE)
+
+        expectHistory(
+          HistoryComparison(
+            value = DistinguishingMark(
+              prisonerNumber = PRISONER_NUMBER,
+              distinguishingMarkId = MARK_1_ID,
+              createdAt = THEN,
+              createdBy = USER1,
+              bodyPart = LEG_REFERENCE,
+              markType = SCAR_REFERENCE,
+            ).also {
+              it.photographUuids = mutableListOf(
+                DistinguishingMarkImage(
+                  distinguishingMarkImageId = UUID.fromString("21855879-1fce-4493-b1eb-0345563eb607"),
+                  distinguishingMark = this,
+                  latest = true,
+                ),
+              )
+            },
+            createdAt = THEN,
+            createdBy = USER1,
+            anomalous = false,
+            appliesFrom = THEN,
+            appliesTo = NOW,
+          ),
+
+          HistoryComparison(
+            value = DistinguishingMark(
+              prisonerNumber = PRISONER_NUMBER,
+              distinguishingMarkId = MARK_1_ID,
+              createdAt = THEN,
+              createdBy = USER1,
+              bodyPart = LEG_REFERENCE,
+              markType = SCAR_REFERENCE,
+            ).also {
+              it.photographUuids = mutableListOf(
+                DistinguishingMarkImage(
+                  distinguishingMarkImageId = UUID.fromString("21855879-1fce-4493-b1eb-0345563eb607"),
+                  distinguishingMark = this,
+                  latest = false,
+                ),
+
+                DistinguishingMarkImage(
+                  distinguishingMarkImageId = UUID.fromString("c46d0ce9-e586-4fa6-ae76-52ea8c242260"),
+                  distinguishingMark = it,
+                  latest = true,
+                ),
+              )
+            },
+            createdAt = NOW,
+            createdBy = USER1,
+            anomalous = false,
+            appliesFrom = NOW,
+            appliesTo = null,
+          ),
+        )
+      }
     }
   }
 
@@ -690,7 +793,7 @@ class DistinguishingMarksServiceTest {
       side = LEFT_SIDE_REFERENCE,
       partOrientation = CENTRE_REFERENCE,
       comment = "Comment",
-      photographUuids = mutableSetOf(),
+      photographUuids = mutableListOf(),
       createdAt = ZonedDateTime.parse("2024-01-02T09:10:11+00:00"),
       createdBy = "PERSON1",
     )
@@ -716,7 +819,7 @@ class DistinguishingMarksServiceTest {
       side = LEFT_SIDE_REFERENCE,
       partOrientation = CENTRE_REFERENCE,
       comment = "Comment",
-      photographUuids = mutableSetOf(),
+      photographUuids = mutableListOf(),
       createdAt = ZonedDateTime.parse("2024-01-02T09:10:11+00:00"),
       createdBy = "PERSON1",
     )

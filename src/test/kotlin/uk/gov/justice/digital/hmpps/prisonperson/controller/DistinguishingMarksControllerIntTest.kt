@@ -269,6 +269,7 @@ class DistinguishingMarksControllerIntTest : IntegrationTestBase() {
     @Nested
     @Sql("classpath:jpa/repository/reset.sql")
     @Sql("classpath:controller/distinguishing_marks/distinguishing_marks.sql")
+    @Sql("classpath:controller/distinguishing_marks/distinguishing_mark_history.sql")
     inner class UpdateMark {
       @Nested
       inner class PatchMarkValidation {

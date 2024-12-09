@@ -2,6 +2,8 @@ package uk.gov.justice.digital.hmpps.prisonperson.jpa
 
 import jakarta.persistence.Convert
 import jakarta.persistence.Entity
+import jakarta.persistence.EnumType.STRING
+import jakarta.persistence.Enumerated
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
@@ -30,6 +32,8 @@ class DistinguishingMarkHistory(
   override val migratedAt: ZonedDateTime? = null,
   override var mergedAt: ZonedDateTime? = null,
   override var mergedFrom: String? = null,
+
+  @Enumerated(STRING)
   override val source: Source? = null,
   override var anomalous: Boolean,
 ) : HistoryItem {

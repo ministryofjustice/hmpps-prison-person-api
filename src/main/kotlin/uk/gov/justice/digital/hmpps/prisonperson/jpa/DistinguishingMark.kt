@@ -52,7 +52,7 @@ class DistinguishingMark(
   var comment: String? = null,
 
   @OneToMany(mappedBy = "distinguishingMark", fetch = EAGER, cascade = [PERSIST, MERGE])
-  var photographUuids: MutableSet<DistinguishingMarkImage> = mutableSetOf(),
+  var photographUuids: MutableList<DistinguishingMarkImage> = mutableListOf(),
 
   val createdAt: ZonedDateTime = ZonedDateTime.now(),
   val createdBy: String,
@@ -187,15 +187,16 @@ class DistinguishingMarkImage(
 
     other as DistinguishingMarkImage
 
+    if (distinguishingMarkImageId != other.distinguishingMarkImageId) return false
     if (latest != other.latest) return false
-    if (distinguishingMark != other.distinguishingMark) return false
+    if (distinguishingMark.distinguishingMarkId != other.distinguishingMark.distinguishingMarkId) return false
 
     return true
   }
 
   override fun hashCode(): Int {
     var result = latest.hashCode()
-    result = 31 * result + distinguishingMark.hashCode()
+    result = 31 * result + distinguishingMark.distinguishingMarkId.hashCode()
     return result
   }
 }

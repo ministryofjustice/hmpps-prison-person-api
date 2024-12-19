@@ -6,6 +6,7 @@ import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import uk.gov.justice.digital.hmpps.prisonperson.config.FixedClock
 import uk.gov.justice.digital.hmpps.prisonperson.integration.testcontainers.PostgresContainer
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.DistinguishingMarkHistoryRepository
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.FieldHistoryRepository
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.FieldMetadataRepository
 import java.time.Instant
@@ -19,6 +20,9 @@ abstract class TestBase {
 
   @Autowired
   lateinit var fieldMetadataRepository: FieldMetadataRepository
+
+  @Autowired
+  lateinit var distinguishingMarkHistoryRepository: DistinguishingMarkHistoryRepository
 
   companion object {
     val clock: FixedClock = FixedClock(

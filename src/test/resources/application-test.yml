@@ -13,6 +13,7 @@ api:
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/prison-person-data
+    hikari.maximum-pool-size: 2
 
   main:
     allow-bean-definition-overriding: true

@@ -30,8 +30,10 @@ import uk.gov.justice.digital.hmpps.prisonperson.integration.testcontainers.Loca
 import uk.gov.justice.digital.hmpps.prisonperson.integration.wiremock.DocumentServiceExtension
 import uk.gov.justice.digital.hmpps.prisonperson.integration.wiremock.HmppsAuthApiExtension
 import uk.gov.justice.digital.hmpps.prisonperson.integration.wiremock.PrisonerSearchExtension
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.DistinguishingMark
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.FieldMetadata
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.utils.HistoryComparison
+import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.utils.expectDistinguishingMarksHistory
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.utils.expectFieldHistory
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.utils.expectNoFieldHistoryFor
 import uk.gov.justice.digital.hmpps.prisonperson.service.event.DomainEvent
@@ -40,6 +42,7 @@ import uk.gov.justice.hmpps.sqs.HmppsQueueService
 import uk.gov.justice.hmpps.sqs.MissingQueueException
 import uk.gov.justice.hmpps.sqs.MissingTopicException
 import uk.gov.justice.hmpps.sqs.countAllMessagesOnQueue
+import java.util.UUID
 
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 @ExtendWith(HmppsAuthApiExtension::class, PrisonerSearchExtension::class, DocumentServiceExtension::class)
@@ -77,12 +80,14 @@ abstract class IntegrationTestBase : TestBase() {
   @BeforeEach
   fun `clear queues`() {
     await untilCallTo {
-      publishTestQueue.sqsClient.purgeQueue(PurgeQueueRequest.builder().queueUrl(publishTestQueue.queueUrl).build()).get()
+      publishTestQueue.sqsClient.purgeQueue(PurgeQueueRequest.builder().queueUrl(publishTestQueue.queueUrl).build())
+        .get()
       publishTestQueue.countAllMessagesOnQueue()
     } matches { it == 0 }
 
     await untilCallTo {
-      prisonPersonQueue.sqsClient.purgeQueue(PurgeQueueRequest.builder().queueUrl(prisonPersonQueue.queueUrl).build()).get()
+      prisonPersonQueue.sqsClient.purgeQueue(PurgeQueueRequest.builder().queueUrl(prisonPersonQueue.queueUrl).build())
+        .get()
       prisonPersonQueue.countAllMessagesOnQueue()
     } matches { it == 0 }
   }
@@ -110,6 +115,12 @@ abstract class IntegrationTestBase : TestBase() {
   protected fun <T> expectFieldHistory(field: PrisonPersonField, vararg comparison: HistoryComparison<T>) =
     expectFieldHistory(field, fieldHistoryRepository.findAllByPrisonerNumber(PRISONER_NUMBER), *comparison)
 
+  protected fun expectDistinguishingMarkHistory(id: UUID, vararg comparison: HistoryComparison<DistinguishingMark>) =
+    expectDistinguishingMarksHistory(
+      distinguishingMarkHistoryRepository.findAllByMarkDistinguishingMarkId(id),
+      *comparison,
+    )
+
   protected fun expectNoFieldHistoryFor(vararg field: PrisonPersonField) {
     val history = fieldHistoryRepository.findAllByPrisonerNumber(PRISONER_NUMBER)
     field.forEach { expectNoFieldHistoryFor(it, history) }
@@ -119,7 +130,8 @@ abstract class IntegrationTestBase : TestBase() {
     assertThat(fieldMetadataRepository.findAllByPrisonerNumber(prisonerNumber)).containsExactlyInAnyOrder(*comparison)
   }
 
-  protected fun expectFieldMetadata(vararg comparison: FieldMetadata) = expectFieldMetadata(PRISONER_NUMBER, *comparison)
+  protected fun expectFieldMetadata(vararg comparison: FieldMetadata) =
+    expectFieldMetadata(PRISONER_NUMBER, *comparison)
 
   @JsonNaming(value = PropertyNamingStrategies.UpperCamelCaseStrategy::class)
   data class MsgBody(val Message: String)

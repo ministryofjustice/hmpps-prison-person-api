@@ -17,6 +17,8 @@ import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.DistinguishingMa
 import uk.gov.justice.digital.hmpps.prisonperson.jpa.repository.ReferenceDataCodeRepository
 import uk.gov.justice.digital.hmpps.prisonperson.utils.AuthenticationFacade
 import uk.gov.justice.digital.hmpps.prisonperson.utils.toReferenceDataCode
+import java.time.Clock
+import java.time.ZonedDateTime
 import java.util.UUID
 
 @Service
@@ -26,6 +28,7 @@ class DistinguishingMarksService(
   private val distinguishingMarkImageRepository: DistinguishingMarkImageRepository,
   private val authenticationFacade: AuthenticationFacade,
   private val referenceDataCodeRepository: ReferenceDataCodeRepository,
+  private val clock: Clock,
 ) {
   fun getDistinguishingMarksForPrisoner(prisonerNumber: String): List<DistinguishingMarkDto> =
     distinguishingMarksRepository.findAllByPrisonerNumber(prisonerNumber).map {
@@ -46,6 +49,7 @@ class DistinguishingMarksService(
     distinguishingMarkRequest: DistinguishingMarkRequest,
   ): DistinguishingMarkDto {
     val username = authenticationFacade.getUserOrSystemInContext()
+    val now = ZonedDateTime.now(clock)
 
     val distinguishingMark = DistinguishingMark(
       prisonerNumber = distinguishingMarkRequest.prisonerNumber,
@@ -55,6 +59,7 @@ class DistinguishingMarksService(
       partOrientation = toReferenceDataCode(referenceDataCodeRepository, distinguishingMarkRequest.partOrientation),
       comment = distinguishingMarkRequest.comment,
       createdBy = username,
+      createdAt = now,
     )
 
     if (file?.isEmpty == false) {
@@ -81,7 +86,10 @@ class DistinguishingMarksService(
     }
 
     // TODO consider deleting the doc from document service if the db save fails
-    return distinguishingMarksRepository.save(distinguishingMark).toDto()
+
+    return distinguishingMarksRepository.save(
+      distinguishingMark.also { it.updateFieldHistory(now, username) },
+    ).toDto()
   }
 
   @Transactional
@@ -89,18 +97,23 @@ class DistinguishingMarksService(
     uuid: UUID,
     request: DistinguishingMarkUpdateRequest,
   ): DistinguishingMarkDto {
+    val username = authenticationFacade.getUserOrSystemInContext()
+    val now = ZonedDateTime.now(clock)
+
     val distinguishingMark = distinguishingMarksRepository.findById(uuid).orElseThrow().apply {
       request.markType.let<String> { markType = toReferenceDataCode(referenceDataCodeRepository, it)!! }
       request.bodyPart.let<String> { bodyPart = toReferenceDataCode(referenceDataCodeRepository, it)!! }
       request.side.apply(this::side) { toReferenceDataCode(referenceDataCodeRepository, it) }
       request.partOrientation.apply(this::partOrientation) { toReferenceDataCode(referenceDataCodeRepository, it) }
       request.comment.apply(this::comment)
-    }
+    }.also { it.updateFieldHistory(now, username) }
 
     return distinguishingMarksRepository.save(distinguishingMark).toDto()
   }
 
+  @Transactional
   fun updatePhoto(uuid: UUID, file: MultipartFile?, fileType: MediaType): DistinguishingMarkDto {
+    val now = ZonedDateTime.now(clock)
     val username = authenticationFacade.getUserOrSystemInContext()
     val distinguishingMark = distinguishingMarksRepository.findById(uuid)
       .orElseThrow { GenericNotFoundException("Distinguishing mark not found") }
@@ -124,6 +137,8 @@ class DistinguishingMarksService(
       )
     }
 
-    return distinguishingMarksRepository.save(distinguishingMark).toDto()
+    return distinguishingMarksRepository.save(
+      distinguishingMark.also { it.updateFieldHistory(now, username) },
+    ).toDto()
   }
 }

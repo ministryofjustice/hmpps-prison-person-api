@@ -16,7 +16,6 @@ import uk.gov.justice.digital.hmpps.prisonperson.enums.FieldValues
 import uk.gov.justice.digital.hmpps.prisonperson.enums.PrisonPersonField
 import uk.gov.justice.digital.hmpps.prisonperson.enums.Source
 import uk.gov.justice.digital.hmpps.prisonperson.mapper.toSimpleDto
-import java.time.Instant
 import java.time.ZonedDateTime
 
 @Entity
@@ -42,20 +41,19 @@ class FieldHistory(
   @JoinColumn(name = "valueRef", referencedColumnName = "id")
   override var valueRef: ReferenceDataCode? = null,
 
-  val appliesFrom: ZonedDateTime = ZonedDateTime.now(),
-  var appliesTo: ZonedDateTime? = null,
-  val createdAt: ZonedDateTime = ZonedDateTime.now(),
-  val createdBy: String,
-  val migratedAt: ZonedDateTime? = null,
-  var mergedAt: ZonedDateTime? = null,
-  var mergedFrom: String? = null,
+  override val appliesFrom: ZonedDateTime = ZonedDateTime.now(),
+  override var appliesTo: ZonedDateTime? = null,
+  override val createdAt: ZonedDateTime = ZonedDateTime.now(),
+  override val createdBy: String,
+  override val migratedAt: ZonedDateTime? = null,
+  override var mergedAt: ZonedDateTime? = null,
+  override var mergedFrom: String? = null,
 
   @Enumerated(STRING)
-  val source: Source? = null,
+  override val source: Source? = null,
 
-  var anomalous: Boolean,
-) : FieldValues,
-  Comparable<FieldHistory> {
+  override var anomalous: Boolean,
+) : FieldValues, HistoryItem {
 
   fun toMetadata() = FieldMetadata(
     prisonerNumber = prisonerNumber,
@@ -80,16 +78,6 @@ class FieldHistory(
     source = source.toString(),
     anomalous = anomalous,
   )
-
-  override fun compareTo(other: FieldHistory) =
-    compareValuesBy(
-      this,
-      other,
-      { it.appliesTo?.toInstant() ?: if (it.anomalous) it.appliesFrom.toInstant() else Instant.MAX },
-      { it.createdAt },
-      { it.appliesFrom },
-      { it.hashCode() },
-    )
 
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
